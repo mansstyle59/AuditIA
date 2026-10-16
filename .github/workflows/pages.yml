@@ -1,4 +1,4 @@
-name: Deploy AuditIA to GitHub Pages
+name: Deploy AuditIA site to GitHub Pages
 
 on:
   push:
@@ -20,20 +20,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-      - name: Install dependencies
-        run: npm install
-      - name: Build frontend
-        run: npm run build
-        env:
-          BASE_PATH: /AuditIA/
-      - name: Upload Pages artifact
+      - name: Upload site artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: dist
+          path: site
   deploy:
     environment:
       name: github-pages
