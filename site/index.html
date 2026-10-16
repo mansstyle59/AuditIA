@@ -404,7 +404,74 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
 .social-platform-fallback{display:grid;place-items:center;background:#32294e;color:#d2c8ff;font-size:10px;font-weight:850}.social-platform-card>span:last-child{overflow-wrap:anywhere}
 .social-platforms .social-platform-note{margin:12px 0 2px;padding-top:10px;border-top:1px solid #ffffff0d;font-size:10px}.social-logo-credit{display:inline-block;margin-top:5px;color:#a99aff;font-size:10px;text-decoration:none}
 @media(max-width:420px){.social-platforms{padding:13px}.social-platform-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.social-platform-card{padding:8px}.social-platforms-head h3{font-size:16px}}
-</style>
+
+    /* Réglages : densité maîtrisée, hiérarchie nette et cartes homogènes */
+    .workspace-main:has([data-settings-form]){max-width:100%}
+    .workspace-main:has([data-settings-form]) .app-panel{border-radius:15px}
+    .workspace-main:has([data-settings-form]) .app-panel[style*="margin-bottom:14px"]{padding:16px!important}
+    .workspace-main:has([data-settings-form]) .settings-intro{margin:5px 0 0;color:#a9a2c0;font-size:12px}
+    .app-settings-grid{grid-template-columns:minmax(0,1.12fr) minmax(270px,.88fr);gap:12px}
+    .app-settings-grid>.app-panel{padding:17px}
+    .app-settings-grid h2{font-size:16px;letter-spacing:-.25px;margin:0 0 12px}
+    .app-settings-grid .logo-upload{gap:12px;padding:11px;border-radius:12px}
+    .app-settings-grid .logo-preview{width:58px;height:58px;border-radius:13px}
+    .app-settings-grid .logo-upload p{font-size:11px;line-height:1.45}
+    .app-settings-grid .app-form{gap:11px}
+    .app-settings-grid .app-form label,.app-form[data-settings-form] label{font-size:12px;gap:5px}
+    .app-settings-grid input:not([type=color]),.app-settings-grid textarea{min-height:39px;padding:9px 11px;border-radius:10px;font-size:13px}
+    .app-settings-grid textarea{min-height:76px}
+    .app-settings-grid .color-field input[type=color]{width:40px;height:36px;border-radius:9px}
+    .app-settings-grid .settings-preview{padding:14px;border-radius:15px}
+    .app-settings-grid .signature-card{padding:13px;gap:10px;border-radius:11px}
+    .app-settings-grid .signature-card img{width:46px;height:46px}
+    .settings-actions{margin-top:11px;gap:8px}
+    .settings-actions .app-btn{min-height:40px;padding:9px 14px;font-size:12px;border-radius:10px}
+    .workspace-main:has([data-settings-form])>section.app-panel{padding:16px!important}
+    .api-section-heading{gap:10px;margin-bottom:10px}
+    .api-section-icon{width:34px;height:34px;flex-basis:34px;border-radius:10px}
+    .api-section-icon svg{width:18px;height:18px}
+    .api-section-heading h2{font-size:17px;margin:0 0 3px!important}
+    .api-section-heading p{font-size:12px;line-height:1.45}
+    .api-overview{gap:8px;margin:10px 0;padding:0}
+    .api-overview-item{padding:9px 10px;border-radius:11px}
+    .api-overview-item strong{font-size:15px}
+    .api-overview-item span{font-size:10px;margin-top:2px}
+    .api-security-note{padding:10px 12px;border-radius:11px;font-size:11px;line-height:1.45;margin:0 0 10px}
+    .integration-group{gap:8px;margin-top:8px;padding:12px;border-radius:13px}
+    .integration-head{margin-bottom:0;gap:8px}
+    .integration-head b{font-size:12px;line-height:1.4}
+    .integration-head small{font-size:10px;line-height:1.4;margin-top:2px}
+    .integration-status{font-size:9px;padding:4px 7px;max-width:120px}
+    .integration-group label{gap:5px;font-size:11px}
+    .integration-group input{min-height:39px;padding:8px 10px;font-size:13px;border-radius:9px}
+    .integration-key{gap:6px}
+    .integration-key button,.reveal-key{padding:7px 9px;border-radius:8px;font-size:10px}
+    .integration-group .field-help,.integration-group p.field-help{font-size:10px;line-height:1.45}
+    .api-actions{gap:6px;margin-top:1px}
+    .api-link{min-height:33px;padding:7px 9px;border-radius:9px;font-size:10px}
+    .integration-actions{gap:7px;margin-top:9px}
+    .integration-actions .app-btn{min-height:36px;padding:8px 10px;font-size:11px}
+    @media(max-width:760px){
+      .app-settings-grid{grid-template-columns:1fr;gap:10px}
+      .app-settings-grid>.app-panel,.workspace-main:has([data-settings-form])>section.app-panel{padding:13px!important}
+      .app-settings-grid .settings-preview{order:2}
+      .api-overview{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+      .api-overview-item{padding:8px}
+      .api-overview-item span{font-size:9px}
+      .integration-group{padding:11px}
+      .integration-head{align-items:flex-start}
+      .integration-status{white-space:normal;text-align:center}
+      .api-actions .api-link{flex:1 1 auto}
+    }
+    @media(max-width:420px){
+      .api-overview-item strong{font-size:13px}
+      .api-overview-item span{font-size:8px}
+      .integration-head{flex-direction:column}
+      .integration-status{max-width:none}
+      .settings-actions{display:grid;grid-template-columns:1fr}
+    }
+
+  </style>
 </head>
 <body>
   <header class="wrap top">
