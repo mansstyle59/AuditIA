@@ -151,10 +151,10 @@
             status.textContent = 'Session Supabase active';
           }
         } else if (mode === 'signup') {
-          result = await supabase.auth.signUp({ email, password: passwordInput.value, options: { emailRedirectTo: location.href.split('#')[0] } });
+          result = await supabase.auth.signUp({ email, password: passwordInput.value, options: { emailRedirectTo: 'https://mansstyle59.github.io/AuditIA/' } });
           if (!result.error) announce('Demande envoyée. Vérifiez votre e-mail pour confirmer votre compte.', 'success');
         } else {
-          result = await supabase.auth.resetPasswordForEmail(email, { redirectTo: location.href.split('#')[0] });
+          result = await supabase.auth.resetPasswordForEmail(email, { redirectTo: 'https://mansstyle59.github.io/AuditIA/' });
           if (!result.error) announce('Si cette adresse est connue, un e-mail de réinitialisation va être envoyé.', 'success');
         }
         if (result?.error) throw result.error;
