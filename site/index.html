@@ -324,7 +324,27 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
  .app-content-title h2{font-size:21px}
 }
 
-  </style>
+  
+/* Refined navigation and icon system */
+.nav-icon svg,.tab-icon svg,.workspace-actions svg{width:22px;height:22px;display:block;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}
+.workspace-actions .app-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.sidebar-nav button{display:flex;align-items:center;gap:12px}
+.nav-count{margin-left:auto;min-width:24px;height:24px;padding:0 7px;display:inline-flex;align-items:center;justify-content:center;border-radius:9px;background:#34334a;color:#c8c4d9;font-size:11px;font-weight:800}
+.sidebar-bottom{font-size:12px;line-height:1.65;letter-spacing:.1px}
+.workspace-footnote{border-top:1px solid #ffffff10;padding-top:16px;color:#89869d!important;font-size:11px!important}
+.mobile-tabbar button{transition:background .16s ease,color .16s ease,border-color .16s ease}
+.mobile-tabbar button .tab-icon{display:grid;place-items:center;width:28px;height:25px}
+.mobile-tabbar button .tab-icon svg{width:23px;height:23px}
+.mobile-tabbar button span:last-child{font-size:10px;letter-spacing:-.15px}
+@media(max-width:760px){
+ .workspace-actions .app-btn{gap:6px}
+ .workspace-actions svg{width:17px;height:17px}
+ .mobile-tabbar{grid-template-columns:repeat(6,minmax(0,1fr));padding-left:7px;padding-right:7px}
+ .mobile-tabbar button{min-height:68px}
+ .mobile-tabbar button span:last-child{font-size:9px}
+}
+
+</style>
 </head>
 <body>
   <header class="wrap top">
@@ -436,9 +456,23 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       appClients=c.data||[]; appAudits=a.data||[];
     }
     function appNoticeHtml(){return appNotice?'<div class="app-notice '+(appNotice.startsWith('Erreur')?'error':'')+'">'+escHtml(appNotice)+'</div>':''}
+    function navIcon(name){
+      const paths={
+        home:'<path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1Z"/>',
+        clients:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20v-1.5a6.5 6.5 0 0 1 13 0V20Z"/><path d="M16 5.2a3.5 3.5 0 0 1 0 6.6M18 14a5 5 0 0 1 3.5 4.8V20"/>',
+        audits:'<path d="M7 3h10l4 4v14H3V3Z"/><path d="M7 11h10M7 15h10M7 7h4"/>',
+        tools:'<path d="M14 6a5 5 0 0 0-6.6 6.6L3 17l4 4 4.4-4.4A5 5 0 0 0 18 10l-3 3-4-4Z"/><path d="m15 3 6 6"/>',
+        reports:'<path d="M4 20V11M10 20V4M16 20v-7M22 20H2"/>',
+        settings:'<circle cx="12" cy="12" r="3"/><path d="m19.4 15 .1.1 1.4 1.1-1.4 2.4-1.7-.6a8 8 0 0 1-1.8 1l-.3 1.8h-2.8l-.3-1.8a8 8 0 0 1-1.8-1l-1.7.6-1.4-2.4 1.4-1.1a7 7 0 0 1 0-2l-1.4-1.1 1.4-2.4 1.7.6a8 8 0 0 1 1.8-1l.3-1.8h2.8l.3 1.8a8 8 0 0 1 1.8 1l1.7-.6 1.4 2.4-1.4 1.1a7 7 0 0 1 0 2Z"/>',
+        refresh:'<path d="M20 7v5h-5"/><path d="M20 12a8 8 0 1 1-2.3-5.7L20 9"/>',
+        logout:'<path d="M10 17l5-5-5-5M15 12H3"/><path d="M12 3h7a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-7"/>'
+      };
+      return '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><g>'+ (paths[name]||paths.home) +'</g></svg>';
+    }
     function appShell(body) {
       const page = document.querySelector('.login-page');
-      page.innerHTML = '<div class="workspace-app"><div class="sidebar-backdrop" data-close-menu></div><aside class="workspace-sidebar" id="workspaceSidebar"><div class="sidebar-brand"><img src="'+escHtml(currentLogo())+'" alt=""><div><b>'+escHtml(appSettings?.app_name||'AuditIA')+'</b><small>ESPACE AFFIADS</small></div></div><nav class="sidebar-nav">'+[['Accueil','⌂'],['Clients','♙'],['Audits','◈'],['Paramètres','⚙']].map(([v,ico])=>'<button class="'+(appView===v?'active':'')+'" data-app-view="'+v+'"><span class="nav-icon">'+ico+'</span><span>'+v+'</span>'+(v==='Clients'?'<span style="margin-left:auto">'+appClients.length+'</span>':v==='Audits'?'<span style="margin-left:auto">'+appAudits.length+'</span>':'')+'</button>').join('')+'</nav><div class="sidebar-bottom">AuditIA · Auditer mieux, décider plus clairement</div></aside><div class="workspace-layout"><main class="workspace-main"><div class="workspace-head"><div><div class="eyebrow">ESPACE ADMINISTRATEUR</div><h1>'+escHtml(appView==='Accueil'?'Bonjour 👋':appView)+'</h1><p>'+escHtml(appUser?.email||'')+' · '+escHtml(appSettings?.company_name||'AffiAds')+'</p></div><div class="workspace-actions"><button class="app-btn" data-app-action="refresh">↻ Actualiser</button><button class="app-btn" data-app-action="logout">Déconnexion</button></div></div><nav class="app-nav">'+['Accueil','Clients','Audits','Paramètres'].map(v=>'<button class="'+(appView===v?'active':'')+'" data-app-view="'+v+'">'+v+'</button>').join('')+'</nav>'+appNoticeHtml()+body+'<p class="app-muted" style="text-align:center;margin:22px 0 0">AuditIA · Données privées protégées par Supabase</p></main></div><nav class="mobile-tabbar" aria-label="Navigation principale">'+[['Accueil','⌂','Accueil'],['Clients','♙','Clients'],['Audits','▤','Audits'],['Outils','⚒','Outils'],['Rapports','▥','Rapports'],['Admin','♙','Paramètres']].map(([v,ico,target])=>'<button class="'+(appView===target?'active':'')+'" data-app-view="'+target+'" aria-label="'+v+'"><span class="tab-icon">'+ico+'</span><span>'+v+'</span></button>').join('')+'</nav></div>';
+      const navItems=[['Accueil','home'],['Clients','clients'],['Audits','audits'],['Outils','tools'],['Rapports','reports'],['Réglages','settings','Paramètres']];
+      page.innerHTML = '<div class="workspace-app"><div class="sidebar-backdrop" data-close-menu></div><aside class="workspace-sidebar" id="workspaceSidebar"><div class="sidebar-brand"><img src="'+escHtml(currentLogo())+'" alt=""><div><b>'+escHtml(appSettings?.app_name||'AuditIA')+'</b><small>BY AFFIADS</small></div></div><nav class="sidebar-nav" aria-label="Navigation principale">'+navItems.map(([v,ico,target])=>'<button type="button" class="'+(appView===(target||v)?'active':'')+'" data-app-view="'+(target||v)+'"><span class="nav-icon">'+navIcon(ico)+'</span><span>'+v+'</span>'+(v==='Clients'?'<span class="nav-count">'+appClients.length+'</span>':v==='Audits'?'<span class="nav-count">'+appAudits.length+'</span>':'')+'</button>').join('')+'</nav><div class="sidebar-bottom">Auditer mieux.<br>Décider plus clairement.</div></aside><div class="workspace-layout"><main class="workspace-main"><div class="workspace-head"><div><div class="eyebrow">ESPACE AFFIADS</div><h1>'+escHtml(appView==='Accueil'?'Bonjour 👋':appView==='Paramètres'?'Réglages':appView)+'</h1><p>'+escHtml(appSettings?.company_name||'AffiAds')+' · '+escHtml(appUser?.email||'')+'</p></div><div class="workspace-actions"><button class="app-btn" type="button" data-app-action="refresh">'+navIcon('refresh')+'<span>Actualiser</span></button><button class="app-btn" type="button" data-app-action="logout">'+navIcon('logout')+'<span>Quitter</span></button></div></div>'+appNoticeHtml()+body+'<p class="app-muted workspace-footnote">AuditIA · Espace privé</p></main></div><nav class="mobile-tabbar" aria-label="Navigation principale">'+navItems.map(([v,ico,target])=>'<button type="button" class="'+(appView===(target||v)?'active':'')+'" data-app-view="'+(target||v)+'" aria-label="'+v+'" '+(appView===(target||v)?'aria-current="page"':'')+'><span class="tab-icon">'+navIcon(ico)+'</span><span>'+v+'</span></button>').join('')+'</nav></div>';
       page.querySelectorAll('[data-app-view]').forEach(b=>b.addEventListener('click',()=>{appView=b.dataset.appView;activeAudit=null;appNotice='';renderApp()}));
       page.querySelectorAll('[data-toggle-menu]').forEach(b=>b.addEventListener('click',()=>{const side=page.querySelector('#workspaceSidebar');const backdrop=page.querySelector('[data-close-menu]');const open=!side.classList.contains('open');side.classList.toggle('open',open);backdrop.classList.toggle('open',open);b.setAttribute('aria-expanded',String(open));b.textContent=open?'×':'☰'}));
       page.querySelectorAll('[data-close-menu]').forEach(b=>b.addEventListener('click',()=>{page.querySelector('#workspaceSidebar')?.classList.remove('open');b.classList.remove('open')}));
