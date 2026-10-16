@@ -38,6 +38,35 @@
     .login-foot{color:#8f87a8;text-align:center;margin:30px auto 0;font-size:13px}
     .login-status{font-size:12px;color:#8f87a8;text-align:center;margin-top:8px}
     .auth-view-toggle{display:flex;justify-content:center;gap:14px;margin:0 0 26px;flex-wrap:wrap}.auth-view-toggle button{border:1px solid #dfdaef;background:#f6f4ff;color:#4c36c2;border-radius:999px;padding:9px 13px;font-size:13px;font-weight:700;cursor:pointer}
+
+    .workspace-app{width:min(1120px,100%);margin:0 auto;padding:10px 0 36px;color:var(--text)}
+    .workspace-head{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:12px 0 22px}
+    .workspace-head h1{font-size:clamp(28px,5vw,40px);margin:0 0 5px;letter-spacing:-1.5px}
+    .workspace-head p{margin:0;color:var(--muted);font-size:14px}
+    .workspace-actions{display:flex;gap:8px;flex-wrap:wrap}
+    .app-btn{border:1px solid var(--line);border-radius:12px;padding:11px 14px;background:#211b37;color:var(--text);font-weight:750;cursor:pointer}
+    .app-btn.primary{background:linear-gradient(135deg,#6d4de8,#5033c8);border:0}
+    .app-btn:disabled{opacity:.55}
+    .app-nav{display:flex;gap:8px;overflow:auto;padding:4px 0 14px;margin-bottom:10px}
+    .app-nav button{flex:0 0 auto;border:1px solid var(--line);border-radius:999px;padding:10px 15px;background:#19152b;color:var(--muted);font-weight:750}
+    .app-nav button.active{background:#33265f;color:#e6dfff;border-color:#6250a1}
+    .app-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:16px 0 22px}
+    .app-stat,.app-panel{background:linear-gradient(145deg,#211b37,#171326);border:1px solid #ffffff20;border-radius:18px;padding:18px;min-width:0}
+    .app-stat span{display:block;color:var(--muted);font-size:13px}.app-stat strong{display:block;font-size:30px;margin-top:6px}
+    .app-panel h2{font-size:19px;margin:0 0 14px}.app-panel p{color:var(--muted);font-size:13px}
+    .app-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+    .app-form{display:grid;gap:12px}.app-form label{display:grid;gap:6px;font-size:13px;font-weight:750;color:#e8e3fa}
+    .app-form input,.app-form select,.app-form textarea{width:100%;min-width:0;border:1px solid #51466e;border-radius:11px;background:#100d1d;color:#fff;padding:12px;font:inherit}
+    .app-form textarea{min-height:95px;resize:vertical}
+    .app-list{display:grid;gap:10px}.app-row{display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid #ffffff14;background:#171326;border-radius:13px;padding:13px}
+    .app-row b{display:block;font-size:14px}.app-row small{display:block;color:var(--muted);font-size:12px;margin-top:4px}
+    .app-empty{padding:24px;text-align:center;border:1px dashed #55476f;border-radius:15px;color:var(--muted);font-size:13px}
+    .app-check{display:flex;align-items:flex-start;gap:10px;padding:13px 0;border-bottom:1px solid #ffffff12;font-size:14px}
+    .app-check input{margin-top:4px;accent-color:#8f7bff}.app-check small{display:block;color:var(--muted);margin-top:3px}
+    .app-notice{border-radius:12px;padding:12px 14px;margin:12px 0;background:#173b31;color:#a7f0cf;font-size:13px}.app-notice.error{background:#431f2a;color:#ffc4cc}
+    .app-score{font-size:30px;font-weight:850;color:#c9bcff}.app-muted{color:var(--muted);font-size:12px}
+    @media(max-width:640px){.workspace-app{padding-top:0}.workspace-head{align-items:flex-start;flex-direction:column}.workspace-actions{width:100%}.app-stats{gap:8px}.app-stat{padding:13px}.app-stat strong{font-size:25px}.app-stat span{font-size:11px}.app-grid{grid-template-columns:1fr}.app-row{align-items:flex-start}.app-row .app-btn{padding:9px 10px;font-size:12px}}
+
     @media(max-width:600px){.wrap{width:calc(100% - 30px)}.login-page{min-height:auto;padding:22px 0 24px}.login-brand{margin:2px auto 20px;gap:11px}.login-mark{width:48px;height:48px;flex-basis:48px;border-radius:14px;font-size:30px}.login-wordmark{font-size:34px;letter-spacing:-1.7px}.login-card{border-radius:22px;padding:24px 20px 25px}.login-card h1{margin-bottom:16px}.login-subtitle{margin-bottom:23px;font-size:16px}.login-field{font-size:15px;margin-bottom:19px}.login-field>span{margin-bottom:9px}.login-control{height:54px;border-radius:14px}.password-wrap .login-control{padding-right:54px}.toggle-password{top:4px;right:4px}.login-submit{min-height:56px;font-size:17px;margin-bottom:17px}.login-foot{margin-top:24px;font-size:12px}.login-create{margin-top:19px}.login-reset{font-size:14px}.login-status{font-size:11px}}
 
     @media(max-width:800px){.hero{grid-template-columns:1fr;gap:38px;padding:58px 0 35px}.preview{transform:none;max-width:540px;width:100%;margin:auto}h1{letter-spacing:-2.2px}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.bottom{align-items:flex-start;flex-direction:column}}@media(max-width:520px){.wrap{width:calc(100% - 30px)}.top{height:68px}.toplink{font-size:12px}.hero{padding-top:42px}.lead{font-size:16px}h1{font-size:43px}.grid{grid-template-columns:1fr}.card{padding:19px}.preview{padding:17px;border-radius:22px}.scorebox{gap:12px}.gauge{width:82px;height:82px;flex-shrink:0}.bottom{padding:22px}.foot{flex-direction:column}}
@@ -128,6 +157,73 @@
         auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
       });
     }
+
+    const checklistTemplate = [
+      ['Présence en ligne','Le commerce est facilement trouvable sur le web'],
+      ['Fiche établissement','Coordonnées, horaires et catégorie sont cohérents'],
+      ['Avis clients','Les avis récents sont suivis et reçoivent une réponse'],
+      ['Site web','Le site est accessible et adapté au mobile'],
+      ['Contact','Téléphone, adresse et liens fonctionnent'],
+      ['Réseaux sociaux','Les profils sont actifs et à jour'],
+      ['Identité visuelle','Logo, photos et informations sont cohérents'],
+      ['Informations locales','Ville, zone desservie et services sont clairs']
+    ];
+    let appClient = null, appUser = null, appClients = [], appAudits = [], appView = 'Accueil', activeAudit = null, appNotice = '';
+    const escHtml = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    async function refreshData() {
+      const [c,a] = await Promise.all([
+        appClient.from('clients').select('*').order('created_at',{ascending:false}),
+        appClient.from('audits').select('*').order('created_at',{ascending:false})
+      ]);
+      if(c.error) throw c.error;
+      if(a.error) throw a.error;
+      appClients=c.data||[]; appAudits=a.data||[];
+    }
+    function appNoticeHtml(){return appNotice?'<div class="app-notice '+(appNotice.startsWith('Erreur')?'error':'')+'">'+escHtml(appNotice)+'</div>':''}
+    function appShell(body) {
+      const page = document.querySelector('.login-page');
+      page.innerHTML = '<div class="workspace-app"><div class="workspace-head"><div><div class="eyebrow">ESPACE ADMINISTRATEUR</div><h1>Bonjour 👋</h1><p>'+escHtml(appUser?.email||'')+' · Vos audits, clients et actions au même endroit.</p></div><div class="workspace-actions"><button class="app-btn" data-app-action="refresh">↻ Actualiser</button><button class="app-btn" data-app-action="logout">Déconnexion</button></div></div><nav class="app-nav">'+['Accueil','Clients','Audits'].map(v=>'<button class="'+(appView===v?'active':'')+'" data-app-view="'+v+'">'+v+(v==='Clients'?' ('+appClients.length+')':v==='Audits'?' ('+appAudits.length+')':'')+'</button>').join('')+'</nav>'+appNoticeHtml()+body+'<p class="app-muted" style="text-align:center;margin:22px 0 0">AuditIA · Données privées protégées par Supabase</p></div>';
+      page.querySelectorAll('[data-app-view]').forEach(b=>b.addEventListener('click',()=>{appView=b.dataset.appView;activeAudit=null;appNotice='';renderApp()}));
+      page.querySelectorAll('[data-app-action]').forEach(b=>b.addEventListener('click',async()=>{const action=b.dataset.appAction;if(action==='logout'){await appClient.auth.signOut();appUser=null;appView='Accueil';location.reload()}else{try{appNotice='';await refreshData();renderApp()}catch(e){appNotice='Erreur : '+(e.message||'chargement impossible');renderApp()}}}));
+      page.querySelectorAll('[data-create-client]').forEach(form=>form.addEventListener('submit',async e=>{e.preventDefault();const fd=new FormData(form);const row={user_id:appUser.id,name:String(fd.get('name')||'').trim(),city:String(fd.get('city')||'').trim(),category:String(fd.get('category')||'Autre').trim(),website:String(fd.get('website')||'').trim()||null};if(row.website&&!/^https?:\/\//i.test(row.website))row.website='https://'+row.website;const {error}=await appClient.from('clients').insert(row);if(error){appNotice='Erreur : '+error.message}else{appNotice='Client enregistré.';appView='Clients';await refreshData()}renderApp()}));
+      page.querySelectorAll('[data-create-audit]').forEach(form=>form.addEventListener('submit',async e=>{e.preventDefault();const fd=new FormData(form);const row={user_id:appUser.id,client_id:String(fd.get('client_id')||''),title:String(fd.get('title')||'Audit de visibilité').trim(),checklist:checklistTemplate.map(([label,detail])=>({label,detail,done:false}))};const {error}=await appClient.from('audits').insert(row);if(error){appNotice='Erreur : '+error.message}else{appNotice='Audit créé. Tu peux maintenant ouvrir son dossier.';appView='Audits';await refreshData()}renderApp()}));
+      page.querySelectorAll('[data-open-audit]').forEach(b=>b.addEventListener('click',()=>{activeAudit=b.dataset.openAudit;appView='Détail';renderApp()}));
+      page.querySelectorAll('[data-audit-check]').forEach(el=>el.addEventListener('change',async()=>{const audit=appAudits.find(a=>a.id===activeAudit);if(!audit)return;const list=(audit.checklist||[]).map((x,i)=>i===Number(el.dataset.auditCheck)?{...x,done:el.checked}:x);const done=list.filter(x=>x.done).length;const score=Math.round(done/list.length*100);const {error}=await appClient.from('audits').update({checklist:list,score,status:done===list.length?'Terminé':'En cours',updated_at:new Date().toISOString()}).eq('id',audit.id);if(error)appNotice='Erreur : '+error.message;else appNotice='Contrôle enregistré.';await refreshData();renderApp()}));
+      page.querySelectorAll('[data-save-notes]').forEach(form=>form.addEventListener('submit',async e=>{e.preventDefault();const fd=new FormData(form);const {error}=await appClient.from('audits').update({notes:String(fd.get('notes')||''),updated_at:new Date().toISOString()}).eq('id',activeAudit);appNotice=error?'Erreur : '+error.message:'Notes enregistrées.';await refreshData();renderApp()}));
+      page.querySelectorAll('[data-delete-client]').forEach(b=>b.addEventListener('click',async()=>{if(!confirm('Supprimer ce client et ses audits associés ?'))return;const {error}=await appClient.from('clients').delete().eq('id',b.dataset.deleteClient);appNotice=error?'Erreur : '+error.message:'Client supprimé.';await refreshData();renderApp()}));
+      page.querySelectorAll('[data-delete-audit]').forEach(b=>b.addEventListener('click',async()=>{if(!confirm('Supprimer cet audit ?'))return;const {error}=await appClient.from('audits').delete().eq('id',b.dataset.deleteAudit);appNotice=error?'Erreur : '+error.message:'Audit supprimé.';await refreshData();renderApp()}));
+    }
+    function renderApp(){
+      const completed=appAudits.filter(a=>a.status==='Terminé').length;
+      let body='';
+      if(appView==='Accueil'){
+        body='<div class="app-stats"><article class="app-stat"><span>Clients enregistrés</span><strong>'+appClients.length+'</strong></article><article class="app-stat"><span>Audits réalisés / en cours</span><strong>'+appAudits.length+'</strong></article><article class="app-stat"><span>Audits terminés</span><strong>'+completed+'</strong></article></div><div class="app-grid"><section class="app-panel"><h2>Commencer un audit</h2><p>Ajoute un commerce, puis crée son audit avec les contrôles de visibilité.</p><button class="app-btn primary" data-app-view="Clients">+ Ajouter un client</button> <button class="app-btn" data-app-view="Audits">Voir les audits</button></section><section class="app-panel"><h2>Derniers audits</h2>'+(appAudits.length?'<div class="app-list">'+appAudits.slice(0,5).map(a=>{const c=appClients.find(x=>x.id===a.client_id);return '<div class="app-row"><div><b>'+escHtml(c?.name||'Commerce')+'</b><small>'+escHtml(a.title)+' · '+escHtml(a.status)+' · '+(a.score||0)+'/100</small></div><button class="app-btn" data-open-audit="'+a.id+'">Ouvrir</button></div>'}).join('')+'</div>':'<div class="app-empty">Aucun audit pour le moment.</div>')+'</section></div>';
+      } else if(appView==='Clients'){
+        body='<div class="app-grid"><section class="app-panel"><h2>Ajouter un client</h2><form class="app-form" data-create-client><label>Nom du commerce<input name="name" required maxlength="120" placeholder="Ex. Boulangerie du Centre"></label><label>Ville<input name="city" required maxlength="100" placeholder="Ex. Azille"></label><label>Catégorie<select name="category"><option>Commerce</option><option>Restaurant</option><option>Artisan</option><option>Beauté & bien-être</option><option>Automobile</option><option>Hébergement</option><option>Autre</option></select></label><label>Site web (facultatif)<input name="website" type="text" placeholder="https://exemple.fr"></label><button class="app-btn primary" type="submit">Enregistrer le client</button></form></section><section class="app-panel"><h2>Mes clients ('+appClients.length+')</h2>'+(appClients.length?'<div class="app-list">'+appClients.map(c=>'<div class="app-row"><div><b>'+escHtml(c.name)+'</b><small>'+escHtml(c.city)+' · '+escHtml(c.category)+(c.website?' · '+escHtml(c.website):'')+'</small></div><button class="app-btn" data-delete-client="'+c.id+'">Supprimer</button></div>').join('')+'</div>':'<div class="app-empty">Aucun client enregistré. Ajoute ton premier commerce.</div>')+'</section></div>';
+      } else if(appView==='Audits'){
+        body='<div class="app-grid"><section class="app-panel"><h2>Créer un audit</h2>'+(appClients.length?'<form class="app-form" data-create-audit><label>Client<select name="client_id" required>'+appClients.map(c=>'<option value="'+c.id+'">'+escHtml(c.name)+' — '+escHtml(c.city)+'</option>').join('')+'</select></label><label>Nom de l’audit<input name="title" required maxlength="120" value="Audit de visibilité numérique"></label><button class="app-btn primary" type="submit">Créer l’audit</button></form>':'<div class="app-empty">Ajoute d’abord un client dans l’onglet Clients.</div>')+'</section><section class="app-panel"><h2>Historique ('+appAudits.length+')</h2>'+(appAudits.length?'<div class="app-list">'+appAudits.map(a=>{const c=appClients.find(x=>x.id===a.client_id);return '<div class="app-row"><div><b>'+escHtml(c?.name||'Commerce')+'</b><small>'+escHtml(a.title)+' · '+escHtml(a.status)+' · '+(a.score||0)+'/100</small></div><button class="app-btn" data-open-audit="'+a.id+'">Ouvrir</button></div>'}).join('')+'</div>':'<div class="app-empty">Aucun audit créé.</div>')+'</section></div>';
+      } else if(appView==='Détail'){
+        const a=appAudits.find(x=>x.id===activeAudit);
+        if(!a){appView='Audits';renderApp();return}
+        const c=appClients.find(x=>x.id===a.client_id);
+        const list=Array.isArray(a.checklist)?a.checklist:[];
+        body='<button class="app-btn" data-app-view="Audits">← Retour aux audits</button><section class="app-panel" style="margin-top:14px"><div class="eyebrow">DOSSIER D’AUDIT</div><h2 style="margin-top:8px">'+escHtml(c?.name||'Commerce')+'</h2><p>'+escHtml(c?.city||'')+' · '+escHtml(a.title)+'</p><div class="app-score">'+(a.score||0)+'/100</div><p>'+list.filter(x=>x.done).length+' sur '+list.length+' contrôles validés</p>'+list.map((x,i)=>'<label class="app-check"><input type="checkbox" data-audit-check="'+i+'" '+(x.done?'checked':'')+'><span><b>'+escHtml(x.label)+'</b><small>'+escHtml(x.detail)+'</small></span></label>').join('')+'<form class="app-form" data-save-notes style="margin-top:18px"><label>Notes et recommandations<textarea name="notes" placeholder="Constats, actions à prévoir…">'+escHtml(a.notes||'')+'</textarea></label><button class="app-btn primary" type="submit">Enregistrer les notes</button></form><div style="margin-top:16px"><button class="app-btn" data-delete-audit="'+a.id+'">Supprimer cet audit</button></div></section>';
+      }
+      appShell(body);
+    }
+    async function openWorkspace(client,user){
+      appClient=client;appUser=user;
+      if(!user||String(user.email||'').toLowerCase()!=='dewulf.denis@gmail.com'){await client.auth.signOut();throw new Error('Ce compte n’est pas autorisé à accéder à l’espace administrateur AuditIA.')}
+      await refreshData();appView='Accueil';activeAudit=null;appNotice='';status.textContent='Session Supabase active';renderApp();
+    }
+    async function initAuth(){
+      try{
+        const client=await getSupabase();
+        const {data,error}=await client.auth.getSession();
+        if(error)throw error;
+        if(data.session?.user){await openWorkspace(client,data.session.user)}
+      }catch(err){if(err?.message)announce(err.message,'error')}
+    }
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
       if (!emailInput.reportValidity()) return;
@@ -147,8 +243,7 @@
             throw new Error('Ce compte n’est pas autorisé à accéder à l’espace administrateur AuditIA.');
           }
           if (!result.error) {
-            announce('Connexion réussie. Votre espace AuditIA est authentifié ; les outils privés seront reliés à cette session.', 'success');
-            status.textContent = 'Session Supabase active';
+            await openWorkspace(supabase, result.data.user);
           }
         } else if (mode === 'signup') {
           result = await supabase.auth.signUp({ email, password: passwordInput.value, options: { emailRedirectTo: 'https://mansstyle59.github.io/AuditIA/' } });
@@ -165,6 +260,8 @@
         submit.textContent = oldLabel;
       }
     });
+    initAuth();
+
   </script>
   <footer class="wrap foot"><span>© <span id="year"></span> AuditIA · AffiAds</span><span>Connexion protégée par Supabase quand la configuration sera activée.</span></footer>
   <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
