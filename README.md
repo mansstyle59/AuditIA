@@ -1,41 +1,23 @@
 # AuditIA — AffiAds
 
-Application autonome d'audit de visibilité numérique des commerces.
+Site public AuditIA publié avec **GitHub Pages** depuis le dossier `site/`.
 
-## Fonctionnalités
+## Ce qui est publié
 
-- Gestion des clients et historique des audits
-- Checklist terrain avec score manuel distinct des mesures automatiques
-- Analyse mobile via Google PageSpeed Insights / Lighthouse
-- Enrichissement par des sources publiques : Photon / OpenStreetMap, Overpass, RDAP et Jina Reader
-- Réglages des clés API facultatives, export CSV et rapport imprimable d'une page
-- Interface responsive et authentification avec contrôle administrateur côté serveur
+- Page d’accueil responsive en thème sombre
+- Présentation des fonctionnalités prévues d’AuditIA
+- Liens vers le dépôt et les informations du projet
 
-## Technologies
+## Déploiement GitHub Pages
 
-- Vite + TypeScript
-- Backend AppDeploy SDK (`@appdeploy/sdk`)
-- Client AppDeploy (`@appdeploy/client`)
+Le workflow `.github/workflows/pages.yml` publie directement le dossier `site/` sur chaque push vers `main`.
 
-## Développement frontend
+## Authentification
 
-```bash
-npm install
-npm run dev
-```
+GitHub Pages sert uniquement des fichiers statiques : il ne peut pas vérifier des mots de passe ni protéger des données privées côté serveur par lui-même. Pour ajouter une vraie connexion par e-mail/mot de passe, il faut connecter un fournisseur d'authentification externe compatible avec les sites statiques et protéger tout accès aux données côté service/API. Aucun mot de passe ne doit être stocké dans le dépôt ni dans le JavaScript public.
 
-## Build
+L'adresse administrateur souhaitée est `Dewulf.denis@gmail.com`. Aucun mot de passe n'est inclus dans le dépôt.
 
-```bash
-npm run build
-```
+## Périmètre du dépôt
 
-## Backend et déploiement
-
-Le backend actuel utilise les services d'authentification et de base de données d'AppDeploy. Pour l'exécuter hors d'AppDeploy, il faudra adapter ces dépendances à une cible d'hébergement compatible. Les données clients/audits de l'ancienne instance et ses éventuels secrets ne sont pas transférés par ce dépôt.
-
-## Sécurité
-
-- Ne commitez jamais de clés API ou de secrets.
-- Les routes privées sont protégées par authentification et liste d'administrateurs.
-- Les clés Google réglées dans l'interface sont enregistrées dans le localStorage du navigateur : utilisez uniquement des clés restreintes.
+Le dépôt n'embarque pas un backend autonome complet. Les anciens fichiers sources contiennent encore des références AppDeploy et ne sont pas utilisés dans la publication Pages actuelle.
