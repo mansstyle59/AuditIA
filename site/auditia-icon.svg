@@ -1,1 +1,14 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#6758e8"/><stop offset="1" stop-color="#342078"/></linearGradient></defs><rect width="180" height="180" rx="42" fill="url(#g)"/><path d="M42 129 77 45h19l35 84h-22l-7-19H70l-7 19H42zm35-37h18L86 67 77 92z" fill="#fff"/><path d="m112 46 9 9 18-21" fill="none" stroke="#ffad72" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/><circle cx="133" cy="117" r="20" fill="#ffad72"/><path d="m123 117 7 7 13-15" fill="none" stroke="#342078" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" role="img" aria-labelledby="title">
+  <title id="title">AuditIA</title>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#6650df"/>
+      <stop offset="1" stop-color="#38218d"/>
+    </linearGradient>
+  </defs>
+  <rect width="180" height="180" rx="42" fill="url(#background)"/>
+  <path d="M31 124 66 42h20l35 82H99l-7-18H59l-7 18H31Zm35-35h21L76.5 62 66 89Z" fill="#fff"/>
+  <path d="m113 29 8 8 18-20" fill="none" stroke="#ffad72" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="133" cy="119" r="20" fill="#ffad72"/>
+  <path d="m123 119 7 7 13-15" fill="none" stroke="#38218d" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
