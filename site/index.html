@@ -766,13 +766,18 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
     const API_TEST = { logo_dev:testLogoDev, places:testPlaces, maps:testMaps, pagespeed:testPagespeed, bing:async v=>fmtBing(v), openai:async v=>fmtOpenai(v), search_console:async v=>fmtSearchConsole(v), business:async v=>fmtBusiness(v) };
     function testRow(kind){ const net=API_MODE[kind]==='net'; const label=net?'Tester la clé':'Vérifier le format'; const okTxt=keyValidated(kind)?(net?'✓ Clé validée lors du dernier test':'✓ Format vérifié'):''; return '<div class="api-test"><button type="button" class="app-btn api-test-btn" data-test-key="'+kind+'">'+label+'</button><span class="api-test-msg'+(keyValidated(kind)?' ok':'')+'" data-test-msg="'+kind+'">'+okTxt+'</span></div>'; }
     async function refreshData() {
-      const [c,a] = await Promise.all([
+      const [c,a,s] = await Promise.all([
         appClient.from('clients').select('*').order('created_at',{ascending:false}),
-        appClient.from('audits').select('*').order('created_at',{ascending:false})
+        appClient.from('audits').select('*').order('created_at',{ascending:false}),
+        appClient.from('app_settings').select('*').eq('user_id',appUser.id).maybeSingle()
       ]);
       if(c.error) throw c.error;
       if(a.error) throw a.error;
       appClients=c.data||[]; appAudits=a.data||[];
+      // Recharge les paramètres enregistrés (clés API, identité de marque…) — saisis une seule fois
+      if(!s.error && s.data){ appSettings={...defaultSettings(),...s.data}; }
+      else if(!appSettings){ appSettings=defaultSettings(); }
+      updateBrandColors();
     }
     function appNoticeHtml(){return appNotice?'<div class="app-notice '+(appNotice.startsWith('Erreur')?'error':'')+'">'+escHtml(appNotice)+'</div>':''}
     function navIcon(name){
