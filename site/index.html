@@ -546,6 +546,24 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       .r-notes{white-space:pre-wrap;font-size:12.5px;background:#f9f8fd;border-radius:8px;padding:10px}
       .r-sign{margin-top:18px;break-inside:avoid}.r-sign-line{width:46px;height:3px;border-radius:3px;margin-bottom:7px}.r-sign b{display:block;font-size:14px}.r-sign span{display:block;font-size:11.5px;color:#777}.r-sign p{font-style:italic;font-size:12px;margin:6px 0 0}
       .r-foot{margin-top:16px;border-top:1px solid #eee;padding-top:8px;font-size:9.5px;color:#999}
+      .r-verdict{display:flex;align-items:center;gap:16px;background:#f6f4fc;border-radius:12px;padding:14px 16px;break-inside:avoid}
+      .r-verdict-score{text-align:center;flex:0 0 auto}
+      .r-ring-lg{width:78px;height:78px}.r-ring-lg span{width:62px;height:62px;font-size:22px}
+      .r-verdict-score small{display:block;font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.05em;margin-top:3px}
+      .r-verdict-txt b{display:block;font-size:16px;margin-bottom:3px}.r-verdict-txt p{margin:0 0 4px;font-size:12.5px;color:#555}
+      .r-verdict-meta{font-size:11px;color:#999}
+      .r-cols{display:flex;gap:16px}.r-col{flex:1;min-width:0}
+      .r-good-h{color:#1f9d57!important;border-bottom-color:#d8efe0!important}.r-bad-h{color:#c0392b!important;border-bottom-color:#f3dad5!important}
+      .r-list{list-style:none;margin:0;padding:0}.r-list li{margin-bottom:7px;padding-left:16px;position:relative;font-size:12px;break-inside:avoid}
+      .r-list li b{font-size:12.5px}.r-list li span{display:block;color:#777;font-size:11px;line-height:1.4}
+      .r-good li::before{content:"✓";position:absolute;left:0;color:#1f9d57;font-weight:800}
+      .r-bad li::before{content:"▲";position:absolute;left:0;color:#c98a00;font-size:9px;top:2px}
+      .r-plan{display:flex;flex-direction:column;gap:7px}
+      .r-plan-item{display:flex;align-items:flex-start;gap:10px;background:#f9f8fd;border-radius:9px;padding:9px 11px;break-inside:avoid}
+      .r-plan-n{flex:0 0 20px;width:20px;height:20px;border-radius:50%;background:#7657ed;color:#fff;font-size:11px;font-weight:800;display:grid;place-items:center}
+      .r-plan-c{flex:1;min-width:0}.r-plan-c b{display:block;font-size:12.5px}.r-plan-c span{display:block;color:#777;font-size:11px;line-height:1.4}
+      .r-pill{flex:0 0 auto;font-size:9.5px;font-weight:800;padding:2px 7px;border-radius:20px;white-space:nowrap}
+      .r-pill-high{background:#fbe3df;color:#c0392b}.r-pill-mid{background:#fdf0d8;color:#a06700}.r-pill-low{background:#eceaf6;color:#6a5ab8}
       @page{margin:12mm 8mm}
     }
 
@@ -605,6 +623,23 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
     .scan-metric span{color:#aaa6bd;min-width:0;overflow-wrap:anywhere}
     .scan-metric b{white-space:nowrap}
     .scan-note{font-size:11.5px;color:#8f88a6;line-height:1.5;margin:10px 0 0}
+    /* ===== Synthèse de visibilité (dans le dossier d'audit) ===== */
+    .vis-panel{margin-top:14px}
+    .vis-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .vis-score{display:flex;flex-direction:column;align-items:center;flex:0 0 auto}
+    .vis-ring{width:62px;height:62px;border-radius:50%;display:grid;place-items:center}
+    .vis-ring span{width:48px;height:48px;border-radius:50%;background:#35334a;display:grid;place-items:center;font-weight:800;font-size:18px;color:#f3f2f8}
+    .vis-score small{font-size:10px;color:#aaa6bd;margin-top:3px}
+    .vis-cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+    .vis-col{background:#42445e;border:1px solid #ffffff0d;border-radius:12px;padding:11px 13px}
+    .vis-col>b{display:block;font-size:12.5px;margin-bottom:7px}
+    .vis-col.good>b{color:#6ee7b7}.vis-col.bad>b{color:#fca5a5}
+    .vis-col ul{list-style:none;margin:0;padding:0}
+    .vis-col li{font-size:12px;color:#d7d4e4;line-height:1.5;padding-left:14px;position:relative}
+    .vis-col.good li::before{content:"✓";position:absolute;left:0;color:#34d399;font-weight:800}
+    .vis-col.bad li::before{content:"▲";position:absolute;left:0;color:#fbbf24;font-size:9px;top:2px}
+    .vis-none{color:#8f88a6!important}
+    @media(max-width:600px){.vis-cols{grid-template-columns:minmax(0,1fr)}}
     @media(max-width:600px){.scan-scores{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.scan-metrics{grid-template-columns:minmax(0,1fr)}.scan-head .app-btn{width:100%}}
 
     /* ===== Test & validation des clés API ===== */
@@ -1009,22 +1044,67 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       const recs=(s.recommendations&&s.recommendations.length)?'<h3 class="rec-title">Recommandations prioritaires</h3><div class="rec-list">'+s.recommendations.map(r=>'<div class="rec-item rec-'+(r.severity==='haute'?'high':'mid')+'"><div class="rec-dot"></div><div class="rec-copy"><b>'+escHtml(r.title)+(r.gain?' <span class="rec-gain">'+escHtml(r.gain)+'</span>':'')+'</b>'+(r.detail?'<small>'+escHtml(r.detail)+'</small>':'')+'</div></div>').join('')+'</div>':'';
       return '<section class="app-panel scan-panel">'+head+'<p class="app-muted">'+escHtml(s.finalUrl||site)+' · analysé le '+escHtml(new Date(s.analyzedAt).toLocaleString('fr-FR'))+'</p><div class="scan-scores">'+scanGauge('Performance',s.scores.performance)+scanGauge('Accessibilité',s.scores.accessibility)+scanGauge('Bonnes pratiques',s.scores.bestPractices)+scanGauge('SEO',s.scores.seo)+'</div>'+(metrics?'<div class="scan-metrics">'+metrics+'</div>':'')+recs+'<p class="scan-note">Scores mesurés par Google (Lighthouse mobile). Ils reflètent le site web ; les points de contrôle terrain ci-dessous restent manuels.</p></section>';
     }
+    function visibilityAudit(a,c){
+      const d=(c&&c.details)||{}; const s=a&&a.scan;
+      const site=String((c&&c.website)||d.website||'').trim();
+      const rating=(d.rating!=null)?Number(d.rating):null;
+      const reviews=Number(d.reviews||0);
+      const phone=String((c&&c.phone)||d.phone||'').trim();
+      const hasGoogle=!!(d.place_id||d.address||rating!=null);
+      const hours=!!(Array.isArray(d.hours)&&d.hours.length);
+      const perf=(s&&s.scores)?s.scores.performance:null;
+      const seo=(s&&s.scores)?s.scores.seo:null;
+      const items=[];
+      const add=(label,ok,weight,bad,good)=>items.push({label,ok,weight,advice:ok?good:bad});
+      add('Fiche Google établie',hasGoogle,20,'Créer ou revendiquer la fiche Google Business Profile : c’est la base de la visibilité locale.','La fiche Google est présente et renseignée.');
+      add('Site web',!!site,18,'Aucun site web : créer au minimum une page vitrine (coordonnées, horaires, services).','Le commerce dispose d’un site web.');
+      if(rating!=null) add('Note Google',rating>=4.0,14,'Note Google sous 4/5 : répondre aux avis et solliciter les clients satisfaits.','Bonne note Google ('+rating+'/5).');
+      else add('Note Google',false,14,'Pas encore de note Google : encourager les premiers avis clients.','');
+      add('Volume d’avis',reviews>=20,12,'Peu d’avis ('+reviews+') : mettre en place une collecte régulière (QR code en caisse, SMS, e-mail).',reviews+' avis clients : bon signal de confiance.');
+      add('Téléphone visible',!!phone,8,'Numéro de téléphone absent de la fiche : l’ajouter pour faciliter les appels.','Numéro de téléphone renseigné.');
+      add('Horaires renseignés',hours,8,'Horaires d’ouverture manquants : les renseigner sur la fiche Google.','Horaires d’ouverture renseignés.');
+      if(perf!=null) add('Performance mobile du site',perf>=50,12,'Site lent sur mobile (perf '+perf+'/100) : optimiser images, polices et temps de chargement.','Site bien optimisé sur mobile (perf '+perf+'/100).');
+      if(seo!=null) add('SEO technique',seo>=90,8,'Bases SEO à renforcer (SEO '+seo+'/100) : titres, descriptions et balises.','Bonnes bases SEO ('+seo+'/100).');
+      const totW=items.reduce((n,x)=>n+x.weight,0);
+      const gotW=items.filter(x=>x.ok).reduce((n,x)=>n+x.weight,0);
+      const index=totW?Math.round(gotW/totW*100):0;
+      return {items,strengths:items.filter(x=>x.ok),weaknesses:items.filter(x=>!x.ok&&x.advice),index};
+    }
+    function visibilityVerdict(i){ return i>=75?'Bonne visibilité numérique, avec quelques optimisations pour aller plus loin.':i>=50?'Visibilité correcte mais perfectible : plusieurs leviers simples renforceraient la présence en ligne.':i>=25?'Visibilité fragile : des actions prioritaires sont nécessaires pour être trouvé par les clients.':'Présence en ligne très limitée : le commerce est aujourd’hui difficile à trouver sur internet.'; }
+    function actionPlan(a,c,diag){
+      const plan=[]; const rank={'Haute':0,'Moyenne':1,'À planifier':2};
+      diag.weaknesses.slice().sort((x,y)=>y.weight-x.weight).forEach(x=>plan.push({t:x.label,d:x.advice,p:x.weight>=14?'Haute':x.weight>=10?'Moyenne':'À planifier'}));
+      const s=a&&a.scan;
+      if(s&&s.recommendations) s.recommendations.slice(0,5).forEach(r=>plan.push({t:r.title,d:r.detail||'',p:r.severity==='haute'?'Haute':'Moyenne'}));
+      return plan.sort((x,y)=>rank[x.p]-rank[y.p]).slice(0,10);
+    }
+    function visibilitySummaryHtml(a,c){
+      const diag=visibilityAudit(a,c); const i=diag.index;
+      const col=i>=75?'#34d399':i>=50?'#fbbf24':'#f87171';
+      const strong=diag.strengths.slice(0,4).map(x=>'<li>'+escHtml(x.label)+'</li>').join('');
+      const weak=diag.weaknesses.slice(0,4).map(x=>'<li>'+escHtml(x.label)+'</li>').join('');
+      return '<section class="app-panel vis-panel"><div class="vis-head"><div><div class="eyebrow">SYNTHÈSE DE VISIBILITÉ</div><h3 style="margin:4px 0 0">Présence en ligne</h3></div><div class="vis-score"><div class="vis-ring" style="background:conic-gradient('+col+' '+(i*3.6)+'deg,#4a4866 0)"><span>'+i+'</span></div><small>/100</small></div></div><p class="app-muted" style="margin:6px 0 12px">'+escHtml(visibilityVerdict(i))+'</p><div class="vis-cols"><div class="vis-col good"><b>✓ Points forts</b><ul>'+(strong||'<li class="vis-none">À construire</li>')+'</ul></div><div class="vis-col bad"><b>▲ À améliorer</b><ul>'+(weak||'<li class="vis-none">Rien de bloquant</li>')+'</ul></div></div><p class="scan-note">Indice calculé à partir des données réelles Google et de l’analyse du site. Export complet dans le rapport PDF.</p></section>';
+    }
     function reportHtml(a,c){
       const d=(c&&c.details)||{}; const s=a.scan; const st={...defaultSettings(),...(appSettings||{})};
       const list=Array.isArray(a.checklist)?a.checklist:[]; const done=list.filter(x=>x.done).length;
       const logo=currentLogo(); const col=st.primary_color||'#7657ed';
+      const diag=visibilityAudit(a,c); const idx=diag.index; const idxCol=idx>=75?'#1f9d57':idx>=50?'#c98a00':'#c0392b';
+      const plan=actionPlan(a,c,diag);
       const gauge=(l,v)=>{const cc=v==null?'#999':v>=90?'#1f9d57':v>=50?'#c98a00':'#c0392b';return '<div class="r-score"><div class="r-ring" style="background:conic-gradient('+cc+' '+((v==null?0:v)*3.6)+'deg,#e7e3f2 0)"><span>'+(v==null?'—':v)+'</span></div><small>'+l+'</small></div>';};
       const infoRows=[]; if(c){ if(c.category||d.category)infoRows.push(['Catégorie',c.category||d.category]); if(d.address)infoRows.push(['Adresse',d.address]); if(c.phone||d.phone)infoRows.push(['Téléphone',c.phone||d.phone]); if(c.website)infoRows.push(['Site web',c.website]); if(d.rating!=null)infoRows.push(['Note Google','★ '+d.rating+' ('+(d.reviews||0)+' avis)']); if(d.domainCreated)infoRows.push(['Ancienneté du domaine','depuis '+new Date(d.domainCreated).toLocaleDateString('fr-FR')]); }
-      return '<div class="r-head"><div class="r-brand"><img src="'+escHtml(logo)+'" alt=""><div><b>'+escHtml(st.app_name||'AuditIA')+'</b><span>'+escHtml(st.company_name||'AffiAds')+'</span></div></div><div class="r-meta"><b>Rapport d\'audit de visibilité</b><span>'+escHtml(new Date(a.updated_at||Date.now()).toLocaleDateString('fr-FR'))+'</span></div></div>'
+      const pill=p=>'<span class="r-pill r-pill-'+(p==='Haute'?'high':p==='Moyenne'?'mid':'low')+'">'+escHtml(p)+'</span>';
+      return '<div class="r-head"><div class="r-brand"><img src="'+escHtml(logo)+'" alt=""><div><b>'+escHtml(st.app_name||'AuditIA')+'</b><span>'+escHtml(st.company_name||'AffiAds')+'</span></div></div><div class="r-meta"><b>Rapport de visibilité numérique</b><span>'+escHtml(new Date(a.updated_at||Date.now()).toLocaleDateString('fr-FR'))+'</span></div></div>'
         +'<h1 class="r-client">'+escHtml(c?.name||'Commerce')+'</h1><p class="r-sub">'+escHtml([c?.city,c?.category||d.category].filter(Boolean).join(' · '))+'</p>'
-        +'<div class="r-global"><div class="r-global-score" style="color:'+escHtml(col)+'">'+(a.score||0)+'<small>/100</small></div><div class="r-global-txt"><b>Score global '+(s?'(analyse réelle du site)':'(contrôles terrain)')+'</b><span>'+escHtml(a.status||'À démarrer')+' · '+done+'/'+list.length+' contrôles terrain validés</span></div></div>'
+        +'<div class="r-verdict"><div class="r-verdict-score"><div class="r-ring r-ring-lg" style="background:conic-gradient('+idxCol+' '+(idx*3.6)+'deg,#e7e3f2 0)"><span>'+idx+'</span></div><small>visibilité</small></div><div class="r-verdict-txt"><b>Note de visibilité : '+idx+'/100</b><p>'+escHtml(visibilityVerdict(idx))+'</p><span class="r-verdict-meta">'+escHtml(a.status||'À démarrer')+' · '+done+'/'+list.length+' contrôles terrain validés'+(s?' · performance du site mesurée par Google':'')+'</span></div></div>'
+        +'<div class="r-section r-cols"><div class="r-col"><h2 class="r-good-h">Points forts</h2><ul class="r-list r-good">'+(diag.strengths.length?diag.strengths.map(x=>'<li><b>'+escHtml(x.label)+'</b>'+(x.advice?'<span>'+escHtml(x.advice)+'</span>':'')+'</li>').join(''):'<li><span>Visibilité à construire : voir le plan d’action ci-dessous.</span></li>')+'</ul></div><div class="r-col"><h2 class="r-bad-h">À améliorer</h2><ul class="r-list r-bad">'+(diag.weaknesses.length?diag.weaknesses.map(x=>'<li><b>'+escHtml(x.label)+'</b><span>'+escHtml(x.advice)+'</span></li>').join(''):'<li><span>Aucun point bloquant détecté.</span></li>')+'</ul></div></div>'
         +(infoRows.length?'<div class="r-section"><h2>Fiche commerce</h2><table class="r-table">'+infoRows.map(([k,v])=>'<tr><td>'+escHtml(k)+'</td><td>'+escHtml(v)+'</td></tr>').join('')+'</table></div>':'')
-        +(s?'<div class="r-section"><h2>Analyse du site · Google Lighthouse (mobile)</h2><div class="r-scores">'+gauge('Performance',s.scores.performance)+gauge('Accessibilité',s.scores.accessibility)+gauge('Bonnes pratiques',s.scores.bestPractices)+gauge('SEO',s.scores.seo)+'</div></div>':'')
-        +((s&&s.recommendations&&s.recommendations.length)?'<div class="r-section"><h2>Recommandations prioritaires</h2><ol class="r-recs">'+s.recommendations.slice(0,6).map(r=>'<li><b>'+escHtml(r.title)+'</b>'+(r.detail?'<span>'+escHtml(r.detail)+'</span>':'')+'</li>').join('')+'</ol></div>':'')
-        +'<div class="r-section"><h2>Contrôles terrain</h2><ul class="r-checks">'+list.map(x=>'<li class="'+(x.done?'done':'')+'"><span class="r-box">'+(x.done?'✓':'')+'</span>'+escHtml(x.label)+'</li>').join('')+'</ul></div>'
+        +(s?'<div class="r-section"><h2>Performance du site · Google Lighthouse (mobile)</h2><div class="r-scores">'+gauge('Performance',s.scores.performance)+gauge('Accessibilité',s.scores.accessibility)+gauge('Bonnes pratiques',s.scores.bestPractices)+gauge('SEO',s.scores.seo)+'</div></div>':'')
+        +(plan.length?'<div class="r-section"><h2>Plan d’action priorisé</h2><div class="r-plan">'+plan.map((p,i)=>'<div class="r-plan-item"><span class="r-plan-n">'+(i+1)+'</span><div class="r-plan-c"><b>'+escHtml(p.t)+'</b>'+(p.d?'<span>'+escHtml(p.d)+'</span>':'')+'</div>'+pill(p.p)+'</div>').join('')+'</div></div>':'')
+        +'<div class="r-section"><h2>Contrôles terrain ('+done+'/'+list.length+')</h2><ul class="r-checks">'+list.map(x=>'<li class="'+(x.done?'done':'')+'"><span class="r-box">'+(x.done?'✓':'')+'</span>'+escHtml(x.label)+'</li>').join('')+'</ul></div>'
         +(a.notes?'<div class="r-section"><h2>Notes & recommandations</h2><p class="r-notes">'+escHtml(a.notes)+'</p></div>':'')
         +'<div class="r-sign"><div class="r-sign-line" style="background:'+escHtml(col)+'"></div><b>'+escHtml(st.signature_name||st.company_name)+'</b><span>'+escHtml(st.signature_role||'')+'</span>'+[st.contact_email,st.phone,st.website].filter(Boolean).map(x=>'<span>'+escHtml(x)+'</span>').join('')+(st.signature_text?'<p>'+escHtml(st.signature_text)+'</p>':'')+'</div>'
-        +'<div class="r-foot">Rapport généré par '+escHtml(st.app_name||'AuditIA')+' · '+escHtml(st.company_name||'AffiAds')+' · Scores mesurés par Google PageSpeed Insights. Le nom du propriétaire et la date d\'ouverture ne sont pas fournis par Google.</div>';
+        +'<div class="r-foot">Rapport généré par '+escHtml(st.app_name||'AuditIA')+' · '+escHtml(st.company_name||'AffiAds')+' · Performance mesurée par Google PageSpeed Insights. Le nom du propriétaire et la date d\'ouverture ne sont pas fournis par Google.</div>';
     }
     function exportReport(auditId){
       const a=appAudits.find(x=>x.id===auditId); if(!a) return;
@@ -1066,7 +1146,7 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
         if(!a){appView='Audits';renderApp();return}
         const c=appClients.find(x=>x.id===a.client_id);
         const list=Array.isArray(a.checklist)?a.checklist:[];
-        body='<button class="app-btn" data-app-view="Audits">← Retour aux audits</button><section class="app-panel" style="margin-top:14px"><div class="eyebrow">DOSSIER D’AUDIT</div><h2 style="margin-top:8px">'+escHtml(c?.name||'Commerce')+'</h2><p>'+escHtml(c?.city||'')+' · '+escHtml(a.title)+'</p>'+clientInfoHtml(c)+scanPanelHtml(a,c)+socialPresenceHtml()+'<div class="scan-head" style="margin-top:8px"><div><div class="eyebrow">CONTRÔLES TERRAIN</div><h3 style="margin:4px 0 0">Vérifications manuelles</h3></div><div class="app-score">'+(a.score||0)+'/100</div></div><p class="app-muted">'+list.filter(x=>x.done).length+' sur '+list.length+' contrôles validés'+(a.scan?' · le score global provient de l’analyse réelle du site':'')+'</p>'+list.map((x,i)=>'<label class="app-check"><input type="checkbox" data-audit-check="'+i+'" '+(x.done?'checked':'')+'><span><b>'+escHtml(x.label)+'</b><small>'+escHtml(x.detail)+'</small></span></label>').join('')+'<form class="app-form" data-save-notes style="margin-top:18px"><label>Notes et recommandations<textarea name="notes" placeholder="Constats, actions à prévoir…">'+escHtml(a.notes||'')+'</textarea></label><button class="app-btn primary" type="submit">Enregistrer les notes</button></form><div class="detail-actions" style="margin-top:16px"><button class="app-btn primary" data-export-report="'+a.id+'">📄 Exporter le rapport (PDF)</button><button class="app-btn" data-delete-audit="'+a.id+'">Supprimer cet audit</button></div></section>';
+        body='<button class="app-btn" data-app-view="Audits">← Retour aux audits</button><section class="app-panel" style="margin-top:14px"><div class="eyebrow">DOSSIER D’AUDIT</div><h2 style="margin-top:8px">'+escHtml(c?.name||'Commerce')+'</h2><p>'+escHtml(c?.city||'')+' · '+escHtml(a.title)+'</p>'+visibilitySummaryHtml(a,c)+clientInfoHtml(c)+scanPanelHtml(a,c)+socialPresenceHtml()+'<div class="scan-head" style="margin-top:8px"><div><div class="eyebrow">CONTRÔLES TERRAIN</div><h3 style="margin:4px 0 0">Vérifications manuelles</h3></div><div class="app-score">'+(a.score||0)+'/100</div></div><p class="app-muted">'+list.filter(x=>x.done).length+' sur '+list.length+' contrôles validés'+(a.scan?' · le score global provient de l’analyse réelle du site':'')+'</p>'+list.map((x,i)=>'<label class="app-check"><input type="checkbox" data-audit-check="'+i+'" '+(x.done?'checked':'')+'><span><b>'+escHtml(x.label)+'</b><small>'+escHtml(x.detail)+'</small></span></label>').join('')+'<form class="app-form" data-save-notes style="margin-top:18px"><label>Notes et recommandations<textarea name="notes" placeholder="Constats, actions à prévoir…">'+escHtml(a.notes||'')+'</textarea></label><button class="app-btn primary" type="submit">Enregistrer les notes</button></form><div class="detail-actions" style="margin-top:16px"><button class="app-btn primary" data-export-report="'+a.id+'">📄 Exporter le rapport (PDF)</button><button class="app-btn" data-delete-audit="'+a.id+'">Supprimer cet audit</button></div></section>';
       }
       appShell(body);
     }
