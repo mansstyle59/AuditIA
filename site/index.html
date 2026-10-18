@@ -562,6 +562,16 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
 
     /* ===== Recherche automatique de commerces (Google Places) ===== */
     .place-search{margin-bottom:14px}
+    .ac-wrap{position:relative;margin-top:6px}
+    .ac-input{width:100%;border:1px solid #565472;background:#2f2d40;color:#f5f3fb;border-radius:13px;padding:14px 15px;min-height:50px;font-size:16px}
+    .ac-input:focus{outline:2px solid #8268ff80;border-color:#8268ff}
+    .ac-list{display:grid;gap:6px;margin-top:8px}
+    .ac-item{display:block;width:100%;text-align:left;background:#403e56;border:1px solid #524f6c;border-radius:12px;padding:12px 13px;cursor:pointer;color:#f3f2f8}
+    .ac-item:hover{background:#4a4866;border-color:#6a6790}
+    .ac-item b{display:block;font-size:14px;line-height:1.3}
+    .ac-item small{display:block;color:#bdb9cc;font-size:12px;margin-top:2px;overflow-wrap:anywhere}
+    .ac-msg{font-size:12.5px;color:#bdb9cc;padding:8px 2px;line-height:1.5}
+    .ac-msg.err{color:#ffb4bd}
     .place-form{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
     .place-form input{flex:1;min-width:160px;border:1px solid #5b5b7e;background:#3a3858;color:#f5f3fb;border-radius:13px;padding:13px 14px;min-height:48px}
     .place-form .app-btn{min-height:48px;white-space:nowrap}
@@ -713,7 +723,7 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       ['Informations locales','Ville, zone desservie et services sont clairs']
     ];
     let appClient = null, appUser = null, appClients = [], appAudits = [], appSettings = null, appView = 'Accueil', activeAudit = null, activeClient = null, appNotice = '';
-    let placeResults = [], placeSearching = false, placeMsg = '', pickedDetails = null, clientDraft = null, keyAlerts = [], auditFilter = '', noticeTimer = null;
+    let placeResults = [], placeSearching = false, placeMsg = '', pickedDetails = null, clientDraft = null, keyAlerts = [], auditFilter = '', noticeTimer = null, acTimer = null;
     const KEY_NAMES = { logo_dev:'Logo.dev', places:'Google Places', maps:'Google Maps', pagespeed:'PageSpeed' };
     function recomputeKeyAlerts(){ const a=[]; ['logo_dev','places','maps','pagespeed'].forEach(k=>{ const field=API_FIELD[k]; const val=String((appSettings&&appSettings[field])||'').trim(); if(!val) return; const rec=keyStore()[k]; if(rec&&rec.h===keyHash(val)&&rec.ok===false) a.push(KEY_NAMES[k]); }); keyAlerts=a; }
     async function checkKeysHealth(){
@@ -819,8 +829,8 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       page.querySelectorAll('[data-create-client]').forEach(form=>form.addEventListener('submit',async e=>{e.preventDefault();const fd=new FormData(form);const row={user_id:appUser.id,name:String(fd.get('name')||'').trim(),city:String(fd.get('city')||'').trim(),category:String(fd.get('category')||'Autre').trim(),website:String(fd.get('website')||'').trim()||null};if(row.website&&!/^https?:\/\//i.test(row.website))row.website='https://'+row.website;if(pickedDetails){row.details=pickedDetails;if(pickedDetails.phone)row.phone=pickedDetails.phone;if(!row.website&&pickedDetails.website)row.website=pickedDetails.website;}const {error}=await appClient.from('clients').insert(row);if(error){appNotice='Erreur : '+error.message}else{appNotice='Client enregistré.';pickedDetails=null;clientDraft=null;placeResults=[];placeMsg='';appView='Clients';await refreshData()}renderApp()}));
       page.querySelectorAll('[data-create-client]').forEach(form=>form.addEventListener('input',()=>{const g=n=>form.querySelector('[name="'+n+'"]');clientDraft={name:g('name').value,city:g('city').value,category:g('category').value,website:g('website').value};}));
       page.querySelectorAll('[data-clear-draft]').forEach(b=>b.addEventListener('click',()=>{clientDraft=null;pickedDetails=null;placeResults=[];placeMsg='';renderApp();}));
-      page.querySelectorAll('[data-place-search]').forEach(form=>form.addEventListener('submit',e=>{e.preventDefault();searchPlaces(String(new FormData(form).get('q')||''));}));
-      page.querySelectorAll('[data-place-pick]').forEach(b=>b.addEventListener('click',()=>pickPlace(Number(b.dataset.placePick))));
+      page.querySelectorAll('[data-place-input]').forEach(inp=>inp.addEventListener('input',()=>{clearTimeout(acTimer);const v=inp.value;acTimer=setTimeout(()=>autocompletePlaces(v),300);}));
+      const acBox=page.querySelector('#acList'); if(acBox) acBox.addEventListener('click',e=>{const b=e.target.closest('[data-ac-pick]');if(b)pickSuggestion(b.dataset.acPick);});
       page.querySelectorAll('[data-place-clear]').forEach(b=>b.addEventListener('click',()=>{pickedDetails=null;placeMsg='';renderApp();}));
       page.querySelectorAll('[data-create-audit]').forEach(form=>form.addEventListener('submit',async e=>{e.preventDefault();const fd=new FormData(form);const row={user_id:appUser.id,client_id:String(fd.get('client_id')||''),title:String(fd.get('title')||'Audit de visibilité').trim(),status:'À démarrer',score:0,checklist:checklistTemplate.map(([label,detail])=>({label,detail,done:false}))};const {error}=await appClient.from('audits').insert(row);if(error){appNotice='Erreur : '+error.message}else{appNotice='Audit créé. Tu peux maintenant ouvrir son dossier.';appView='Audits';await refreshData()}renderApp()}));
       page.querySelectorAll('[data-open-audit]').forEach(b=>b.addEventListener('click',()=>{activeAudit=b.dataset.openAudit;appView='Détail';renderApp()}));
@@ -880,20 +890,53 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
         return ev?ev.eventDate:null;
       }catch(e){ return null; }
     }
-    async function pickPlace(i){
-      const p=placeResults[i]; if(!p) return;
-      let website=p.website||''; if(website&&!/^https?:\/\//i.test(website)) website='https://'+website;
+    function normalizePlace(p){
+      let website=p.websiteUri||''; if(website&&!/^https?:\/\//i.test(website)) website='https://'+website;
+      return { placeId:p.id, name:(p.displayName&&p.displayName.text)||'', address:p.formattedAddress||'',
+        city:cityFromComponents(p.addressComponents), category:mapCategory(p.primaryType,p.types),
+        primaryType:p.primaryType||'', phone:p.nationalPhoneNumber||'', website:website,
+        rating:typeof p.rating==='number'?p.rating:null, reviews:p.userRatingCount||0,
+        status:p.businessStatus||'', hours:(p.regularOpeningHours&&p.regularOpeningHours.weekdayDescriptions)||null };
+    }
+    async function applyPlace(p){
+      const website=p.website||'';
       pickedDetails={ place_id:p.placeId, address:p.address, category:p.category, primaryType:p.primaryType, phone:p.phone||null, rating:p.rating, reviews:p.reviews, status:p.status, hours:p.hours, website:website||null, domainCreated:null, source:'Google Places', fetchedAt:new Date().toISOString() };
       clientDraft={ name:p.name, city:p.city, category:p.category, website:website };
-      placeMsg='« '+p.name+' » chargé. La date de création du domaine est recherchée…';
-      placeResults=[]; renderApp();
+      placeMsg='« '+p.name+' » chargé. Recherche de la date du domaine…';
+      renderApp();
       if(website){ const dc=await fetchDomainDate(website); if(pickedDetails) pickedDetails.domainCreated=dc; placeMsg=dc?'Fiche chargée. Domaine créé le '+new Date(dc).toLocaleDateString('fr-FR')+' (indice d’ancienneté, pas la date d’ouverture).':'Fiche chargée. Date de domaine indisponible pour ce site.'; }
       else placeMsg='Fiche chargée. Ce commerce n’a pas de site web public connu.';
       renderApp();
     }
+    let acSeq=0;
+    async function autocompletePlaces(val){
+      const box=document.getElementById('acList'); if(!box) return;
+      const key=placesKey();
+      if(!key){ box.innerHTML='<div class="ac-msg">Ajoute et teste ta clé Google Places dans les Réglages pour activer l’auto-complétion.</div>'; return; }
+      if(String(val||'').trim().length<2){ box.innerHTML=''; return; }
+      const seq=++acSeq; box.innerHTML='<div class="ac-msg">Recherche…</div>';
+      try{
+        const r=await withTimeout(fetch('https://places.googleapis.com/v1/places:autocomplete',{method:'POST',headers:{'Content-Type':'application/json','X-Goog-Api-Key':key},body:JSON.stringify({input:String(val).trim(),languageCode:'fr',regionCode:'FR'})}),9000);
+        if(seq!==acSeq) return;
+        if(!r.ok){ if(r.status===403||r.status===400) keyStoreSet('places',false,key); const d=await r.json().catch(()=>null); const m=(d&&d.error&&d.error.message)||('HTTP '+r.status); box.innerHTML='<div class="ac-msg err">'+escHtml(r.status===403?'Refusé (403) : active « Places API (New) » et autorise le domaine de l’app dans les restrictions de la clé.':r.status===400&&/api key/i.test(m)?'Clé Google Places refusée (vérifie-la dans les Réglages).':'Indisponible : '+m.slice(0,80))+'</div>'; recomputeKeyAlerts(); return; }
+        keyStoreSet('places',true,key); recomputeKeyAlerts();
+        const d=await r.json();
+        const sugg=(d.suggestions||[]).map(s=>s.placePrediction).filter(Boolean);
+        if(!sugg.length){ box.innerHTML='<div class="ac-msg">Aucun résultat pour l’instant. Continue à taper…</div>'; return; }
+        box.innerHTML=sugg.slice(0,6).map(s=>{const main=(s.structuredFormat&&s.structuredFormat.mainText&&s.structuredFormat.mainText.text)||(s.text&&s.text.text)||'';const sec=(s.structuredFormat&&s.structuredFormat.secondaryText&&s.structuredFormat.secondaryText.text)||'';return '<button type="button" class="ac-item" data-ac-pick="'+escHtml(s.placeId)+'"><b>'+escHtml(main)+'</b>'+(sec?'<small>'+escHtml(sec)+'</small>':'')+'</button>';}).join('');
+      }catch(e){ if(seq!==acSeq) return; box.innerHTML='<div class="ac-msg err">'+escHtml(/timeout/.test(e.message)?'Délai dépassé. Réessaie.':'Auto-complétion bloquée par le navigateur (réseau ou restriction de la clé).')+'</div>'; }
+    }
+    async function pickSuggestion(placeId){
+      const key=placesKey(); if(!key||!placeId) return;
+      const box=document.getElementById('acList'); if(box) box.innerHTML='<div class="ac-msg">Chargement de la fiche…</div>';
+      try{
+        const r=await withTimeout(fetch('https://places.googleapis.com/v1/places/'+encodeURIComponent(placeId),{headers:{'X-Goog-Api-Key':key,'X-Goog-FieldMask':'id,displayName,formattedAddress,addressComponents,primaryType,types,nationalPhoneNumber,websiteUri,rating,userRatingCount,businessStatus,regularOpeningHours'}}),12000);
+        if(!r.ok){ if(box) box.innerHTML='<div class="ac-msg err">Impossible de charger la fiche (HTTP '+r.status+').</div>'; return; }
+        const p=await r.json(); await applyPlace(normalizePlace(p));
+      }catch(e){ if(box) box.innerHTML='<div class="ac-msg err">Chargement impossible. Réessaie.</div>'; }
+    }
     function placeSearchHtml(){
-      const cards=placeResults.map((p,i)=>'<div class="place-card"><div class="place-info"><b>'+escHtml(p.name)+'</b><small>'+escHtml(p.address||p.city)+'</small><small>'+escHtml(p.category)+(p.phone?' · '+escHtml(p.phone):'')+(p.rating!=null?' · ★ '+p.rating+' ('+p.reviews+')':'')+(p.status&&p.status!=='OPERATIONAL'?' · ⚠️ '+(p.status==='CLOSED_TEMPORARILY'?'fermé temporairement':p.status==='CLOSED_PERMANENTLY'?'fermé définitivement':p.status):'')+'</small></div><button type="button" class="app-btn primary" data-place-pick="'+i+'">Choisir</button></div>').join('');
-      return '<section class="app-panel place-search"><div class="scan-head"><div><div class="eyebrow">RECHERCHE AUTOMATIQUE</div><h2 style="margin:4px 0 0">Trouver un commerce</h2></div></div><p class="app-muted">Tape le nom + la ville : Google remplit automatiquement la catégorie, l’adresse, le téléphone, le site et la note.</p><form class="place-form" data-place-search><input name="q" placeholder="Ex. Boulangerie Dupont, Narbonne" autocomplete="off" '+(placeSearching?'disabled':'')+'><button class="app-btn primary" type="submit" '+(placeSearching?'disabled':'')+'>'+(placeSearching?'Recherche…':'Rechercher')+'</button></form>'+(placeMsg?'<p class="place-msg">'+escHtml(placeMsg)+'</p>':'')+(placeResults.length?'<div class="place-results">'+cards+'</div>':'')+(pickedDetails?'<p class="place-picked">✓ Infos Google prêtes : elles seront enregistrées avec le client. <button type="button" class="place-clear" data-place-clear>Annuler</button></p>':'')+'</section>';
+      return '<section class="app-panel place-search"><div class="eyebrow">RECHERCHE AUTOMATIQUE</div><h2 style="margin:4px 0 2px">Trouver un commerce</h2><p class="app-muted">Tape les premières lettres : Google propose les commerces et remplit tout (catégorie, adresse, téléphone, site, note).</p><div class="ac-wrap"><input class="ac-input" data-place-input placeholder="Ex. Boulangerie Dupont Narbonne" autocomplete="off" inputmode="search"><div class="ac-list" id="acList"></div></div>'+(placeMsg?'<p class="place-msg">'+escHtml(placeMsg)+'</p>':'')+(pickedDetails?'<p class="place-picked">✓ Infos Google prêtes : elles seront enregistrées avec le client. <button type="button" class="place-clear" data-place-clear>Annuler</button></p>':'')+'</section>';
     }
     function clientInfoHtml(c){
       if(!c) return '';
