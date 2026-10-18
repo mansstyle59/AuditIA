@@ -477,6 +477,48 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       .settings-actions{display:grid;grid-template-columns:1fr}
     }
 
+    /* ===== Recommandations d'audit + filtre ===== */
+    .rec-title{font-size:16px;margin:16px 0 8px}
+    .rec-list{display:grid;gap:8px}
+    .rec-item{display:flex;gap:10px;background:#25283a;border:1px solid #ffffff0d;border-radius:12px;padding:11px 13px}
+    .rec-dot{flex:0 0 8px;width:8px;height:8px;border-radius:50%;margin-top:6px}
+    .rec-high .rec-dot{background:#f87171}.rec-mid .rec-dot{background:#fbbf24}
+    .rec-copy{min-width:0}.rec-copy b{font-size:13.5px;line-height:1.35;display:block}
+    .rec-copy small{display:block;color:#aaa6bd;font-size:12px;line-height:1.5;margin-top:3px}
+    .rec-gain{display:inline-block;font-size:11px;font-weight:800;color:#9ae8c4;background:#17372f;border-radius:999px;padding:1px 7px;margin-left:4px;vertical-align:middle}
+    .app-filter{width:100%;border:1px solid #3b3b58;background:#201f31;color:#f5f3fb;border-radius:12px;padding:11px 13px;min-height:44px;margin-bottom:10px}
+    .detail-actions{display:flex;gap:8px;flex-wrap:wrap}
+    .detail-actions .app-btn{flex:1;min-width:150px}
+
+    /* ===== Rapport PDF imprimable ===== */
+    #printReport{display:none}
+    @media print{
+      body.printing{background:#fff!important}
+      body.printing .status-safe,body.printing>.top,body.printing>.wrap,body.printing .login-page,body.printing footer{display:none!important}
+      body.printing #printReport{display:block!important}
+      #printReport{color:#1c1830;font:13px/1.5 -apple-system,system-ui,sans-serif}
+      .r-page{width:100%;max-width:720px;margin:0 auto;padding:0 4mm}
+      .r-head{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #eee;padding-bottom:10px}
+      .r-brand{display:flex;gap:10px;align-items:center}.r-brand img{width:40px;height:40px;border-radius:9px}
+      .r-brand b{display:block;font-size:16px}.r-brand span{font-size:11px;color:#777}
+      .r-meta{text-align:right}.r-meta b{display:block;font-size:12px}.r-meta span{font-size:11px;color:#777}
+      .r-client{font-size:26px;margin:14px 0 2px}.r-sub{color:#777;margin:0 0 12px}
+      .r-global{display:flex;align-items:center;gap:16px;background:#f6f4fc;border-radius:12px;padding:14px 16px}
+      .r-global-score{font-size:40px;font-weight:800;line-height:1}.r-global-score small{font-size:16px;color:#999}
+      .r-global-txt b{display:block;font-size:14px}.r-global-txt span{font-size:12px;color:#777}
+      .r-section{margin-top:16px;break-inside:avoid}
+      .r-section h2{font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:#7657ed;border-bottom:1px solid #eee;padding-bottom:5px;margin:0 0 9px}
+      .r-table{width:100%;border-collapse:collapse}.r-table td{padding:5px 0;font-size:12.5px;border-bottom:1px solid #f2f2f2;vertical-align:top}.r-table td:first-child{color:#888;width:38%}
+      .r-scores{display:flex;gap:14px;justify-content:space-between}
+      .r-score{text-align:center;flex:1}.r-ring{width:64px;height:64px;border-radius:50%;margin:0 auto 5px;display:grid;place-items:center}.r-ring span{width:50px;height:50px;border-radius:50%;background:#fff;display:grid;place-items:center;font-weight:800;font-size:17px}.r-score small{font-size:11px;color:#777}
+      .r-recs{margin:0;padding-left:18px}.r-recs li{margin-bottom:7px}.r-recs b{font-size:12.5px}.r-recs span{display:block;color:#777;font-size:11.5px}
+      .r-checks{list-style:none;margin:0;padding:0;columns:2;gap:16px}.r-checks li{font-size:12px;margin-bottom:5px;display:flex;gap:7px;break-inside:avoid}.r-box{flex:0 0 15px;width:15px;height:15px;border:1.5px solid #bbb;border-radius:4px;display:inline-grid;place-items:center;font-size:10px;color:#1f9d57}.r-checks li.done .r-box{border-color:#1f9d57}
+      .r-notes{white-space:pre-wrap;font-size:12.5px;background:#f9f8fd;border-radius:8px;padding:10px}
+      .r-sign{margin-top:18px;break-inside:avoid}.r-sign-line{width:46px;height:3px;border-radius:3px;margin-bottom:7px}.r-sign b{display:block;font-size:14px}.r-sign span{display:block;font-size:11.5px;color:#777}.r-sign p{font-style:italic;font-size:12px;margin:6px 0 0}
+      .r-foot{margin-top:16px;border-top:1px solid #eee;padding-top:8px;font-size:9.5px;color:#999}
+      @page{margin:12mm 8mm}
+    }
+
     /* ===== Bannière d'alerte clé API + écran de chargement connexion ===== */
     .key-alert{display:flex;align-items:center;gap:12px;background:#3a2719;border:1px solid #7a512b;border-radius:16px;padding:13px 15px;margin:0 0 14px}
     .key-alert-ic{font-size:20px;flex:0 0 auto}
@@ -586,7 +628,7 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       ['Informations locales','Ville, zone desservie et services sont clairs']
     ];
     let appClient = null, appUser = null, appClients = [], appAudits = [], appSettings = null, appView = 'Accueil', activeAudit = null, appNotice = '';
-    let placeResults = [], placeSearching = false, placeMsg = '', pickedDetails = null, clientDraft = null, keyAlerts = [];
+    let placeResults = [], placeSearching = false, placeMsg = '', pickedDetails = null, clientDraft = null, keyAlerts = [], auditFilter = '';
     const KEY_NAMES = { logo_dev:'Logo.dev', places:'Google Places', maps:'Google Maps', pagespeed:'PageSpeed' };
     function recomputeKeyAlerts(){ const a=[]; ['logo_dev','places','maps','pagespeed'].forEach(k=>{ const field=API_FIELD[k]; const val=String((appSettings&&appSettings[field])||'').trim(); if(!val) return; const rec=keyStore()[k]; if(rec&&rec.h===keyHash(val)&&rec.ok===false) a.push(KEY_NAMES[k]); }); keyAlerts=a; }
     async function checkKeysHealth(){
@@ -695,6 +737,8 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       page.querySelectorAll('[data-delete-client]').forEach(b=>b.addEventListener('click',async()=>{if(!confirm('Supprimer ce client et ses audits associés ?'))return;const id=b.dataset.deleteClient;const au=await appClient.from('audits').delete().eq('client_id',id);const {error}=await appClient.from('clients').delete().eq('id',id);appNotice=error?'Erreur : '+error.message:(au.error?'Client supprimé. Audits liés : '+au.error.message:'Client et audits associés supprimés.');await refreshData();renderApp()}));
       page.querySelectorAll('[data-delete-audit]').forEach(b=>b.addEventListener('click',async()=>{if(!confirm('Supprimer cet audit ?'))return;const {error}=await appClient.from('audits').delete().eq('id',b.dataset.deleteAudit);appNotice=error?'Erreur : '+error.message:'Audit supprimé.';await refreshData();renderApp()}));
       page.querySelectorAll('[data-run-scan]').forEach(b=>b.addEventListener('click',()=>runScan(b.dataset.runScan)));
+      page.querySelectorAll('[data-export-report]').forEach(b=>b.addEventListener('click',()=>exportReport(b.dataset.exportReport)));
+      page.querySelectorAll('[data-audit-filter]').forEach(inp=>inp.addEventListener('input',()=>{auditFilter=inp.value;const pos=inp.selectionStart;renderApp();const n=document.querySelector('[data-audit-filter]');if(n){n.focus();try{n.setSelectionRange(pos,pos);}catch(e){}}}));
     }
     /* ----- Recherche automatique de commerces (Google Places API New) ----- */
     function mapCategory(primary, types){
@@ -786,6 +830,7 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
         const u=new URL('https://www.googleapis.com/pagespeedonline/v5/runPagespeed');
         u.searchParams.set('url',site); u.searchParams.set('strategy','mobile');
         ['performance','accessibility','best-practices','seo'].forEach(cat=>u.searchParams.append('category',cat));
+        u.searchParams.set('locale','fr');
         if(key) u.searchParams.set('key',key);
         const r=await withTimeout(fetch(u.toString()),60000);
         if(!r.ok){ if(key&&(r.status===400||r.status===401||r.status===403)) keyStoreSet('pagespeed',false,key); const d=await r.json().catch(()=>null); const m=(d&&d.error&&d.error.message)||('HTTP '+r.status); throw new Error(r.status===429?'Limite d’analyses atteinte (quota). Réessaie dans quelques minutes, ou ajoute une clé PageSpeed dans les Réglages.':r.status===400?'Google n’a pas pu analyser cette adresse. Vérifie le site web du client.':m); }
@@ -793,9 +838,12 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
         if(!lh||!lh.categories) throw new Error('Aucun résultat exploitable renvoyé par Google.');
         const sc=k=>typeof (lh.categories[k]||{}).score==='number'?Math.round(lh.categories[k].score*100):null;
         const au=lh.audits||{}; const dv=k=>(au[k]&&au[k].displayValue)||null;
+        const cleanTxt=s=>String(s||'').replace(/\[([^\]]+)\]\([^)]+\)/g,'$1').replace(/\s+/g,' ').trim();
+        const recommendations=Object.values(au).filter(x=>x&&typeof x.score==='number'&&x.score<0.9&&x.title&&(x.scoreDisplayMode==='metricSavings'||(x.details&&x.details.type==='opportunity')||x.scoreDisplayMode==='binary'||x.scoreDisplayMode==='numeric')).sort((a,b)=>a.score-b.score).slice(0,8).map(x=>({title:cleanTxt(x.title),detail:cleanTxt(x.description),gain:x.displayValue||null,severity:x.score<0.5?'haute':'moyenne'}));
         const scan={ provider:'Google PageSpeed Insights · Lighthouse (mobile)', analyzedAt:new Date().toISOString(), url:site, finalUrl:lh.finalDisplayedUrl||site,
           scores:{performance:sc('performance'),accessibility:sc('accessibility'),bestPractices:sc('best-practices'),seo:sc('seo')},
-          metrics:{ 'Contenu affiché (FCP)':dv('first-contentful-paint'), 'Plus grand contenu (LCP)':dv('largest-contentful-paint'), 'Interactivité (TBT)':dv('total-blocking-time'), 'Stabilité visuelle (CLS)':dv('cumulative-layout-shift'), 'Vitesse (Speed Index)':dv('speed-index') } };
+          metrics:{ 'Contenu affiché (FCP)':dv('first-contentful-paint'), 'Plus grand contenu (LCP)':dv('largest-contentful-paint'), 'Interactivité (TBT)':dv('total-blocking-time'), 'Stabilité visuelle (CLS)':dv('cumulative-layout-shift'), 'Vitesse (Speed Index)':dv('speed-index') },
+          recommendations };
         const vals=Object.values(scan.scores).filter(v=>typeof v==='number');
         const overall=vals.length?Math.round(vals.reduce((s,n)=>s+n,0)/vals.length):0;
         const {error}=await appClient.from('audits').update({scan,score:overall,status:'Analysé',updated_at:new Date().toISOString()}).eq('id',auditId);
@@ -812,7 +860,36 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       if(!site) return '<section class="app-panel scan-panel">'+head+'<div class="app-empty">Ajoute un site web à la fiche client pour lancer l’analyse réelle.</div></section>';
       if(!s) return '<section class="app-panel scan-panel">'+head+'<p class="app-muted">'+escHtml(site)+'</p><div class="app-empty">Aucune analyse pour le moment. Touche « Analyser le site » pour mesurer la performance, le SEO et l’accessibilité réels du site.</div></section>';
       const metrics=Object.entries(s.metrics||{}).filter(([k,v])=>v).map(([k,v])=>'<div class="scan-metric"><span>'+escHtml(k)+'</span><b>'+escHtml(v)+'</b></div>').join('');
-      return '<section class="app-panel scan-panel">'+head+'<p class="app-muted">'+escHtml(s.finalUrl||site)+' · analysé le '+escHtml(new Date(s.analyzedAt).toLocaleString('fr-FR'))+'</p><div class="scan-scores">'+scanGauge('Performance',s.scores.performance)+scanGauge('Accessibilité',s.scores.accessibility)+scanGauge('Bonnes pratiques',s.scores.bestPractices)+scanGauge('SEO',s.scores.seo)+'</div>'+(metrics?'<div class="scan-metrics">'+metrics+'</div>':'')+'<p class="scan-note">Scores mesurés par Google (Lighthouse mobile). Ils reflètent le site web ; les points de contrôle terrain ci-dessous restent manuels.</p></section>';
+      const recs=(s.recommendations&&s.recommendations.length)?'<h3 class="rec-title">Recommandations prioritaires</h3><div class="rec-list">'+s.recommendations.map(r=>'<div class="rec-item rec-'+(r.severity==='haute'?'high':'mid')+'"><div class="rec-dot"></div><div class="rec-copy"><b>'+escHtml(r.title)+(r.gain?' <span class="rec-gain">'+escHtml(r.gain)+'</span>':'')+'</b>'+(r.detail?'<small>'+escHtml(r.detail)+'</small>':'')+'</div></div>').join('')+'</div>':'';
+      return '<section class="app-panel scan-panel">'+head+'<p class="app-muted">'+escHtml(s.finalUrl||site)+' · analysé le '+escHtml(new Date(s.analyzedAt).toLocaleString('fr-FR'))+'</p><div class="scan-scores">'+scanGauge('Performance',s.scores.performance)+scanGauge('Accessibilité',s.scores.accessibility)+scanGauge('Bonnes pratiques',s.scores.bestPractices)+scanGauge('SEO',s.scores.seo)+'</div>'+(metrics?'<div class="scan-metrics">'+metrics+'</div>':'')+recs+'<p class="scan-note">Scores mesurés par Google (Lighthouse mobile). Ils reflètent le site web ; les points de contrôle terrain ci-dessous restent manuels.</p></section>';
+    }
+    function reportHtml(a,c){
+      const d=(c&&c.details)||{}; const s=a.scan; const st={...defaultSettings(),...(appSettings||{})};
+      const list=Array.isArray(a.checklist)?a.checklist:[]; const done=list.filter(x=>x.done).length;
+      const logo=currentLogo(); const col=st.primary_color||'#7657ed';
+      const gauge=(l,v)=>{const cc=v==null?'#999':v>=90?'#1f9d57':v>=50?'#c98a00':'#c0392b';return '<div class="r-score"><div class="r-ring" style="background:conic-gradient('+cc+' '+((v==null?0:v)*3.6)+'deg,#e7e3f2 0)"><span>'+(v==null?'—':v)+'</span></div><small>'+l+'</small></div>';};
+      const infoRows=[]; if(c){ if(c.category||d.category)infoRows.push(['Catégorie',c.category||d.category]); if(d.address)infoRows.push(['Adresse',d.address]); if(c.phone||d.phone)infoRows.push(['Téléphone',c.phone||d.phone]); if(c.website)infoRows.push(['Site web',c.website]); if(d.rating!=null)infoRows.push(['Note Google','★ '+d.rating+' ('+(d.reviews||0)+' avis)']); if(d.domainCreated)infoRows.push(['Ancienneté du domaine','depuis '+new Date(d.domainCreated).toLocaleDateString('fr-FR')]); }
+      return '<div class="r-head"><div class="r-brand"><img src="'+escHtml(logo)+'" alt=""><div><b>'+escHtml(st.app_name||'AuditIA')+'</b><span>'+escHtml(st.company_name||'AffiAds')+'</span></div></div><div class="r-meta"><b>Rapport d\'audit de visibilité</b><span>'+escHtml(new Date(a.updated_at||Date.now()).toLocaleDateString('fr-FR'))+'</span></div></div>'
+        +'<h1 class="r-client">'+escHtml(c?.name||'Commerce')+'</h1><p class="r-sub">'+escHtml([c?.city,c?.category||d.category].filter(Boolean).join(' · '))+'</p>'
+        +'<div class="r-global"><div class="r-global-score" style="color:'+escHtml(col)+'">'+(a.score||0)+'<small>/100</small></div><div class="r-global-txt"><b>Score global '+(s?'(analyse réelle du site)':'(contrôles terrain)')+'</b><span>'+escHtml(a.status||'À démarrer')+' · '+done+'/'+list.length+' contrôles terrain validés</span></div></div>'
+        +(infoRows.length?'<div class="r-section"><h2>Fiche commerce</h2><table class="r-table">'+infoRows.map(([k,v])=>'<tr><td>'+escHtml(k)+'</td><td>'+escHtml(v)+'</td></tr>').join('')+'</table></div>':'')
+        +(s?'<div class="r-section"><h2>Analyse du site · Google Lighthouse (mobile)</h2><div class="r-scores">'+gauge('Performance',s.scores.performance)+gauge('Accessibilité',s.scores.accessibility)+gauge('Bonnes pratiques',s.scores.bestPractices)+gauge('SEO',s.scores.seo)+'</div></div>':'')
+        +((s&&s.recommendations&&s.recommendations.length)?'<div class="r-section"><h2>Recommandations prioritaires</h2><ol class="r-recs">'+s.recommendations.slice(0,6).map(r=>'<li><b>'+escHtml(r.title)+'</b>'+(r.detail?'<span>'+escHtml(r.detail)+'</span>':'')+'</li>').join('')+'</ol></div>':'')
+        +'<div class="r-section"><h2>Contrôles terrain</h2><ul class="r-checks">'+list.map(x=>'<li class="'+(x.done?'done':'')+'"><span class="r-box">'+(x.done?'✓':'')+'</span>'+escHtml(x.label)+'</li>').join('')+'</ul></div>'
+        +(a.notes?'<div class="r-section"><h2>Notes & recommandations</h2><p class="r-notes">'+escHtml(a.notes)+'</p></div>':'')
+        +'<div class="r-sign"><div class="r-sign-line" style="background:'+escHtml(col)+'"></div><b>'+escHtml(st.signature_name||st.company_name)+'</b><span>'+escHtml(st.signature_role||'')+'</span>'+[st.contact_email,st.phone,st.website].filter(Boolean).map(x=>'<span>'+escHtml(x)+'</span>').join('')+(st.signature_text?'<p>'+escHtml(st.signature_text)+'</p>':'')+'</div>'
+        +'<div class="r-foot">Rapport généré par '+escHtml(st.app_name||'AuditIA')+' · '+escHtml(st.company_name||'AffiAds')+' · Scores mesurés par Google PageSpeed Insights. Le nom du propriétaire et la date d\'ouverture ne sont pas fournis par Google.</div>';
+    }
+    function exportReport(auditId){
+      const a=appAudits.find(x=>x.id===auditId); if(!a) return;
+      const c=appClients.find(x=>x.id===a.client_id);
+      let host=document.getElementById('printReport');
+      if(!host){ host=document.createElement('div'); host.id='printReport'; document.body.appendChild(host); }
+      host.innerHTML='<div class="r-page">'+reportHtml(a,c)+'</div>';
+      document.body.classList.add('printing');
+      const done=()=>{ document.body.classList.remove('printing'); window.removeEventListener('afterprint',done); };
+      window.addEventListener('afterprint',done);
+      setTimeout(()=>{ window.print(); setTimeout(done,1500); },120);
     }
     function renderApp(){
       const completed=appAudits.filter(a=>a.status==='Terminé').length;
@@ -825,7 +902,7 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
         const cd=clientDraft||{}; const catOpts=['Commerce','Restaurant','Artisan','Beauté & bien-être','Automobile','Hébergement','Autre'].map(o=>'<option'+(cd.category===o?' selected':'')+'>'+o+'</option>').join('');
         body=placeSearchHtml()+'<div class="app-grid"><section class="app-panel"><h2>Fiche du commerce</h2><p class="app-muted" style="margin:-4px 0 12px">Remplie automatiquement après une recherche, ou à compléter à la main.</p><form class="app-form" data-create-client><label>Nom du commerce<input name="name" required maxlength="120" placeholder="Ex. Boulangerie du Centre" value="'+escHtml(cd.name||'')+'"></label><label>Ville<input name="city" required maxlength="100" placeholder="Ex. Azille" value="'+escHtml(cd.city||'')+'"></label><label>Catégorie<select name="category">'+catOpts+'</select></label><label>Site web (facultatif)<input name="website" type="text" placeholder="https://exemple.fr" value="'+escHtml(cd.website||'')+'"></label><button class="app-btn primary" type="submit">Enregistrer le client</button>'+(cd.name?'<button class="app-btn" type="button" data-clear-draft>Vider le formulaire</button>':'')+'</form></section><section class="app-panel"><h2>Mes clients ('+appClients.length+')</h2>'+(appClients.length?'<div class="app-list">'+appClients.map(c=>{const d=c.details||{};const extra=[c.category,c.phone||d.phone,(d.rating!=null?'★ '+d.rating+(d.reviews?' ('+d.reviews+')':''):'')].filter(Boolean).join(' · ');return '<div class="app-row"><div><b>'+escHtml(c.name)+'</b><small>'+escHtml(c.city)+(extra?' · '+escHtml(extra):'')+'</small>'+(c.website?'<small>'+escHtml(c.website)+'</small>':'')+'</div><button class="app-btn" data-delete-client="'+c.id+'">Supprimer</button></div>'}).join('')+'</div>':'<div class="app-empty">Aucun client enregistré. Utilise la recherche automatique ci-dessus.</div>')+'</section></div>';
       } else if(appView==='Audits'){
-        body='<div class="app-grid"><section class="app-panel"><h2>Créer un audit</h2>'+(appClients.length?'<form class="app-form" data-create-audit><label>Client<select name="client_id" required>'+appClients.map(c=>'<option value="'+c.id+'">'+escHtml(c.name)+' — '+escHtml(c.city)+'</option>').join('')+'</select></label><label>Nom de l’audit<input name="title" required maxlength="120" value="Audit de visibilité numérique"></label><button class="app-btn primary" type="submit">Créer l’audit</button></form>':'<div class="app-empty">Ajoute d’abord un client dans l’onglet Clients.</div>')+'</section><section class="app-panel"><h2>Historique ('+appAudits.length+')</h2>'+(appAudits.length?'<div class="app-list">'+appAudits.map(a=>{const c=appClients.find(x=>x.id===a.client_id);return '<div class="app-row"><div><b>'+escHtml(c?.name||'Commerce')+'</b><small>'+escHtml(a.title)+' · '+escHtml(a.status||'À démarrer')+' · '+(a.score||0)+'/100</small></div><button class="app-btn" data-open-audit="'+a.id+'">Ouvrir</button></div>'}).join('')+'</div>':'<div class="app-empty">Aucun audit créé.</div>')+'</section></div>';
+        body='<div class="app-grid"><section class="app-panel"><h2>Créer un audit</h2>'+(appClients.length?'<form class="app-form" data-create-audit><label>Client<select name="client_id" required>'+appClients.map(c=>'<option value="'+c.id+'">'+escHtml(c.name)+' — '+escHtml(c.city)+'</option>').join('')+'</select></label><label>Nom de l’audit<input name="title" required maxlength="120" value="Audit de visibilité numérique"></label><button class="app-btn primary" type="submit">Créer l’audit</button></form>':'<div class="app-empty">Ajoute d’abord un client dans l’onglet Clients.</div>')+'</section><section class="app-panel"><h2>Historique ('+appAudits.length+')</h2>'+(appAudits.length>3?'<input class="app-filter" data-audit-filter placeholder="🔎 Filtrer par commerce, ville, statut…" value="'+escHtml(auditFilter)+'">':'')+(function(){const q=auditFilter.trim().toLowerCase();const rows=appAudits.filter(a=>{if(!q)return true;const c=appClients.find(x=>x.id===a.client_id);return ((c?.name||'')+' '+(c?.city||'')+' '+(a.title||'')+' '+(a.status||'')).toLowerCase().includes(q);});return rows.length?'<div class="app-list">'+rows.map(a=>{const c=appClients.find(x=>x.id===a.client_id);return '<div class="app-row"><div><b>'+escHtml(c?.name||'Commerce')+'</b><small>'+escHtml(a.title)+' · '+escHtml(a.status||'À démarrer')+' · '+(a.score||0)+'/100</small></div><button class="app-btn" data-open-audit="'+a.id+'">Ouvrir</button></div>'}).join('')+'</div>':'<div class="app-empty">'+(appAudits.length?'Aucun audit ne correspond à « '+escHtml(auditFilter)+' ».':'Aucun audit créé.')+'</div>';})()+'</section></div>';
       } else if(appView==='Outils'){
         body='<div class="app-content-title"><div><h2>Outils d’audit</h2><p>Accède rapidement aux outils de contrôle de visibilité.</p></div></div><div class="app-grid"><section class="app-panel"><h2>Audit de visibilité</h2><p>Crée un audit pour évaluer la présence numérique d’un commerce.</p><button class="app-btn primary" data-app-view="Audits">Créer un audit</button></section><section class="app-panel"><h2>Base clients</h2><p>Ajoute ou retrouve les commerces que tu accompagnes.</p><button class="app-btn" data-app-view="Clients">Ouvrir les clients</button></section><section class="app-panel"><h2>Configuration des API</h2><p>Prépare Google Places, PageSpeed et les autres intégrations.</p><button class="app-btn" data-app-view="Paramètres">Configurer les API</button></section></div>';
       } else if(appView==='Rapports'){
@@ -838,7 +915,7 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
         if(!a){appView='Audits';renderApp();return}
         const c=appClients.find(x=>x.id===a.client_id);
         const list=Array.isArray(a.checklist)?a.checklist:[];
-        body='<button class="app-btn" data-app-view="Audits">← Retour aux audits</button><section class="app-panel" style="margin-top:14px"><div class="eyebrow">DOSSIER D’AUDIT</div><h2 style="margin-top:8px">'+escHtml(c?.name||'Commerce')+'</h2><p>'+escHtml(c?.city||'')+' · '+escHtml(a.title)+'</p>'+clientInfoHtml(c)+scanPanelHtml(a,c)+socialPresenceHtml()+'<div class="scan-head" style="margin-top:8px"><div><div class="eyebrow">CONTRÔLES TERRAIN</div><h3 style="margin:4px 0 0">Vérifications manuelles</h3></div><div class="app-score">'+(a.score||0)+'/100</div></div><p class="app-muted">'+list.filter(x=>x.done).length+' sur '+list.length+' contrôles validés'+(a.scan?' · le score global provient de l’analyse réelle du site':'')+'</p>'+list.map((x,i)=>'<label class="app-check"><input type="checkbox" data-audit-check="'+i+'" '+(x.done?'checked':'')+'><span><b>'+escHtml(x.label)+'</b><small>'+escHtml(x.detail)+'</small></span></label>').join('')+'<form class="app-form" data-save-notes style="margin-top:18px"><label>Notes et recommandations<textarea name="notes" placeholder="Constats, actions à prévoir…">'+escHtml(a.notes||'')+'</textarea></label><button class="app-btn primary" type="submit">Enregistrer les notes</button></form><div style="margin-top:16px"><button class="app-btn" data-delete-audit="'+a.id+'">Supprimer cet audit</button></div></section>';
+        body='<button class="app-btn" data-app-view="Audits">← Retour aux audits</button><section class="app-panel" style="margin-top:14px"><div class="eyebrow">DOSSIER D’AUDIT</div><h2 style="margin-top:8px">'+escHtml(c?.name||'Commerce')+'</h2><p>'+escHtml(c?.city||'')+' · '+escHtml(a.title)+'</p>'+clientInfoHtml(c)+scanPanelHtml(a,c)+socialPresenceHtml()+'<div class="scan-head" style="margin-top:8px"><div><div class="eyebrow">CONTRÔLES TERRAIN</div><h3 style="margin:4px 0 0">Vérifications manuelles</h3></div><div class="app-score">'+(a.score||0)+'/100</div></div><p class="app-muted">'+list.filter(x=>x.done).length+' sur '+list.length+' contrôles validés'+(a.scan?' · le score global provient de l’analyse réelle du site':'')+'</p>'+list.map((x,i)=>'<label class="app-check"><input type="checkbox" data-audit-check="'+i+'" '+(x.done?'checked':'')+'><span><b>'+escHtml(x.label)+'</b><small>'+escHtml(x.detail)+'</small></span></label>').join('')+'<form class="app-form" data-save-notes style="margin-top:18px"><label>Notes et recommandations<textarea name="notes" placeholder="Constats, actions à prévoir…">'+escHtml(a.notes||'')+'</textarea></label><button class="app-btn primary" type="submit">Enregistrer les notes</button></form><div class="detail-actions" style="margin-top:16px"><button class="app-btn primary" data-export-report="'+a.id+'">📄 Exporter le rapport (PDF)</button><button class="app-btn" data-delete-audit="'+a.id+'">Supprimer cet audit</button></div></section>';
       }
       appShell(body);
     }
