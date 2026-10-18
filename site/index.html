@@ -40,6 +40,7 @@
     .login-submit{width:100%;min-height:60px;border:0;border-radius:16px;background:linear-gradient(135deg,#6d4de8,#5033c8);color:#fff;font-size:18px;font-weight:800;cursor:pointer;margin:3px 0 20px;box-shadow:0 10px 26px #5740d53d}
     .login-submit:hover{filter:brightness(1.06)}.login-submit:disabled{opacity:.7;cursor:wait}
     .login-reset{display:block;text-align:center;color:#c4b7ff;text-decoration:none;text-underline-offset:3px;font-weight:700;font-size:15px;margin:0 auto 4px;background:none;border:0;cursor:pointer}
+    .login-hint{margin:-8px 0 18px;color:var(--muted);font-size:12.5px;line-height:1.5}
     .login-message{margin:18px 0 0;padding:13px 15px;border-radius:13px;background:#302553;color:#e2d9ff;font-size:14px;line-height:1.5;display:none}
     .login-message.error{display:block;background:#431f2a;color:#ffc4cc}.login-message.success{display:block;background:#173b31;color:#a7f0cf}
     .login-create{margin:23px auto 0;text-align:center;color:#c7c0da;font-size:clamp(14px,2.5vw,17px);line-height:1.6}
@@ -483,84 +484,22 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
     <a class="brand" href="./" aria-label="AuditIA accueil"><img src="./auditia-icon.svg" alt=""><span><strong>AuditIA</strong><small>by AffiAds</small></span></a>
   </header>
   <main class="wrap">
-    <div class="login-page">
-      <a class="login-brand" href="./" aria-label="AuditIA accueil">
-        <span class="login-mark" aria-hidden="true">A<span>·</span></span>
-        <span class="login-wordmark">Audit<span style="color:#f28b46">IA</span></span>
-      </a>
-      <section class="login-card" id="connexion" aria-labelledby="login-title">
-        <h1 id="login-title">Connexion</h1>
-        <p class="login-subtitle" id="login-subtitle">Retrouvez vos audits et votre espace de travail.</p>
-        <form id="auth-form" novalidate>
-          <label class="login-field" for="auth-email"><span>Adresse e-mail</span>
-            <input class="login-control" id="auth-email" name="email" type="email" inputmode="email" autocomplete="username" value="" placeholder="vous@exemple.fr" required>
-          </label>
-          <label class="login-field" id="password-field" for="auth-password"><span>Mot de passe</span>
-            <span class="password-wrap">
-              <input class="login-control" id="auth-password" name="password" type="password" autocomplete="current-password" required minlength="8">
-              <button class="toggle-password" type="button" id="toggle-password" aria-label="Afficher le mot de passe" title="Afficher le mot de passe">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-              </button>
-            </span>
-          </label>
-          <button class="login-submit" type="submit" id="auth-submit">Se connecter</button>
-          <button class="login-reset" type="button" id="reset-password">Mot de passe oublié ?</button>
-          <div class="login-message" id="auth-message" role="status" aria-live="polite"></div>
-        </form>
-      </section>
-      <p class="login-create">Première connexion ? <button type="button" id="create-account">Créer un compte gratuit</button></p>
-      <p class="login-foot">AuditIA · Auditer mieux, décider plus clairement</p>
-      <p class="login-status" id="auth-status">Connexion sécurisée via Supabase</p>
-    </div>
+    <div class="login-page" id="authRoot" aria-live="polite"></div>
   </main>
   <script type="module">
+    /* ===== AuditIA — connexion (expérience FormIA, accès réservé à l'administrateur) ===== */
     const SUPABASE_URL = 'https://vkerjefkaxcohwhdwccq.supabase.co';
     const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_J9FosHeYMdbYdbwOFfrUDw_WKhI7dXI';
-    const emailInput = document.getElementById('auth-email');
-    const passwordInput = document.getElementById('auth-password');
-    const passwordField = document.getElementById('password-field');
-    const submit = document.getElementById('auth-submit');
-    const form = document.getElementById('auth-form');
-    const message = document.getElementById('auth-message');
-    const subtitle = document.getElementById('login-subtitle');
-    const status = document.getElementById('auth-status');
-    let mode = 'signin';
-
-    document.getElementById('toggle-password').addEventListener('click', () => {
-      const showing = passwordInput.type === 'text';
-      passwordInput.type = showing ? 'password' : 'text';
-      document.getElementById('toggle-password').setAttribute('aria-label', showing ? 'Afficher le mot de passe' : 'Masquer le mot de passe');
-    });
-
-    function announce(text, kind = '') {
-      message.textContent = text;
-      message.className = 'login-message' + (kind ? ' ' + kind : '');
-    }
-    function configureMode(next) {
-      mode = next;
-      const reset = next === 'reset';
-      const signup = next === 'signup';
-      document.getElementById('login-title').textContent = reset ? 'Réinitialiser le mot de passe' : signup ? 'Créer un compte' : 'Connexion';
-      subtitle.textContent = reset ? 'Nous vous enverrons un lien sécurisé pour choisir un nouveau mot de passe.' : signup ? 'Créez votre compte AuditIA pour commencer.' : 'Retrouvez vos audits et votre espace de travail.';
-      passwordField.hidden = reset;
-      passwordInput.required = !reset;
-      passwordInput.autocomplete = signup ? 'new-password' : 'current-password';
-      submit.textContent = reset ? 'Envoyer le lien de réinitialisation' : signup ? 'Créer mon compte' : 'Se connecter';
-      document.getElementById('reset-password').hidden = reset || signup;
-      document.getElementById('create-account').textContent = signup ? 'Revenir à la connexion' : 'Créer un compte gratuit';
-      announce('');
-    }
-    document.getElementById('reset-password').addEventListener('click', () => configureMode('reset'));
-    document.getElementById('create-account').addEventListener('click', () => configureMode(mode === 'signup' ? 'signin' : 'signup'));
-
-    async function getSupabase() {
-      if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
-        throw new Error('La connexion Supabase n’est pas encore configurée pour AuditIA. Le formulaire est prêt, mais il faut renseigner l’URL et la clé publique du projet AuditIA.');
-      }
+    const ADMIN_EMAIL = 'dewulf.denis@gmail.com';
+    const REDIRECT_URL = location.origin + location.pathname;
+    let sb = null;
+    async function getClient() {
+      if (sb) return sb;
       const { createClient } = await import('https://esm.sh/@supabase/supabase-js@2.57.0');
-      return createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
-        auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+      sb = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+        auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, flowType: 'implicit', storageKey: 'auditia-auth' }
       });
+      return sb;
     }
 
     const checklistTemplate = [
@@ -659,53 +598,131 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
     async function openWorkspace(client,user){
       appClient=client;appUser=user;
       if(!user||String(user.email||'').toLowerCase()!=='dewulf.denis@gmail.com'){await client.auth.signOut();throw new Error('Ce compte n’est pas autorisé à accéder à l’espace administrateur AuditIA.')}
-      await refreshData();appView='Accueil';activeAudit=null;appNotice='';status.textContent='Session Supabase active';renderApp();
+      await refreshData();appView='Accueil';activeAudit=null;appNotice='';renderApp();
     }
-    async function initAuth(){
-      try{
-        const client=await getSupabase();
-        const {data,error}=await client.auth.getSession();
-        if(error)throw error;
-        if(data.session?.user){await openWorkspace(client,data.session.user)}
-      }catch(err){if(err?.message)announce(err.message,'error')}
+    /* ----- écrans de connexion (rendus dans #authRoot) ----- */
+    const authRoot = document.getElementById('authRoot');
+    const EYE = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
+    const BRAND = '<a class="login-brand" href="./" aria-label="AuditIA accueil"><span class="login-mark" aria-hidden="true">A<span>✓</span></span><span class="login-wordmark">Audit<span style="color:#f28b46">IA</span></span></a>';
+    const FOOT = '<p class="login-foot">AuditIA · Auditer mieux, décider plus clairement</p><p class="login-status">Connexion sécurisée via Supabase</p>';
+    const pwdField = (id,label,ac) => '<label class="login-field" for="'+id+'"><span>'+label+'</span><span class="password-wrap"><input class="login-control" id="'+id+'" type="password" autocomplete="'+ac+'" required minlength="8"><button class="toggle-password" type="button" data-showpwd="'+id+'" aria-label="Afficher le mot de passe" title="Afficher le mot de passe">'+EYE+'</button></span></label>';
+    const validEmail = e => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e);
+    const pwdIssue = p => p.length<8 ? '8 caractères minimum.' : (!/[A-Za-zÀ-ÿ]/.test(p)||!/\d/.test(p)) ? 'au moins une lettre et un chiffre.' : p.length>72 ? '72 caractères maximum.' : '';
+    function authError(e){
+      const m=((e&&(e.message||e.error_description))||'').toLowerCase(), st=e&&e.status;
+      if(st===429||m.includes('rate limit')||m.includes('too many')) return 'Trop de tentatives. Patientez quelques minutes avant de réessayer.';
+      if(m.includes('invalid login')) return 'E-mail ou mot de passe incorrect.';
+      if(m.includes('email not confirmed')) return 'Votre adresse e-mail n’est pas encore confirmée. Ouvrez le lien reçu par e-mail.';
+      if(m.includes('same password')||m.includes('different from the old')) return 'Choisissez un mot de passe différent de l’ancien.';
+      if(m.includes('password')&&(m.includes('weak')||m.includes('at least')||m.includes('should'))) return 'Mot de passe trop faible : 8 caractères minimum, avec au moins une lettre et un chiffre.';
+      if(m.includes('fetch')||m.includes('network')) return 'Connexion impossible. Vérifiez votre réseau internet.';
+      return 'Une erreur est survenue. Réessayez.';
     }
-    form.addEventListener('submit', async (event) => {
-      event.preventDefault();
-      if (!emailInput.reportValidity()) return;
-      if (mode !== 'reset' && !passwordInput.reportValidity()) return;
-      submit.disabled = true;
-      const oldLabel = submit.textContent;
-      submit.textContent = 'Veuillez patienter…';
-      announce('');
-      try {
-        const supabase = await getSupabase();
-        const email = emailInput.value.trim();
-        let result;
-        if (mode === 'signin') {
-          result = await supabase.auth.signInWithPassword({ email, password: passwordInput.value });
-          if (!result.error && email.toLowerCase() !== 'dewulf.denis@gmail.com') {
-            await supabase.auth.signOut();
-            throw new Error('Ce compte n’est pas autorisé à accéder à l’espace administrateur AuditIA.');
-          }
-          if (!result.error) {
-            await openWorkspace(supabase, result.data.user);
-          }
-        } else if (mode === 'signup') {
-          result = await supabase.auth.signUp({ email, password: passwordInput.value, options: { emailRedirectTo: 'https://mansstyle59.github.io/AuditIA/' } });
-          if (!result.error) announce('Demande envoyée. Vérifiez votre e-mail pour confirmer votre compte.', 'success');
-        } else {
-          result = await supabase.auth.resetPasswordForEmail(email, { redirectTo: 'https://mansstyle59.github.io/AuditIA/' });
-          if (!result.error) announce('Si cette adresse est connue, un e-mail de réinitialisation va être envoyé.', 'success');
-        }
-        if (result?.error) throw result.error;
-      } catch (err) {
-        announce(err instanceof Error ? err.message : 'Connexion impossible. Vérifiez vos informations et réessayez.', 'error');
-      } finally {
-        submit.disabled = false;
-        submit.textContent = oldLabel;
+    function setMsg(txt,kind){const el=document.getElementById('authMsg');if(!el)return;el.textContent=txt||'';el.className='login-message'+(txt?(kind==='ok'?' success':' error'):'');}
+    function busy(btn,on,label){if(!btn)return;btn.disabled=on;if(on){btn.dataset.l=btn.textContent;btn.textContent=label||'Veuillez patienter…';}else if(btn.dataset.l){btn.textContent=btn.dataset.l;}}
+    const val = id => (document.getElementById(id)?.value||'').trim();
+
+    function renderAuth(mode){
+      let card='';
+      if(mode==='forgot'){
+        card='<section class="login-card"><h1>Mot de passe oublié</h1><p class="login-subtitle">Indiquez votre adresse : vous recevrez un lien sécurisé pour choisir un nouveau mot de passe.</p>'
+          +'<form id="fForgot" novalidate><label class="login-field" for="foEmail"><span>Adresse e-mail</span><input class="login-control" id="foEmail" type="email" inputmode="email" autocomplete="username" placeholder="vous@exemple.fr" required></label>'
+          +'<button class="login-submit" type="submit">Envoyer le lien</button><div class="login-message" id="authMsg" role="status" aria-live="polite"></div></form></section>'
+          +'<p class="login-create"><button type="button" data-go="signin">← Retour à la connexion</button></p>';
+      } else if(mode==='reset'){
+        card='<section class="login-card"><h1>Nouveau mot de passe</h1><p class="login-subtitle">Choisissez un nouveau mot de passe pour votre compte AuditIA.</p>'
+          +'<form id="fReset" novalidate>'+pwdField('rPwd','Nouveau mot de passe','new-password')+pwdField('rPwd2','Confirmer le mot de passe','new-password')
+          +'<p class="login-hint">8 caractères minimum, avec au moins une lettre et un chiffre.</p>'
+          +'<button class="login-submit" type="submit">Enregistrer</button><div class="login-message" id="authMsg" role="status" aria-live="polite"></div></form></section>';
+      } else if(mode==='expired'){
+        card='<section class="login-card"><h1>Lien expiré</h1><p class="login-subtitle">Ce lien n’est plus valable : il a expiré ou a déjà été utilisé. Demandez-en un nouveau, ou connectez-vous si vous avez déjà un mot de passe.</p>'
+          +'<button class="login-submit" type="button" data-go="forgot">Recevoir un nouveau lien</button>'
+          +'<button class="login-reset" type="button" data-go="signin">Retour à la connexion</button></section>';
+      } else {
+        card='<section class="login-card"><h1>Connexion</h1><p class="login-subtitle">Retrouvez vos audits et votre espace de travail.</p>'
+          +'<form id="fSignin" novalidate><label class="login-field" for="siEmail"><span>Adresse e-mail</span><input class="login-control" id="siEmail" type="email" inputmode="email" autocomplete="username" placeholder="vous@exemple.fr" required></label>'
+          +pwdField('siPwd','Mot de passe','current-password')
+          +'<button class="login-submit" type="submit">Se connecter</button><button class="login-reset" type="button" data-go="forgot">Mot de passe oublié ?</button>'
+          +'<div class="login-message" id="authMsg" role="status" aria-live="polite"></div></form></section>';
       }
+      authRoot.innerHTML = BRAND + card + FOOT;
+      window.scrollTo(0,0);
+      const first = authRoot.querySelector('input'); if(first) setTimeout(()=>first.focus(),60);
+    }
+
+    let loginFails=0, loginLockUntil=0;
+    async function doSignin(e){
+      e.preventDefault();
+      const btn=e.target.querySelector('.login-submit');
+      const email=val('siEmail').toLowerCase(), pwd=document.getElementById('siPwd').value;
+      if(Date.now()<loginLockUntil){setMsg('Trop d’essais. Réessayez dans '+Math.ceil((loginLockUntil-Date.now())/1000)+' secondes.');return;}
+      if(!validEmail(email)){setMsg('Saisissez une adresse e-mail valide.');return;}
+      if(!pwd){setMsg('Saisissez votre mot de passe.');return;}
+      busy(btn,true,'Connexion…'); setMsg('');
+      const {data,error}=await sb.auth.signInWithPassword({email,password:pwd});
+      busy(btn,false);
+      if(error){ loginFails++; if(loginFails>=5){loginLockUntil=Date.now()+60000;loginFails=0;} setMsg(authError(error)); return; }
+      if(email!==ADMIN_EMAIL){ await sb.auth.signOut(); setMsg('Ce compte n’est pas autorisé à accéder à AuditIA.'); return; }
+      loginFails=0;
+      try{ await openWorkspace(sb,data.user); }catch(err){ setMsg(err&&err.message||'Connexion impossible.'); }
+    }
+    async function doForgot(e){
+      e.preventDefault();
+      const btn=e.target.querySelector('.login-submit');
+      const email=val('foEmail').toLowerCase();
+      if(!validEmail(email)){setMsg('Saisissez une adresse e-mail valide.');return;}
+      busy(btn,true,'Envoi…'); setMsg('');
+      const {error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:REDIRECT_URL});
+      busy(btn,false);
+      if(error&&(error.status===429||/rate/i.test(error.message||''))){ setMsg(authError(error)); return; }
+      setMsg('Si un compte existe avec cette adresse, un e-mail vient d’être envoyé. Pensez à regarder dans les indésirables.','ok');
+    }
+    async function doReset(e){
+      e.preventDefault();
+      const btn=e.target.querySelector('.login-submit');
+      const p=document.getElementById('rPwd').value, p2=document.getElementById('rPwd2').value;
+      const pi=pwdIssue(p); if(pi){setMsg('Mot de passe trop faible : '+pi);return;}
+      if(p!==p2){setMsg('Les deux mots de passe ne sont pas identiques.');return;}
+      busy(btn,true,'Enregistrement…'); setMsg('');
+      const {error}=await sb.auth.updateUser({password:p});
+      busy(btn,false);
+      if(error){ setMsg(authError(error)); return; }
+      setMsg('Mot de passe modifié.','ok');
+      try{ const {data}=await sb.auth.getUser(); if(data&&data.user){ await openWorkspace(sb,data.user); return; } }catch(err){}
+      renderAuth('signin'); setMsg('Mot de passe modifié. Vous pouvez vous connecter.','ok');
+    }
+
+    authRoot.addEventListener('click', e=>{
+      const go=e.target.closest('[data-go]'); if(go){ renderAuth(go.dataset.go); return; }
+      const sp=e.target.closest('[data-showpwd]');
+      if(sp){ const inp=document.getElementById(sp.dataset.showpwd); if(inp){ const show=inp.type==='password'; inp.type=show?'text':'password'; sp.setAttribute('aria-label',show?'Masquer le mot de passe':'Afficher le mot de passe'); } }
     });
-    initAuth();
+    authRoot.addEventListener('submit', e=>{
+      if(e.target.id==='fSignin') doSignin(e);
+      else if(e.target.id==='fForgot') doForgot(e);
+      else if(e.target.id==='fReset') doReset(e);
+    });
+
+    let recoveryShown=false;
+    async function boot(){
+      renderAuth('signin');
+      await getClient();
+      const hp=new URLSearchParams(location.hash.slice(1)), qp=new URLSearchParams(location.search);
+      const linkType=hp.get('type')||qp.get('type')||'';
+      const linkErr=hp.get('error_code')||qp.get('error_code')||hp.get('error')||qp.get('error')||'';
+      sb.auth.onAuthStateChange(ev=>{ if(ev==='PASSWORD_RECOVERY'&&!recoveryShown){ recoveryShown=true; renderAuth('reset'); } });
+      let session=null;
+      try{ const {data}=await sb.auth.getSession(); session=data.session; }catch(err){}
+      const dirty=/access_token|refresh_token|error|type=/.test(location.hash+location.search);
+      if(dirty && linkType!=='recovery') history.replaceState(null,'',location.pathname);
+      if(linkErr){ renderAuth('expired'); return; }
+      if(linkType==='recovery'){ recoveryShown=true; renderAuth('reset'); return; }
+      if(session&&session.user){
+        try{ await openWorkspace(sb,session.user); }
+        catch(err){ renderAuth('signin'); setMsg(err&&err.message||'Connexion impossible.'); }
+      }
+    }
+    boot();
 
   </script>
   <footer class="wrap foot"><span>© <span id="year"></span> AuditIA · AffiAds</span><span>Espace privé AuditIA · Paramètres synchronisés avec Supabase.</span></footer>
