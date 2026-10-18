@@ -477,9 +477,22 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       .settings-actions{display:grid;grid-template-columns:1fr}
     }
 
+    /* ===== Finitions « application » (iPhone plein écran) ===== */
+    :root{--safe-top:env(safe-area-inset-top,0px)}
+    html,body{background:#100e1b}
+    body{-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%;text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased;overscroll-behavior-y:none}
+    button,a{-webkit-tap-highlight-color:transparent}
+    /* Bande unie derrière l'horloge / la 5G : plus de contenu flou qui passe dessous */
+    .status-safe{position:fixed;top:0;left:0;right:0;height:var(--safe-top);background:#100e1b;z-index:95;pointer-events:none}
+    .login-page{padding-top:calc(var(--safe-top) + 12px)}
+    @media(max-width:760px){
+      .workspace-app{padding-top:calc(var(--safe-top) + 16px)}
+      .login-page{padding-top:calc(var(--safe-top) + 8px)}
+    }
   </style>
 </head>
 <body>
+  <div class="status-safe" aria-hidden="true"></div>
   <header class="wrap top">
     <a class="brand" href="./" aria-label="AuditIA accueil"><img src="./auditia-icon.svg" alt=""><span><strong>AuditIA</strong><small>by AffiAds</small></span></a>
   </header>
