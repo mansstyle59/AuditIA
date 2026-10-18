@@ -564,6 +564,7 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       .r-plan-c{flex:1;min-width:0}.r-plan-c b{display:block;font-size:12.5px}.r-plan-c span{display:block;color:#777;font-size:11px;line-height:1.4}
       .r-pill{flex:0 0 auto;font-size:9.5px;font-weight:800;padding:2px 7px;border-radius:20px;white-space:nowrap}
       .r-pill-high{background:#fbe3df;color:#c0392b}.r-pill-mid{background:#fdf0d8;color:#a06700}.r-pill-low{background:#eceaf6;color:#6a5ab8}
+      .r-sig-line{font-size:12px;color:#555;margin:8px 0 0}.r-mini{font-size:10px;color:#999;margin:6px 0 0}
       @page{margin:12mm 8mm}
     }
 
@@ -640,6 +641,20 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
     .vis-col.bad li::before{content:"▲";position:absolute;left:0;color:#fbbf24;font-size:9px;top:2px}
     .vis-none{color:#8f88a6!important}
     @media(max-width:600px){.vis-cols{grid-template-columns:minmax(0,1fr)}}
+    /* ===== Présence sociale détectée ===== */
+    .social-panel{margin-top:14px}
+    .sp-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:4px}
+    .sp-card{display:flex;align-items:center;gap:10px;background:#42445e;border:1px solid #ffffff0d;border-radius:12px;padding:10px 12px;text-decoration:none;color:#f3f2f8}
+    .sp-card.found{border-color:#2f6b52;background:#2c4a40}
+    .sp-ico{flex:0 0 28px;width:28px;height:28px;border-radius:7px;overflow:hidden;display:grid;place-items:center;background:#ffffff10}
+    .sp-ico img{width:28px;height:28px;object-fit:cover}
+    .sp-fallback{display:grid;place-items:center;width:28px;height:28px;font-weight:800;font-size:13px;color:#cbbcff}
+    .sp-name{flex:1;min-width:0;font-size:13px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .sp-badge{flex:0 0 auto;font-size:10px;font-weight:800;padding:2px 7px;border-radius:20px}
+    .sp-badge.ok{background:#1f4a3c;color:#9ae8c4}.sp-badge.no{background:#3a3850;color:#9a94ad}
+    .sp-signals{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+    .sp-chip{font-size:11px;font-weight:700;color:#cdbffb;background:#453f6c;border:1px solid #675f95;border-radius:20px;padding:4px 10px}
+    @media(max-width:600px){.sp-grid{grid-template-columns:minmax(0,1fr)}}
     @media(max-width:600px){.scan-scores{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.scan-metrics{grid-template-columns:minmax(0,1fr)}.scan-head .app-btn{width:100%}}
 
     /* ===== Test & validation des clés API ===== */
@@ -773,10 +788,32 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
     }
     function keyAlertHtml(){ if(!keyAlerts.length) return ''; return '<div class="key-alert"><span class="key-alert-ic">⚠️</span><div><b>'+(keyAlerts.length>1?'Clés à vérifier':'Clé à vérifier')+' : '+escHtml(keyAlerts.join(', '))+'</b><p>Une clé semble expirée ou invalide. Ouvre les Réglages pour la renouveler.</p></div><button type="button" class="app-btn" data-app-view="Paramètres">Réglages</button></div>'; }
     const defaultSettings = () => ({company_name:'AffiAds',app_name:'AuditIA',tagline:'Auditer mieux, décider plus clairement',contact_email:'Dewulf.denis@gmail.com',phone:'',website:'',address:'',signature_name:'Denis Dewulf',signature_role:'Audit & conseil en visibilité numérique',signature_text:'Merci pour votre confiance.',logo_data_url:'',primary_color:'#7657ed',accent_color:'#ffad72',google_places_api_key:'',google_maps_api_key:'',pagespeed_api_key:'',search_console_property:'',google_business_profile_url:'',bing_webmaster_api_key:'',openai_api_key:'',logo_dev_publishable_key:'',integrations_notes:''});
-    function socialPresenceHtml(){
-      const platforms=[['YouTube','youtube.com','YT'],['Instagram','instagram.com','IG'],['TikTok','tiktok.com','TT'],['Facebook','facebook.com','f'],['Snapchat','snapchat.com','SC'],['LinkedIn','linkedin.com','in'],['Pinterest','pinterest.com','P'],['X','x.com','X']];
+    function socialPresenceHtml(a){
+      const site=a&&a.site; const busy=siteScanningId===(a&&a.id);
+      const hasWeb=!!String((a&&appClients.find(x=>x.id===a.client_id)||{}).website||'').trim();
       const token=String(appSettings?.logo_dev_publishable_key||'').trim();
-      return '<section class="social-platforms"><div class="social-platforms-head"><div><div class="eyebrow">PRÉSENCE SOCIALE</div><h3>Plateformes à contrôler</h3></div><span class="social-platforms-count">8 réseaux</span></div><p>Vérifie les profils du commerce, les liens et leur activité. Les logos sont fournis par Logo.dev si la clé publishable est configurée.</p><div class="social-platform-grid">'+platforms.map(([name,domain,initials])=>'<div class="social-platform-card">'+(token?'<img src="https://img.logo.dev/'+domain+'?token='+encodeURIComponent(token)+'&size=64&format=png&theme=dark" alt="" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'grid\'"><span class="social-platform-fallback" style="display:none">'+initials+'</span>':'<span class="social-platform-fallback">'+initials+'</span>')+'<span>'+name+'</span></div>').join('')+'</div><p class="social-platform-note">Les logos identifient les plateformes : ils ne confirment pas que le commerce y possède un compte.</p><a class="social-logo-credit" href="https://logo.dev" target="_blank" rel="noopener noreferrer">Logos fournis par Logo.dev</a></section>';
+      const platforms=[['Instagram','instagram.com'],['Facebook','facebook.com'],['TikTok','tiktok.com'],['YouTube','youtube.com'],['LinkedIn','linkedin.com'],['X / Twitter','x.com'],['Pinterest','pinterest.com'],['Snapchat','snapchat.com']];
+      const found=new Map(((site&&site.socials)||[]).map(s=>[s.net,s.url]));
+      const head='<div class="scan-head"><div><div class="eyebrow">PRÉSENCE SOCIALE · AUTO</div><h3 style="margin:4px 0 0">Réseaux détectés sur le site</h3></div><button class="app-btn primary" data-run-site="'+(a&&a.id)+'" '+((!hasWeb||busy)?'disabled':'')+'>'+(busy?'Détection…':(site?'Relancer la détection':'Détecter automatiquement'))+'</button></div>';
+      if(!hasWeb) return '<section class="app-panel social-panel">'+head+'<div class="app-empty">Sans site web renseigné, les réseaux ne peuvent pas être trouvés automatiquement. Ajoute un site à la fiche, ou saisis les profils à la main.</div></section>';
+      const cards=platforms.map(([name,domain])=>{
+        const url=found.get(name);
+        const logo=token?'<img src="https://img.logo.dev/'+domain+'?token='+encodeURIComponent(token)+'&size=64&format=png&theme=dark" alt="" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'grid\'"><span class="sp-fallback" style="display:none">'+escHtml(name.charAt(0))+'</span>':'<span class="sp-fallback">'+escHtml(name.charAt(0))+'</span>';
+        const inner='<span class="sp-ico">'+logo+'</span><span class="sp-name">'+escHtml(name)+'</span><span class="sp-badge '+(url?'ok':'no')+'">'+(url?'✓ trouvé':(site?'non détecté':'—'))+'</span>';
+        return url?'<a class="sp-card found" href="'+escHtml(url)+'" target="_blank" rel="noopener noreferrer">'+inner+'</a>':'<div class="sp-card">'+inner+'</div>';
+      }).join('');
+      let signals='';
+      if(site){
+        const chips=[];
+        if(site.booking&&site.booking.length) chips.push('Réservation en ligne : '+escHtml(site.booking.join(', ')));
+        if(site.whatsapp) chips.push('WhatsApp');
+        if(site.tracking&&site.tracking.length) chips.push('Suivi : '+escHtml(site.tracking.join(', ')));
+        if(site.cms) chips.push('Technologie : '+escHtml(site.cms));
+        if(site.tel&&site.tel.length) chips.push('Téléphone cliquable sur le site');
+        signals=chips.length?'<div class="sp-signals">'+chips.map(c=>'<span class="sp-chip">'+c+'</span>').join('')+'</div>':'';
+      }
+      const status=site?'<p class="app-muted" style="margin:10px 0 2px">Site lu le '+escHtml(new Date(site.analyzedAt).toLocaleString('fr-FR'))+' · '+((site&&site.socials&&site.socials.length)?site.socials.length+' réseau'+(site.socials.length>1?'x':'')+' relié'+(site.socials.length>1?'s':'')+' au site':'aucun réseau relié depuis la page d’accueil')+'</p>':'<p class="app-muted" style="margin:10px 0 2px">Touche « Détecter automatiquement » : AuditIA lit la page d’accueil du site et repère les réseaux, la réservation en ligne et les outils de suivi.</p>';
+      return '<section class="app-panel social-panel">'+head+status+'<div class="sp-grid">'+cards+'</div>'+signals+'<p class="scan-note">Détection depuis la page d’accueil du site (lecture via Jina Reader). Les statistiques privées (abonnés, engagement) ne sont pas fournies publiquement — voir la note dans le rapport. Logos : Logo.dev.</p></section>';
     }
     function currentLogo(){return appSettings?.logo_data_url || './auditia-icon.svg'}
     function updateBrandColors(){document.documentElement.style.setProperty('--purple',appSettings?.primary_color||'#7657ed');document.documentElement.style.setProperty('--orange',appSettings?.accent_color||'#ffad72')}
@@ -879,6 +916,7 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       page.querySelectorAll('[data-delete-client]').forEach(b=>b.addEventListener('click',async()=>{if(!confirm('Supprimer ce client et ses audits associés ?'))return;const id=b.dataset.deleteClient;const au=await appClient.from('audits').delete().eq('client_id',id);const {error}=await appClient.from('clients').delete().eq('id',id);appNotice=error?'Erreur : '+error.message:(au.error?'Client supprimé. Audits liés : '+au.error.message:'Client et audits associés supprimés.');if(activeClient===id){activeClient=null;appView='Clients';}await refreshData();renderApp()}));
       page.querySelectorAll('[data-delete-audit]').forEach(b=>b.addEventListener('click',async()=>{if(!confirm('Supprimer cet audit ?'))return;const {error}=await appClient.from('audits').delete().eq('id',b.dataset.deleteAudit);appNotice=error?'Erreur : '+error.message:'Audit supprimé.';await refreshData();renderApp()}));
       page.querySelectorAll('[data-run-scan]').forEach(b=>b.addEventListener('click',()=>runScan(b.dataset.runScan)));
+      page.querySelectorAll('[data-run-site]').forEach(b=>b.addEventListener('click',()=>runSiteScan(b.dataset.runSite)));
       page.querySelectorAll('[data-export-report]').forEach(b=>b.addEventListener('click',()=>exportReport(b.dataset.exportReport)));
       page.querySelectorAll('[data-audit-filter]').forEach(inp=>inp.addEventListener('input',()=>{auditFilter=inp.value;const pos=inp.selectionStart;renderApp();const n=document.querySelector('[data-audit-filter]');if(n){n.focus();try{n.setSelectionRange(pos,pos);}catch(e){}}}));
     }
@@ -1035,6 +1073,57 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       finally{ scanningId=null; recomputeKeyAlerts(); renderApp(); }
     }
     function scanGauge(label,v){ const val=(v==null?'—':v); const col=v==null?'#8a84a0':v>=90?'#34d399':v>=50?'#fbbf24':'#f87171'; const deg=(v==null?0:v)*3.6; return '<article class="scan-score"><div class="scan-ring" style="background:conic-gradient('+col+' '+deg+'deg,#2c2a42 0)"><span class="scan-ring-in"><strong>'+val+'</strong></span></div><span class="scan-score-label">'+label+'</span></article>'; }
+    /* ===== Détection automatique du site & des réseaux (inspiré d'AffiAds Audit 360) =====
+       Lit la page d'accueil du commerce via Jina Reader (contourne le CORS), AllOrigins en secours,
+       puis extrait les liens vers les réseaux sociaux et quelques signaux (réservation, suivi, CMS). */
+    let siteScanningId=null; const siteAutoTried=new Set();
+    const SOCIAL_RX=[['Instagram',/(^|\.)instagram\.com$/],['Facebook',/(^|\.)facebook\.com$|(^|\.)fb\.com$/],['TikTok',/(^|\.)tiktok\.com$/],['YouTube',/(^|\.)youtube\.com$|(^|\.)youtu\.be$/],['LinkedIn',/(^|\.)linkedin\.com$/],['X / Twitter',/(^|\.)(twitter|x)\.com$/],['Pinterest',/(^|\.)pinterest\.[a-z]+$/],['Snapchat',/(^|\.)snapchat\.com$/]];
+    const BOOKING_RX=/booksy|planity|treatwell|doctolib|thefork|lafourchette|zenchef|resy\.com|guestonline|covermanager|opentable|calendly|resalib|keldoc|maiia|wecasa|ubereats|deliveroo|just-?eat|simplybook|resengo/i;
+    const TRACK_RX=[['Pixel Meta',/connect\.facebook\.net|fbq\(/],['Google Tag Manager',/googletagmanager\.com\/gtm|GTM-[A-Z0-9]{4,}/],['Google Analytics',/google-analytics\.com|gtag\(/],['Pixel TikTok',/analytics\.tiktok\.com|ttq\.load/]];
+    const CMS_RX=[['Wix',/wix\.com|wixstatic/i],['WordPress',/wp-content|wp-includes/i],['Shopify',/cdn\.shopify|Shopify\.theme/i],['Squarespace',/squarespace/i],['Webflow',/webflow/i],['Jimdo',/jimdo/i],['PrestaShop',/prestashop/i],['Google Sites',/sites\.google/i]];
+    async function readSiteText(url,opts,timeout){const ctl=new AbortController();const t=setTimeout(()=>ctl.abort(),timeout||40000);try{const r=await fetch(url,{...(opts||{}),signal:ctl.signal});if(!r.ok){const e=new Error('HTTP '+r.status);e.status=r.status;throw e;}return await r.text();}finally{clearTimeout(t);}}
+    async function readSiteHtml(url){
+      const tries=[()=>readSiteText('https://r.jina.ai/'+url,{headers:{'X-Return-Format':'html','X-Timeout':'25'}},45000),()=>readSiteText('https://api.allorigins.win/raw?url='+encodeURIComponent(url),{},30000)];
+      let last;for(const f of tries){try{const t=await f();if(t&&t.length>200&&/<(html|head|body)[\s>]/i.test(t))return t;last=new Error('page vide ou illisible');}catch(e){last=e;}}
+      throw last||new Error('page illisible');
+    }
+    function analyzeSite(html,pageUrl){
+      const doc=new DOMParser().parseFromString(html,'text/html');
+      const base=(()=>{try{return new URL(pageUrl);}catch(e){return null;}})();
+      const links=[...doc.querySelectorAll('a[href]')].map(a=>({href:(a.getAttribute('href')||'').trim(),text:(a.textContent||'').replace(/\s+/g,' ').trim()}));
+      const socials=[];const seen=new Set();
+      links.forEach(l=>{let u;try{u=new URL(l.href,base||undefined);}catch(e){return;}if(/sharer|share\?|intent\/tweet|\/share$/i.test(u.href))return;const s=SOCIAL_RX.find(([,rx])=>rx.test(u.hostname));if(s&&!seen.has(s[0])&&u.pathname.length>1){seen.add(s[0]);socials.push({net:s[0],url:u.href});}});
+      const tel=[...new Set(links.filter(l=>/^tel:/i.test(l.href)).map(l=>l.href.slice(4)))];
+      const whatsapp=links.some(l=>/wa\.me|whatsapp/i.test(l.href));
+      const booking=[...new Set(links.filter(l=>BOOKING_RX.test(l.href)).map(l=>{try{return new URL(l.href,base||undefined).hostname.replace(/^www\./,'');}catch(e){return '';}}).filter(Boolean))].slice(0,4);
+      const tracking=TRACK_RX.filter(([,rx])=>rx.test(html)).map(([n])=>n);
+      const gen=(doc.querySelector('meta[name="generator" i]')&&doc.querySelector('meta[name="generator" i]').getAttribute('content'))||'';
+      const cms=gen||((CMS_RX.find(([,rx])=>rx.test(html))||[])[0]||'');
+      const title=!!((doc.querySelector('title')&&doc.querySelector('title').textContent||'').trim());
+      const metaDesc=!!((doc.querySelector('meta[name="description" i]')&&doc.querySelector('meta[name="description" i]').getAttribute('content')||'').trim());
+      const viewport=!!doc.querySelector('meta[name="viewport" i]');
+      const text=(doc.body&&doc.body.textContent||'').replace(/\s+/g,' ');
+      const hoursOnSite=/horaires|lundi|mardi|ouvert du|ouverture/i.test(text);
+      return {socials,tel,whatsapp,booking,tracking,cms,title,metaDesc,viewport,hoursOnSite,analyzedAt:new Date().toISOString(),finalUrl:pageUrl};
+    }
+    async function runSiteScan(auditId){
+      const a=appAudits.find(x=>x.id===auditId); if(!a) return;
+      const c=appClients.find(x=>x.id===a.client_id);
+      let site=String((c&&c.website)||'').trim();
+      if(!site){ appNotice='Ajoute un site web à la fiche client pour détecter les réseaux automatiquement.'; renderApp(); return; }
+      if(!/^https?:\/\//i.test(site)) site='https://'+site;
+      siteScanningId=auditId; appNotice='Lecture du site et détection des réseaux… (10 à 30 s)'; renderApp();
+      try{
+        const html=await readSiteHtml(site);
+        const res=analyzeSite(html,site);
+        const {error}=await appClient.from('audits').update({site:res,updated_at:new Date().toISOString()}).eq('id',auditId);
+        if(error) throw new Error(error.message);
+        const n=res.socials.length;
+        appNotice=n?('Détection terminée : '+n+' réseau'+(n>1?'x':'')+' trouvé'+(n>1?'s':'')+' sur le site.'):'Site lu : aucun lien de réseau social trouvé sur la page d’accueil.';
+        await refreshData();
+      }catch(e){ appNotice='Lecture du site impossible : '+((e&&e.message)||'réseau').slice(0,120)+' — tu peux renseigner les réseaux manuellement.'; }
+      finally{ siteScanningId=null; renderApp(); }
+    }
     function scanPanelHtml(a,c){
       const site=String((c&&c.website)||'').trim(); const busy=scanningId===a.id; const s=a.scan;
       const head='<div class="scan-head"><div><div class="eyebrow">ANALYSE RÉELLE DU SITE</div><h3 style="margin:4px 0 0">Google PageSpeed · Lighthouse mobile</h3></div><button class="app-btn primary" data-run-scan="'+a.id+'" '+((!site||busy)?'disabled':'')+'>'+(busy?'Analyse en cours…':(s?'Relancer l’analyse':'Analyser le site'))+'</button></div>';
@@ -1065,6 +1154,7 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       add('Horaires renseignés',hours,8,'Horaires d’ouverture manquants : les renseigner sur la fiche Google.','Horaires d’ouverture renseignés.');
       if(perf!=null) add('Performance mobile du site',perf>=50,12,'Site lent sur mobile (perf '+perf+'/100) : optimiser images, polices et temps de chargement.','Site bien optimisé sur mobile (perf '+perf+'/100).');
       if(seo!=null) add('SEO technique',seo>=90,8,'Bases SEO à renforcer (SEO '+seo+'/100) : titres, descriptions et balises.','Bonnes bases SEO ('+seo+'/100).');
+      if(a&&a.site){ const ns=(a.site.socials||[]).length; add('Réseaux sociaux reliés',ns>=1,12,'Aucun réseau social relié au site : créer/relier au moins un profil (Instagram ou Facebook) et l’afficher sur le site.',ns+' réseau'+(ns>1?'x':'')+' social'+(ns>1?'aux':'')+' relié'+(ns>1?'s':'')+' au site.'); }
       const totW=items.reduce((n,x)=>n+x.weight,0);
       const gotW=items.filter(x=>x.ok).reduce((n,x)=>n+x.weight,0);
       const index=totW?Math.round(gotW/totW*100):0;
@@ -1100,6 +1190,7 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
         +'<div class="r-section r-cols"><div class="r-col"><h2 class="r-good-h">Points forts</h2><ul class="r-list r-good">'+(diag.strengths.length?diag.strengths.map(x=>'<li><b>'+escHtml(x.label)+'</b>'+(x.advice?'<span>'+escHtml(x.advice)+'</span>':'')+'</li>').join(''):'<li><span>Visibilité à construire : voir le plan d’action ci-dessous.</span></li>')+'</ul></div><div class="r-col"><h2 class="r-bad-h">À améliorer</h2><ul class="r-list r-bad">'+(diag.weaknesses.length?diag.weaknesses.map(x=>'<li><b>'+escHtml(x.label)+'</b><span>'+escHtml(x.advice)+'</span></li>').join(''):'<li><span>Aucun point bloquant détecté.</span></li>')+'</ul></div></div>'
         +(infoRows.length?'<div class="r-section"><h2>Fiche commerce</h2><table class="r-table">'+infoRows.map(([k,v])=>'<tr><td>'+escHtml(k)+'</td><td>'+escHtml(v)+'</td></tr>').join('')+'</table></div>':'')
         +(s?'<div class="r-section"><h2>Performance du site · Google Lighthouse (mobile)</h2><div class="r-scores">'+gauge('Performance',s.scores.performance)+gauge('Accessibilité',s.scores.accessibility)+gauge('Bonnes pratiques',s.scores.bestPractices)+gauge('SEO',s.scores.seo)+'</div></div>':'')
+        +(a.site?(function(){const si=a.site;const soc=(si.socials||[]);const sig=[];if(si.booking&&si.booking.length)sig.push('Réservation en ligne ('+si.booking.join(', ')+')');if(si.whatsapp)sig.push('WhatsApp');if(si.tracking&&si.tracking.length)sig.push('Outils de suivi : '+si.tracking.join(', '));if(si.cms)sig.push('Technologie du site : '+si.cms);return '<div class="r-section"><h2>Réseaux sociaux & présence web</h2>'+(soc.length?'<table class="r-table">'+soc.map(x=>'<tr><td>'+escHtml(x.net)+'</td><td>'+escHtml(x.url)+'</td></tr>').join('')+'</table>':'<p class="r-notes">Aucun réseau social n’est relié depuis la page d’accueil du site. Recommandation : créer/relier au moins un profil (Instagram ou Facebook) et l’afficher sur le site.</p>')+(sig.length?'<p class="r-sig-line">Autres signaux détectés : '+escHtml(sig.join(' · '))+'</p>':'')+'<p class="r-mini">Détection automatique depuis la page d’accueil. Les statistiques privées (abonnés, engagement) ne sont pas publiques.</p></div>';})():'')
         +(plan.length?'<div class="r-section"><h2>Plan d’action priorisé</h2><div class="r-plan">'+plan.map((p,i)=>'<div class="r-plan-item"><span class="r-plan-n">'+(i+1)+'</span><div class="r-plan-c"><b>'+escHtml(p.t)+'</b>'+(p.d?'<span>'+escHtml(p.d)+'</span>':'')+'</div>'+pill(p.p)+'</div>').join('')+'</div></div>':'')
         +'<div class="r-section"><h2>Contrôles terrain ('+done+'/'+list.length+')</h2><ul class="r-checks">'+list.map(x=>'<li class="'+(x.done?'done':'')+'"><span class="r-box">'+(x.done?'✓':'')+'</span>'+escHtml(x.label)+'</li>').join('')+'</ul></div>'
         +(a.notes?'<div class="r-section"><h2>Notes & recommandations</h2><p class="r-notes">'+escHtml(a.notes)+'</p></div>':'')
@@ -1146,7 +1237,8 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
         if(!a){appView='Audits';renderApp();return}
         const c=appClients.find(x=>x.id===a.client_id);
         const list=Array.isArray(a.checklist)?a.checklist:[];
-        body='<button class="app-btn" data-app-view="Audits">← Retour aux audits</button><section class="app-panel" style="margin-top:14px"><div class="eyebrow">DOSSIER D’AUDIT</div><h2 style="margin-top:8px">'+escHtml(c?.name||'Commerce')+'</h2><p>'+escHtml(c?.city||'')+' · '+escHtml(a.title)+'</p>'+visibilitySummaryHtml(a,c)+clientInfoHtml(c)+scanPanelHtml(a,c)+socialPresenceHtml()+'<div class="scan-head" style="margin-top:8px"><div><div class="eyebrow">CONTRÔLES TERRAIN</div><h3 style="margin:4px 0 0">Vérifications manuelles</h3></div><div class="app-score">'+(a.score||0)+'/100</div></div><p class="app-muted">'+list.filter(x=>x.done).length+' sur '+list.length+' contrôles validés'+(a.scan?' · le score global provient de l’analyse réelle du site':'')+'</p>'+list.map((x,i)=>'<label class="app-check"><input type="checkbox" data-audit-check="'+i+'" '+(x.done?'checked':'')+'><span><b>'+escHtml(x.label)+'</b><small>'+escHtml(x.detail)+'</small></span></label>').join('')+'<form class="app-form" data-save-notes style="margin-top:18px"><label>Notes et recommandations<textarea name="notes" placeholder="Constats, actions à prévoir…">'+escHtml(a.notes||'')+'</textarea></label><button class="app-btn primary" type="submit">Enregistrer les notes</button></form><div class="detail-actions" style="margin-top:16px"><button class="app-btn primary" data-export-report="'+a.id+'">📄 Exporter le rapport (PDF)</button><button class="app-btn" data-delete-audit="'+a.id+'">Supprimer cet audit</button></div></section>';
+        if(c&&String(c.website||'').trim()&&!a.site&&siteScanningId!==a.id&&!siteAutoTried.has(a.id)){ siteAutoTried.add(a.id); setTimeout(()=>runSiteScan(a.id),400); }
+        body='<button class="app-btn" data-app-view="Audits">← Retour aux audits</button><section class="app-panel" style="margin-top:14px"><div class="eyebrow">DOSSIER D’AUDIT</div><h2 style="margin-top:8px">'+escHtml(c?.name||'Commerce')+'</h2><p>'+escHtml(c?.city||'')+' · '+escHtml(a.title)+'</p>'+visibilitySummaryHtml(a,c)+clientInfoHtml(c)+scanPanelHtml(a,c)+socialPresenceHtml(a)+'<div class="scan-head" style="margin-top:8px"><div><div class="eyebrow">CONTRÔLES TERRAIN</div><h3 style="margin:4px 0 0">Vérifications manuelles</h3></div><div class="app-score">'+(a.score||0)+'/100</div></div><p class="app-muted">'+list.filter(x=>x.done).length+' sur '+list.length+' contrôles validés'+(a.scan?' · le score global provient de l’analyse réelle du site':'')+'</p>'+list.map((x,i)=>'<label class="app-check"><input type="checkbox" data-audit-check="'+i+'" '+(x.done?'checked':'')+'><span><b>'+escHtml(x.label)+'</b><small>'+escHtml(x.detail)+'</small></span></label>').join('')+'<form class="app-form" data-save-notes style="margin-top:18px"><label>Notes et recommandations<textarea name="notes" placeholder="Constats, actions à prévoir…">'+escHtml(a.notes||'')+'</textarea></label><button class="app-btn primary" type="submit">Enregistrer les notes</button></form><div class="detail-actions" style="margin-top:16px"><button class="app-btn primary" data-export-report="'+a.id+'">📄 Exporter le rapport (PDF)</button><button class="app-btn" data-delete-audit="'+a.id+'">Supprimer cet audit</button></div></section>';
       }
       appShell(body);
     }
