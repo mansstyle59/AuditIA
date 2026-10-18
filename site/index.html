@@ -575,6 +575,9 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       .r-have-h{font-size:11px!important;text-transform:uppercase;letter-spacing:.05em;color:#1f9d57!important;border:0!important;padding:0!important;margin:0 0 6px!important}
       .r-miss-h{font-size:11px!important;text-transform:uppercase;letter-spacing:.05em;color:#c0392b!important;border:0!important;padding:0!important;margin:0 0 6px!important}
       .r-axis-tag{flex:0 0 auto;font-size:9px;font-weight:800;padding:2px 6px;border-radius:5px;background:#eef0f7;color:#5a68a8;letter-spacing:.03em}
+      .r-tgt-sub{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:#7657ed;margin:12px 0 6px}
+      .r-kw{display:flex;flex-wrap:wrap;gap:6px;margin:0}
+      .r-kw span{font-size:11px;background:#f1effb;border:1px solid #e3def5;border-radius:6px;padding:3px 8px;color:#4a3f8a}
       @page{margin:12mm 8mm}
     }
 
@@ -687,6 +690,16 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
     .ap-meta b{font-size:24px;font-weight:800;color:#cbbcff}
     .ap-meta span{font-size:12.5px;color:#aaa6bd}
     .ap-phase{font-size:12.5px;color:#d7d4e4;margin:8px 0 0}
+    /* ===== Verdict visibilité sociale + ciblage/mots-clés ===== */
+    .sv-verdict{display:inline-block;font-size:12.5px;font-weight:800;padding:6px 12px;border-radius:20px;margin:4px 0 10px}
+    .sv-ok{background:#1f4a3c;color:#9ae8c4}.sv-mid{background:#4a3f1f;color:#fbe0a6}.sv-bad{background:#4a2330;color:#ffb4bd}.sv-no{background:#3a3850;color:#aaa6bd}
+    .tgt-panel{margin-top:14px}
+    .tgt-sub{font-size:12px;font-weight:800;color:#cbbcff;margin:14px 0 8px}
+    .kw-wrap{display:flex;flex-wrap:wrap;gap:7px}
+    .kw-chip{font-size:12px;font-weight:700;color:#e7defb;background:#453f6c;border:1px solid #675f95;border-radius:9px;padding:6px 11px}
+    .geo-q{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+    .geo-q li{font-size:12.5px;color:#d7d4e4;background:#42445e;border:1px solid #ffffff0d;border-radius:10px;padding:9px 11px;line-height:1.4}
+    .geo-q li::before{content:"“";color:#9a87ff;font-weight:800;margin-right:2px}
     @media(max-width:600px){.scan-scores{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.scan-metrics{grid-template-columns:minmax(0,1fr)}.scan-head .app-btn{width:100%}}
 
     /* ===== Test & validation des clés API ===== */
@@ -845,8 +858,21 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
         if(site.tel&&site.tel.length) chips.push('Téléphone cliquable sur le site');
         signals=chips.length?'<div class="sp-signals">'+chips.map(c=>'<span class="sp-chip">'+c+'</span>').join('')+'</div>':'';
       }
-      const status=site?'<p class="app-muted" style="margin:10px 0 2px">Site lu le '+escHtml(new Date(site.analyzedAt).toLocaleString('fr-FR'))+' · '+((site&&site.socials&&site.socials.length)?site.socials.length+' réseau'+(site.socials.length>1?'x':'')+' relié'+(site.socials.length>1?'s':'')+' au site':'aucun réseau relié depuis la page d’accueil')+'</p>':'<p class="app-muted" style="margin:10px 0 2px">Touche « Détecter automatiquement » : AuditIA lit la page d’accueil du site et repère les réseaux, la réservation en ligne et les outils de suivi.</p>';
-      return '<section class="app-panel social-panel">'+head+status+'<div class="sp-grid">'+cards+'</div>'+signals+'<p class="scan-note">Détection depuis la page d’accueil du site (lecture via Jina Reader). Les statistiques privées (abonnés, engagement) ne sont pas fournies publiquement — voir la note dans le rapport. Logos : Logo.dev.</p></section>';
+      const sv=socialVisibility(a);
+      const verdict=site?'<div class="sv-verdict sv-'+sv.tone+'">'+escHtml(sv.label)+'</div>':'';
+      const status=site?'<p class="app-muted" style="margin:10px 0 2px">Site lu le '+escHtml(new Date(site.analyzedAt).toLocaleString('fr-FR'))+'</p>':'<p class="app-muted" style="margin:10px 0 2px">L’analyse complète lit la page d’accueil et repère les réseaux, la réservation en ligne et les outils de suivi.</p>';
+      return '<section class="app-panel social-panel">'+head+status+verdict+'<div class="sp-grid">'+cards+'</div>'+signals+'<p class="scan-note">Détection depuis la page d’accueil du site. Les statistiques privées (abonnés, engagement) ne sont pas fournies publiquement. Logos : Logo.dev.</p></section>';
+    }
+    function targetingPanelHtml(a,c){
+      const d=(c&&c.details)||{};
+      const kw=targetKeywords(c); const age=businessAge(a,c);
+      const cat=c&&(c.category||d.category)||'—';
+      const rows=[['Catégorie',cat]];
+      if(d.primaryType) rows.push(['Type Google',String(d.primaryType).replace(/_/g,' ')]);
+      if(age.hasData) rows.push(['Ancienneté estimée','présence en ligne depuis '+age.since+(age.detail?' ('+age.detail+')':'')]);
+      const seoChips=kw.seo.map(k=>'<span class="kw-chip">'+escHtml(k)+'</span>').join('');
+      const geoQ=kw.geo.map(q=>'<li>'+escHtml(q)+'</li>').join('');
+      return '<section class="app-panel tgt-panel"><div class="eyebrow">CIBLAGE &amp; OPPORTUNITÉS</div><h3 style="margin:4px 0 10px">Catégorie, ancienneté &amp; mots-clés</h3><div class="info-grid">'+rows.map(([k,v])=>'<div class="info-row"><span>'+escHtml(k)+'</span><b>'+escHtml(v)+'</b></div>').join('')+'</div>'+(seoChips?'<div class="tgt-sub">Mots-clés cibles (recherche Google)</div><div class="kw-wrap">'+seoChips+'</div>':'')+(geoQ?'<div class="tgt-sub">Questions types posées aux IA (GEO)</div><ul class="geo-q">'+geoQ+'</ul>':'')+(age.hasData?'':'<p class="scan-note">Date d’ouverture exacte non fournie par Google. L’ancienneté s’affiche après l’analyse du site (domaine + mentions sur la page).</p>')+'</section>';
     }
     function currentLogo(){return appSettings?.logo_data_url || './auditia-icon.svg'}
     function updateBrandColors(){document.documentElement.style.setProperty('--purple',appSettings?.primary_color||'#7657ed');document.documentElement.style.setProperty('--orange',appSettings?.accent_color||'#ffad72')}
@@ -981,6 +1007,56 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
         const ev=(d.events||[]).find(e=>/registration/i.test(e.eventAction||''));
         return ev?ev.eventDate:null;
       }catch(e){ return null; }
+    }
+    /* Mots-clés & requêtes cibles (SEO local + questions types posées aux IA = GEO) */
+    function targetKeywords(c){
+      const city=String((c&&c.city)||'').trim();
+      const d=(c&&c.details)||{};
+      const t=((c&&c.category)||d.category||'')+' '+(d.primaryType||'');
+      const s=t.toLowerCase();
+      const map=[
+        [/boulanger|bakery|p[âa]tiss/,['boulangerie','pâtisserie','pain artisanal']],
+        [/restaurant|meal_|food|brasserie|pizz|diner|traiteur/,['restaurant','où manger','meilleur restaurant']],
+        [/cafe|coffee|bar|pub/,['café','bar','terrasse']],
+        [/hair|salon|coiff|barber/,['coiffeur','salon de coiffure','barbier']],
+        [/nail|ongle/,['onglerie','manucure']],
+        [/spa|wellness|massage|beaut/,['institut de beauté','spa','soin du visage']],
+        [/plumb|plomb/,['plombier','dépannage plomberie']],
+        [/electric|électric/,['électricien','dépannage électrique']],
+        [/paint|peint|fa[çc]ad/,['peintre','façadier','ravalement de façade']],
+        [/garage|car_repair|auto|m[ée]can/,['garage auto','réparation voiture','garagiste']],
+        [/hotel|lodging|h[ée]berg/,['hôtel','où dormir']],
+        [/pharmac/,['pharmacie']],
+        [/fleuri|florist/,['fleuriste','livraison de fleurs']],
+        [/store|shop|market|boutique|commerce/,['boutique','magasin']]
+      ];
+      let base=[]; for(const [rx,ks] of map){ if(rx.test(s)){ base=ks; break; } }
+      if(!base.length){ const cat=String((c&&c.category)||d.category||'').trim(); base=[cat&&cat.toLowerCase()!=='autre'?cat.toLowerCase():'commerce']; }
+      const b0=base[0];
+      const seo=new Set(); base.forEach(b=>seo.add(city?b+' '+city:b));
+      if(city){ ['meilleur '+b0+' '+city,b0+' près de '+city,'avis '+b0+' '+city,b0+' '+city+' horaires'].forEach(k=>seo.add(k)); }
+      const geo=[]; if(city){ geo.push('Quel est le meilleur '+b0+' à '+city+' ?'); geo.push('Où trouver un bon '+b0+' à '+city+' ?'); geo.push('Recommande-moi un '+b0+' à '+city); }
+      return { seo:[...seo].slice(0,8), geo:geo.slice(0,3), base:b0, city };
+    }
+    function socialVisibility(a){
+      const soc=(a&&a.site&&a.site.socials)||[]; const n=soc.length;
+      const major=['Instagram','Facebook','TikTok','YouTube'].filter(k=>soc.some(s=>s.net===k)).length;
+      let label,tone;
+      if(!(a&&a.site)){ return {analyzed:false,n:0,major:0,label:'Non analysé',tone:'no'}; }
+      if(n===0){ label='Aucune présence sociale détectée sur le site'; tone='bad'; }
+      else if(n<=1){ label='Visibilité sociale faible — 1 réseau seulement'; tone='bad'; }
+      else if(n<=3){ label='Visibilité sociale correcte — '+n+' réseaux'; tone='mid'; }
+      else { label='Bonne visibilité sociale — '+n+' réseaux'; tone='ok'; }
+      return {analyzed:true,n,major,label,tone};
+    }
+    function businessAge(a,c){
+      const d=(c&&c.details)||{};
+      const dom=d.domainCreated?new Date(d.domainCreated):null;
+      const cy=(a&&a.site&&a.site.copyrightYear)||null;
+      const years=[]; if(dom&&!isNaN(dom.getTime())) years.push(dom.getFullYear()); if(cy) years.push(cy);
+      const since=years.length?Math.min(...years):null;
+      const parts=[]; if(dom&&!isNaN(dom.getTime())) parts.push('domaine enregistré le '+dom.toLocaleDateString('fr-FR')); if(cy) parts.push('mention « '+cy+' » sur le site');
+      return { since, detail:parts.join(' · '), hasData:!!since };
     }
     function normalizePlace(p){
       let website=p.websiteUri||''; if(website&&!/^https?:\/\//i.test(website)) website='https://'+website;
@@ -1144,7 +1220,9 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       const words=text.split(' ').filter(w=>w.length>2).length;
       const hoursOnSite=/horaires|lundi|mardi|ouvert du|ouverture/i.test(text);
       const addressOnSite=/\b\d{5}\b/.test(text);
-      return {socials,tel,whatsapp,booking,tracking,cms,title,metaDesc,viewport,ldTypes:[...ldTypes],localSchema,words,hoursOnSite,addressOnSite,analyzedAt:new Date().toISOString(),finalUrl:pageUrl};
+      const years=[...text.matchAll(/(?:©|copyright|depuis)\s*(?:\d{4}\s*[-–]\s*)?(\d{4})/gi)].map(m=>+m[1]).filter(y=>y>1990&&y<=new Date().getFullYear());
+      const copyrightYear=years.length?Math.min(...years):null;
+      return {socials,tel,whatsapp,booking,tracking,cms,title,metaDesc,viewport,ldTypes:[...ldTypes],localSchema,words,hoursOnSite,addressOnSite,copyrightYear,analyzedAt:new Date().toISOString(),finalUrl:pageUrl};
     }
     async function runSiteScan(auditId){
       const a=appAudits.find(x=>x.id===auditId); if(!a) return;
@@ -1199,27 +1277,38 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       const a=appAudits.find(x=>x.id===auditId); if(!a||fullAuditState) return;
       const c=appClients.find(x=>x.id===a.client_id);
       let site=String((c&&c.website)||'').trim(); const hasWeb=!!site; if(hasWeb&&!/^https?:\/\//i.test(site)) site='https://'+site;
-      fullAuditState={id:auditId,pct:3,target:hasWeb?22:70,phase:hasWeb?'Lecture du site et détection des réseaux…':'Analyse des données Google…',startedAt:Date.now(),estTotal:hasWeb?38:4};
+      const wait=ms=>new Promise(r=>setTimeout(r,ms));
+      fullAuditState={id:auditId,pct:2,target:hasWeb?16:40,phase:'Récupération des données Google du commerce…',startedAt:Date.now(),estTotal:hasWeb?46:7};
       appNotice=''; renderApp(); stopFullTicker(); fullAuditTimer=setInterval(tickProgress,170);
-      let siteRes=a.site||null, scan=a.scan||null, issues=[];
+      let siteRes=a.site||null, scan=a.scan||null, newDetails=null, issues=[];
       try{
         if(hasWeb){
+          setPhase('Lecture du site et détection des réseaux…',22);
           try{ const html=await readSiteHtml(site); siteRes=analyzeSite(html,site); await appClient.from('audits').update({site:siteRes}).eq('id',auditId); }
           catch(e){ issues.push('lecture du site impossible'); }
-          setPhase('Mesure de la performance (Google PageSpeed)…',58);
+          setPhase('Recherche de l’ancienneté (nom de domaine)…',40);
+          try{ const dc=await fetchDomainDate(site); if(dc){ newDetails={...(c&&c.details||{}),domainCreated:dc}; await appClient.from('clients').update({details:newDetails}).eq('id',c.id); } }
+          catch(e){}
+          setPhase('Mesure de la performance (Google PageSpeed)…',66);
           try{ scan=await fetchPagespeed(site); }
           catch(e){ issues.push('performance indisponible ('+((e&&e.message)||'').slice(0,40)+')'); }
+          setPhase('Analyse des catégories et des mots-clés cibles…',86);
+          await wait(1400);
           setPhase('Génération du rapport SEO &amp; GEO…',95);
-        } else { setPhase('Génération du rapport…',95); }
+          await wait(700);
+        } else {
+          setPhase('Analyse des catégories et des mots-clés cibles…',75); await wait(1500);
+          setPhase('Génération du rapport…',95); await wait(700);
+        }
         const merged={...a,site:siteRes,scan:scan};
-        const diag=visibilityAudit(merged,c);
+        const diag=visibilityAudit(merged, newDetails?{...c,details:newDetails}:c);
         const payload={score:diag.index,status:'Analysé',updated_at:new Date().toISOString()};
         if(siteRes) payload.site=siteRes; if(scan) payload.scan=scan;
         const {error}=await appClient.from('audits').update(payload).eq('id',auditId);
         if(error) throw new Error(error.message);
-        if(fullAuditState){ fullAuditState.pct=100; fullAuditState.target=100; } tickProgress();
+        if(fullAuditState){ fullAuditState.pct=100; fullAuditState.target=100; } tickProgress(); await wait(350);
         await refreshData();
-        appNotice=issues.length?('Analyse terminée (limites : '+issues.join(', ')+'). Rapport disponible.'):'Analyse complète terminée — rapport prêt à exporter.';
+        appNotice=issues.length?('Analyse terminée (limites : '+issues.join(', ')+'). Rapport complet disponible.'):'Analyse complète terminée — rapport prêt à exporter.';
       }catch(e){ appNotice='Erreur pendant l’analyse : '+((e&&e.message)||'inconnue').slice(0,140); }
       finally{ stopFullTicker(); fullAuditState=null; recomputeKeyAlerts(); renderApp(); }
     }
@@ -1315,15 +1404,15 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       };
       return '<div class="r-head"><div class="r-brand"><img src="'+escHtml(logo)+'" alt=""><div><b>'+escHtml(st.app_name||'AuditIA')+'</b><span>'+escHtml(st.company_name||'AffiAds')+'</span></div></div><div class="r-meta"><b>Rapport de visibilité numérique</b><span>'+escHtml(new Date(a.updated_at||Date.now()).toLocaleDateString('fr-FR'))+'</span></div></div>'
         +'<h1 class="r-client">'+escHtml(c?.name||'Commerce')+'</h1><p class="r-sub">'+escHtml([c?.city,c?.category||d.category].filter(Boolean).join(' · '))+'</p>'
-        +'<div class="r-verdict"><div class="r-verdict-score"><div class="r-ring r-ring-lg" style="background:conic-gradient('+idxCol+' '+(idx*3.6)+'deg,#e7e3f2 0)"><span>'+idx+'</span></div><small>visibilité</small></div><div class="r-verdict-txt"><b>Note de visibilité : '+idx+'/100</b><p>'+escHtml(visibilityVerdict(idx))+'</p><span class="r-verdict-meta">'+escHtml(a.status||'À démarrer')+' · '+done+'/'+list.length+' contrôles terrain validés'+(s?' · performance du site mesurée par Google':'')+'</span></div></div>'
+        +'<div class="r-verdict"><div class="r-verdict-score"><div class="r-ring r-ring-lg" style="background:conic-gradient('+idxCol+' '+(idx*3.6)+'deg,#e7e3f2 0)"><span>'+idx+'</span></div><small>visibilité</small></div><div class="r-verdict-txt"><b>Note de visibilité : '+idx+'/100</b><p>'+escHtml(visibilityVerdict(idx))+'</p><span class="r-verdict-meta">Analyse automatique du '+escHtml(new Date(a.updated_at||Date.now()).toLocaleDateString('fr-FR'))+(s?' · performance mesurée par Google':'')+(a.site?' · site lu automatiquement':'')+'</span></div></div>'
         +'<div class="r-axes"><div class="r-axis"><span>SEO · Google</span><b style="color:'+axisCol(diag.seo.score)+'">'+diag.seo.score+'/100</b></div><div class="r-axis"><span>GEO · IA génératives</span><b style="color:'+axisCol(diag.geo.score)+'">'+diag.geo.score+'/100</b></div></div>'
         +pillarSection('SEO — être trouvé sur Google','Quand un client cherche votre activité près de chez lui, apparaissez-vous ?',diag.seo)
         +pillarSection('GEO — être cité par les IA','ChatGPT, Gemini et Perplexity recommandent de plus en plus de commerces. GEO, c’est être la réponse que l’IA donne.',diag.geo)
         +(infoRows.length?'<div class="r-section"><h2>Fiche commerce</h2><table class="r-table">'+infoRows.map(([k,v])=>'<tr><td>'+escHtml(k)+'</td><td>'+escHtml(v)+'</td></tr>').join('')+'</table></div>':'')
         +(s?'<div class="r-section"><h2>Performance du site · Google Lighthouse (mobile)</h2><div class="r-scores">'+gauge('Performance',s.scores.performance)+gauge('Accessibilité',s.scores.accessibility)+gauge('Bonnes pratiques',s.scores.bestPractices)+gauge('SEO',s.scores.seo)+'</div></div>':'')
-        +(a.site?(function(){const si=a.site;const soc=(si.socials||[]);const sig=[];if(si.booking&&si.booking.length)sig.push('Réservation en ligne ('+si.booking.join(', ')+')');if(si.whatsapp)sig.push('WhatsApp');if(si.tracking&&si.tracking.length)sig.push('Outils de suivi : '+si.tracking.join(', '));if(si.cms)sig.push('Technologie du site : '+si.cms);return '<div class="r-section"><h2>Réseaux sociaux & présence web</h2>'+(soc.length?'<table class="r-table">'+soc.map(x=>'<tr><td>'+escHtml(x.net)+'</td><td>'+escHtml(x.url)+'</td></tr>').join('')+'</table>':'<p class="r-notes">Aucun réseau social n’est relié depuis la page d’accueil du site. Recommandation : créer/relier au moins un profil (Instagram ou Facebook) et l’afficher sur le site.</p>')+(sig.length?'<p class="r-sig-line">Autres signaux détectés : '+escHtml(sig.join(' · '))+'</p>':'')+'<p class="r-mini">Détection automatique depuis la page d’accueil. Les statistiques privées (abonnés, engagement) ne sont pas publiques.</p></div>';})():'')
+        +(a.site?(function(){const si=a.site;const soc=(si.socials||[]);const sv=socialVisibility(a);const sig=[];if(si.booking&&si.booking.length)sig.push('Réservation en ligne ('+si.booking.join(', ')+')');if(si.whatsapp)sig.push('WhatsApp');if(si.tracking&&si.tracking.length)sig.push('Outils de suivi : '+si.tracking.join(', '));if(si.cms)sig.push('Technologie du site : '+si.cms);return '<div class="r-section"><h2>Réseaux sociaux &amp; visibilité</h2><p class="r-verdict-meta" style="margin:0 0 8px;font-size:12px"><b>'+escHtml(sv.label)+'</b></p>'+(soc.length?'<table class="r-table">'+soc.map(x=>'<tr><td>'+escHtml(x.net)+'</td><td>'+escHtml(x.url)+'</td></tr>').join('')+'</table>':'<p class="r-notes">Aucun réseau social n’est relié depuis la page d’accueil du site. Recommandation : créer/relier au moins un profil (Instagram ou Facebook) et l’afficher sur le site.</p>')+(sig.length?'<p class="r-sig-line">Autres signaux détectés : '+escHtml(sig.join(' · '))+'</p>':'')+'<p class="r-mini">Détection automatique depuis la page d’accueil. Les statistiques privées (abonnés, engagement) ne sont pas publiques.</p></div>';})():'')
+        +(function(){const kw=targetKeywords(c);const age=businessAge(a,c);const rows=[];const cat=c&&(c.category||d.category);if(cat)rows.push(['Catégorie',cat]);if(d.primaryType)rows.push(['Type Google',String(d.primaryType).replace(/_/g,' ')]);if(age.hasData)rows.push(['Ancienneté estimée','présence en ligne depuis '+age.since+(age.detail?' ('+age.detail+')':'')]);const kwHtml=kw.seo.length?'<p class="r-tgt-sub">Mots-clés cibles (recherche Google)</p><p class="r-kw">'+kw.seo.map(k=>'<span>'+escHtml(k)+'</span>').join('')+'</p>':'';const geoHtml=kw.geo.length?'<p class="r-tgt-sub">Questions types posées aux IA (GEO)</p><ul class="r-recs">'+kw.geo.map(q=>'<li>'+escHtml(q)+'</li>').join('')+'</ul>':'';return (rows.length||kwHtml||geoHtml)?'<div class="r-section"><h2>Catégorie, ancienneté &amp; mots-clés cibles</h2>'+(rows.length?'<table class="r-table">'+rows.map(([k,v])=>'<tr><td>'+escHtml(k)+'</td><td>'+escHtml(v)+'</td></tr>').join('')+'</table>':'')+kwHtml+geoHtml+'<p class="r-mini">Date d’ouverture exacte non fournie par Google : l’ancienneté est estimée via le nom de domaine et les mentions du site.</p></div>':'';})()
         +(plan.length?'<div class="r-section"><h2>Plan d’action priorisé</h2><div class="r-plan">'+plan.map((p,i)=>'<div class="r-plan-item"><span class="r-plan-n">'+(i+1)+'</span><div class="r-plan-c"><b>'+escHtml(p.t)+'</b>'+(p.d?'<span>'+escHtml(p.d)+'</span>':'')+'</div>'+(p.axis?'<span class="r-axis-tag">'+escHtml(p.axis)+'</span>':'')+pill(p.p)+'</div>').join('')+'</div></div>':'')
-        +'<div class="r-section"><h2>Contrôles terrain ('+done+'/'+list.length+')</h2><ul class="r-checks">'+list.map(x=>'<li class="'+(x.done?'done':'')+'"><span class="r-box">'+(x.done?'✓':'')+'</span>'+escHtml(x.label)+'</li>').join('')+'</ul></div>'
         +(a.notes?'<div class="r-section"><h2>Notes & recommandations</h2><p class="r-notes">'+escHtml(a.notes)+'</p></div>':'')
         +'<div class="r-sign"><div class="r-sign-line" style="background:'+escHtml(col)+'"></div><b>'+escHtml(st.signature_name||st.company_name)+'</b><span>'+escHtml(st.signature_role||'')+'</span>'+[st.contact_email,st.phone,st.website].filter(Boolean).map(x=>'<span>'+escHtml(x)+'</span>').join('')+(st.signature_text?'<p>'+escHtml(st.signature_text)+'</p>':'')+'</div>'
         +'<div class="r-foot">Rapport généré par '+escHtml(st.app_name||'AuditIA')+' · '+escHtml(st.company_name||'AffiAds')+' · Performance mesurée par Google PageSpeed Insights. Le nom du propriétaire et la date d\'ouverture ne sont pas fournis par Google.</div>';
@@ -1368,7 +1457,7 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
         if(!a){appView='Audits';renderApp();return}
         const c=appClients.find(x=>x.id===a.client_id);
         const list=Array.isArray(a.checklist)?a.checklist:[];
-        body='<button class="app-btn" data-app-view="Audits">← Retour aux audits</button><section class="app-panel" style="margin-top:14px"><div class="eyebrow">DOSSIER D’AUDIT</div><h2 style="margin-top:8px">'+escHtml(c?.name||'Commerce')+'</h2><p>'+escHtml(c?.city||'')+' · '+escHtml(a.title)+'</p>'+analysePanelHtml(a,c)+visibilitySummaryHtml(a,c)+clientInfoHtml(c)+scanPanelHtml(a,c)+socialPresenceHtml(a)+'<div class="scan-head" style="margin-top:8px"><div><div class="eyebrow">CONTRÔLES TERRAIN</div><h3 style="margin:4px 0 0">Vérifications manuelles</h3></div><div class="app-score">'+(a.score||0)+'/100</div></div><p class="app-muted">'+list.filter(x=>x.done).length+' sur '+list.length+' contrôles validés'+(a.scan?' · le score global provient de l’analyse réelle du site':'')+'</p>'+list.map((x,i)=>'<label class="app-check"><input type="checkbox" data-audit-check="'+i+'" '+(x.done?'checked':'')+'><span><b>'+escHtml(x.label)+'</b><small>'+escHtml(x.detail)+'</small></span></label>').join('')+'<form class="app-form" data-save-notes style="margin-top:18px"><label>Notes et recommandations<textarea name="notes" placeholder="Constats, actions à prévoir…">'+escHtml(a.notes||'')+'</textarea></label><button class="app-btn primary" type="submit">Enregistrer les notes</button></form><div class="detail-actions" style="margin-top:16px"><button class="app-btn primary" data-export-report="'+a.id+'">📄 Exporter le rapport (PDF)</button><button class="app-btn" data-delete-audit="'+a.id+'">Supprimer cet audit</button></div></section>';
+        body='<button class="app-btn" data-app-view="Audits">← Retour aux audits</button><section class="app-panel" style="margin-top:14px"><div class="eyebrow">DOSSIER D’AUDIT</div><h2 style="margin-top:8px">'+escHtml(c?.name||'Commerce')+'</h2><p>'+escHtml(c?.city||'')+' · '+escHtml(a.title)+'</p>'+analysePanelHtml(a,c)+visibilitySummaryHtml(a,c)+clientInfoHtml(c)+scanPanelHtml(a,c)+socialPresenceHtml(a)+targetingPanelHtml(a,c)+'<details class="cd-edit" style="margin-top:14px"><summary>Notes personnelles (facultatif)</summary><form class="app-form" data-save-notes style="padding:0 16px 16px"><label>Notes internes<textarea name="notes" placeholder="Remarques pour toi — n’apparaissent dans le rapport que si tu les remplis.">'+escHtml(a.notes||'')+'</textarea></label><button class="app-btn primary" type="submit">Enregistrer les notes</button></form></details><div class="detail-actions" style="margin-top:16px"><button class="app-btn primary" data-export-report="'+a.id+'">📄 Exporter le rapport (PDF)</button><button class="app-btn" data-delete-audit="'+a.id+'">Supprimer cet audit</button></div></section>';
       }
       appShell(body);
     }
