@@ -477,6 +477,23 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       .settings-actions{display:grid;grid-template-columns:1fr}
     }
 
+    /* ===== Analyse réelle du site (scan Lighthouse) ===== */
+    .scan-panel{margin-top:14px}
+    .scan-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+    .scan-head .app-btn{min-height:44px}
+    .scan-scores{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:8px 0 6px}
+    .scan-score{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;min-width:0}
+    .scan-ring{width:74px;height:74px;border-radius:50%;display:grid;place-items:center}
+    .scan-ring-in{width:58px;height:58px;border-radius:50%;background:#201f31;display:grid;place-items:center}
+    .scan-ring-in strong{font-size:19px;letter-spacing:-.5px}
+    .scan-score-label{font-size:11px;color:#aaa6bd;line-height:1.25}
+    .scan-metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:12px 0 6px}
+    .scan-metric{display:flex;justify-content:space-between;gap:8px;background:#25283a;border:1px solid #ffffff0d;border-radius:12px;padding:10px 12px;font-size:12.5px}
+    .scan-metric span{color:#aaa6bd;min-width:0;overflow-wrap:anywhere}
+    .scan-metric b{white-space:nowrap}
+    .scan-note{font-size:11.5px;color:#8f88a6;line-height:1.5;margin:10px 0 0}
+    @media(max-width:600px){.scan-scores{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.scan-metrics{grid-template-columns:minmax(0,1fr)}.scan-head .app-btn{width:100%}}
+
     /* ===== Test & validation des clés API ===== */
     .api-test{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:10px 0 2px}
     .api-test-btn{min-height:40px;border:1px solid #4b4570;background:#2a2446;color:#e7defb;border-radius:12px;padding:9px 14px;font-weight:800;font-size:13px;cursor:pointer}
@@ -621,10 +638,52 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       page.querySelectorAll('[data-create-client]').forEach(form=>form.addEventListener('submit',async e=>{e.preventDefault();const fd=new FormData(form);const row={user_id:appUser.id,name:String(fd.get('name')||'').trim(),city:String(fd.get('city')||'').trim(),category:String(fd.get('category')||'Autre').trim(),website:String(fd.get('website')||'').trim()||null};if(row.website&&!/^https?:\/\//i.test(row.website))row.website='https://'+row.website;const {error}=await appClient.from('clients').insert(row);if(error){appNotice='Erreur : '+error.message}else{appNotice='Client enregistré.';appView='Clients';await refreshData()}renderApp()}));
       page.querySelectorAll('[data-create-audit]').forEach(form=>form.addEventListener('submit',async e=>{e.preventDefault();const fd=new FormData(form);const row={user_id:appUser.id,client_id:String(fd.get('client_id')||''),title:String(fd.get('title')||'Audit de visibilité').trim(),status:'À démarrer',score:0,checklist:checklistTemplate.map(([label,detail])=>({label,detail,done:false}))};const {error}=await appClient.from('audits').insert(row);if(error){appNotice='Erreur : '+error.message}else{appNotice='Audit créé. Tu peux maintenant ouvrir son dossier.';appView='Audits';await refreshData()}renderApp()}));
       page.querySelectorAll('[data-open-audit]').forEach(b=>b.addEventListener('click',()=>{activeAudit=b.dataset.openAudit;appView='Détail';renderApp()}));
-      page.querySelectorAll('[data-audit-check]').forEach(el=>el.addEventListener('change',async()=>{const audit=appAudits.find(a=>a.id===activeAudit);if(!audit)return;const list=(audit.checklist||[]).map((x,i)=>i===Number(el.dataset.auditCheck)?{...x,done:el.checked}:x);const done=list.filter(x=>x.done).length;const score=Math.round(done/list.length*100);const {error}=await appClient.from('audits').update({checklist:list,score,status:done===list.length?'Terminé':'En cours',updated_at:new Date().toISOString()}).eq('id',audit.id);if(error)appNotice='Erreur : '+error.message;else appNotice='Contrôle enregistré.';await refreshData();renderApp()}));
+      page.querySelectorAll('[data-audit-check]').forEach(el=>el.addEventListener('change',async()=>{const audit=appAudits.find(a=>a.id===activeAudit);if(!audit)return;const list=(audit.checklist||[]).map((x,i)=>i===Number(el.dataset.auditCheck)?{...x,done:el.checked}:x);const done=list.filter(x=>x.done).length;const score=list.length?Math.round(done/list.length*100):0;const payload=audit.scan?{checklist:list,updated_at:new Date().toISOString()}:{checklist:list,score,status:done===list.length?'Terminé':'En cours',updated_at:new Date().toISOString()};const {error}=await appClient.from('audits').update(payload).eq('id',audit.id);if(error)appNotice='Erreur : '+error.message;else appNotice='Contrôle enregistré.';await refreshData();renderApp()}));
       page.querySelectorAll('[data-save-notes]').forEach(form=>form.addEventListener('submit',async e=>{e.preventDefault();const fd=new FormData(form);const {error}=await appClient.from('audits').update({notes:String(fd.get('notes')||''),updated_at:new Date().toISOString()}).eq('id',activeAudit);appNotice=error?'Erreur : '+error.message:'Notes enregistrées.';await refreshData();renderApp()}));
       page.querySelectorAll('[data-delete-client]').forEach(b=>b.addEventListener('click',async()=>{if(!confirm('Supprimer ce client et ses audits associés ?'))return;const id=b.dataset.deleteClient;const au=await appClient.from('audits').delete().eq('client_id',id);const {error}=await appClient.from('clients').delete().eq('id',id);appNotice=error?'Erreur : '+error.message:(au.error?'Client supprimé. Audits liés : '+au.error.message:'Client et audits associés supprimés.');await refreshData();renderApp()}));
       page.querySelectorAll('[data-delete-audit]').forEach(b=>b.addEventListener('click',async()=>{if(!confirm('Supprimer cet audit ?'))return;const {error}=await appClient.from('audits').delete().eq('id',b.dataset.deleteAudit);appNotice=error?'Erreur : '+error.message:'Audit supprimé.';await refreshData();renderApp()}));
+      page.querySelectorAll('[data-run-scan]').forEach(b=>b.addEventListener('click',()=>runScan(b.dataset.runScan)));
+    }
+    let scanningId=null;
+    async function runScan(auditId){
+      const a=appAudits.find(x=>x.id===auditId); if(!a) return;
+      const c=appClients.find(x=>x.id===a.client_id);
+      let site=String((c&&c.website)||'').trim();
+      if(!site){ appNotice='Erreur : ajoute un site web à la fiche client avant de lancer l’analyse.'; renderApp(); return; }
+      if(!/^https?:\/\//i.test(site)) site='https://'+site;
+      scanningId=auditId; appNotice='Analyse du site en cours… (20 à 40 secondes)'; renderApp();
+      try{
+        const key=String((appSettings&&appSettings.pagespeed_api_key)||'').trim();
+        const u=new URL('https://www.googleapis.com/pagespeedonline/v5/runPagespeed');
+        u.searchParams.set('url',site); u.searchParams.set('strategy','mobile');
+        ['performance','accessibility','best-practices','seo'].forEach(cat=>u.searchParams.append('category',cat));
+        if(key) u.searchParams.set('key',key);
+        const r=await withTimeout(fetch(u.toString()),60000);
+        if(!r.ok){ const d=await r.json().catch(()=>null); const m=(d&&d.error&&d.error.message)||('HTTP '+r.status); throw new Error(r.status===429?'Limite d’analyses atteinte (quota). Réessaie dans quelques minutes, ou ajoute une clé PageSpeed dans les Réglages.':r.status===400?'Google n’a pas pu analyser cette adresse. Vérifie le site web du client.':m); }
+        const data=await r.json(); const lh=data.lighthouseResult;
+        if(!lh||!lh.categories) throw new Error('Aucun résultat exploitable renvoyé par Google.');
+        const sc=k=>typeof (lh.categories[k]||{}).score==='number'?Math.round(lh.categories[k].score*100):null;
+        const au=lh.audits||{}; const dv=k=>(au[k]&&au[k].displayValue)||null;
+        const scan={ provider:'Google PageSpeed Insights · Lighthouse (mobile)', analyzedAt:new Date().toISOString(), url:site, finalUrl:lh.finalDisplayedUrl||site,
+          scores:{performance:sc('performance'),accessibility:sc('accessibility'),bestPractices:sc('best-practices'),seo:sc('seo')},
+          metrics:{ 'Contenu affiché (FCP)':dv('first-contentful-paint'), 'Plus grand contenu (LCP)':dv('largest-contentful-paint'), 'Interactivité (TBT)':dv('total-blocking-time'), 'Stabilité visuelle (CLS)':dv('cumulative-layout-shift'), 'Vitesse (Speed Index)':dv('speed-index') } };
+        const vals=Object.values(scan.scores).filter(v=>typeof v==='number');
+        const overall=vals.length?Math.round(vals.reduce((s,n)=>s+n,0)/vals.length):0;
+        const {error}=await appClient.from('audits').update({scan,score:overall,status:'Analysé',updated_at:new Date().toISOString()}).eq('id',auditId);
+        if(error) throw new Error(error.message);
+        appNotice='Analyse terminée : scores réels enregistrés.';
+        await refreshData();
+      }catch(e){ appNotice='Erreur : '+((e&&e.message)||'analyse impossible').slice(0,160); }
+      finally{ scanningId=null; renderApp(); }
+    }
+    function scanGauge(label,v){ const val=(v==null?'—':v); const col=v==null?'#8a84a0':v>=90?'#34d399':v>=50?'#fbbf24':'#f87171'; const deg=(v==null?0:v)*3.6; return '<article class="scan-score"><div class="scan-ring" style="background:conic-gradient('+col+' '+deg+'deg,#2c2a42 0)"><span class="scan-ring-in"><strong>'+val+'</strong></span></div><span class="scan-score-label">'+label+'</span></article>'; }
+    function scanPanelHtml(a,c){
+      const site=String((c&&c.website)||'').trim(); const busy=scanningId===a.id; const s=a.scan;
+      const head='<div class="scan-head"><div><div class="eyebrow">ANALYSE RÉELLE DU SITE</div><h3 style="margin:4px 0 0">Google PageSpeed · Lighthouse mobile</h3></div><button class="app-btn primary" data-run-scan="'+a.id+'" '+((!site||busy)?'disabled':'')+'>'+(busy?'Analyse en cours…':(s?'Relancer l’analyse':'Analyser le site'))+'</button></div>';
+      if(!site) return '<section class="app-panel scan-panel">'+head+'<div class="app-empty">Ajoute un site web à la fiche client pour lancer l’analyse réelle.</div></section>';
+      if(!s) return '<section class="app-panel scan-panel">'+head+'<p class="app-muted">'+escHtml(site)+'</p><div class="app-empty">Aucune analyse pour le moment. Touche « Analyser le site » pour mesurer la performance, le SEO et l’accessibilité réels du site.</div></section>';
+      const metrics=Object.entries(s.metrics||{}).filter(([k,v])=>v).map(([k,v])=>'<div class="scan-metric"><span>'+escHtml(k)+'</span><b>'+escHtml(v)+'</b></div>').join('');
+      return '<section class="app-panel scan-panel">'+head+'<p class="app-muted">'+escHtml(s.finalUrl||site)+' · analysé le '+escHtml(new Date(s.analyzedAt).toLocaleString('fr-FR'))+'</p><div class="scan-scores">'+scanGauge('Performance',s.scores.performance)+scanGauge('Accessibilité',s.scores.accessibility)+scanGauge('Bonnes pratiques',s.scores.bestPractices)+scanGauge('SEO',s.scores.seo)+'</div>'+(metrics?'<div class="scan-metrics">'+metrics+'</div>':'')+'<p class="scan-note">Scores mesurés par Google (Lighthouse mobile). Ils reflètent le site web ; les points de contrôle terrain ci-dessous restent manuels.</p></section>';
     }
     function renderApp(){
       const completed=appAudits.filter(a=>a.status==='Terminé').length;
@@ -649,7 +708,7 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
         if(!a){appView='Audits';renderApp();return}
         const c=appClients.find(x=>x.id===a.client_id);
         const list=Array.isArray(a.checklist)?a.checklist:[];
-        body='<button class="app-btn" data-app-view="Audits">← Retour aux audits</button><section class="app-panel" style="margin-top:14px"><div class="eyebrow">DOSSIER D’AUDIT</div><h2 style="margin-top:8px">'+escHtml(c?.name||'Commerce')+'</h2><p>'+escHtml(c?.city||'')+' · '+escHtml(a.title)+'</p>'+socialPresenceHtml()+'<div class="app-score">'+(a.score||0)+'/100</div><p>'+list.filter(x=>x.done).length+' sur '+list.length+' contrôles validés</p>'+list.map((x,i)=>'<label class="app-check"><input type="checkbox" data-audit-check="'+i+'" '+(x.done?'checked':'')+'><span><b>'+escHtml(x.label)+'</b><small>'+escHtml(x.detail)+'</small></span></label>').join('')+'<form class="app-form" data-save-notes style="margin-top:18px"><label>Notes et recommandations<textarea name="notes" placeholder="Constats, actions à prévoir…">'+escHtml(a.notes||'')+'</textarea></label><button class="app-btn primary" type="submit">Enregistrer les notes</button></form><div style="margin-top:16px"><button class="app-btn" data-delete-audit="'+a.id+'">Supprimer cet audit</button></div></section>';
+        body='<button class="app-btn" data-app-view="Audits">← Retour aux audits</button><section class="app-panel" style="margin-top:14px"><div class="eyebrow">DOSSIER D’AUDIT</div><h2 style="margin-top:8px">'+escHtml(c?.name||'Commerce')+'</h2><p>'+escHtml(c?.city||'')+' · '+escHtml(a.title)+'</p>'+scanPanelHtml(a,c)+socialPresenceHtml()+'<div class="scan-head" style="margin-top:8px"><div><div class="eyebrow">CONTRÔLES TERRAIN</div><h3 style="margin:4px 0 0">Vérifications manuelles</h3></div><div class="app-score">'+(a.score||0)+'/100</div></div><p class="app-muted">'+list.filter(x=>x.done).length+' sur '+list.length+' contrôles validés'+(a.scan?' · le score global provient de l’analyse réelle du site':'')+'</p>'+list.map((x,i)=>'<label class="app-check"><input type="checkbox" data-audit-check="'+i+'" '+(x.done?'checked':'')+'><span><b>'+escHtml(x.label)+'</b><small>'+escHtml(x.detail)+'</small></span></label>').join('')+'<form class="app-form" data-save-notes style="margin-top:18px"><label>Notes et recommandations<textarea name="notes" placeholder="Constats, actions à prévoir…">'+escHtml(a.notes||'')+'</textarea></label><button class="app-btn primary" type="submit">Enregistrer les notes</button></form><div style="margin-top:16px"><button class="app-btn" data-delete-audit="'+a.id+'">Supprimer cet audit</button></div></section>';
       }
       appShell(body);
     }
