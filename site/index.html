@@ -509,6 +509,8 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
     html,body{background:#100e1b}
     body{-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%;text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased;overscroll-behavior-y:none}
     button,a{-webkit-tap-highlight-color:transparent}
+    /* Pas de zoom automatique iOS au focus d'un champ : 16px minimum sur toutes les saisies */
+    input,select,textarea,.login-control,.input{font-size:16px!important}
     /* Bande unie derrière l'horloge / la 5G : plus de contenu flou qui passe dessous */
     .status-safe{position:fixed;top:0;left:0;right:0;height:var(--safe-top);background:#100e1b;z-index:95;pointer-events:none}
     .login-page{padding-top:calc(var(--safe-top) + 12px)}
