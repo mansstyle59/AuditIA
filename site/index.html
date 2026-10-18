@@ -565,6 +565,16 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       .r-pill{flex:0 0 auto;font-size:9.5px;font-weight:800;padding:2px 7px;border-radius:20px;white-space:nowrap}
       .r-pill-high{background:#fbe3df;color:#c0392b}.r-pill-mid{background:#fdf0d8;color:#a06700}.r-pill-low{background:#eceaf6;color:#6a5ab8}
       .r-sig-line{font-size:12px;color:#555;margin:8px 0 0}.r-mini{font-size:10px;color:#999;margin:6px 0 0}
+      .r-axes{display:flex;gap:12px;margin-top:10px}
+      .r-axis{flex:1;background:#faf9fd;border:1px solid #eee;border-radius:9px;padding:9px 12px;display:flex;align-items:center;justify-content:space-between}
+      .r-axis span{font-size:11px;color:#777;font-weight:700}.r-axis b{font-size:16px}
+      .r-pillar-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;border-bottom:1px solid #eee;padding-bottom:6px;margin-bottom:9px}
+      .r-pillar-h{border:0!important;padding:0!important;margin:0!important;color:#2a2440!important;font-size:15px!important;text-transform:none!important;letter-spacing:0!important}
+      .r-pillar-sub{font-size:11px;color:#888;margin:2px 0 0}
+      .r-pillar-score{flex:0 0 auto;font-size:26px;font-weight:800;line-height:1}.r-pillar-score small{font-size:12px;color:#aaa}
+      .r-have-h{font-size:11px!important;text-transform:uppercase;letter-spacing:.05em;color:#1f9d57!important;border:0!important;padding:0!important;margin:0 0 6px!important}
+      .r-miss-h{font-size:11px!important;text-transform:uppercase;letter-spacing:.05em;color:#c0392b!important;border:0!important;padding:0!important;margin:0 0 6px!important}
+      .r-axis-tag{flex:0 0 auto;font-size:9px;font-weight:800;padding:2px 6px;border-radius:5px;background:#eef0f7;color:#5a68a8;letter-spacing:.03em}
       @page{margin:12mm 8mm}
     }
 
@@ -655,6 +665,28 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
     .sp-signals{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
     .sp-chip{font-size:11px;font-weight:700;color:#cdbffb;background:#453f6c;border:1px solid #675f95;border-radius:20px;padding:4px 10px}
     @media(max-width:600px){.sp-grid{grid-template-columns:minmax(0,1fr)}}
+    /* ===== Diagnostic SEO & GEO (synthèse à l'écran) ===== */
+    .pil-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+    .pil{background:#42445e;border:1px solid #ffffff0d;border-radius:14px;padding:13px}
+    .pil-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:9px}
+    .pil-ttl b{display:block;font-size:15px;font-weight:800}
+    .pil-ttl small{display:block;color:#aaa6bd;font-size:11px;line-height:1.3;margin-top:2px}
+    .pil-score{flex:0 0 auto;font-size:22px;font-weight:800;line-height:1}.pil-score small{font-size:11px;color:#9a94ad;font-weight:700}
+    .pil-list{list-style:none;margin:0;padding:0;display:grid;gap:5px}
+    .pil-list li{font-size:12px;line-height:1.4;color:#d7d4e4;padding-left:16px;position:relative}
+    .pil-list li.ok::before{content:"✓";position:absolute;left:0;color:#34d399;font-weight:800}
+    .pil-list li.no::before{content:"✗";position:absolute;left:0;color:#fb7185;font-weight:800}
+    @media(max-width:600px){.pil-grid{grid-template-columns:minmax(0,1fr)}}
+    /* ===== Analyse complète : bouton + barre de progression ===== */
+    .analyse-panel{margin-top:14px;border:1px solid #5a4fb0!important;background:linear-gradient(180deg,#3a3566,#322e4e)!important}
+    .ap-cta{width:100%;min-height:52px;font-size:16px;font-weight:800}
+    .ap-last{font-size:11.5px;color:#aaa6bd;margin:10px 0 0;text-align:center}
+    .ap-bar-wrap{height:14px;border-radius:10px;background:#2a2740;overflow:hidden;border:1px solid #ffffff12}
+    .ap-bar{height:100%;width:3%;border-radius:10px;background:linear-gradient(90deg,#8b78ff,#b9a4ff);transition:width .2s ease}
+    .ap-meta{display:flex;align-items:baseline;justify-content:space-between;margin-top:9px}
+    .ap-meta b{font-size:24px;font-weight:800;color:#cbbcff}
+    .ap-meta span{font-size:12.5px;color:#aaa6bd}
+    .ap-phase{font-size:12.5px;color:#d7d4e4;margin:8px 0 0}
     @media(max-width:600px){.scan-scores{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.scan-metrics{grid-template-columns:minmax(0,1fr)}.scan-head .app-btn{width:100%}}
 
     /* ===== Test & validation des clés API ===== */
@@ -794,8 +826,9 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       const token=String(appSettings?.logo_dev_publishable_key||'').trim();
       const platforms=[['Instagram','instagram.com'],['Facebook','facebook.com'],['TikTok','tiktok.com'],['YouTube','youtube.com'],['LinkedIn','linkedin.com'],['X / Twitter','x.com'],['Pinterest','pinterest.com'],['Snapchat','snapchat.com']];
       const found=new Map(((site&&site.socials)||[]).map(s=>[s.net,s.url]));
-      const head='<div class="scan-head"><div><div class="eyebrow">PRÉSENCE SOCIALE · AUTO</div><h3 style="margin:4px 0 0">Réseaux détectés sur le site</h3></div><button class="app-btn primary" data-run-site="'+(a&&a.id)+'" '+((!hasWeb||busy)?'disabled':'')+'>'+(busy?'Détection…':(site?'Relancer la détection':'Détecter automatiquement'))+'</button></div>';
-      if(!hasWeb) return '<section class="app-panel social-panel">'+head+'<div class="app-empty">Sans site web renseigné, les réseaux ne peuvent pas être trouvés automatiquement. Ajoute un site à la fiche, ou saisis les profils à la main.</div></section>';
+      const head='<div class="scan-head"><div><div class="eyebrow">PRÉSENCE SOCIALE · AUTO</div><h3 style="margin:4px 0 0">Réseaux détectés sur le site</h3></div></div>';
+      if(!hasWeb) return '';
+      if(!site && !busy) return '<section class="app-panel social-panel">'+head+'<div class="app-empty">Lance l’analyse complète ci-dessus : AuditIA lira la page d’accueil et repérera les réseaux.</div></section>';
       const cards=platforms.map(([name,domain])=>{
         const url=found.get(name);
         const logo=token?'<img src="https://img.logo.dev/'+domain+'?token='+encodeURIComponent(token)+'&size=64&format=png&theme=dark" alt="" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'grid\'"><span class="sp-fallback" style="display:none">'+escHtml(name.charAt(0))+'</span>':'<span class="sp-fallback">'+escHtml(name.charAt(0))+'</span>';
@@ -917,6 +950,7 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       page.querySelectorAll('[data-delete-audit]').forEach(b=>b.addEventListener('click',async()=>{if(!confirm('Supprimer cet audit ?'))return;const {error}=await appClient.from('audits').delete().eq('id',b.dataset.deleteAudit);appNotice=error?'Erreur : '+error.message:'Audit supprimé.';await refreshData();renderApp()}));
       page.querySelectorAll('[data-run-scan]').forEach(b=>b.addEventListener('click',()=>runScan(b.dataset.runScan)));
       page.querySelectorAll('[data-run-site]').forEach(b=>b.addEventListener('click',()=>runSiteScan(b.dataset.runSite)));
+      page.querySelectorAll('[data-run-full]').forEach(b=>b.addEventListener('click',()=>runFullAudit(b.dataset.runFull)));
       page.querySelectorAll('[data-export-report]').forEach(b=>b.addEventListener('click',()=>exportReport(b.dataset.exportReport)));
       page.querySelectorAll('[data-audit-filter]').forEach(inp=>inp.addEventListener('input',()=>{auditFilter=inp.value;const pos=inp.selectionStart;renderApp();const n=document.querySelector('[data-audit-filter]');if(n){n.focus();try{n.setSelectionRange(pos,pos);}catch(e){}}}));
     }
@@ -1102,9 +1136,15 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       const title=!!((doc.querySelector('title')&&doc.querySelector('title').textContent||'').trim());
       const metaDesc=!!((doc.querySelector('meta[name="description" i]')&&doc.querySelector('meta[name="description" i]').getAttribute('content')||'').trim());
       const viewport=!!doc.querySelector('meta[name="viewport" i]');
+      const ldTypes=new Set();
+      doc.querySelectorAll('script[type="application/ld+json"]').forEach(s=>{try{const walk=o=>{if(!o||typeof o!=='object')return;if(Array.isArray(o))return o.forEach(walk);const t=o['@type'];(Array.isArray(t)?t:[t]).filter(Boolean).forEach(x=>ldTypes.add(String(x)));if(o['@graph'])walk(o['@graph']);};walk(JSON.parse(s.textContent));}catch(e){}});
+      const LOCAL_TYPES=/LocalBusiness|Restaurant|FoodEstablishment|Bakery|CafeOrCoffeeShop|BarOrPub|Store|HairSalon|BeautySalon|DaySpa|HealthAndBeautyBusiness|Hotel|LodgingBusiness|AutoRepair|AutomotiveBusiness|HomeAndConstructionBusiness|Plumber|Electrician|HousePainter|ProfessionalService|MedicalBusiness|Dentist|Physician|Organization/;
+      const localSchema=[...ldTypes].some(t=>LOCAL_TYPES.test(t));
       const text=(doc.body&&doc.body.textContent||'').replace(/\s+/g,' ');
+      const words=text.split(' ').filter(w=>w.length>2).length;
       const hoursOnSite=/horaires|lundi|mardi|ouvert du|ouverture/i.test(text);
-      return {socials,tel,whatsapp,booking,tracking,cms,title,metaDesc,viewport,hoursOnSite,analyzedAt:new Date().toISOString(),finalUrl:pageUrl};
+      const addressOnSite=/\b\d{5}\b/.test(text);
+      return {socials,tel,whatsapp,booking,tracking,cms,title,metaDesc,viewport,ldTypes:[...ldTypes],localSchema,words,hoursOnSite,addressOnSite,analyzedAt:new Date().toISOString(),finalUrl:pageUrl};
     }
     async function runSiteScan(auditId){
       const a=appAudits.find(x=>x.id===auditId); if(!a) return;
@@ -1124,17 +1164,87 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       }catch(e){ appNotice='Lecture du site impossible : '+((e&&e.message)||'réseau').slice(0,120)+' — tu peux renseigner les réseaux manuellement.'; }
       finally{ siteScanningId=null; renderApp(); }
     }
+    /* ===== Analyse complète en un bouton : site + réseaux + performance + diagnostic, avec progression ===== */
+    async function fetchPagespeed(site){
+      const key=String((appSettings&&appSettings.pagespeed_api_key)||'').trim();
+      const u=new URL('https://www.googleapis.com/pagespeedonline/v5/runPagespeed');
+      u.searchParams.set('url',site); u.searchParams.set('strategy','mobile');
+      ['performance','accessibility','best-practices','seo'].forEach(cat=>u.searchParams.append('category',cat));
+      u.searchParams.set('locale','fr'); if(key) u.searchParams.set('key',key);
+      const r=await withTimeout(fetch(u.toString()),60000);
+      if(!r.ok){ if(key&&(r.status===400||r.status===401||r.status===403)) keyStoreSet('pagespeed',false,key); const dd=await r.json().catch(()=>null); const m=(dd&&dd.error&&dd.error.message)||('HTTP '+r.status); throw new Error(r.status===429?'quota PageSpeed atteint':r.status===400?'adresse non analysable':m); }
+      const data=await r.json(); const lh=data.lighthouseResult; if(key) keyStoreSet('pagespeed',true,key);
+      if(!lh||!lh.categories) throw new Error('aucun résultat Lighthouse');
+      const sc=k=>typeof (lh.categories[k]||{}).score==='number'?Math.round(lh.categories[k].score*100):null;
+      const au=lh.audits||{}; const dv=k=>(au[k]&&au[k].displayValue)||null;
+      const cleanTxt=t=>String(t||'').replace(/\[([^\]]+)\]\([^)]+\)/g,'$1').replace(/\s+/g,' ').trim();
+      const recommendations=Object.values(au).filter(x=>x&&typeof x.score==='number'&&x.score<0.9&&x.title&&(x.scoreDisplayMode==='metricSavings'||(x.details&&x.details.type==='opportunity')||x.scoreDisplayMode==='binary'||x.scoreDisplayMode==='numeric')).sort((x,y)=>x.score-y.score).slice(0,8).map(x=>({title:cleanTxt(x.title),detail:cleanTxt(x.description),gain:x.displayValue||null,severity:x.score<0.5?'haute':'moyenne'}));
+      return { provider:'Google PageSpeed Insights · Lighthouse (mobile)', analyzedAt:new Date().toISOString(), url:site, finalUrl:lh.finalDisplayedUrl||site, scores:{performance:sc('performance'),accessibility:sc('accessibility'),bestPractices:sc('best-practices'),seo:sc('seo')}, metrics:{ 'Contenu affiché (FCP)':dv('first-contentful-paint'), 'Plus grand contenu (LCP)':dv('largest-contentful-paint'), 'Interactivité (TBT)':dv('total-blocking-time'), 'Stabilité visuelle (CLS)':dv('cumulative-layout-shift'), 'Vitesse (Speed Index)':dv('speed-index') }, recommendations };
+    }
+    let fullAuditState=null, fullAuditTimer=null;
+    function stopFullTicker(){ if(fullAuditTimer){ clearInterval(fullAuditTimer); fullAuditTimer=null; } }
+    function tickProgress(){
+      if(!fullAuditState) return;
+      fullAuditState.pct += (fullAuditState.target-fullAuditState.pct)*0.09;
+      if(fullAuditState.pct>99.4) fullAuditState.pct=99.4;
+      const el=document.querySelector('[data-ap-root]'); if(!el) return;
+      const shown=Math.min(100,Math.round(fullAuditState.pct));
+      const bar=el.querySelector('[data-ap-bar]'); if(bar) bar.style.width=shown+'%';
+      const pc=el.querySelector('[data-ap-pct]'); if(pc) pc.textContent=shown+'%';
+      const ph=el.querySelector('[data-ap-phase]'); if(ph) ph.textContent=fullAuditState.phase;
+      const eta=el.querySelector('[data-ap-eta]'); if(eta){ const elapsed=(Date.now()-fullAuditState.startedAt)/1000; const rem=Math.max(0,Math.round(fullAuditState.estTotal-elapsed)); eta.textContent=(fullAuditState.pct>=99?'finalisation…':(rem>0?'≈ '+rem+' s restantes':'presque terminé…')); }
+    }
+    function setPhase(phase,target){ if(fullAuditState){ fullAuditState.phase=phase; fullAuditState.target=target; } }
+    async function runFullAudit(auditId){
+      const a=appAudits.find(x=>x.id===auditId); if(!a||fullAuditState) return;
+      const c=appClients.find(x=>x.id===a.client_id);
+      let site=String((c&&c.website)||'').trim(); const hasWeb=!!site; if(hasWeb&&!/^https?:\/\//i.test(site)) site='https://'+site;
+      fullAuditState={id:auditId,pct:3,target:hasWeb?22:70,phase:hasWeb?'Lecture du site et détection des réseaux…':'Analyse des données Google…',startedAt:Date.now(),estTotal:hasWeb?38:4};
+      appNotice=''; renderApp(); stopFullTicker(); fullAuditTimer=setInterval(tickProgress,170);
+      let siteRes=a.site||null, scan=a.scan||null, issues=[];
+      try{
+        if(hasWeb){
+          try{ const html=await readSiteHtml(site); siteRes=analyzeSite(html,site); await appClient.from('audits').update({site:siteRes}).eq('id',auditId); }
+          catch(e){ issues.push('lecture du site impossible'); }
+          setPhase('Mesure de la performance (Google PageSpeed)…',58);
+          try{ scan=await fetchPagespeed(site); }
+          catch(e){ issues.push('performance indisponible ('+((e&&e.message)||'').slice(0,40)+')'); }
+          setPhase('Génération du rapport SEO &amp; GEO…',95);
+        } else { setPhase('Génération du rapport…',95); }
+        const merged={...a,site:siteRes,scan:scan};
+        const diag=visibilityAudit(merged,c);
+        const payload={score:diag.index,status:'Analysé',updated_at:new Date().toISOString()};
+        if(siteRes) payload.site=siteRes; if(scan) payload.scan=scan;
+        const {error}=await appClient.from('audits').update(payload).eq('id',auditId);
+        if(error) throw new Error(error.message);
+        if(fullAuditState){ fullAuditState.pct=100; fullAuditState.target=100; } tickProgress();
+        await refreshData();
+        appNotice=issues.length?('Analyse terminée (limites : '+issues.join(', ')+'). Rapport disponible.'):'Analyse complète terminée — rapport prêt à exporter.';
+      }catch(e){ appNotice='Erreur pendant l’analyse : '+((e&&e.message)||'inconnue').slice(0,140); }
+      finally{ stopFullTicker(); fullAuditState=null; recomputeKeyAlerts(); renderApp(); }
+    }
+    function analysePanelHtml(a,c){
+      if(fullAuditState&&fullAuditState.id===a.id){
+        return '<section class="app-panel analyse-panel" data-ap-root><div class="eyebrow">ANALYSE EN COURS</div><h3 style="margin:4px 0 12px">Analyse complète du commerce</h3><div class="ap-bar-wrap"><div class="ap-bar" data-ap-bar style="width:3%"></div></div><div class="ap-meta"><b data-ap-pct>3%</b><span data-ap-eta>…</span></div><p class="ap-phase" data-ap-phase>Préparation…</p></section>';
+      }
+      const site=String((c&&c.website)||'').trim(); const analyzed=!!(a.scan||a.site);
+      const sub=site?'Lecture du site, détection des réseaux, performance Google et diagnostic SEO &amp; GEO — en une seule fois.':'Ce commerce n’a pas de site : l’analyse se base sur les données Google. Ajoute un site pour l’analyse complète (performance, réseaux, GEO).';
+      const last=(a.scan&&a.scan.analyzedAt)||(a.site&&a.site.analyzedAt)||null;
+      return '<section class="app-panel analyse-panel"><div class="eyebrow">ANALYSE AUTOMATIQUE</div><h3 style="margin:4px 0 6px">Analyse complète du commerce</h3><p class="app-muted" style="margin:0 0 12px">'+sub+'</p><button class="app-btn primary ap-cta" data-run-full="'+a.id+'">⚡ '+(analyzed?'Relancer l’analyse complète':'Analyser le commerce')+'</button>'+(last?'<p class="ap-last">Dernière analyse : '+escHtml(new Date(last).toLocaleString('fr-FR'))+'</p>':'')+'</section>';
+    }
     function scanPanelHtml(a,c){
-      const site=String((c&&c.website)||'').trim(); const busy=scanningId===a.id; const s=a.scan;
-      const head='<div class="scan-head"><div><div class="eyebrow">ANALYSE RÉELLE DU SITE</div><h3 style="margin:4px 0 0">Google PageSpeed · Lighthouse mobile</h3></div><button class="app-btn primary" data-run-scan="'+a.id+'" '+((!site||busy)?'disabled':'')+'>'+(busy?'Analyse en cours…':(s?'Relancer l’analyse':'Analyser le site'))+'</button></div>';
-      if(!site) return '<section class="app-panel scan-panel">'+head+'<div class="app-empty">Ajoute un site web à la fiche client pour lancer l’analyse réelle.</div></section>';
-      if(!s) return '<section class="app-panel scan-panel">'+head+'<p class="app-muted">'+escHtml(site)+'</p><div class="app-empty">Aucune analyse pour le moment. Touche « Analyser le site » pour mesurer la performance, le SEO et l’accessibilité réels du site.</div></section>';
+      const site=String((c&&c.website)||'').trim(); const s=a.scan;
+      const head='<div class="scan-head"><div><div class="eyebrow">PERFORMANCE DU SITE</div><h3 style="margin:4px 0 0">Google PageSpeed · Lighthouse mobile</h3></div></div>';
+      if(!site) return '';
+      if(!s) return '<section class="app-panel scan-panel">'+head+'<p class="app-muted">'+escHtml(site)+'</p><div class="app-empty">Lance l’analyse complète ci-dessus pour mesurer la performance, le SEO et l’accessibilité réels du site.</div></section>';
       const metrics=Object.entries(s.metrics||{}).filter(([k,v])=>v).map(([k,v])=>'<div class="scan-metric"><span>'+escHtml(k)+'</span><b>'+escHtml(v)+'</b></div>').join('');
       const recs=(s.recommendations&&s.recommendations.length)?'<h3 class="rec-title">Recommandations prioritaires</h3><div class="rec-list">'+s.recommendations.map(r=>'<div class="rec-item rec-'+(r.severity==='haute'?'high':'mid')+'"><div class="rec-dot"></div><div class="rec-copy"><b>'+escHtml(r.title)+(r.gain?' <span class="rec-gain">'+escHtml(r.gain)+'</span>':'')+'</b>'+(r.detail?'<small>'+escHtml(r.detail)+'</small>':'')+'</div></div>').join('')+'</div>':'';
       return '<section class="app-panel scan-panel">'+head+'<p class="app-muted">'+escHtml(s.finalUrl||site)+' · analysé le '+escHtml(new Date(s.analyzedAt).toLocaleString('fr-FR'))+'</p><div class="scan-scores">'+scanGauge('Performance',s.scores.performance)+scanGauge('Accessibilité',s.scores.accessibility)+scanGauge('Bonnes pratiques',s.scores.bestPractices)+scanGauge('SEO',s.scores.seo)+'</div>'+(metrics?'<div class="scan-metrics">'+metrics+'</div>':'')+recs+'<p class="scan-note">Scores mesurés par Google (Lighthouse mobile). Ils reflètent le site web ; les points de contrôle terrain ci-dessous restent manuels.</p></section>';
     }
+    /* Diagnostic en 2 piliers — SEO (être trouvé sur Google) & GEO (être cité par les IA génératives).
+       Chaque critère est calculé sur des données réelles ; les manques deviennent des arguments de vente. */
     function visibilityAudit(a,c){
-      const d=(c&&c.details)||{}; const s=a&&a.scan;
+      const d=(c&&c.details)||{}; const s=a&&a.scan; const si=a&&a.site;
       const site=String((c&&c.website)||d.website||'').trim();
       const rating=(d.rating!=null)?Number(d.rating):null;
       const reviews=Number(d.reviews||0);
@@ -1142,38 +1252,51 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       const hasGoogle=!!(d.place_id||d.address||rating!=null);
       const hours=!!(Array.isArray(d.hours)&&d.hours.length);
       const perf=(s&&s.scores)?s.scores.performance:null;
-      const seo=(s&&s.scores)?s.scores.seo:null;
+      const ns=si?(si.socials||[]).length:null;
       const items=[];
-      const add=(label,ok,weight,bad,good)=>items.push({label,ok,weight,advice:ok?good:bad});
-      add('Fiche Google établie',hasGoogle,20,'Créer ou revendiquer la fiche Google Business Profile : c’est la base de la visibilité locale.','La fiche Google est présente et renseignée.');
-      add('Site web',!!site,18,'Aucun site web : créer au minimum une page vitrine (coordonnées, horaires, services).','Le commerce dispose d’un site web.');
-      if(rating!=null) add('Note Google',rating>=4.0,14,'Note Google sous 4/5 : répondre aux avis et solliciter les clients satisfaits.','Bonne note Google ('+rating+'/5).');
-      else add('Note Google',false,14,'Pas encore de note Google : encourager les premiers avis clients.','');
-      add('Volume d’avis',reviews>=20,12,'Peu d’avis ('+reviews+') : mettre en place une collecte régulière (QR code en caisse, SMS, e-mail).',reviews+' avis clients : bon signal de confiance.');
-      add('Téléphone visible',!!phone,8,'Numéro de téléphone absent de la fiche : l’ajouter pour faciliter les appels.','Numéro de téléphone renseigné.');
-      add('Horaires renseignés',hours,8,'Horaires d’ouverture manquants : les renseigner sur la fiche Google.','Horaires d’ouverture renseignés.');
-      if(perf!=null) add('Performance mobile du site',perf>=50,12,'Site lent sur mobile (perf '+perf+'/100) : optimiser images, polices et temps de chargement.','Site bien optimisé sur mobile (perf '+perf+'/100).');
-      if(seo!=null) add('SEO technique',seo>=90,8,'Bases SEO à renforcer (SEO '+seo+'/100) : titres, descriptions et balises.','Bonnes bases SEO ('+seo+'/100).');
-      if(a&&a.site){ const ns=(a.site.socials||[]).length; add('Réseaux sociaux reliés',ns>=1,12,'Aucun réseau social relié au site : créer/relier au moins un profil (Instagram ou Facebook) et l’afficher sur le site.',ns+' réseau'+(ns>1?'x':'')+' social'+(ns>1?'aux':'')+' relié'+(ns>1?'s':'')+' au site.'); }
-      const totW=items.reduce((n,x)=>n+x.weight,0);
-      const gotW=items.filter(x=>x.ok).reduce((n,x)=>n+x.weight,0);
-      const index=totW?Math.round(gotW/totW*100):0;
-      return {items,strengths:items.filter(x=>x.ok),weaknesses:items.filter(x=>!x.ok&&x.advice),index};
+      const add=(pillar,label,ok,weight,bad,good)=>items.push({pillar,label,ok,weight,advice:ok?good:bad,gap:bad});
+      /* ---- SEO : être trouvé quand on cherche sur Google ---- */
+      add('seo','Fiche Google Business',hasGoogle,18,'Créer ou revendiquer la fiche Google Business Profile : sans elle, le commerce est quasi invisible dans les recherches locales et sur Maps.','Fiche Google présente et renseignée.');
+      add('seo','Site web',!!site,16,'Aucun site web : impossible d’être bien référencé. Une vitrine (services, coordonnées, horaires) est la base.','Le commerce dispose d’un site web.');
+      if(rating!=null) add('seo','Note Google',rating>=4.0,10,'Note Google sous 4/5 : elle pèse sur le classement local. Répondre aux avis et solliciter les clients satisfaits.','Bonne note Google ('+rating+'/5).');
+      else add('seo','Note Google',false,10,'Pas encore de note Google : les premiers avis manquent pour rassurer et bien se classer.','');
+      add('seo','Volume d’avis',reviews>=20,10,'Trop peu d’avis ('+reviews+') : un flux régulier d’avis améliore le classement et la confiance.',reviews+' avis clients.');
+      add('seo','Horaires renseignés',hours,5,'Horaires absents de la fiche : Google les affiche dans les résultats, leur absence fait perdre des clics.','Horaires renseignés sur Google.');
+      add('seo','Téléphone visible',!!phone,5,'Numéro absent : moins d’appels directs depuis les résultats de recherche.','Numéro de téléphone renseigné.');
+      if(perf!=null) add('seo','Performance mobile',perf>=50,8,'Site lent sur mobile (perf '+perf+'/100) : pénalise le référencement et fait fuir les visiteurs.','Site rapide sur mobile (perf '+perf+'/100).');
+      if(si) add('seo','Balises SEO (titre + description)',!!(si.title&&si.metaDesc),8,'Titre ou meta-description manquants : Google n’a pas de résumé clair à afficher.','Titre et description présents sur le site.');
+      if(si) add('seo','Réseaux sociaux reliés',ns>=1,6,'Aucun réseau relié au site : moins de signaux de présence et d’activité.',ns+' réseau'+(ns>1?'x':'')+' relié'+(ns>1?'s':'')+' au site.');
+      /* ---- GEO : être cité et recommandé par les IA (ChatGPT, Gemini, Perplexity…) ---- */
+      add('geo','Présence reconnue (Google/Maps)',hasGoogle,16,'Les IA s’appuient sur des sources fiables : sans fiche Google solide, le commerce n’est pas une « entité » identifiable pour elles.','Entité identifiable via Google/Maps.');
+      if(si) add('geo','Données structurées (schema.org)',!!si.localSchema,20,'Aucune donnée structurée LocalBusiness : les IA ont du mal à comprendre qui vous êtes, où et ce que vous proposez. C’est LE levier GEO n°1.','Données structurées LocalBusiness détectées : les IA lisent le commerce facilement.');
+      if(si) add('geo','Contenu lisible par les IA',(si.words||0)>=150,10,'Page d’accueil pauvre en texte : les IA ont peu de matière à citer. Ajouter une présentation claire (qui, quoi, où, pourquoi vous).','Contenu texte suffisant pour être compris et cité.');
+      if(si) add('geo','Infos clés en clair (adresse + horaires)',!!(si.addressOnSite&&si.hoursOnSite),10,'Adresse ou horaires absents du texte du site : les IA ne peuvent pas les restituer de façon fiable.','Adresse et horaires présents en clair sur le site.');
+      if(si) add('geo','Cohérence des informations (NAP)',!!(si.tel&&si.tel.length),8,'Téléphone non repris sur le site : une info incohérente entre Google et le site brouille les IA.','Coordonnées cohérentes entre le site et Google.');
+      add('geo','Preuve sociale (avis)',reviews>=20,12,'Peu d’avis : les IA privilégient les commerces avec une réputation visible et nombreuse.',reviews+' avis : réputation visible pour les IA.');
+      if(si) add('geo','Description claire du commerce',!!si.metaDesc,8,'Pas de description : les IA n’ont pas de résumé prêt à l’emploi pour vous présenter.','Description claire disponible pour les IA.');
+      const pill=p=>{const it=items.filter(x=>x.pillar===p);const t=it.reduce((n,x)=>n+x.weight,0);const g=it.filter(x=>x.ok).reduce((n,x)=>n+x.weight,0);return {score:t?Math.round(g/t*100):0,have:it.filter(x=>x.ok),miss:it.filter(x=>!x.ok&&x.gap)};};
+      const seoP=pill('seo'),geoP=pill('geo');
+      const index=Math.round((seoP.score+geoP.score)/2);
+      return {items,seo:seoP,geo:geoP,index,strengths:items.filter(x=>x.ok),weaknesses:items.filter(x=>!x.ok&&x.gap)};
     }
-    function visibilityVerdict(i){ return i>=75?'Bonne visibilité numérique, avec quelques optimisations pour aller plus loin.':i>=50?'Visibilité correcte mais perfectible : plusieurs leviers simples renforceraient la présence en ligne.':i>=25?'Visibilité fragile : des actions prioritaires sont nécessaires pour être trouvé par les clients.':'Présence en ligne très limitée : le commerce est aujourd’hui difficile à trouver sur internet.'; }
+    function visibilityVerdict(i){ return i>=75?'Bonne présence en ligne, avec quelques optimisations pour dominer la concurrence locale.':i>=50?'Présence correcte mais perfectible : plusieurs leviers simples manquent pour être réellement visible.':i>=25?'Présence fragile : des actions prioritaires sont nécessaires pour être trouvé par les clients et cité par les IA.':'Présence très limitée : aujourd’hui, ce commerce est difficile à trouver sur Google comme sur les assistants IA.'; }
     function actionPlan(a,c,diag){
       const plan=[]; const rank={'Haute':0,'Moyenne':1,'À planifier':2};
-      diag.weaknesses.slice().sort((x,y)=>y.weight-x.weight).forEach(x=>plan.push({t:x.label,d:x.advice,p:x.weight>=14?'Haute':x.weight>=10?'Moyenne':'À planifier'}));
+      diag.weaknesses.slice().sort((x,y)=>y.weight-x.weight).forEach(x=>plan.push({t:x.label,d:x.advice,p:x.weight>=14?'Haute':x.weight>=10?'Moyenne':'À planifier',axis:x.pillar==='geo'?'GEO':'SEO'}));
       const s=a&&a.scan;
-      if(s&&s.recommendations) s.recommendations.slice(0,5).forEach(r=>plan.push({t:r.title,d:r.detail||'',p:r.severity==='haute'?'Haute':'Moyenne'}));
+      if(s&&s.recommendations) s.recommendations.slice(0,4).forEach(r=>plan.push({t:r.title,d:r.detail||'',p:r.severity==='haute'?'Haute':'Moyenne',axis:'SEO'}));
       return plan.sort((x,y)=>rank[x.p]-rank[y.p]).slice(0,10);
+    }
+    function pillarCardHtml(title,sub,p){
+      const col=p.score>=75?'#34d399':p.score>=50?'#fbbf24':'#f87171';
+      const have=p.have.slice(0,3).map(x=>'<li class="ok">'+escHtml(x.label)+'</li>').join('');
+      const miss=p.miss.slice(0,4).map(x=>'<li class="no">'+escHtml(x.label)+'</li>').join('');
+      return '<div class="pil"><div class="pil-top"><div class="pil-ttl"><b>'+escHtml(title)+'</b><small>'+escHtml(sub)+'</small></div><div class="pil-score" style="color:'+col+'">'+p.score+'<small>/100</small></div></div><ul class="pil-list">'+(have||'')+(miss||'')+((!have&&!miss)?'<li class="vis-none">En attente d’analyse</li>':'')+'</ul></div>';
     }
     function visibilitySummaryHtml(a,c){
       const diag=visibilityAudit(a,c); const i=diag.index;
       const col=i>=75?'#34d399':i>=50?'#fbbf24':'#f87171';
-      const strong=diag.strengths.slice(0,4).map(x=>'<li>'+escHtml(x.label)+'</li>').join('');
-      const weak=diag.weaknesses.slice(0,4).map(x=>'<li>'+escHtml(x.label)+'</li>').join('');
-      return '<section class="app-panel vis-panel"><div class="vis-head"><div><div class="eyebrow">SYNTHÈSE DE VISIBILITÉ</div><h3 style="margin:4px 0 0">Présence en ligne</h3></div><div class="vis-score"><div class="vis-ring" style="background:conic-gradient('+col+' '+(i*3.6)+'deg,#4a4866 0)"><span>'+i+'</span></div><small>/100</small></div></div><p class="app-muted" style="margin:6px 0 12px">'+escHtml(visibilityVerdict(i))+'</p><div class="vis-cols"><div class="vis-col good"><b>✓ Points forts</b><ul>'+(strong||'<li class="vis-none">À construire</li>')+'</ul></div><div class="vis-col bad"><b>▲ À améliorer</b><ul>'+(weak||'<li class="vis-none">Rien de bloquant</li>')+'</ul></div></div><p class="scan-note">Indice calculé à partir des données réelles Google et de l’analyse du site. Export complet dans le rapport PDF.</p></section>';
+      return '<section class="app-panel vis-panel"><div class="vis-head"><div><div class="eyebrow">DIAGNOSTIC · SEO &amp; GEO</div><h3 style="margin:4px 0 0">Ce que vous avez, ce qu’il vous manque</h3></div><div class="vis-score"><div class="vis-ring" style="background:conic-gradient('+col+' '+(i*3.6)+'deg,#4a4866 0)"><span>'+i+'</span></div><small>/100</small></div></div><p class="app-muted" style="margin:6px 0 12px">'+escHtml(visibilityVerdict(i))+'</p><div class="pil-grid">'+pillarCardHtml('SEO','Être trouvé sur Google',diag.seo)+pillarCardHtml('GEO','Être cité par les IA (ChatGPT, Gemini…)',diag.geo)+'</div><p class="scan-note">GEO = optimisation pour les moteurs génératifs (IA). Diagnostic calculé sur des données réelles. Rapport complet et argumenté dans le PDF.</p></section>';
     }
     function reportHtml(a,c){
       const d=(c&&c.details)||{}; const s=a.scan; const st={...defaultSettings(),...(appSettings||{})};
@@ -1184,14 +1307,22 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       const gauge=(l,v)=>{const cc=v==null?'#999':v>=90?'#1f9d57':v>=50?'#c98a00':'#c0392b';return '<div class="r-score"><div class="r-ring" style="background:conic-gradient('+cc+' '+((v==null?0:v)*3.6)+'deg,#e7e3f2 0)"><span>'+(v==null?'—':v)+'</span></div><small>'+l+'</small></div>';};
       const infoRows=[]; if(c){ if(c.category||d.category)infoRows.push(['Catégorie',c.category||d.category]); if(d.address)infoRows.push(['Adresse',d.address]); if(c.phone||d.phone)infoRows.push(['Téléphone',c.phone||d.phone]); if(c.website)infoRows.push(['Site web',c.website]); if(d.rating!=null)infoRows.push(['Note Google','★ '+d.rating+' ('+(d.reviews||0)+' avis)']); if(d.domainCreated)infoRows.push(['Ancienneté du domaine','depuis '+new Date(d.domainCreated).toLocaleDateString('fr-FR')]); }
       const pill=p=>'<span class="r-pill r-pill-'+(p==='Haute'?'high':p==='Moyenne'?'mid':'low')+'">'+escHtml(p)+'</span>';
+      const axisCol=v=>v>=75?'#1f9d57':v>=50?'#c98a00':'#c0392b';
+      const pillarSection=(title,sub,p)=>{
+        const have=p.have.length?p.have.map(x=>'<li><b>'+escHtml(x.label)+'</b>'+(x.advice?'<span>'+escHtml(x.advice)+'</span>':'')+'</li>').join(''):'<li><span>À construire entièrement sur cet axe.</span></li>';
+        const miss=p.miss.length?p.miss.map(x=>'<li><b>'+escHtml(x.label)+'</b><span>'+escHtml(x.gap)+'</span></li>').join(''):'<li><span>Rien de bloquant sur cet axe.</span></li>';
+        return '<div class="r-section r-pillar"><div class="r-pillar-head"><div><h2 class="r-pillar-h">'+title+'</h2><p class="r-pillar-sub">'+sub+'</p></div><div class="r-pillar-score" style="color:'+axisCol(p.score)+'">'+p.score+'<small>/100</small></div></div><div class="r-cols"><div class="r-col"><h3 class="r-have-h">Ce que vous avez</h3><ul class="r-list r-good">'+have+'</ul></div><div class="r-col"><h3 class="r-miss-h">Ce qu’il vous manque</h3><ul class="r-list r-bad">'+miss+'</ul></div></div></div>';
+      };
       return '<div class="r-head"><div class="r-brand"><img src="'+escHtml(logo)+'" alt=""><div><b>'+escHtml(st.app_name||'AuditIA')+'</b><span>'+escHtml(st.company_name||'AffiAds')+'</span></div></div><div class="r-meta"><b>Rapport de visibilité numérique</b><span>'+escHtml(new Date(a.updated_at||Date.now()).toLocaleDateString('fr-FR'))+'</span></div></div>'
         +'<h1 class="r-client">'+escHtml(c?.name||'Commerce')+'</h1><p class="r-sub">'+escHtml([c?.city,c?.category||d.category].filter(Boolean).join(' · '))+'</p>'
         +'<div class="r-verdict"><div class="r-verdict-score"><div class="r-ring r-ring-lg" style="background:conic-gradient('+idxCol+' '+(idx*3.6)+'deg,#e7e3f2 0)"><span>'+idx+'</span></div><small>visibilité</small></div><div class="r-verdict-txt"><b>Note de visibilité : '+idx+'/100</b><p>'+escHtml(visibilityVerdict(idx))+'</p><span class="r-verdict-meta">'+escHtml(a.status||'À démarrer')+' · '+done+'/'+list.length+' contrôles terrain validés'+(s?' · performance du site mesurée par Google':'')+'</span></div></div>'
-        +'<div class="r-section r-cols"><div class="r-col"><h2 class="r-good-h">Points forts</h2><ul class="r-list r-good">'+(diag.strengths.length?diag.strengths.map(x=>'<li><b>'+escHtml(x.label)+'</b>'+(x.advice?'<span>'+escHtml(x.advice)+'</span>':'')+'</li>').join(''):'<li><span>Visibilité à construire : voir le plan d’action ci-dessous.</span></li>')+'</ul></div><div class="r-col"><h2 class="r-bad-h">À améliorer</h2><ul class="r-list r-bad">'+(diag.weaknesses.length?diag.weaknesses.map(x=>'<li><b>'+escHtml(x.label)+'</b><span>'+escHtml(x.advice)+'</span></li>').join(''):'<li><span>Aucun point bloquant détecté.</span></li>')+'</ul></div></div>'
+        +'<div class="r-axes"><div class="r-axis"><span>SEO · Google</span><b style="color:'+axisCol(diag.seo.score)+'">'+diag.seo.score+'/100</b></div><div class="r-axis"><span>GEO · IA génératives</span><b style="color:'+axisCol(diag.geo.score)+'">'+diag.geo.score+'/100</b></div></div>'
+        +pillarSection('SEO — être trouvé sur Google','Quand un client cherche votre activité près de chez lui, apparaissez-vous ?',diag.seo)
+        +pillarSection('GEO — être cité par les IA','ChatGPT, Gemini et Perplexity recommandent de plus en plus de commerces. GEO, c’est être la réponse que l’IA donne.',diag.geo)
         +(infoRows.length?'<div class="r-section"><h2>Fiche commerce</h2><table class="r-table">'+infoRows.map(([k,v])=>'<tr><td>'+escHtml(k)+'</td><td>'+escHtml(v)+'</td></tr>').join('')+'</table></div>':'')
         +(s?'<div class="r-section"><h2>Performance du site · Google Lighthouse (mobile)</h2><div class="r-scores">'+gauge('Performance',s.scores.performance)+gauge('Accessibilité',s.scores.accessibility)+gauge('Bonnes pratiques',s.scores.bestPractices)+gauge('SEO',s.scores.seo)+'</div></div>':'')
         +(a.site?(function(){const si=a.site;const soc=(si.socials||[]);const sig=[];if(si.booking&&si.booking.length)sig.push('Réservation en ligne ('+si.booking.join(', ')+')');if(si.whatsapp)sig.push('WhatsApp');if(si.tracking&&si.tracking.length)sig.push('Outils de suivi : '+si.tracking.join(', '));if(si.cms)sig.push('Technologie du site : '+si.cms);return '<div class="r-section"><h2>Réseaux sociaux & présence web</h2>'+(soc.length?'<table class="r-table">'+soc.map(x=>'<tr><td>'+escHtml(x.net)+'</td><td>'+escHtml(x.url)+'</td></tr>').join('')+'</table>':'<p class="r-notes">Aucun réseau social n’est relié depuis la page d’accueil du site. Recommandation : créer/relier au moins un profil (Instagram ou Facebook) et l’afficher sur le site.</p>')+(sig.length?'<p class="r-sig-line">Autres signaux détectés : '+escHtml(sig.join(' · '))+'</p>':'')+'<p class="r-mini">Détection automatique depuis la page d’accueil. Les statistiques privées (abonnés, engagement) ne sont pas publiques.</p></div>';})():'')
-        +(plan.length?'<div class="r-section"><h2>Plan d’action priorisé</h2><div class="r-plan">'+plan.map((p,i)=>'<div class="r-plan-item"><span class="r-plan-n">'+(i+1)+'</span><div class="r-plan-c"><b>'+escHtml(p.t)+'</b>'+(p.d?'<span>'+escHtml(p.d)+'</span>':'')+'</div>'+pill(p.p)+'</div>').join('')+'</div></div>':'')
+        +(plan.length?'<div class="r-section"><h2>Plan d’action priorisé</h2><div class="r-plan">'+plan.map((p,i)=>'<div class="r-plan-item"><span class="r-plan-n">'+(i+1)+'</span><div class="r-plan-c"><b>'+escHtml(p.t)+'</b>'+(p.d?'<span>'+escHtml(p.d)+'</span>':'')+'</div>'+(p.axis?'<span class="r-axis-tag">'+escHtml(p.axis)+'</span>':'')+pill(p.p)+'</div>').join('')+'</div></div>':'')
         +'<div class="r-section"><h2>Contrôles terrain ('+done+'/'+list.length+')</h2><ul class="r-checks">'+list.map(x=>'<li class="'+(x.done?'done':'')+'"><span class="r-box">'+(x.done?'✓':'')+'</span>'+escHtml(x.label)+'</li>').join('')+'</ul></div>'
         +(a.notes?'<div class="r-section"><h2>Notes & recommandations</h2><p class="r-notes">'+escHtml(a.notes)+'</p></div>':'')
         +'<div class="r-sign"><div class="r-sign-line" style="background:'+escHtml(col)+'"></div><b>'+escHtml(st.signature_name||st.company_name)+'</b><span>'+escHtml(st.signature_role||'')+'</span>'+[st.contact_email,st.phone,st.website].filter(Boolean).map(x=>'<span>'+escHtml(x)+'</span>').join('')+(st.signature_text?'<p>'+escHtml(st.signature_text)+'</p>':'')+'</div>'
@@ -1237,8 +1368,7 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
         if(!a){appView='Audits';renderApp();return}
         const c=appClients.find(x=>x.id===a.client_id);
         const list=Array.isArray(a.checklist)?a.checklist:[];
-        if(c&&String(c.website||'').trim()&&!a.site&&siteScanningId!==a.id&&!siteAutoTried.has(a.id)){ siteAutoTried.add(a.id); setTimeout(()=>runSiteScan(a.id),400); }
-        body='<button class="app-btn" data-app-view="Audits">← Retour aux audits</button><section class="app-panel" style="margin-top:14px"><div class="eyebrow">DOSSIER D’AUDIT</div><h2 style="margin-top:8px">'+escHtml(c?.name||'Commerce')+'</h2><p>'+escHtml(c?.city||'')+' · '+escHtml(a.title)+'</p>'+visibilitySummaryHtml(a,c)+clientInfoHtml(c)+scanPanelHtml(a,c)+socialPresenceHtml(a)+'<div class="scan-head" style="margin-top:8px"><div><div class="eyebrow">CONTRÔLES TERRAIN</div><h3 style="margin:4px 0 0">Vérifications manuelles</h3></div><div class="app-score">'+(a.score||0)+'/100</div></div><p class="app-muted">'+list.filter(x=>x.done).length+' sur '+list.length+' contrôles validés'+(a.scan?' · le score global provient de l’analyse réelle du site':'')+'</p>'+list.map((x,i)=>'<label class="app-check"><input type="checkbox" data-audit-check="'+i+'" '+(x.done?'checked':'')+'><span><b>'+escHtml(x.label)+'</b><small>'+escHtml(x.detail)+'</small></span></label>').join('')+'<form class="app-form" data-save-notes style="margin-top:18px"><label>Notes et recommandations<textarea name="notes" placeholder="Constats, actions à prévoir…">'+escHtml(a.notes||'')+'</textarea></label><button class="app-btn primary" type="submit">Enregistrer les notes</button></form><div class="detail-actions" style="margin-top:16px"><button class="app-btn primary" data-export-report="'+a.id+'">📄 Exporter le rapport (PDF)</button><button class="app-btn" data-delete-audit="'+a.id+'">Supprimer cet audit</button></div></section>';
+        body='<button class="app-btn" data-app-view="Audits">← Retour aux audits</button><section class="app-panel" style="margin-top:14px"><div class="eyebrow">DOSSIER D’AUDIT</div><h2 style="margin-top:8px">'+escHtml(c?.name||'Commerce')+'</h2><p>'+escHtml(c?.city||'')+' · '+escHtml(a.title)+'</p>'+analysePanelHtml(a,c)+visibilitySummaryHtml(a,c)+clientInfoHtml(c)+scanPanelHtml(a,c)+socialPresenceHtml(a)+'<div class="scan-head" style="margin-top:8px"><div><div class="eyebrow">CONTRÔLES TERRAIN</div><h3 style="margin:4px 0 0">Vérifications manuelles</h3></div><div class="app-score">'+(a.score||0)+'/100</div></div><p class="app-muted">'+list.filter(x=>x.done).length+' sur '+list.length+' contrôles validés'+(a.scan?' · le score global provient de l’analyse réelle du site':'')+'</p>'+list.map((x,i)=>'<label class="app-check"><input type="checkbox" data-audit-check="'+i+'" '+(x.done?'checked':'')+'><span><b>'+escHtml(x.label)+'</b><small>'+escHtml(x.detail)+'</small></span></label>').join('')+'<form class="app-form" data-save-notes style="margin-top:18px"><label>Notes et recommandations<textarea name="notes" placeholder="Constats, actions à prévoir…">'+escHtml(a.notes||'')+'</textarea></label><button class="app-btn primary" type="submit">Enregistrer les notes</button></form><div class="detail-actions" style="margin-top:16px"><button class="app-btn primary" data-export-report="'+a.id+'">📄 Exporter le rapport (PDF)</button><button class="app-btn" data-delete-audit="'+a.id+'">Supprimer cet audit</button></div></section>';
       }
       appShell(body);
     }
