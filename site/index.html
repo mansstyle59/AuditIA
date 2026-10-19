@@ -520,14 +520,10 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
     .detail-actions{display:flex;gap:8px;flex-wrap:wrap}
     .detail-actions .app-btn{flex:1;min-width:150px}
 
-    /* ===== Rapport PDF imprimable ===== */
-    #printReport{display:none}
-    @media print{
-      body.printing{background:#fff!important}
-      body.printing .status-safe,body.printing>.top,body.printing>.wrap,body.printing .login-page,body.printing footer{display:none!important}
-      body.printing #printReport{display:block!important}
-      #printReport{color:#1c1830;font:13px/1.5 -apple-system,system-ui,sans-serif}
-      .r-page{width:100%;max-width:720px;margin:0 auto;padding:0 4mm}
+    /* ===== Rapport PDF — hors écran (invisible) mais rendu, pour permettre la capture html2canvas ===== */
+    #printReport{position:fixed;left:-99999px;top:0;width:760px;color:#1c1830;background:#fff;font:13px/1.5 -apple-system,system-ui,sans-serif;z-index:-1}
+    #printReport *{box-sizing:border-box}
+      .r-page{width:100%;max-width:720px;margin:0 auto;padding:16px 18px;background:#fff}
       .r-head{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #eee;padding-bottom:10px}
       .r-brand{display:flex;gap:10px;align-items:center}.r-brand img{width:40px;height:40px;border-radius:9px}
       .r-brand b{display:block;font-size:16px}.r-brand span{font-size:11px;color:#777}
@@ -578,6 +574,12 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       .r-tgt-sub{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:#7657ed;margin:12px 0 6px}
       .r-kw{display:flex;flex-wrap:wrap;gap:6px;margin:0}
       .r-kw span{font-size:11px;background:#f1effb;border:1px solid #e3def5;border-radius:6px;padding:3px 8px;color:#4a3f8a}
+      .r-ring-wrap{display:inline-flex}
+    @media print{
+      body.printing{background:#fff!important}
+      body.printing .status-safe,body.printing>.top,body.printing>.wrap,body.printing .login-page,body.printing footer{display:none!important}
+      #printReport{position:static!important;left:auto!important;top:auto!important;width:auto!important}
+      body.printing #printReport{display:block!important}
       @page{margin:12mm 8mm}
     }
 
@@ -863,16 +865,29 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       const status=site?'<p class="app-muted" style="margin:10px 0 2px">Site lu le '+escHtml(new Date(site.analyzedAt).toLocaleString('fr-FR'))+'</p>':'<p class="app-muted" style="margin:10px 0 2px">L’analyse complète lit la page d’accueil et repère les réseaux, la réservation en ligne et les outils de suivi.</p>';
       return '<section class="app-panel social-panel">'+head+status+verdict+'<div class="sp-grid">'+cards+'</div>'+signals+'<p class="scan-note">Détection depuis la page d’accueil du site. Les statistiques privées (abonnés, engagement) ne sont pas fournies publiquement. Logos : Logo.dev.</p></section>';
     }
+    const FORME_JURIDIQUE={'1000':'Entrepreneur individuel','5202':'SNC','5410':'SARL','5415':'SARL','5426':'EARL','5430':'SARL','5498':'SARL','5499':'SARL','5505':'SA','5510':'SA','5710':'SAS','5720':'SASU','9220':'Association','5385':'Société européenne','6540':'SCI','5308':'Société civile'};
+    function legalRows(c){
+      const sir=(c&&c.details&&c.details.sirene)||null; if(!sir||!sir.matched) return [];
+      const rows=[];
+      if(sir.denomination) rows.push(['Raison sociale',sir.denomination]);
+      if(sir.dirigeant) rows.push(['Dirigeant',sir.dirigeant]);
+      if(sir.siret) rows.push(['SIRET',sir.siret]); else if(sir.siren) rows.push(['SIREN',sir.siren]);
+      if(sir.dateCreation){ const dt=new Date(sir.dateCreation); if(!isNaN(dt.getTime())) rows.push(['Date de création',dt.toLocaleDateString('fr-FR')]); }
+      if(sir.naf) rows.push(['Activité (code NAF)',sir.naf]);
+      const fj=FORME_JURIDIQUE[String(sir.formeJuridique)]; if(fj) rows.push(['Forme juridique',fj]);
+      return rows;
+    }
     function targetingPanelHtml(a,c){
       const d=(c&&c.details)||{};
       const kw=targetKeywords(c); const age=businessAge(a,c);
       const cat=c&&(c.category||d.category)||'—';
       const rows=[['Catégorie',cat]];
       if(d.primaryType) rows.push(['Type Google',String(d.primaryType).replace(/_/g,' ')]);
-      if(age.hasData) rows.push(['Ancienneté estimée','présence en ligne depuis '+age.since+(age.detail?' ('+age.detail+')':'')]);
+      if(age.hasData) rows.push([age.official?'Ouverture (officielle)':'Ancienneté estimée',(age.official?'depuis '+age.since:'présence en ligne depuis '+age.since)+(age.detail?' ('+age.detail+')':'')]);
+      const legal=legalRows(c);
       const seoChips=kw.seo.map(k=>'<span class="kw-chip">'+escHtml(k)+'</span>').join('');
       const geoQ=kw.geo.map(q=>'<li>'+escHtml(q)+'</li>').join('');
-      return '<section class="app-panel tgt-panel"><div class="eyebrow">CIBLAGE &amp; OPPORTUNITÉS</div><h3 style="margin:4px 0 10px">Catégorie, ancienneté &amp; mots-clés</h3><div class="info-grid">'+rows.map(([k,v])=>'<div class="info-row"><span>'+escHtml(k)+'</span><b>'+escHtml(v)+'</b></div>').join('')+'</div>'+(seoChips?'<div class="tgt-sub">Mots-clés cibles (recherche Google)</div><div class="kw-wrap">'+seoChips+'</div>':'')+(geoQ?'<div class="tgt-sub">Questions types posées aux IA (GEO)</div><ul class="geo-q">'+geoQ+'</ul>':'')+(age.hasData?'':'<p class="scan-note">Date d’ouverture exacte non fournie par Google. L’ancienneté s’affiche après l’analyse du site (domaine + mentions sur la page).</p>')+'</section>';
+      return '<section class="app-panel tgt-panel"><div class="eyebrow">CIBLAGE &amp; OPPORTUNITÉS</div><h3 style="margin:4px 0 10px">Profil, ancienneté &amp; mots-clés</h3><div class="info-grid">'+rows.map(([k,v])=>'<div class="info-row"><span>'+escHtml(k)+'</span><b>'+escHtml(v)+'</b></div>').join('')+'</div>'+(legal.length?'<div class="tgt-sub">Informations légales (registre SIRENE)</div><div class="info-grid">'+legal.map(([k,v])=>'<div class="info-row"><span>'+escHtml(k)+'</span><b>'+escHtml(v)+'</b></div>').join('')+'</div>':'')+(seoChips?'<div class="tgt-sub">Mots-clés cibles (recherche Google)</div><div class="kw-wrap">'+seoChips+'</div>':'')+(geoQ?'<div class="tgt-sub">Questions types posées aux IA (GEO)</div><ul class="geo-q">'+geoQ+'</ul>':'')+(legal.length?'<p class="scan-note">Infos légales publiques (base SIRENE / INSEE). Vérifie que l’établissement correspond bien au commerce audité.</p>':'')+'</section>';
     }
     function currentLogo(){return appSettings?.logo_data_url || './auditia-icon.svg'}
     function updateBrandColors(){document.documentElement.style.setProperty('--purple',appSettings?.primary_color||'#7657ed');document.documentElement.style.setProperty('--orange',appSettings?.accent_color||'#ffad72')}
@@ -1008,6 +1023,29 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
         return ev?ev.eventDate:null;
       }catch(e){ return null; }
     }
+    /* Informations légales officielles via l'API publique Recherche d'entreprises (base SIRENE / INSEE).
+       Donne : SIREN/SIRET, raison sociale, date de création réelle, activité (NAF), dirigeant. */
+    async function fetchSirene(c){
+      const name=String((c&&c.name)||'').trim(); if(!name) return {matched:false};
+      const city=String((c&&c.city)||'').trim();
+      const url='https://recherche-entreprises.api.gouv.fr/search?q='+encodeURIComponent((name+' '+city).trim())+'&page=1&per_page=1';
+      let data=null;
+      try{ const r=await withTimeout(fetch(url),12000); if(r.ok) data=await r.json(); }catch(e){}
+      if(!data){ try{ const r2=await withTimeout(fetch('https://api.allorigins.win/raw?url='+encodeURIComponent(url)),15000); if(r2.ok) data=await r2.json(); }catch(e){} }
+      const res=data&&data.results&&data.results[0]; if(!res) return {matched:false};
+      const siege=res.siege||{};
+      const dir=(res.dirigeants&&res.dirigeants[0])||null;
+      const dirName=dir?((dir.nom||dir.nom_patronymique)?((dir.prenoms||dir.prenom||'')+' '+(dir.nom||dir.nom_patronymique)).replace(/\s+/g,' ').trim():(dir.denomination||'')):'';
+      return { matched:true, siren:res.siren||'', siret:siege.siret||'',
+        denomination:res.nom_complet||res.nom_raison_sociale||'',
+        dateCreation:siege.date_creation||res.date_creation||'',
+        naf:res.activite_principale||siege.activite_principale||'',
+        nafSection:res.section_activite_principale||'',
+        formeJuridique:res.nature_juridique||'',
+        dirigeant:dirName, etablissements:res.nombre_etablissements||null,
+        ville:siege.libelle_commune||'', codePostal:siege.code_postal||'',
+        fetchedAt:new Date().toISOString() };
+    }
     /* Mots-clés & requêtes cibles (SEO local + questions types posées aux IA = GEO) */
     function targetKeywords(c){
       const city=String((c&&c.city)||'').trim();
@@ -1050,13 +1088,14 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       return {analyzed:true,n,major,label,tone};
     }
     function businessAge(a,c){
-      const d=(c&&c.details)||{};
+      const d=(c&&c.details)||{}; const sir=d.sirene;
+      if(sir&&sir.matched&&sir.dateCreation){ const dt=new Date(sir.dateCreation); if(!isNaN(dt.getTime())) return { since:dt.getFullYear(), detail:'immatriculé le '+dt.toLocaleDateString('fr-FR')+' (source officielle SIRENE)', hasData:true, official:true }; }
       const dom=d.domainCreated?new Date(d.domainCreated):null;
       const cy=(a&&a.site&&a.site.copyrightYear)||null;
       const years=[]; if(dom&&!isNaN(dom.getTime())) years.push(dom.getFullYear()); if(cy) years.push(cy);
       const since=years.length?Math.min(...years):null;
       const parts=[]; if(dom&&!isNaN(dom.getTime())) parts.push('domaine enregistré le '+dom.toLocaleDateString('fr-FR')); if(cy) parts.push('mention « '+cy+' » sur le site');
-      return { since, detail:parts.join(' · '), hasData:!!since };
+      return { since, detail:parts.join(' · '), hasData:!!since, official:false };
     }
     function normalizePlace(p){
       let website=p.websiteUri||''; if(website&&!/^https?:\/\//i.test(website)) website='https://'+website;
@@ -1287,9 +1326,13 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
           try{ const html=await readSiteHtml(site); siteRes=analyzeSite(html,site); await appClient.from('audits').update({site:siteRes}).eq('id',auditId); }
           catch(e){ issues.push('lecture du site impossible'); }
           setPhase('Recherche de l’ancienneté (nom de domaine)…',40);
-          try{ const dc=await fetchDomainDate(site); if(dc){ newDetails={...(c&&c.details||{}),domainCreated:dc}; await appClient.from('clients').update({details:newDetails}).eq('id',c.id); } }
+          try{ const dc=await fetchDomainDate(site); if(dc){ newDetails={...(c&&c.details||{}),domainCreated:dc}; } }
           catch(e){}
-          setPhase('Mesure de la performance (Google PageSpeed)…',66);
+          setPhase('Recherche des informations légales (SIRET / SIRENE)…',54);
+          try{ const sir=await fetchSirene(c); if(sir&&sir.matched){ newDetails={...(newDetails||(c&&c.details)||{}),sirene:sir}; } }
+          catch(e){}
+          if(newDetails){ try{ await appClient.from('clients').update({details:newDetails}).eq('id',c.id); }catch(e){} }
+          setPhase('Mesure de la performance (Google PageSpeed)…',70);
           try{ scan=await fetchPagespeed(site); }
           catch(e){ issues.push('performance indisponible ('+((e&&e.message)||'').slice(0,40)+')'); }
           setPhase('Analyse des catégories et des mots-clés cibles…',86);
@@ -1297,8 +1340,11 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
           setPhase('Génération du rapport SEO &amp; GEO…',95);
           await wait(700);
         } else {
-          setPhase('Analyse des catégories et des mots-clés cibles…',75); await wait(1500);
-          setPhase('Génération du rapport…',95); await wait(700);
+          setPhase('Recherche des informations légales (SIRET / SIRENE)…',45);
+          try{ const sir=await fetchSirene(c); if(sir&&sir.matched){ newDetails={...(newDetails||(c&&c.details)||{}),sirene:sir}; await appClient.from('clients').update({details:newDetails}).eq('id',c.id); } }
+          catch(e){}
+          setPhase('Analyse des catégories et des mots-clés cibles…',75); await wait(1200);
+          setPhase('Génération du rapport…',95); await wait(600);
         }
         const merged={...a,site:siteRes,scan:scan};
         const diag=visibilityAudit(merged, newDetails?{...c,details:newDetails}:c);
@@ -1387,13 +1433,22 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       const col=i>=75?'#34d399':i>=50?'#fbbf24':'#f87171';
       return '<section class="app-panel vis-panel"><div class="vis-head"><div><div class="eyebrow">DIAGNOSTIC · SEO &amp; GEO</div><h3 style="margin:4px 0 0">Ce que vous avez, ce qu’il vous manque</h3></div><div class="vis-score"><div class="vis-ring" style="background:conic-gradient('+col+' '+(i*3.6)+'deg,#4a4866 0)"><span>'+i+'</span></div><small>/100</small></div></div><p class="app-muted" style="margin:6px 0 12px">'+escHtml(visibilityVerdict(i))+'</p><div class="pil-grid">'+pillarCardHtml('SEO','Être trouvé sur Google',diag.seo)+pillarCardHtml('GEO','Être cité par les IA (ChatGPT, Gemini…)',diag.geo)+'</div><p class="scan-note">GEO = optimisation pour les moteurs génératifs (IA). Diagnostic calculé sur des données réelles. Rapport complet et argumenté dans le PDF.</p></section>';
     }
+    function rSvgRing(v,size,stroke){
+      const r=(size-stroke)/2, cx=size/2, circ=2*Math.PI*r, val=v==null?0:Math.max(0,Math.min(100,v));
+      const col=v==null?'#bbbbbb':v>=90?'#1f9d57':v>=50?'#c98a00':'#c0392b';
+      const off=circ*(1-val/100);
+      return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 '+size+' '+size+'" xmlns="http://www.w3.org/2000/svg">'
+        +'<circle cx="'+cx+'" cy="'+cx+'" r="'+r+'" fill="none" stroke="#e7e3f2" stroke-width="'+stroke+'"></circle>'
+        +'<circle cx="'+cx+'" cy="'+cx+'" r="'+r+'" fill="none" stroke="'+col+'" stroke-width="'+stroke+'" stroke-linecap="round" stroke-dasharray="'+circ.toFixed(2)+'" stroke-dashoffset="'+off.toFixed(2)+'" transform="rotate(-90 '+cx+' '+cx+')"></circle>'
+        +'<text x="'+cx+'" y="'+cx+'" text-anchor="middle" dominant-baseline="central" font-family="-apple-system,system-ui,sans-serif" font-size="'+(size*0.32).toFixed(0)+'" font-weight="800" fill="#1c1830">'+(v==null?'—':val)+'</text></svg>';
+    }
     function reportHtml(a,c){
       const d=(c&&c.details)||{}; const s=a.scan; const st={...defaultSettings(),...(appSettings||{})};
       const list=Array.isArray(a.checklist)?a.checklist:[]; const done=list.filter(x=>x.done).length;
       const logo=currentLogo(); const col=st.primary_color||'#7657ed';
       const diag=visibilityAudit(a,c); const idx=diag.index; const idxCol=idx>=75?'#1f9d57':idx>=50?'#c98a00':'#c0392b';
       const plan=actionPlan(a,c,diag);
-      const gauge=(l,v)=>{const cc=v==null?'#999':v>=90?'#1f9d57':v>=50?'#c98a00':'#c0392b';return '<div class="r-score"><div class="r-ring" style="background:conic-gradient('+cc+' '+((v==null?0:v)*3.6)+'deg,#e7e3f2 0)"><span>'+(v==null?'—':v)+'</span></div><small>'+l+'</small></div>';};
+      const gauge=(l,v)=>'<div class="r-score"><div class="r-ring-wrap">'+rSvgRing(v,64,8)+'</div><small>'+l+'</small></div>';
       const infoRows=[]; if(c){ if(c.category||d.category)infoRows.push(['Catégorie',c.category||d.category]); if(d.address)infoRows.push(['Adresse',d.address]); if(c.phone||d.phone)infoRows.push(['Téléphone',c.phone||d.phone]); if(c.website)infoRows.push(['Site web',c.website]); if(d.rating!=null)infoRows.push(['Note Google','★ '+d.rating+' ('+(d.reviews||0)+' avis)']); if(d.domainCreated)infoRows.push(['Ancienneté du domaine','depuis '+new Date(d.domainCreated).toLocaleDateString('fr-FR')]); }
       const pill=p=>'<span class="r-pill r-pill-'+(p==='Haute'?'high':p==='Moyenne'?'mid':'low')+'">'+escHtml(p)+'</span>';
       const axisCol=v=>v>=75?'#1f9d57':v>=50?'#c98a00':'#c0392b';
@@ -1404,29 +1459,60 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       };
       return '<div class="r-head"><div class="r-brand"><img src="'+escHtml(logo)+'" alt=""><div><b>'+escHtml(st.app_name||'AuditIA')+'</b><span>'+escHtml(st.company_name||'AffiAds')+'</span></div></div><div class="r-meta"><b>Rapport de visibilité numérique</b><span>'+escHtml(new Date(a.updated_at||Date.now()).toLocaleDateString('fr-FR'))+'</span></div></div>'
         +'<h1 class="r-client">'+escHtml(c?.name||'Commerce')+'</h1><p class="r-sub">'+escHtml([c?.city,c?.category||d.category].filter(Boolean).join(' · '))+'</p>'
-        +'<div class="r-verdict"><div class="r-verdict-score"><div class="r-ring r-ring-lg" style="background:conic-gradient('+idxCol+' '+(idx*3.6)+'deg,#e7e3f2 0)"><span>'+idx+'</span></div><small>visibilité</small></div><div class="r-verdict-txt"><b>Note de visibilité : '+idx+'/100</b><p>'+escHtml(visibilityVerdict(idx))+'</p><span class="r-verdict-meta">Analyse automatique du '+escHtml(new Date(a.updated_at||Date.now()).toLocaleDateString('fr-FR'))+(s?' · performance mesurée par Google':'')+(a.site?' · site lu automatiquement':'')+'</span></div></div>'
+        +'<div class="r-verdict"><div class="r-verdict-score"><div class="r-ring-wrap">'+rSvgRing(idx,80,9)+'</div><small>visibilité</small></div><div class="r-verdict-txt"><b>Note de visibilité : '+idx+'/100</b><p>'+escHtml(visibilityVerdict(idx))+'</p><span class="r-verdict-meta">Analyse automatique du '+escHtml(new Date(a.updated_at||Date.now()).toLocaleDateString('fr-FR'))+(s?' · performance mesurée par Google':'')+(a.site?' · site lu automatiquement':'')+'</span></div></div>'
         +'<div class="r-axes"><div class="r-axis"><span>SEO · Google</span><b style="color:'+axisCol(diag.seo.score)+'">'+diag.seo.score+'/100</b></div><div class="r-axis"><span>GEO · IA génératives</span><b style="color:'+axisCol(diag.geo.score)+'">'+diag.geo.score+'/100</b></div></div>'
         +pillarSection('SEO — être trouvé sur Google','Quand un client cherche votre activité près de chez lui, apparaissez-vous ?',diag.seo)
         +pillarSection('GEO — être cité par les IA','ChatGPT, Gemini et Perplexity recommandent de plus en plus de commerces. GEO, c’est être la réponse que l’IA donne.',diag.geo)
         +(infoRows.length?'<div class="r-section"><h2>Fiche commerce</h2><table class="r-table">'+infoRows.map(([k,v])=>'<tr><td>'+escHtml(k)+'</td><td>'+escHtml(v)+'</td></tr>').join('')+'</table></div>':'')
         +(s?'<div class="r-section"><h2>Performance du site · Google Lighthouse (mobile)</h2><div class="r-scores">'+gauge('Performance',s.scores.performance)+gauge('Accessibilité',s.scores.accessibility)+gauge('Bonnes pratiques',s.scores.bestPractices)+gauge('SEO',s.scores.seo)+'</div></div>':'')
         +(a.site?(function(){const si=a.site;const soc=(si.socials||[]);const sv=socialVisibility(a);const sig=[];if(si.booking&&si.booking.length)sig.push('Réservation en ligne ('+si.booking.join(', ')+')');if(si.whatsapp)sig.push('WhatsApp');if(si.tracking&&si.tracking.length)sig.push('Outils de suivi : '+si.tracking.join(', '));if(si.cms)sig.push('Technologie du site : '+si.cms);return '<div class="r-section"><h2>Réseaux sociaux &amp; visibilité</h2><p class="r-verdict-meta" style="margin:0 0 8px;font-size:12px"><b>'+escHtml(sv.label)+'</b></p>'+(soc.length?'<table class="r-table">'+soc.map(x=>'<tr><td>'+escHtml(x.net)+'</td><td>'+escHtml(x.url)+'</td></tr>').join('')+'</table>':'<p class="r-notes">Aucun réseau social n’est relié depuis la page d’accueil du site. Recommandation : créer/relier au moins un profil (Instagram ou Facebook) et l’afficher sur le site.</p>')+(sig.length?'<p class="r-sig-line">Autres signaux détectés : '+escHtml(sig.join(' · '))+'</p>':'')+'<p class="r-mini">Détection automatique depuis la page d’accueil. Les statistiques privées (abonnés, engagement) ne sont pas publiques.</p></div>';})():'')
-        +(function(){const kw=targetKeywords(c);const age=businessAge(a,c);const rows=[];const cat=c&&(c.category||d.category);if(cat)rows.push(['Catégorie',cat]);if(d.primaryType)rows.push(['Type Google',String(d.primaryType).replace(/_/g,' ')]);if(age.hasData)rows.push(['Ancienneté estimée','présence en ligne depuis '+age.since+(age.detail?' ('+age.detail+')':'')]);const kwHtml=kw.seo.length?'<p class="r-tgt-sub">Mots-clés cibles (recherche Google)</p><p class="r-kw">'+kw.seo.map(k=>'<span>'+escHtml(k)+'</span>').join('')+'</p>':'';const geoHtml=kw.geo.length?'<p class="r-tgt-sub">Questions types posées aux IA (GEO)</p><ul class="r-recs">'+kw.geo.map(q=>'<li>'+escHtml(q)+'</li>').join('')+'</ul>':'';return (rows.length||kwHtml||geoHtml)?'<div class="r-section"><h2>Catégorie, ancienneté &amp; mots-clés cibles</h2>'+(rows.length?'<table class="r-table">'+rows.map(([k,v])=>'<tr><td>'+escHtml(k)+'</td><td>'+escHtml(v)+'</td></tr>').join('')+'</table>':'')+kwHtml+geoHtml+'<p class="r-mini">Date d’ouverture exacte non fournie par Google : l’ancienneté est estimée via le nom de domaine et les mentions du site.</p></div>':'';})()
+        +(function(){const kw=targetKeywords(c);const age=businessAge(a,c);const legal=legalRows(c);const rows=[];const cat=c&&(c.category||d.category);if(cat)rows.push(['Catégorie',cat]);if(d.primaryType)rows.push(['Type Google',String(d.primaryType).replace(/_/g,' ')]);if(age.hasData)rows.push([age.official?'Ouverture (officielle)':'Ancienneté estimée',(age.official?'depuis '+age.since:'présence en ligne depuis '+age.since)+(age.detail?' ('+age.detail+')':'')]);const legalHtml=legal.length?'<p class="r-tgt-sub">Informations légales (registre SIRENE)</p><table class="r-table">'+legal.map(([k,v])=>'<tr><td>'+escHtml(k)+'</td><td>'+escHtml(v)+'</td></tr>').join('')+'</table>':'';const kwHtml=kw.seo.length?'<p class="r-tgt-sub">Mots-clés cibles (recherche Google)</p><p class="r-kw">'+kw.seo.map(k=>'<span>'+escHtml(k)+'</span>').join('')+'</p>':'';const geoHtml=kw.geo.length?'<p class="r-tgt-sub">Questions types posées aux IA (GEO)</p><ul class="r-recs">'+kw.geo.map(q=>'<li>'+escHtml(q)+'</li>').join('')+'</ul>':'';return (rows.length||legalHtml||kwHtml||geoHtml)?'<div class="r-section"><h2>Profil, informations légales &amp; mots-clés</h2>'+(rows.length?'<table class="r-table">'+rows.map(([k,v])=>'<tr><td>'+escHtml(k)+'</td><td>'+escHtml(v)+'</td></tr>').join('')+'</table>':'')+legalHtml+kwHtml+geoHtml+'<p class="r-mini">Informations légales publiques (base SIRENE / INSEE). Les mots-clés sont des pistes pertinentes (catégorie + ville), pas des volumes de recherche mesurés.</p></div>':'';})()
         +(plan.length?'<div class="r-section"><h2>Plan d’action priorisé</h2><div class="r-plan">'+plan.map((p,i)=>'<div class="r-plan-item"><span class="r-plan-n">'+(i+1)+'</span><div class="r-plan-c"><b>'+escHtml(p.t)+'</b>'+(p.d?'<span>'+escHtml(p.d)+'</span>':'')+'</div>'+(p.axis?'<span class="r-axis-tag">'+escHtml(p.axis)+'</span>':'')+pill(p.p)+'</div>').join('')+'</div></div>':'')
         +(a.notes?'<div class="r-section"><h2>Notes & recommandations</h2><p class="r-notes">'+escHtml(a.notes)+'</p></div>':'')
         +'<div class="r-sign"><div class="r-sign-line" style="background:'+escHtml(col)+'"></div><b>'+escHtml(st.signature_name||st.company_name)+'</b><span>'+escHtml(st.signature_role||'')+'</span>'+[st.contact_email,st.phone,st.website].filter(Boolean).map(x=>'<span>'+escHtml(x)+'</span>').join('')+(st.signature_text?'<p>'+escHtml(st.signature_text)+'</p>':'')+'</div>'
         +'<div class="r-foot">Rapport généré par '+escHtml(st.app_name||'AuditIA')+' · '+escHtml(st.company_name||'AffiAds')+' · Performance mesurée par Google PageSpeed Insights. Le nom du propriétaire et la date d\'ouverture ne sont pas fournis par Google.</div>';
     }
-    function exportReport(auditId){
-      const a=appAudits.find(x=>x.id===auditId); if(!a) return;
-      const c=appClients.find(x=>x.id===a.client_id);
-      let host=document.getElementById('printReport');
-      if(!host){ host=document.createElement('div'); host.id='printReport'; document.body.appendChild(host); }
-      host.innerHTML='<div class="r-page">'+reportHtml(a,c)+'</div>';
+    let pdfLibsLoaded=false, pdfBusy=false;
+    function loadScript(src){ return new Promise((res,rej)=>{ const s=document.createElement('script'); s.src=src; s.onload=()=>res(); s.onerror=()=>rej(new Error('chargement '+src)); document.head.appendChild(s); }); }
+    async function ensurePdfLibs(){
+      if(pdfLibsLoaded) return;
+      await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
+      await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+      pdfLibsLoaded=true;
+    }
+    function printFallback(host){
       document.body.classList.add('printing');
       const done=()=>{ document.body.classList.remove('printing'); window.removeEventListener('afterprint',done); };
       window.addEventListener('afterprint',done);
-      setTimeout(()=>{ window.print(); setTimeout(done,1500); },120);
+      setTimeout(()=>{ try{ window.print(); }catch(e){} setTimeout(done,1500); },120);
+    }
+    async function exportReport(auditId){
+      if(pdfBusy) return; const a=appAudits.find(x=>x.id===auditId); if(!a) return;
+      const c=appClients.find(x=>x.id===a.client_id);
+      let host=document.getElementById('printReport');
+      if(!host){ host=document.createElement('div'); host.id='printReport'; document.body.appendChild(host); }
+      host.innerHTML='<div class="r-page" id="rPageCapture">'+reportHtml(a,c)+'</div>';
+      pdfBusy=true; appNotice='Préparation du PDF…'; renderApp();
+      try{
+        await ensurePdfLibs();
+        const el=document.getElementById('rPageCapture');
+        const canvas=await window.html2canvas(el,{scale:2,backgroundColor:'#ffffff',useCORS:true,logging:false,windowWidth:el.scrollWidth});
+        const jsPDFctor=(window.jspdf&&window.jspdf.jsPDF)||window.jsPDF;
+        if(!jsPDFctor) throw new Error('jsPDF indisponible');
+        const pdf=new jsPDFctor('p','mm','a4');
+        const pw=pdf.internal.pageSize.getWidth(), ph=pdf.internal.pageSize.getHeight();
+        const imgW=pw, imgH=canvas.height*pw/canvas.width;
+        const img=canvas.toDataURL('image/jpeg',0.92);
+        let heightLeft=imgH, pos=0;
+        pdf.addImage(img,'JPEG',0,0,imgW,imgH); heightLeft-=ph;
+        while(heightLeft>0){ pos-=ph; pdf.addPage(); pdf.addImage(img,'JPEG',0,pos,imgW,imgH); heightLeft-=ph; }
+        const name=('Rapport-'+((c&&c.name)||'commerce')).normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/gi,'-').replace(/^-|-$/g,'')+'.pdf';
+        pdf.save(name);
+        appNotice='PDF généré : '+name+' (dans tes téléchargements / Fichiers).';
+      }catch(e){
+        appNotice='Export direct indisponible, ouverture de l’impression…';
+        printFallback(host);
+      } finally { pdfBusy=false; renderApp(); }
     }
     function renderApp(){
       const completed=appAudits.filter(a=>a.status==='Terminé'||a.status==='Analysé').length;
@@ -1457,7 +1543,9 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
         if(!a){appView='Audits';renderApp();return}
         const c=appClients.find(x=>x.id===a.client_id);
         const list=Array.isArray(a.checklist)?a.checklist:[];
-        body='<button class="app-btn" data-app-view="Audits">← Retour aux audits</button><section class="app-panel" style="margin-top:14px"><div class="eyebrow">DOSSIER D’AUDIT</div><h2 style="margin-top:8px">'+escHtml(c?.name||'Commerce')+'</h2><p>'+escHtml(c?.city||'')+' · '+escHtml(a.title)+'</p>'+analysePanelHtml(a,c)+visibilitySummaryHtml(a,c)+clientInfoHtml(c)+scanPanelHtml(a,c)+socialPresenceHtml(a)+targetingPanelHtml(a,c)+'<details class="cd-edit" style="margin-top:14px"><summary>Notes personnelles (facultatif)</summary><form class="app-form" data-save-notes style="padding:0 16px 16px"><label>Notes internes<textarea name="notes" placeholder="Remarques pour toi — n’apparaissent dans le rapport que si tu les remplis.">'+escHtml(a.notes||'')+'</textarea></label><button class="app-btn primary" type="submit">Enregistrer les notes</button></form></details><div class="detail-actions" style="margin-top:16px"><button class="app-btn primary" data-export-report="'+a.id+'">📄 Exporter le rapport (PDF)</button><button class="app-btn" data-delete-audit="'+a.id+'">Supprimer cet audit</button></div></section>';
+        const analyzed=!!(a.site||a.scan||a.status==='Analysé');
+        const diagBlocks=analyzed?(visibilitySummaryHtml(a,c)+clientInfoHtml(c)+scanPanelHtml(a,c)+socialPresenceHtml(a)+targetingPanelHtml(a,c)+'<details class="cd-edit" style="margin-top:14px"><summary>Notes personnelles (facultatif)</summary><form class="app-form" data-save-notes style="padding:0 16px 16px"><label>Notes internes<textarea name="notes" placeholder="Remarques pour toi — n’apparaissent dans le rapport que si tu les remplis.">'+escHtml(a.notes||'')+'</textarea></label><button class="app-btn primary" type="submit">Enregistrer les notes</button></form></details><div class="detail-actions" style="margin-top:16px"><button class="app-btn primary" data-export-report="'+a.id+'">📄 Exporter le rapport (PDF)</button><button class="app-btn" data-delete-audit="'+a.id+'">Supprimer cet audit</button></div>'):'<div class="app-panel" style="margin-top:14px"><div class="app-empty">Rien n’est encore analysé. Touche <b>⚡ Analyser le commerce</b> ci-dessus : AuditIA récupère les données Google, lit le site, trouve les réseaux, les informations légales (SIRET) et la performance, puis génère le rapport complet.</div><div class="detail-actions" style="margin-top:14px"><button class="app-btn" data-delete-audit="'+a.id+'">Supprimer cet audit</button></div></div>';
+        body='<button class="app-btn" data-app-view="Audits">← Retour aux audits</button><section class="app-panel" style="margin-top:14px"><div class="eyebrow">DOSSIER D’AUDIT</div><h2 style="margin-top:8px">'+escHtml(c?.name||'Commerce')+'</h2><p>'+escHtml(c?.city||'')+' · '+escHtml(a.title)+'</p>'+analysePanelHtml(a,c)+diagBlocks+'</section>';
       }
       appShell(body);
     }
