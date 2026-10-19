@@ -1757,6 +1757,13 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       const nameTokens=name.split(' ').filter(w=>w.length>3);
       const out=[];
       for(const kw of kws){
+        if(fullAuditState){
+          const done=out.length, total=kws.length||1;
+          const base=String((c&&c.website)||'').trim()?90:85;
+          const target=Math.min(94,base+Math.floor((done/total)*5));
+          setPhase('Vérification des mots-clés ('+(done+1)+'/'+total+') : '+kw+'…',target);
+          tickProgress();
+        }
         const results=await fetchSerp(kw);
         if(!results.length){ out.push({kw,pos:null,found:false,error:true}); continue; }
         let pos=null, matchType='';
@@ -1767,14 +1774,6 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
           if(hostMatch||nameMatch||dirMatch){ pos=i+1; matchType=hostMatch?'site':dirMatch?'annuaire':'nom'; break; }
         }
         out.push({kw,pos,found:pos!=null,matchType});
-        // Afficher l'avancement réel des mots-clés au lieu de laisser l'écran figé à 85/90 %.
-        if(fullAuditState){
-          const done=out.length, total=kws.length||1;
-          const base=String((c&&c.website)||'').trim()?90:85;
-          const target=Math.min(95,base+Math.round((done/total)*5));
-          setPhase('Vérification des mots-clés ('+done+'/'+total+') : '+kw+'…',target);
-          tickProgress();
-        }
       }
       return out;
     }
