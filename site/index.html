@@ -2350,7 +2350,9 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
         showPdfResult(blob,fname);
       }catch(e){
         pdfBusy=false;
-        appNotice='Le PDF n’a pas pu être généré ('+((e&&e.message)||'erreur inconnue').slice(0,90)+'). Réessaie.';
+        try{console.error('[AuditIA PDF] Échec de génération',e&&e.stack||e);}catch(_){}
+        const pdfError=(e&&e.message)||'erreur inconnue';
+        appNotice='Le PDF n’a pas pu être généré ('+String(pdfError).slice(0,180)+'). Réessaie.';
         renderApp();
       }
     }
