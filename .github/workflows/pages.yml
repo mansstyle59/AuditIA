@@ -30,8 +30,8 @@ jobs:
           root = Path("site")
           html_path = root / "index.html"
           html = html_path.read_text(encoding="utf-8")
-          scripts = re.findall(r"<script\\b([^>]*)>([\\s\\S]*?)</script>", html, re.I)
-          inline = [(attrs, body) for attrs, body in scripts if not re.search(r"\\bsrc\\s*=", attrs, re.I)]
+          scripts = re.findall(r"<script\b([^>]*)>([\s\S]*?)</script>", html, re.I)
+          inline = [(attrs, body) for attrs, body in scripts if not re.search(r"\bsrc\s*=", attrs, re.I)]
           if not inline:
               raise SystemExit("No inline JavaScript found in site/index.html")
           with tempfile.TemporaryDirectory() as tmp:
@@ -41,10 +41,10 @@ jobs:
                   subprocess.run(["node", "--check", str(js)], check=True)
           json.loads((root / "manifest.webmanifest").read_text(encoding="utf-8"))
           sw = (root / "sw.js").read_text(encoding="utf-8")
-          assets_block = re.search(r"const ASSETS\\s*=\\s*\\[([\\s\\S]*?)\\];", sw)
+          assets_block = re.search(r"const ASSETS\s*=\s*\[([\s\S]*?)\];", sw)
           if not assets_block:
               raise SystemExit("Service-worker ASSETS list not found")
-          assets = re.findall(r"['\\\"]([^'\\\"]+)['\\\"]", assets_block.group(1))
+          assets = re.findall(r"['\\"]([^'\\"]+)['\\"]", assets_block.group(1))
           missing = [asset for asset in assets if asset not in ("./",) and not (root / asset.removeprefix("./")).is_file()]
           if missing:
               raise SystemExit("Missing service-worker assets: " + ", ".join(missing))
