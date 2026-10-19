@@ -993,6 +993,42 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       .mobile-tabbar button .tab-icon svg{width:25px!important;height:25px!important}
     }
 
+    /* ============================================================
+       BARRE D'EN-TÊTE « APPLICATION » — nette, fixe, style iOS
+       (dernier bloc = prioritaire)
+       ============================================================ */
+    .app-topbar{display:none}
+    @media(max-width:760px){
+      .workspace-app{padding-top:0 !important}
+      .app-topbar{
+        display:flex;align-items:center;justify-content:space-between;gap:12px;
+        position:sticky;top:0;z-index:96;
+        margin:0 -14px 18px;
+        padding:calc(var(--safe-top) + 22px) 16px 15px;
+        background:#201c30;
+        border-bottom:1px solid #ffffff16;
+        box-shadow:0 4px 18px #05030c45;
+      }
+      .app-topbar .tb-brand{display:flex;align-items:center;gap:12px;min-width:0;text-decoration:none}
+      .app-topbar .tb-brand img{width:42px;height:42px;flex:0 0 42px;border-radius:13px;object-fit:contain;box-shadow:0 2px 10px #05030c55;image-rendering:-webkit-optimize-contrast}
+      .app-topbar .tb-brand b{display:block;font-size:18px;font-weight:830;letter-spacing:-.4px;line-height:1.05;color:#f6f5fb}
+      .app-topbar .tb-brand small{display:block;font-size:9px;font-weight:800;letter-spacing:1.7px;color:#a79fc2;margin-top:2px}
+      .app-topbar .tb-actions{display:flex;gap:10px;flex:0 0 auto}
+      .app-topbar .tb-actions button{width:44px;height:44px;display:grid;place-items:center;border:1px solid #ffffff1f;border-radius:14px;background:#312b47;color:#e8e1ff;cursor:pointer;padding:0;transition:background .15s}
+      .app-topbar .tb-actions button:active{background:#3d3660}
+      .app-topbar .tb-actions .nav-icon{width:22px;height:22px;display:grid;place-items:center}
+      .app-topbar .tb-actions svg{width:22px!important;height:22px!important;fill:none!important;stroke:currentColor!important;stroke-width:1.9!important;stroke-linecap:round!important;stroke-linejoin:round!important}
+      /* La barre porte déjà les actions : on retire les doublons du titre */
+      .workspace-head .workspace-actions{display:none !important}
+      /* Titre de section plus net et contrasté sous la barre */
+      .workspace-head{grid-template-columns:1fr !important;border-bottom:0;padding:2px 0 10px;margin-bottom:12px}
+      .workspace-head .eyebrow{color:#b7aedd}
+      .workspace-head h1{color:#fbfaff;font-weight:800}
+      .workspace-head p{color:#b3abca}
+      /* La bande du notch est désormais gérée par la barre : éviter le double fond */
+      .status-safe{display:none}
+    }
+
     /* Overlay de génération PDF — le clic « Exporter » répond visiblement */
     .pdf-overlay{position:fixed;inset:0;z-index:300;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:28px;text-align:center;background:#16131fee;-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px);color:#f3f2f8}
     .pdf-overlay .pdf-spin{width:54px;height:54px;border-radius:50%;border:4px solid #ffffff22;border-top-color:#9a87ff;animation:pdfspin .8s linear infinite}
@@ -1176,7 +1212,7 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       const navItems=[['Accueil','home'],['Clients','clients'],['Audits','audits'],['Rapports','reports'],['Réglages','settings','Paramètres']];
       const navActive = appView==='ClientDétail'?'Clients':appView==='Détail'?'Audits':appView;
       const headTitle = appView==='Accueil'?'Bonjour 👋':appView==='Paramètres'?'Réglages':appView==='ClientDétail'?'Fiche client':appView==='Détail'?'Dossier d’audit':appView;
-      page.innerHTML = '<div class="workspace-app">'+(pdfBusy?'<div class="pdf-overlay"><div class="pdf-spin"></div><b>Génération du PDF…</b><span>Reste sur cet écran quelques secondes : le fichier va s’ouvrir ou s’enregistrer automatiquement.</span></div>':'')+'<div class="sidebar-backdrop" data-close-menu></div><aside class="workspace-sidebar" id="workspaceSidebar"><div class="sidebar-brand"><img src="'+escHtml(currentLogo())+'" alt="" onerror="this.style.display=&#39;none&#39;"><div><b>'+escHtml(appSettings?.app_name||'AuditIA')+'</b><small>BY AFFIADS</small></div></div><nav class="sidebar-nav" aria-label="Navigation principale">'+navItems.map(([v,ico,target])=>'<button type="button" class="'+(navActive===(target||v)?'active':'')+'" data-app-view="'+(target||v)+'"><span class="nav-icon">'+navIcon(ico)+'</span><span>'+v+'</span>'+(v==='Clients'?'<span class="nav-count">'+appClients.length+'</span>':v==='Audits'?'<span class="nav-count">'+appAudits.length+'</span>':'')+'</button>').join('')+'</nav><div class="sidebar-bottom">Auditer mieux.<br>Décider plus clairement.</div></aside><div class="workspace-layout"><main class="workspace-main"><div class="workspace-head"><div><div class="eyebrow">ESPACE AFFIADS</div><h1>'+escHtml(headTitle)+'</h1><p>'+escHtml(appSettings?.company_name||'AffiAds')+' · '+escHtml(appUser?.email||'')+'</p></div><div class="workspace-actions"><button class="app-btn" type="button" data-app-action="refresh">'+navIcon('refresh')+'<span>Actualiser</span></button><button class="app-btn" type="button" data-app-action="logout">'+navIcon('logout')+'<span>Quitter</span></button></div></div><nav class="desktop-nav" aria-label="Navigation principale">'+navItems.map(([v,ico,target])=>'<button type="button" class="'+(navActive===(target||v)?'active':'')+'" data-app-view="'+(target||v)+'">'+navIcon(ico)+'<span>'+v+'</span></button>').join('')+'</nav>'+keyAlertHtml()+appNoticeHtml()+body+'<p class="app-muted workspace-footnote">AuditIA · Espace privé</p></main></div><nav class="mobile-tabbar" aria-label="Navigation principale">'+navItems.map(([v,ico,target])=>'<button type="button" class="'+(navActive===(target||v)?'active':'')+'" data-app-view="'+(target||v)+'" aria-label="'+v+'" '+(navActive===(target||v)?'aria-current="page"':'')+'><span class="tab-icon">'+navIcon(ico)+'</span><span>'+v+'</span></button>').join('')+'</nav></div>';
+      page.innerHTML = '<div class="workspace-app">'+(pdfBusy?'<div class="pdf-overlay"><div class="pdf-spin"></div><b>Génération du PDF…</b><span>Reste sur cet écran quelques secondes : le fichier va s’ouvrir ou s’enregistrer automatiquement.</span></div>':'')+'<header class="app-topbar"><a class="tb-brand" href="#" data-app-view="Accueil"><img src="'+escHtml(currentLogo())+'" alt="" onerror="this.style.display=&#39;none&#39;"><div><b>'+escHtml(appSettings?.app_name||'AuditIA')+'</b><small>BY AFFIADS</small></div></a><div class="tb-actions"><button type="button" data-app-action="refresh" aria-label="Actualiser" title="Actualiser"><span class="nav-icon">'+navIcon('refresh')+'</span></button><button type="button" data-app-action="logout" aria-label="Quitter" title="Quitter"><span class="nav-icon">'+navIcon('logout')+'</span></button></div></header><div class="sidebar-backdrop" data-close-menu></div><aside class="workspace-sidebar" id="workspaceSidebar"><div class="sidebar-brand"><img src="'+escHtml(currentLogo())+'" alt="" onerror="this.style.display=&#39;none&#39;"><div><b>'+escHtml(appSettings?.app_name||'AuditIA')+'</b><small>BY AFFIADS</small></div></div><nav class="sidebar-nav" aria-label="Navigation principale">'+navItems.map(([v,ico,target])=>'<button type="button" class="'+(navActive===(target||v)?'active':'')+'" data-app-view="'+(target||v)+'"><span class="nav-icon">'+navIcon(ico)+'</span><span>'+v+'</span>'+(v==='Clients'?'<span class="nav-count">'+appClients.length+'</span>':v==='Audits'?'<span class="nav-count">'+appAudits.length+'</span>':'')+'</button>').join('')+'</nav><div class="sidebar-bottom">Auditer mieux.<br>Décider plus clairement.</div></aside><div class="workspace-layout"><main class="workspace-main"><div class="workspace-head"><div><div class="eyebrow">ESPACE AFFIADS</div><h1>'+escHtml(headTitle)+'</h1><p>'+escHtml(appSettings?.company_name||'AffiAds')+' · '+escHtml(appUser?.email||'')+'</p></div><div class="workspace-actions"><button class="app-btn" type="button" data-app-action="refresh">'+navIcon('refresh')+'<span>Actualiser</span></button><button class="app-btn" type="button" data-app-action="logout">'+navIcon('logout')+'<span>Quitter</span></button></div></div><nav class="desktop-nav" aria-label="Navigation principale">'+navItems.map(([v,ico,target])=>'<button type="button" class="'+(navActive===(target||v)?'active':'')+'" data-app-view="'+(target||v)+'">'+navIcon(ico)+'<span>'+v+'</span></button>').join('')+'</nav>'+keyAlertHtml()+appNoticeHtml()+body+'<p class="app-muted workspace-footnote">AuditIA · Espace privé</p></main></div><nav class="mobile-tabbar" aria-label="Navigation principale">'+navItems.map(([v,ico,target])=>'<button type="button" class="'+(navActive===(target||v)?'active':'')+'" data-app-view="'+(target||v)+'" aria-label="'+v+'" '+(navActive===(target||v)?'aria-current="page"':'')+'><span class="tab-icon">'+navIcon(ico)+'</span><span>'+v+'</span></button>').join('')+'</nav></div>';
       clearTimeout(noticeTimer);
       if(appNotice && !/^Erreur/.test(appNotice)){ noticeTimer=setTimeout(()=>{ appNotice=''; renderApp(); },4500); }
       page.querySelectorAll('[data-app-view]').forEach(b=>b.addEventListener('click',()=>{appView=b.dataset.appView;activeAudit=null;activeClient=null;appNotice='';renderApp()}));
