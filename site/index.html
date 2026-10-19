@@ -1063,6 +1063,28 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       /* Encart conseil : discret */
       .home-bottom-tip{background:transparent !important;border:1px solid #ffffff0d !important;border-radius:14px !important}
     }
+
+    /* ============================================================
+       EN-TÊTE STYLE APP STORE (iOS) — mobile uniquement, dernier bloc
+       ============================================================ */
+    @media(max-width:760px){
+      /* Barre de navigation fine et nette */
+      .app-topbar{padding:calc(var(--safe-top) + 20px) 18px 13px !important;gap:12px !important;background:#201c30 !important;border-bottom:.5px solid #ffffff1f !important;box-shadow:none !important;margin:0 -14px 14px !important}
+      .app-topbar .tb-brand{gap:11px !important}
+      .app-topbar .tb-brand img{width:40px !important;height:40px !important;flex-basis:40px !important;border-radius:12px !important;box-shadow:0 3px 10px #05030c66 !important}
+      .app-topbar .tb-brand b{font-size:18px !important;font-weight:800 !important;letter-spacing:-.3px !important;color:#f7f6fb !important}
+      .app-topbar .tb-brand small{font-size:8.5px !important;letter-spacing:2px !important;color:#8f88a8 !important;margin-top:3px !important}
+      /* Boutons ronds façon iOS */
+      .app-topbar .tb-actions{gap:10px !important}
+      .app-topbar .tb-actions button{width:40px !important;height:40px !important;border-radius:50% !important;background:#ffffff14 !important;border:0 !important;color:#ece7ff !important}
+      .app-topbar .tb-actions button:active{background:#ffffff26 !important}
+      .app-topbar .tb-actions svg{width:20px !important;height:20px !important;stroke-width:2 !important}
+      /* Grand titre « large title » Apple */
+      .workspace-head{padding:12px 2px 12px !important;margin:0 0 8px !important;border-bottom:0 !important;grid-template-columns:1fr !important}
+      .workspace-head .eyebrow{font-size:11px !important;letter-spacing:1.3px !important;color:#948dad !important;font-weight:700 !important}
+      .workspace-head h1{font-size:34px !important;line-height:1.04 !important;font-weight:800 !important;letter-spacing:-1.3px !important;color:#ffffff !important;margin:5px 0 5px !important}
+      .workspace-head p{font-size:13px !important;color:#948dad !important}
+    }
   </style>
 </head>
 <body>
