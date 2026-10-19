@@ -2,7 +2,7 @@
    Stratégie « cache d'abord, mise à jour en arrière-plan » (stale-while-revalidate) :
    l'app s'affiche tout de suite depuis le cache, et la dernière version est
    récupérée en arrière-plan pour la prochaine ouverture. */
-const CACHE = 'auditia-v37';
+const CACHE = 'auditia-v38';
 const ASSETS = [
   './', './index.html', './manifest.webmanifest',
   './auditia-icon.svg', './favicon-32.png',
@@ -32,6 +32,20 @@ self.addEventListener('fetch', e => {
   // Laisser passer tout ce qui n'est pas notre origine (Google, Logo.dev, RDAP…)
   if (url.origin !== location.origin) return;
   e.respondWith((async () => {
+    // Toujours vérifier la dernière version réseau pour les pages HTML.
+    // L'ancien comportement servait d'abord le HTML en cache, ce qui pouvait
+    // laisser l'iPhone exécuter une ancienne version après un correctif.
+    if (req.mode === 'navigate' || /\\.html$/i.test(url.pathname)) {
+      try {
+        const fresh = await fetch(req, { cache: 'no-store' });
+        if (fresh && fresh.ok) {
+          const copy = fresh.clone();
+          caches.open(CACHE).then(c => c.put(req, copy)).catch(() => {});
+          return fresh;
+        }
+      } catch (_) {}
+      return (await caches.match(req)) || (await caches.match('./index.html'));
+    }
     const cached = await caches.match(req);
     // Récupération réseau en arrière-plan : met le cache à jour pour la prochaine fois.
     const network = fetch(req).then(res => {
