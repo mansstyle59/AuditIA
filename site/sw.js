@@ -1,11 +1,12 @@
 /* AuditIA — service worker : chargement instantané + coquille hors-ligne.
    Stratégie « réseau d'abord » : quand on est en ligne, la dernière version
    est toujours récupérée et mise en cache ; hors ligne, on sert le cache. */
-const CACHE = 'auditia-v16';
+const CACHE = 'auditia-v17';
 const ASSETS = [
   './', './index.html', './manifest.webmanifest',
   './auditia-icon.svg', './favicon-32.png',
-  './apple-touch-icon.png', './icon-192.png', './icon-512.png'
+  './apple-touch-icon.png', './icon-192.png', './icon-512.png',
+  './vendor/html2canvas.min.js', './vendor/jspdf.umd.min.js'
 ];
 
 self.addEventListener('install', e => {

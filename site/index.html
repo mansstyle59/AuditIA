@@ -1061,7 +1061,7 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       page.querySelectorAll('[data-run-scan]').forEach(b=>b.addEventListener('click',()=>runScan(b.dataset.runScan)));
       page.querySelectorAll('[data-run-site]').forEach(b=>b.addEventListener('click',()=>runSiteScan(b.dataset.runSite)));
       page.querySelectorAll('[data-run-full]').forEach(b=>b.addEventListener('click',()=>runFullAudit(b.dataset.runFull)));
-      page.querySelectorAll('[data-export-report]').forEach(b=>b.addEventListener('click',()=>exportReport(b.dataset.exportReport)));
+      page.querySelectorAll('[data-export-report]').forEach(b=>b.addEventListener('click',()=>exportReport(b.dataset.exportReport,b.dataset.mode)));
       page.querySelectorAll('[data-audit-filter]').forEach(inp=>inp.addEventListener('input',()=>{auditFilter=inp.value;const pos=inp.selectionStart;renderApp();const n=document.querySelector('[data-audit-filter]');if(n){n.focus();try{n.setSelectionRange(pos,pos);}catch(e){}}}));
     }
     /* ----- Recherche automatique de commerces (Google Places API New) ----- */
@@ -1119,12 +1119,16 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
     function targetKeywords(c){
       const city=String((c&&c.city)||'').trim();
       const d=(c&&c.details)||{};
-      const t=((c&&c.category)||d.category||'')+' '+(d.primaryType||'');
+      const t=((c&&c.name)||'')+' '+((c&&c.category)||d.category||'')+' '+(d.primaryType||'');
       const s=t.toLowerCase();
       const map=[
+        [/camping|campground|rv[_ ]?park|holiday[_ ]?park|mobil.?home|mobilhome|caravan|bungalow|village.?vacances/,['camping','location mobil-home','où dormir en camping']],
+        [/resort/,['hébergement','village vacances','où dormir']],
+        [/hotel|h[ôo]tel|motel|hostel|auberge|bed_and_breakfast|b&b/,['hôtel','où dormir']],
+        [/lodging|h[ée]berg|g[îi]te|chambre.?d|logement|guest/,['hébergement','où dormir']],
         [/boulanger|bakery|p[âa]tiss/,['boulangerie','pâtisserie','pain artisanal']],
         [/restaurant|meal_|food|brasserie|pizz|diner|traiteur/,['restaurant','où manger','meilleur restaurant']],
-        [/cafe|coffee|bar|pub/,['café','bar','terrasse']],
+        [/cafe|coffee|\bbar\b|pub/,['café','bar','terrasse']],
         [/hair|salon|coiff|barber/,['coiffeur','salon de coiffure','barbier']],
         [/nail|ongle/,['onglerie','manucure']],
         [/spa|wellness|massage|beaut/,['institut de beauté','spa','soin du visage']],
@@ -1132,7 +1136,6 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
         [/electric|électric/,['électricien','dépannage électrique']],
         [/paint|peint|fa[çc]ad/,['peintre','façadier','ravalement de façade']],
         [/garage|car_repair|auto|m[ée]can/,['garage auto','réparation voiture','garagiste']],
-        [/hotel|lodging|h[ée]berg/,['hôtel','où dormir']],
         [/pharmac/,['pharmacie']],
         [/fleuri|florist/,['fleuriste','livraison de fleurs']],
         [/store|shop|market|boutique|commerce/,['boutique','magasin']]
@@ -1716,47 +1719,68 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
         +'<div class="r-sign"><div class="r-sign-line" style="background:'+escHtml(col)+'"></div><b>'+escHtml(st.signature_name||st.company_name)+'</b><span>'+escHtml(st.signature_role||'')+'</span>'+[st.contact_email,st.phone,st.website].filter(Boolean).map(x=>'<span>'+escHtml(x)+'</span>').join('')+(st.signature_text?'<p>'+escHtml(st.signature_text)+'</p>':'')+'</div>'
         +'<div class="r-foot">Rapport généré par '+escHtml(st.app_name||'AuditIA')+' · '+escHtml(st.company_name||'AffiAds')+' · Performance mesurée par Google PageSpeed Insights. Le nom du propriétaire et la date d\'ouverture ne sont pas fournis par Google.</div>';
     }
+    function reportSimpleHtml(a,c){
+      const d=(c&&c.details)||{}; const st={...defaultSettings(),...(appSettings||{})};
+      const logo=currentLogo(); const col=st.primary_color||'#7657ed';
+      const diag=visibilityAudit(a,c); const idx=diag.index; const lab=visibilityLabel(idx);
+      const axisCol=v=>v>=75?'#1f9d57':v>=50?'#c98a00':'#c0392b';
+      const forces=(diag.strengths||[]).slice(0,4);
+      const manques=(diag.weaknesses||[]).slice(0,5);
+      const plan=(typeof improvementPlan==='function')?improvementPlan(a,c):[];
+      const topActions=plan.slice(0,3);
+      return '<div class="r-head"><div class="r-brand"><img src="'+escHtml(logo)+'" alt=""><div><b>'+escHtml(st.app_name||'AuditIA')+'</b><span>'+escHtml(st.company_name||'AffiAds')+'</span></div></div><div class="r-meta"><b>Aperçu de visibilité</b><span>'+escHtml(new Date(a.updated_at||Date.now()).toLocaleDateString('fr-FR'))+'</span></div></div>'
+        +'<h1 class="r-client">'+escHtml(c?.name||'Commerce')+'</h1><p class="r-sub">'+escHtml([c?.city,c?.category||d.category].filter(Boolean).join(' · '))+'</p>'
+        +'<div class="r-verdict"><div class="r-verdict-score"><div class="r-ring-wrap">'+rSvgRing(idx,80,9)+'</div><small>visibilité</small></div><div class="r-verdict-txt"><b>Note de visibilité : '+idx+'/100 <span class="r-vis-label r-vis-'+lab.c+'">'+lab.t+'</span></b><p>'+escHtml(visibilityVerdict(idx))+'</p></div></div>'
+        +'<div class="r-axes"><div class="r-axis"><span>SEO · Google</span><b style="color:'+axisCol(diag.seo.score)+'">'+diag.seo.score+'/100</b></div><div class="r-axis"><span>GEO · IA génératives</span><b style="color:'+axisCol(diag.geo.score)+'">'+diag.geo.score+'/100</b></div></div>'
+        +'<div class="r-section"><div class="r-cols"><div class="r-col"><h3 class="r-have-h">Vos points forts</h3><ul class="r-list r-good">'+(forces.length?forces.map(x=>'<li><b>'+escHtml(x.label)+'</b></li>').join(''):'<li><span>À construire sur tous les axes.</span></li>')+'</ul></div><div class="r-col"><h3 class="r-miss-h">Ce qu’il vous manque</h3><ul class="r-list r-bad">'+(manques.length?manques.map(x=>'<li><b>'+escHtml(x.label)+'</b></li>').join(''):'<li><span>Rien de bloquant.</span></li>')+'</ul></div></div></div>'
+        +(topActions.length?'<div class="r-section"><h2>Priorités à traiter</h2>'+topActions.map((it,i)=>'<div class="r-imp"><div class="r-imp-top"><b>'+(i+1)+'. '+escHtml(it.title)+'</b><span class="r-imp-tag r-imp-'+(it.priority==='Haute'?'high':it.priority==='Moyenne'?'mid':'low')+'">'+escHtml(it.axis)+' · '+escHtml(it.priority)+'</span></div></div>').join('')+'</div>':'')
+        +'<div class="r-section" style="background:#f6f3ff;border:1px solid '+escHtml(col)+'33;border-radius:12px;padding:12px 14px"><b style="color:'+escHtml(col)+'">Ceci est un aperçu gratuit.</b><p style="margin:4px 0 0;font-size:13px;color:#444">Le rapport complet détaille chaque critère SEO et GEO, votre classement sur les mots-clés de vos clients, vos concurrents locaux, un aperçu de votre site et un plan d’action priorisé, étape par étape.</p></div>'
+        +'<div class="r-sign"><div class="r-sign-line" style="background:'+escHtml(col)+'"></div><b>'+escHtml(st.signature_name||st.company_name)+'</b><span>'+escHtml(st.signature_role||'')+'</span>'+[st.contact_email,st.phone,st.website].filter(Boolean).map(x=>'<span>'+escHtml(x)+'</span>').join('')+'</div>'
+        +'<div class="r-foot">Aperçu généré par '+escHtml(st.app_name||'AuditIA')+' · '+escHtml(st.company_name||'AffiAds')+' · Analyse automatique Google &amp; web.</div>';
+    }
     let pdfLibsLoaded=false, pdfBusy=false;
     function loadScript(src){ return new Promise((res,rej)=>{ const s=document.createElement('script'); s.src=src; s.onload=()=>res(); s.onerror=()=>rej(new Error('chargement '+src)); document.head.appendChild(s); }); }
     async function ensurePdfLibs(){
       if(pdfLibsLoaded) return;
-      await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
-      await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+      const h2cOk=()=>!!window.html2canvas; const pdfOk=()=>!!((window.jspdf&&window.jspdf.jsPDF)||window.jsPDF);
+      if(!h2cOk()){ try{ await loadScript('./vendor/html2canvas.min.js'); }catch(e){} if(!h2cOk()){ await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js'); } }
+      if(!pdfOk()){ try{ await loadScript('./vendor/jspdf.umd.min.js'); }catch(e){} if(!pdfOk()){ await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'); } }
+      if(!h2cOk()) throw new Error('html2canvas introuvable'); if(!pdfOk()) throw new Error('jsPDF introuvable');
       pdfLibsLoaded=true;
     }
-    function printFallback(host){
-      document.body.classList.add('printing');
-      const done=()=>{ document.body.classList.remove('printing'); window.removeEventListener('afterprint',done); };
-      window.addEventListener('afterprint',done);
-      setTimeout(()=>{ try{ window.print(); }catch(e){} setTimeout(done,1500); },120);
-    }
-    async function exportReport(auditId){
+    async function exportReport(auditId, mode){
       if(pdfBusy) return; const a=appAudits.find(x=>x.id===auditId); if(!a) return;
       const c=appClients.find(x=>x.id===a.client_id);
+      mode=(mode==='simple')?'simple':'full';
       let host=document.getElementById('printReport');
       if(!host){ host=document.createElement('div'); host.id='printReport'; document.body.appendChild(host); }
-      host.innerHTML='<div class="r-page" id="rPageCapture">'+reportHtml(a,c)+'</div>';
-      pdfBusy=true; appNotice='Préparation du PDF…'; renderApp();
+      host.innerHTML='<div class="r-page'+(mode==='simple'?' r-page-simple':'')+'" id="rPageCapture">'+(mode==='simple'?reportSimpleHtml(a,c):reportHtml(a,c))+'</div>';
+      pdfBusy=true; appNotice=(mode==='simple'?'Préparation du rapport express…':'Préparation du rapport complet…'); renderApp();
       try{
         await ensurePdfLibs();
         const el=document.getElementById('rPageCapture');
         const canvas=await window.html2canvas(el,{scale:2,backgroundColor:'#ffffff',useCORS:true,logging:false,windowWidth:el.scrollWidth});
         const jsPDFctor=(window.jspdf&&window.jspdf.jsPDF)||window.jsPDF;
-        if(!jsPDFctor) throw new Error('jsPDF indisponible');
         const pdf=new jsPDFctor('p','mm','a4');
         const pw=pdf.internal.pageSize.getWidth(), ph=pdf.internal.pageSize.getHeight();
-        const imgW=pw, imgH=canvas.height*pw/canvas.width;
         const img=canvas.toDataURL('image/jpeg',0.92);
-        let heightLeft=imgH, pos=0;
-        pdf.addImage(img,'JPEG',0,0,imgW,imgH); heightLeft-=ph;
-        while(heightLeft>0){ pos-=ph; pdf.addPage(); pdf.addImage(img,'JPEG',0,pos,imgW,imgH); heightLeft-=ph; }
-        const name=('Rapport-'+((c&&c.name)||'commerce')).normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/gi,'-').replace(/^-|-$/g,'')+'.pdf';
-        pdf.save(name);
-        appNotice='PDF généré : '+name+' (dans tes téléchargements / Fichiers).';
+        if(mode==='simple'){
+          let imgW=pw, imgH=canvas.height*pw/canvas.width;
+          if(imgH>ph){ imgH=ph; imgW=canvas.width*ph/canvas.height; }
+          pdf.addImage(img,'JPEG',(pw-imgW)/2,0,imgW,imgH);
+        } else {
+          const imgW=pw, imgH=canvas.height*pw/canvas.width;
+          let heightLeft=imgH, pos=0;
+          pdf.addImage(img,'JPEG',0,0,imgW,imgH); heightLeft-=ph;
+          while(heightLeft>0){ pos-=ph; pdf.addPage(); pdf.addImage(img,'JPEG',0,pos,imgW,imgH); heightLeft-=ph; }
+        }
+        const base=((mode==='simple'?'Rapport-express-':'Rapport-complet-')+((c&&c.name)||'commerce')).normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/gi,'-').replace(/^-|-$/g,'');
+        pdf.save(base+'.pdf');
+        appNotice=(mode==='simple'?'Rapport express (1 page) généré : ':'Rapport complet généré : ')+base+'.pdf (dans Fichiers / Téléchargements).';
       }catch(e){
-        appNotice='Export direct indisponible, ouverture de l’impression…';
-        printFallback(host);
-      } finally { pdfBusy=false; renderApp(); }
+        try{ const css=[...document.querySelectorAll('style')].map(s=>s.textContent).join('\n'); const w=window.open('about:blank','_blank'); if(w&&w.document){ w.document.write('<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Rapport AuditIA</title><style>'+css+'\n#printReport{position:static!important;left:auto!important}.r-page{box-shadow:none}</style></head><body style="background:#fff">'+host.innerHTML+'</body></html>'); w.document.close(); appNotice='Génération directe indisponible : le rapport s’est ouvert dans un onglet. Fais Partager → Imprimer → « Enregistrer au format PDF ».'; } else { appNotice='Impossible de générer le PDF ici (autorise les fenêtres, et réessaie en ligne).'; } }
+        catch(_){ appNotice='Export impossible : '+((e&&e.message)||'erreur').slice(0,80); }
+      } finally { pdfBusy=false; host.innerHTML=''; renderApp(); }
     }
     function renderApp(){
       const completed=appAudits.filter(a=>a.status==='Terminé'||a.status==='Analysé').length;
@@ -1788,7 +1812,7 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
         const c=appClients.find(x=>x.id===a.client_id);
         const list=Array.isArray(a.checklist)?a.checklist:[];
         const analyzed=!!(a.site||a.scan||a.status==='Analysé');
-        const diagBlocks=analyzed?(visibilitySummaryHtml(a,c)+clientInfoHtml(c)+siteShotHtml(a)+scanPanelHtml(a,c)+socialPresenceHtml(a)+rankingsHtml(a)+competitorsHtml(a,c)+targetingPanelHtml(a,c)+improvementHtml(a,c)+'<details class="cd-edit" style="margin-top:14px"><summary>Notes personnelles (facultatif)</summary><form class="app-form" data-save-notes style="padding:0 16px 16px"><label>Notes internes<textarea name="notes" placeholder="Remarques pour toi — n’apparaissent dans le rapport que si tu les remplis.">'+escHtml(a.notes||'')+'</textarea></label><button class="app-btn primary" type="submit">Enregistrer les notes</button></form></details><div class="detail-actions" style="margin-top:16px"><button class="app-btn primary" data-export-report="'+a.id+'">📄 Exporter le rapport (PDF)</button><button class="app-btn" data-delete-audit="'+a.id+'">Supprimer cet audit</button></div>'):'<div class="app-panel" style="margin-top:14px"><div class="app-empty">Rien n’est encore analysé. Touche <b>⚡ Analyser le commerce</b> ci-dessus : AuditIA récupère les données Google, lit le site, trouve les réseaux, les informations légales (SIRET) et la performance, puis génère le rapport complet.</div><div class="detail-actions" style="margin-top:14px"><button class="app-btn" data-delete-audit="'+a.id+'">Supprimer cet audit</button></div></div>';
+        const diagBlocks=analyzed?(visibilitySummaryHtml(a,c)+clientInfoHtml(c)+siteShotHtml(a)+scanPanelHtml(a,c)+socialPresenceHtml(a)+rankingsHtml(a)+competitorsHtml(a,c)+targetingPanelHtml(a,c)+improvementHtml(a,c)+'<details class="cd-edit" style="margin-top:14px"><summary>Notes personnelles (facultatif)</summary><form class="app-form" data-save-notes style="padding:0 16px 16px"><label>Notes internes<textarea name="notes" placeholder="Remarques pour toi — n’apparaissent dans le rapport que si tu les remplis.">'+escHtml(a.notes||'')+'</textarea></label><button class="app-btn primary" type="submit">Enregistrer les notes</button></form></details><div class="detail-actions" style="margin-top:16px;flex-wrap:wrap"><button class="app-btn" data-export-report="'+a.id+'" data-mode="simple">📄 Rapport express (1 page · gratuit)</button><button class="app-btn primary" data-export-report="'+a.id+'" data-mode="full">📑 Rapport complet (PDF)</button><button class="app-btn" data-delete-audit="'+a.id+'">Supprimer cet audit</button></div><p class="app-muted" style="margin:8px 0 0;font-size:12px">Le <b>rapport express</b> est l’aperçu gratuit à laisser au prospect ; le <b>rapport complet</b> est le document détaillé que tu peux facturer.</p>'):'<div class="app-panel" style="margin-top:14px"><div class="app-empty">Rien n’est encore analysé. Touche <b>⚡ Analyser le commerce</b> ci-dessus : AuditIA récupère les données Google, lit le site, trouve les réseaux, les informations légales (SIRET) et la performance, puis génère le rapport complet.</div><div class="detail-actions" style="margin-top:14px"><button class="app-btn" data-delete-audit="'+a.id+'">Supprimer cet audit</button></div></div>';
         body='<button class="app-btn" data-app-view="Audits">← Retour aux audits</button><section class="app-panel" style="margin-top:14px"><div class="eyebrow">DOSSIER D’AUDIT</div><h2 style="margin-top:8px">'+escHtml(c?.name||'Commerce')+'</h2><p>'+escHtml(c?.city||'')+' · '+escHtml(a.title)+'</p>'+analysePanelHtml(a,c)+diagBlocks+'</section>';
       }
       appShell(body);
