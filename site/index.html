@@ -1085,6 +1085,26 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       .workspace-head h1{font-size:34px !important;line-height:1.04 !important;font-weight:800 !important;letter-spacing:-1.3px !important;color:#ffffff !important;margin:5px 0 5px !important}
       .workspace-head p{font-size:13px !important;color:#948dad !important}
     }
+
+    /* ============================================================
+       FINITIONS PRO — retours tactiles, boutons premium, transitions
+       (CSS seul, dernier bloc)
+       ============================================================ */
+    @media(max-width:760px){
+      .app-btn,.home-open-btn,.mobile-tabbar button,.sidebar-nav button,.app-topbar .tb-actions button,.app-row,.client-card,.add-toggle>summary{transition:transform .14s ease,background .16s ease,border-color .16s ease,box-shadow .16s ease !important}
+      .app-btn:active,.home-open-btn:active{transform:scale(.97) !important}
+      .mobile-tabbar button:active{transform:scale(.93) !important}
+      .app-row:active,.client-card:active{background:#ffffff08 !important}
+      .app-topbar .tb-actions button:active{transform:scale(.92) !important}
+      /* Bouton principal premium */
+      .app-btn.primary{background:linear-gradient(135deg,#8a70ff,#6a4ae6) !important;box-shadow:0 6px 16px #6a4ae636 !important;font-weight:760 !important;letter-spacing:.1px}
+      .app-btn.primary:active{box-shadow:0 2px 8px #6a4ae636 !important}
+      /* Chiffres alignés + titres nets */
+      .app-stat strong,.home-audit-score b,.app-score,.home-score-ring strong{font-variant-numeric:tabular-nums}
+      .app-panel h2,.app-content-title h2{letter-spacing:-.4px !important}
+      /* Défilement fluide */
+      html{scroll-behavior:smooth}
+    }
   </style>
 </head>
 <body>
