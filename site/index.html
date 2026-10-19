@@ -2149,53 +2149,81 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       if(!h2cOk()) throw new Error('html2canvas introuvable'); if(!pdfOk()) throw new Error('jsPDF introuvable');
       pdfLibsLoaded=true;
     }
+    // Le rendu d'un long rapport en une seule image peut saturer la mémoire iOS.
+    // On capture des tranches de hauteur limitée, une par page A4.
+    async function buildReportPdf(el, mode){
+      const ctor=(window.jspdf&&window.jspdf.jsPDF)||window.jsPDF;
+      const pdf=new ctor('p','mm','a4');
+      const pw=pdf.internal.pageSize.getWidth(),ph=pdf.internal.pageSize.getHeight();
+      const sourceWidth=Math.max(1,Math.ceil(el.getBoundingClientRect().width));
+      const sourceHeight=Math.max(1,Math.ceil(el.scrollHeight));
+      const pagePixels=Math.floor(sourceWidth*ph/pw);
+      const scale=1.25;
+      const totalPages=Math.ceil(sourceHeight/pagePixels);
+      if(totalPages>80) throw new Error('Rapport trop long pour le PDF mobile.');
+      for(let index=0;index<totalPages;index++){
+        if(pdfCancelled) throw new Error('Génération annulée.');
+        const y=index*pagePixels;
+        const h=Math.min(pagePixels,sourceHeight-y);
+        const canvas=await window.html2canvas(el,{
+          scale,backgroundColor:'#ffffff',useCORS:true,logging:false,
+          width:sourceWidth,height:h,x:0,y,
+          windowWidth:sourceWidth,windowHeight:Math.max(h,600),
+          scrollX:0,scrollY:0,imageTimeout:2000
+        });
+        if(!canvas.width||!canvas.height) throw new Error('Capture de la page '+(index+1)+' impossible.');
+        if(index)pdf.addPage();
+        const img=canvas.toDataURL('image/jpeg',0.84);
+        pdf.addImage(img,'JPEG',0,0,pw,Math.min(ph,h*pw/sourceWidth));
+        canvas.width=0;canvas.height=0;
+        await new Promise(resolve=>setTimeout(resolve,0));
+      }
+      return pdf;
+    }
     async function exportReport(auditId, mode){
-      if(pdfBusy) return;
-      const a=appAudits.find(x=>x.id===auditId);
+      if(pdfBusy)return;
+      const a=appAudits.find(x=>String(x.id)===String(auditId));
       if(!a){appNotice='Audit introuvable. Actualise la page puis réessaie.';renderApp();return;}
-      const c=appClients.find(x=>x.id===a.client_id);
-      mode=(mode==='simple')?'simple':'full';
-      // IMPORTANT iOS PWA : ne PAS ouvrir d'onglet ici — cela mettrait la PWA en
-      // arrière-plan et figerait la génération (« Préparation… » bloqué). On génère
-      // tout dans l'app, puis on propose un bouton à toucher (geste utilisateur fiable).
+      const c=appClients.find(x=>String(x.id)===String(a.client_id));
+      mode=mode==='simple'?'simple':'full';
       let host=document.getElementById('printReport');
       if(!host){host=document.createElement('div');host.id='printReport';document.body.appendChild(host);}
-      host.innerHTML='<div class="r-page'+(mode==='simple'?' r-page-simple':'')+'" id="rPageCapture">'+(mode==='simple'?reportSimpleHtml(a,c):reportHtml(a,c))+'</div>';
+      const html=mode==='simple'?reportSimpleHtml(a,c):reportHtml(a,c);
+      host.innerHTML='<div class="r-page'+(mode==='simple'?' r-page-simple':'')+'" id="rPageCapture">'+html+'</div>';
       pdfBusy=true;pdfCancelled=false;appNotice='';renderApp();
+      // Filet de sécurité : pas d'écran de chargement infini en cas de réseau lent.
+      let watchdog;
+      const timedOut=new Promise((_,reject)=>{watchdog=setTimeout(()=>reject(new Error('Délai de génération dépassé.')),30000);});
       try{
-        await ensurePdfLibs();
-        if(pdfCancelled) return;
-        const el=document.getElementById('rPageCapture');
-        if(!el) throw new Error('Le contenu du rapport est introuvable.');
-        if(document.fonts&&document.fonts.ready){try{await Promise.race([document.fonts.ready,new Promise(r=>setTimeout(r,600))]);}catch(_){}}
-        const imgs=[...el.querySelectorAll('img')];
-        await Promise.all(imgs.map(img=>img.complete?Promise.resolve():new Promise(resolve=>{img.onload=resolve;img.onerror=resolve;setTimeout(resolve,900);})));
-        if(pdfCancelled) return;
-        const canvas=await window.html2canvas(el,{scale:(mode==='simple')?1.8:1.25,backgroundColor:'#ffffff',useCORS:true,logging:false,windowWidth:el.scrollWidth,scrollX:0,scrollY:0,imageTimeout:3000});
-        if(pdfCancelled) return;
-        if(!canvas.width||!canvas.height) throw new Error('Le rapport n’a pas pu être rendu en image.');
-        const jsPDFctor=(window.jspdf&&window.jspdf.jsPDF)||window.jsPDF;
-        const pdf=new jsPDFctor('p','mm','a4');
-        const pw=pdf.internal.pageSize.getWidth(),ph=pdf.internal.pageSize.getHeight();
-        const img=canvas.toDataURL('image/jpeg',0.82);
-        if(mode==='simple'){
-          let imgW=pw,imgH=canvas.height*pw/canvas.width;
-          if(imgH>ph){imgH=ph;imgW=canvas.width*ph/canvas.height;}
-          pdf.addImage(img,'JPEG',(pw-imgW)/2,0,imgW,imgH);
-        }else{
-          const imgW=pw,imgH=canvas.height*pw/canvas.width;
-          let heightLeft=imgH,pos=0;
-          pdf.addImage(img,'JPEG',0,0,imgW,imgH);heightLeft-=ph;
-          while(heightLeft>0){pos-=ph;pdf.addPage();pdf.addImage(img,'JPEG',0,pos,imgW,imgH);heightLeft-=ph;}
-        }
+        const job=(async()=>{
+          await ensurePdfLibs();
+          if(pdfCancelled)return null;
+          const el=document.getElementById('rPageCapture');
+          if(!el)throw new Error('Contenu du rapport introuvable.');
+          if(document.fonts&&document.fonts.ready){
+            await Promise.race([document.fonts.ready,new Promise(resolve=>setTimeout(resolve,900))]);
+          }
+          await Promise.all([...el.querySelectorAll('img')].map(img=>img.complete?Promise.resolve():new Promise(resolve=>{
+            const done=()=>resolve();img.addEventListener('load',done,{once:true});img.addEventListener('error',done,{once:true});setTimeout(done,1400);
+          })));
+          if(pdfCancelled)return null;
+          return buildReportPdf(el,mode);
+        })();
+        const pdf=await Promise.race([job,timedOut]);
+        if(pdfCancelled||!pdf)return;
         const base=((mode==='simple'?'Rapport-express-':'Rapport-complet-')+((c&&c.name)||'commerce')).normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/gi,'-').replace(/^-|-$/g,'');
-        const fname=base+'.pdf';
         const blob=pdf.output('blob');
-        pdfBusy=false;host.innerHTML='';appNotice='';renderApp();
-        showPdfResult(blob,fname);
+        if(blob.size<100)throw new Error('Le PDF généré est vide.');
+        showPdfResult(blob,base+'.pdf');
       }catch(e){
-        pdfBusy=false;host.innerHTML='';
-        appNotice='Le PDF n’a pas pu être généré ('+((e&&e.message)||'erreur inconnue').slice(0,90)+'). Réessaie dans un instant.';
+        if(!pdfCancelled){
+          const msg=(e&&e.message)||'erreur inconnue';
+          appNotice='Échec de génération du PDF : '+msg.slice(0,110)+' Réessaie dans Safari si nécessaire.';
+        }
+      }finally{
+        clearTimeout(watchdog);
+        pdfBusy=false;
+        host.innerHTML='';
         renderApp();
       }
     }
