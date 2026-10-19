@@ -1105,6 +1105,12 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       /* Défilement fluide */
       html{scroll-behavior:smooth}
     }
+
+    /* Chiffres clés du diagnostic (résultats plus convaincants) */
+    .vis-kf{display:flex;flex-wrap:wrap;gap:8px;margin:2px 0 14px}
+    .vis-kf-item{display:flex;flex-direction:column;gap:1px;background:#ffffff0d;border:1px solid #ffffff16;border-radius:11px;padding:7px 12px;min-width:0}
+    .vis-kf-item b{font-size:14px;color:#fff;font-variant-numeric:tabular-nums;line-height:1.15}
+    .vis-kf-item small{font-size:10px;color:#aaa3be;letter-spacing:.3px}
   </style>
 </head>
 <body>
@@ -1949,38 +1955,50 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
     function visibilityAudit(a,c){
       const d=(c&&c.details)||{}; const s=a&&a.scan; const si=a&&a.site;
       const site=String((c&&c.website)||d.website||'').trim();
+      const secure=/^https:\/\//i.test(site);
       const rating=(d.rating!=null)?Number(d.rating):null;
       const reviews=Number(d.reviews||0);
       const phone=String((c&&c.phone)||d.phone||'').trim();
       const hasGoogle=!!(d.place_id||d.address||rating!=null);
       const hours=!!(Array.isArray(d.hours)&&d.hours.length);
       const perf=(s&&s.scores)?s.scores.performance:null;
-      const ns=si?(si.socials||[]).length:null;
+      const seoLh=(s&&s.scores)?s.scores.seo:null;
+      const ns=si?(si.socials||[]).length:0;
+      const majorNets=['Instagram','Facebook','TikTok','YouTube'];
+      const major=si?(si.socials||[]).filter(x=>majorNets.includes(x.net)).length:0;
+      const tier=(v,stops)=>{ for(const st of stops){ if(v>=st[0]) return st[1]; } return 0; };
       const items=[];
-      const add=(pillar,label,ok,weight,bad,good)=>items.push({pillar,label,ok,weight,advice:ok?good:bad,gap:bad});
+      // Notation graduée : 'val' entre 0 et 1 (crédibilité), 'ok' = point fort affiché.
+      const add=(pillar,label,ok,weight,bad,good,val)=>{ const v=(val==null?(ok?1:0):val); items.push({pillar,label,ok,weight,advice:ok?good:bad,gap:bad,val:Math.max(0,Math.min(1,v))}); };
       /* ---- SEO : être trouvé quand on cherche sur Google ---- */
       add('seo','Fiche Google Business',hasGoogle,18,'Créer ou revendiquer la fiche Google Business Profile : sans elle, le commerce est quasi invisible dans les recherches locales et sur Maps.','Fiche Google présente et renseignée.');
       add('seo','Site web',!!site,16,'Aucun site web : impossible d’être bien référencé. Une vitrine (services, coordonnées, horaires) est la base.','Le commerce dispose d’un site web.');
-      if(rating!=null) add('seo','Note Google',rating>=4.0,10,'Note Google sous 4/5 : elle pèse sur le classement local. Répondre aux avis et solliciter les clients satisfaits.','Bonne note Google ('+rating+'/5).');
-      else add('seo','Note Google',false,10,'Pas encore de note Google : les premiers avis manquent pour rassurer et bien se classer.','');
-      add('seo','Volume d’avis',reviews>=20,10,'Trop peu d’avis ('+reviews+') : un flux régulier d’avis améliore le classement et la confiance.',reviews+' avis clients.');
+      if(site) add('seo','Site sécurisé (HTTPS)',secure,4,'Le site n’est pas en HTTPS : les navigateurs le signalent comme « non sécurisé », ce qui nuit au référencement et à la confiance.','Site sécurisé en HTTPS.');
+      if(rating!=null){ const rv=tier(rating,[[4.6,1],[4.2,0.9],[4.0,0.8],[3.5,0.55],[3.0,0.3],[0,0.15]]); add('seo','Note Google',rating>=4.0,10,'Note Google sous 4/5 : elle pèse sur le classement local. Répondre aux avis et solliciter les clients satisfaits.','Bonne note Google ('+rating+'/5).',rv); }
+      else add('seo','Note Google',false,10,'Pas encore de note Google : les premiers avis manquent pour rassurer et bien se classer.','',0);
+      { const rv=tier(reviews,[[50,1],[20,0.85],[10,0.6],[3,0.35],[1,0.15],[0,0]]); add('seo','Volume d’avis',reviews>=20,10,'Trop peu d’avis ('+reviews+') : un flux régulier d’avis améliore le classement et la confiance.',reviews+' avis clients.',rv); }
       add('seo','Horaires renseignés',hours,5,'Horaires absents de la fiche : Google les affiche dans les résultats, leur absence fait perdre des clics.','Horaires renseignés sur Google.');
       add('seo','Téléphone visible',!!phone,5,'Numéro absent : moins d’appels directs depuis les résultats de recherche.','Numéro de téléphone renseigné.');
-      if(perf!=null) add('seo','Performance mobile',perf>=50,8,'Site lent sur mobile (perf '+perf+'/100) : pénalise le référencement et fait fuir les visiteurs.','Site rapide sur mobile (perf '+perf+'/100).');
-      if(si) add('seo','Balises SEO (titre + description)',!!(si.title&&si.metaDesc),8,'Titre ou meta-description manquants : Google n’a pas de résumé clair à afficher.','Titre et description présents sur le site.');
-      if(si) add('seo','Réseaux sociaux reliés',ns>=1,6,'Aucun réseau relié au site : moins de signaux de présence et d’activité.',ns+' réseau'+(ns>1?'x':'')+' relié'+(ns>1?'s':'')+' au site.');
-      if(d.photoCount!=null) add('seo','Photos sur la fiche Google',d.photoCount>=5,6,'Peu ou pas de photos ('+d.photoCount+') : ajouter des photos récentes (devanture, intérieur, produits) augmente les clics.',d.photoCount+' photo'+(d.photoCount>1?'s':'')+' sur la fiche Google.');
-      if(si&&si.rankings&&si.rankings.length){ const topN=si.rankings.filter(r=>r.pos!=null&&r.pos<=10).length; const foundN=si.rankings.filter(r=>r.found).length; add('seo','Classement sur les mots-clés',topN>=1,10,'Introuvable dans les premiers résultats sur vos mots-clés : c’est le cœur du problème à vendre (travailler le SEO local et la fiche Google).',foundN+'/'+si.rankings.length+' mots-clés où le commerce apparaît.'); }
+      if(perf!=null){ const pv=tier(perf,[[90,1],[70,0.8],[50,0.6],[30,0.35],[0,0.15]]); add('seo','Performance mobile',perf>=50,8,'Site lent sur mobile (perf '+perf+'/100) : pénalise le référencement et fait fuir les visiteurs.','Site rapide sur mobile (perf '+perf+'/100).',pv); }
+      if(seoLh!=null){ const lv=tier(seoLh,[[90,1],[70,0.75],[50,0.5],[0,0.25]]); add('seo','Référencement technique (Lighthouse)',seoLh>=80,6,'Bases SEO techniques incomplètes (score '+seoLh+'/100) : balises, structure et liens internes à corriger.','Bases SEO techniques correctes ('+seoLh+'/100).',lv); }
+      if(si){ const tv=(si.title&&si.metaDesc)?1:(si.title||si.metaDesc)?0.5:0; add('seo','Balises SEO (titre + description)',!!(si.title&&si.metaDesc),8,'Titre ou meta-description manquants : Google n’a pas de résumé clair à afficher.','Titre et description présents sur le site.',tv); }
+      if(si) add('seo','Compatible mobile',!!si.viewport,6,'Le site n’est pas déclaré adapté au mobile : Google privilégie les sites « mobile-friendly » dans ses résultats.','Site adapté au mobile (responsive).');
+      if(si){ const nv=ns>=2?1:ns===1?0.6:0; add('seo','Réseaux sociaux reliés',ns>=1,6,'Aucun réseau relié au site : moins de signaux de présence et d’activité.',ns+' réseau'+(ns>1?'x':'')+' relié'+(ns>1?'s':'')+' au site.',nv); }
+      if(d.photoCount!=null){ const pv=tier(d.photoCount,[[10,1],[5,0.8],[1,0.4],[0,0]]); add('seo','Photos sur la fiche Google',d.photoCount>=5,6,'Peu ou pas de photos ('+d.photoCount+') : ajouter des photos récentes (devanture, intérieur, produits) augmente les clics.',d.photoCount+' photo'+(d.photoCount>1?'s':'')+' sur la fiche Google.',pv); }
+      if(si&&si.booking!=null) add('seo','Prise de contact en ligne',!!((si.booking&&si.booking.length)||si.whatsapp),4,'Pas de réservation ni de contact direct en ligne : des clients prêts à agir abandonnent faute d’action simple.','Réservation ou contact direct possible en ligne.');
+      if(si&&si.rankings&&si.rankings.length){ const n=si.rankings.length; const topN=si.rankings.filter(r=>r.pos!=null&&r.pos<=10).length; const top3=si.rankings.filter(r=>r.pos!=null&&r.pos<=3).length; const foundN=si.rankings.filter(r=>r.found).length; const rv=Math.max(top3/n,(topN*0.7+foundN*0.3)/n); add('seo','Classement sur les mots-clés',topN>=1,10,'Introuvable dans les premiers résultats sur vos mots-clés : c’est le cœur du problème à vendre (travailler le SEO local et la fiche Google).',foundN+'/'+n+' mots-clés où le commerce apparaît.',rv); }
       /* ---- GEO : être cité et recommandé par les IA (ChatGPT, Gemini, Perplexity…) ---- */
       add('geo','Présence reconnue (Google/Maps)',hasGoogle,16,'Les IA s’appuient sur des sources fiables : sans fiche Google solide, le commerce n’est pas une « entité » identifiable pour elles.','Entité identifiable via Google/Maps.');
-      if(si) add('geo','Données structurées (schema.org)',!!si.localSchema,20,'Aucune donnée structurée LocalBusiness : les IA ont du mal à comprendre qui vous êtes, où et ce que vous proposez. C’est LE levier GEO n°1.','Données structurées LocalBusiness détectées : les IA lisent le commerce facilement.');
-      if(si) add('geo','Contenu lisible par les IA',(si.words||0)>=150,10,'Page d’accueil pauvre en texte : les IA ont peu de matière à citer. Ajouter une présentation claire (qui, quoi, où, pourquoi vous).','Contenu texte suffisant pour être compris et cité.');
-      if(si) add('geo','Infos clés en clair (adresse + horaires)',!!(si.addressOnSite&&si.hoursOnSite),10,'Adresse ou horaires absents du texte du site : les IA ne peuvent pas les restituer de façon fiable.','Adresse et horaires présents en clair sur le site.');
+      if(si){ const sv=si.localSchema?1:((si.ldTypes&&si.ldTypes.length)?0.4:0); add('geo','Données structurées (schema.org)',!!si.localSchema,20,'Aucune donnée structurée LocalBusiness : les IA ont du mal à comprendre qui vous êtes, où et ce que vous proposez. C’est LE levier GEO n°1.','Données structurées LocalBusiness détectées : les IA lisent le commerce facilement.',sv); }
+      if(si){ const wv=tier(si.words||0,[[300,1],[150,0.7],[60,0.4],[0,0.1]]); add('geo','Contenu lisible par les IA',(si.words||0)>=150,10,'Page d’accueil pauvre en texte : les IA ont peu de matière à citer. Ajouter une présentation claire (qui, quoi, où, pourquoi vous).','Contenu texte suffisant pour être compris et cité.',wv); }
+      if(si){ const iv=(si.addressOnSite&&si.hoursOnSite)?1:(si.addressOnSite||si.hoursOnSite)?0.5:0; add('geo','Infos clés en clair (adresse + horaires)',!!(si.addressOnSite&&si.hoursOnSite),10,'Adresse ou horaires absents du texte du site : les IA ne peuvent pas les restituer de façon fiable.','Adresse et horaires présents en clair sur le site.',iv); }
       if(si) add('geo','Cohérence des informations (NAP)',!!(si.tel&&si.tel.length),8,'Téléphone non repris sur le site : une info incohérente entre Google et le site brouille les IA.','Coordonnées cohérentes entre le site et Google.');
-      add('geo','Preuve sociale (avis)',reviews>=20,12,'Peu d’avis : les IA privilégient les commerces avec une réputation visible et nombreuse.',reviews+' avis : réputation visible pour les IA.');
+      { const rv=tier(reviews,[[50,1],[20,0.85],[10,0.6],[3,0.3],[0,0.1]]); add('geo','Preuve sociale (avis)',reviews>=20,12,'Peu d’avis : les IA privilégient les commerces avec une réputation visible et nombreuse.',reviews+' avis : réputation visible pour les IA.',rv); }
       if(si) add('geo','Description claire du commerce',!!si.metaDesc,8,'Pas de description : les IA n’ont pas de résumé prêt à l’emploi pour vous présenter.','Description claire disponible pour les IA.');
-      if(si){ const nd=((si.directories)||[]).length; add('geo','Présence sur le web (annuaires)',nd>=2,10,'Peu présent sur les annuaires/plateformes : être référencé (Pages Jaunes, TripAdvisor, Maps…) renforce la fiabilité pour les IA.',nd+' plateforme'+(nd>1?'s':'')+' où le commerce est référencé.'); }
-      const pill=p=>{const it=items.filter(x=>x.pillar===p);const t=it.reduce((n,x)=>n+x.weight,0);const g=it.filter(x=>x.ok).reduce((n,x)=>n+x.weight,0);return {score:t?Math.round(g/t*100):0,have:it.filter(x=>x.ok),miss:it.filter(x=>!x.ok&&x.gap)};};
+      if(si){ const nd=((si.directories)||[]).length; const dv=tier(nd,[[3,1],[2,0.7],[1,0.4],[0,0]]); add('geo','Présence sur le web (annuaires)',nd>=2,10,'Peu présent sur les annuaires/plateformes : être référencé (Pages Jaunes, TripAdvisor, Maps…) renforce la fiabilité pour les IA.',nd+' plateforme'+(nd>1?'s':'')+' où le commerce est référencé.',dv); }
+      if(si){ const mv=major>=2?1:major===1?0.5:0; add('geo','Présence multi-réseaux',major>=2,6,'Peu de réseaux majeurs actifs : une présence sur Instagram/Facebook renforce les signaux d’activité pour les IA.',major+' réseau'+(major>1?'x':'')+' majeur'+(major>1?'s':'')+' détecté'+(major>1?'s':'')+'.',mv); }
+      if(d.sirene&&d.sirene.matched) add('geo','Entreprise officiellement enregistrée',true,6,'','Entreprise enregistrée au registre officiel (SIRENE) : identité légale vérifiable, rassurante pour les IA et les clients.');
+      const pill=p=>{const it=items.filter(x=>x.pillar===p);const t=it.reduce((n,x)=>n+x.weight,0);const g=it.reduce((n,x)=>n+x.weight*(x.val!=null?x.val:(x.ok?1:0)),0);return {score:t?Math.round(g/t*100):0,have:it.filter(x=>x.ok),miss:it.filter(x=>!x.ok&&x.gap)};};
       const seoP=pill('seo'),geoP=pill('geo');
       const index=Math.round((seoP.score+geoP.score)/2);
       return {items,seo:seoP,geo:geoP,index,strengths:items.filter(x=>x.ok),weaknesses:items.filter(x=>!x.ok&&x.gap)};
@@ -2001,9 +2019,18 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
     }
     function visibilityLabel(i){ return i>=70?{t:'Bonne visibilité',c:'ok'}:i>=45?{t:'Visibilité moyenne',c:'mid'}:{t:'Mauvaise visibilité',c:'bad'}; }
     function visibilitySummaryHtml(a,c){
-      const diag=visibilityAudit(a,c); const i=diag.index;
+      const diag=visibilityAudit(a,c); const i=diag.index; const d=(c&&c.details)||{};
       const col=i>=75?'#34d399':i>=50?'#fbbf24':'#f87171'; const lab=visibilityLabel(i);
-      return '<section class="app-panel vis-panel"><div class="vis-head"><div><div class="eyebrow">DIAGNOSTIC · SEO &amp; GEO</div><h3 style="margin:4px 0 0">Ce que vous avez, ce qu’il vous manque</h3></div><div class="vis-score"><div class="vis-ring" style="background:conic-gradient('+col+' '+(i*3.6)+'deg,#4a4866 0)"><span>'+i+'</span></div><small>/100</small></div></div><div class="sv-verdict sv-'+lab.c+'" style="margin:8px 0 6px">'+lab.t+'</div><p class="app-muted" style="margin:0 0 12px">'+escHtml(visibilityVerdict(i))+'</p><div class="pil-grid">'+pillarCardHtml('SEO','Être trouvé sur Google',diag.seo)+pillarCardHtml('GEO','Être cité par les IA (ChatGPT, Gemini…)',diag.geo)+'</div><p class="scan-note">GEO = optimisation pour les moteurs génératifs (IA). Diagnostic calculé sur des données réelles. Rapport complet et argumenté dans le PDF.</p></section>';
+      const kf=[];
+      if(d.rating!=null) kf.push([(d.reviews||0)+' avis','★ '+d.rating+'/5']);
+      else kf.push([(d.reviews||0)+' avis','note —']);
+      const cp=a&&a.site&&a.site.competitors;
+      if(cp&&cp.selfRank) kf.push(['classement local','n°'+cp.selfRank+' / '+cp.total]);
+      else if(cp&&cp.total) kf.push(['classement local','hors top '+cp.total]);
+      const rk=a&&a.site&&a.site.rankings;
+      if(rk&&rk.length&&!rk.every(r=>r.error)){ const f=rk.filter(r=>r.found).length; kf.push(['mots-clés trouvés',f+' / '+rk.length]); }
+      const kfHtml=kf.length?'<div class="vis-kf">'+kf.map(([k,v])=>'<span class="vis-kf-item"><b>'+escHtml(v)+'</b><small>'+escHtml(k)+'</small></span>').join('')+'</div>':'';
+      return '<section class="app-panel vis-panel"><div class="vis-head"><div><div class="eyebrow">DIAGNOSTIC · SEO &amp; GEO</div><h3 style="margin:4px 0 0">Ce que vous avez, ce qu’il vous manque</h3></div><div class="vis-score"><div class="vis-ring" style="background:conic-gradient('+col+' '+(i*3.6)+'deg,#4a4866 0)"><span>'+i+'</span></div><small>/100</small></div></div><div class="sv-verdict sv-'+lab.c+'" style="margin:8px 0 6px">'+lab.t+'</div><p class="app-muted" style="margin:0 0 12px">'+escHtml(visibilityVerdict(i))+'</p>'+kfHtml+'<div class="pil-grid">'+pillarCardHtml('SEO','Être trouvé sur Google',diag.seo)+pillarCardHtml('GEO','Être cité par les IA (ChatGPT, Gemini…)',diag.geo)+'</div><p class="scan-note">GEO = optimisation pour les moteurs génératifs (IA). Diagnostic calculé sur des données réelles. Rapport complet et argumenté dans le PDF.</p></section>';
     }
     function rSvgRing(v,size,stroke){
       const r=(size-stroke)/2, cx=size/2, circ=2*Math.PI*r, val=v==null?0:Math.max(0,Math.min(100,v));
