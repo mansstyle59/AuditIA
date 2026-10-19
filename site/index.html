@@ -1973,7 +1973,9 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
         if(error) throw new Error(error.message);
         if(fullAuditState){ fullAuditState.pct=100; fullAuditState.target=100; } tickProgress(); await wait(350);
         await refreshData();
-        appNotice=issues.length?('Analyse terminée (limites : '+issues.join(', ')+'). Rapport complet disponible.'):'Analyse complète terminée — rapport prêt à exporter.';
+        appNotice='Analyse terminée. Préparation du rapport complet…';renderApp();
+        try{ await prepareReportForAudit(auditId,'full'); }catch(pdfErr){ issues.push('préparation PDF à la demande : '+((pdfErr&&pdfErr.message)||'indisponible').slice(0,50)); }
+        appNotice=issues.length?('Analyse terminée (limites : '+issues.join(', ')+'). Rapport disponible à exporter.'):'Analyse complète terminée — rapport prêt à ouvrir ou enregistrer.';
       }catch(e){ appNotice='Erreur pendant l’analyse : '+((e&&e.message)||'inconnue').slice(0,140); }
       finally{ stopFullTicker(); fullAuditState=null; recomputeKeyAlerts(); renderApp(); }
     }
@@ -2139,7 +2141,7 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
         +'<div class="r-sign"><div class="r-sign-line" style="background:'+escHtml(col)+'"></div><b>'+escHtml(st.signature_name||st.company_name)+'</b><span>'+escHtml(st.signature_role||'')+'</span>'+[st.contact_email,st.phone,st.website].filter(Boolean).map(x=>'<span>'+escHtml(x)+'</span>').join('')+'</div>'
         +'<div class="r-foot">Aperçu généré par '+escHtml(st.app_name||'AuditIA')+' · '+escHtml(st.company_name||'AffiAds')+' · Analyse automatique Google &amp; web.</div>';
     }
-    let pdfLibsLoaded=false, pdfBusy=false, pdfCancelled=false;
+    let pdfLibsLoaded=false, pdfBusy=false, pdfCancelled=false; const preparedReportBlobs=new Map();
     function loadScript(src){ return new Promise((res,rej)=>{ const s=document.createElement('script'); s.src=src; s.onload=()=>res(); s.onerror=()=>rej(new Error('chargement '+src)); document.head.appendChild(s); }); }
     async function ensurePdfLibs(){
       if(pdfLibsLoaded) return;
@@ -2180,52 +2182,38 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       }
       return pdf;
     }
+    async function prepareReportForAudit(auditId, mode='full'){
+      const a=appAudits.find(x=>String(x.id)===String(auditId)); if(!a)return null;
+      const c=appClients.find(x=>String(x.id)===String(a.client_id));
+      const key=String(auditId)+':'+mode;
+      if(preparedReportBlobs.has(key))return preparedReportBlobs.get(key);
+      let host=document.getElementById('printReport');
+      if(!host){host=document.createElement('div');host.id='printReport';document.body.appendChild(host);}
+      host.innerHTML='<div class="r-page'+(mode==='simple'?' r-page-simple':'')+'" id="rPageCapture">'+(mode==='simple'?reportSimpleHtml(a,c):reportHtml(a,c))+'</div>';
+      try{
+        await ensurePdfLibs();
+        const el=document.getElementById('rPageCapture'); if(!el)throw new Error('Contenu du rapport introuvable.');
+        const pdf=await buildReportPdf(el,mode);
+        const blob=pdf.output('blob'); if(!blob||blob.size<100)throw new Error('PDF vide.');
+        preparedReportBlobs.set(key,{blob,fname:(((mode==='simple'?'Rapport-express-':'Rapport-complet-')+((c&&c.name)||'commerce')).normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').replace(/[^a-z0-9]+/gi,'-').replace(/^-|-$/g,''))+'.pdf'});
+        return preparedReportBlobs.get(key);
+      }finally{host.innerHTML='';}
+    }
     async function exportReport(auditId, mode){
       if(pdfBusy)return;
       const a=appAudits.find(x=>String(x.id)===String(auditId));
       if(!a){appNotice='Audit introuvable. Actualise la page puis réessaie.';renderApp();return;}
-      const c=appClients.find(x=>String(x.id)===String(a.client_id));
       mode=mode==='simple'?'simple':'full';
-      let host=document.getElementById('printReport');
-      if(!host){host=document.createElement('div');host.id='printReport';document.body.appendChild(host);}
-      const html=mode==='simple'?reportSimpleHtml(a,c):reportHtml(a,c);
-      host.innerHTML='<div class="r-page'+(mode==='simple'?' r-page-simple':'')+'" id="rPageCapture">'+html+'</div>';
-      pdfBusy=true;pdfCancelled=false;appNotice='';renderApp();
-      // Filet de sécurité : pas d'écran de chargement infini en cas de réseau lent.
-      let watchdog;
-      const timedOut=new Promise((_,reject)=>{watchdog=setTimeout(()=>reject(new Error('Délai de génération dépassé.')),30000);});
+      const key=String(auditId)+':'+mode;
+      const cached=preparedReportBlobs.get(key);
+      if(cached){showPdfResult(cached.blob,cached.fname);return;}
+      pdfBusy=true;pdfCancelled=false;appNotice='Préparation du rapport à la demande…';renderApp();
       try{
-        const job=(async()=>{
-          await ensurePdfLibs();
-          if(pdfCancelled)return null;
-          const el=document.getElementById('rPageCapture');
-          if(!el)throw new Error('Contenu du rapport introuvable.');
-          if(document.fonts&&document.fonts.ready){
-            await Promise.race([document.fonts.ready,new Promise(resolve=>setTimeout(resolve,900))]);
-          }
-          await Promise.all([...el.querySelectorAll('img')].map(img=>img.complete?Promise.resolve():new Promise(resolve=>{
-            const done=()=>resolve();img.addEventListener('load',done,{once:true});img.addEventListener('error',done,{once:true});setTimeout(done,1400);
-          })));
-          if(pdfCancelled)return null;
-          return buildReportPdf(el,mode);
-        })();
-        const pdf=await Promise.race([job,timedOut]);
-        if(pdfCancelled||!pdf)return;
-        const base=((mode==='simple'?'Rapport-express-':'Rapport-complet-')+((c&&c.name)||'commerce')).normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/gi,'-').replace(/^-|-$/g,'');
-        const blob=pdf.output('blob');
-        if(blob.size<100)throw new Error('Le PDF généré est vide.');
-        showPdfResult(blob,base+'.pdf');
+        const result=await prepareReportForAudit(auditId,mode);
+        if(result)showPdfResult(result.blob,result.fname);
       }catch(e){
-        if(!pdfCancelled){
-          const msg=(e&&e.message)||'erreur inconnue';
-          appNotice='Échec de génération du PDF : '+msg.slice(0,110)+' Réessaie dans Safari si nécessaire.';
-        }
-      }finally{
-        clearTimeout(watchdog);
-        pdfBusy=false;
-        host.innerHTML='';
-        renderApp();
-      }
+        appNotice='Le PDF n’a pas pu être préparé : '+((e&&e.message)||'erreur inconnue').slice(0,100);
+      }finally{pdfBusy=false;const host=document.getElementById('printReport');if(host)host.innerHTML='';renderApp();}
     }
     function showPdfResult(blob,fname){
       let url; try{ url=URL.createObjectURL(blob); }catch(_){ appNotice='PDF prêt mais impossible à ouvrir ici.'; renderApp(); return; }
