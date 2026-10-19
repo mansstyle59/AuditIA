@@ -1111,6 +1111,18 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
     .vis-kf-item{display:flex;flex-direction:column;gap:1px;background:#ffffff0d;border:1px solid #ffffff16;border-radius:11px;padding:7px 12px;min-width:0}
     .vis-kf-item b{font-size:14px;color:#fff;font-variant-numeric:tabular-nums;line-height:1.15}
     .vis-kf-item small{font-size:10px;color:#aaa3be;letter-spacing:.3px}
+
+    /* Écran « rapport prêt » — ouverture/enregistrement du PDF (fiable sur iPhone) */
+    .pdf-result{position:fixed;inset:0;z-index:320;display:flex;align-items:center;justify-content:center;padding:24px;background:#16131fee;-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px)}
+    .pdf-result-card{width:min(360px,100%);background:#2a2740;border:1px solid #ffffff18;border-radius:20px;padding:24px 20px;text-align:center;box-shadow:0 20px 60px #05030c66;display:flex;flex-direction:column;gap:10px}
+    .pdf-result-ic{font-size:40px;line-height:1}
+    .pdf-result-card>b{font-size:18px;color:#fff}
+    .pdf-result-name{font-size:12px;color:#aaa3be;margin:0;word-break:break-all}
+    .pdf-result-btn{display:block;width:100%;padding:14px;border-radius:13px;font-size:15px;font-weight:750;text-decoration:none;text-align:center;border:1px solid #ffffff1f;background:#332e4d;color:#f3f2f8;cursor:pointer;transition:transform .14s ease}
+    .pdf-result-btn:active{transform:scale(.97)}
+    .pdf-result-btn.primary{background:linear-gradient(135deg,#8a70ff,#6a4ae6);border:0;color:#fff}
+    .pdf-result-btn.ghost{background:transparent;border:0;color:#aaa3be;font-weight:600;padding:8px}
+    .pdf-result-tip{font-size:11px;color:#948dad;line-height:1.5;margin-top:2px}
   </style>
 </head>
 <body>
@@ -2110,17 +2122,13 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       if(!a){appNotice='Audit introuvable. Actualise la page puis réessaie.';renderApp();return;}
       const c=appClients.find(x=>x.id===a.client_id);
       mode=(mode==='simple')?'simple':'full';
-
-      // iOS/Safari bloque souvent window.open() après un await. Réserver l’onglet
-      // directement pendant le clic pour disposer d’un vrai secours si le PDF échoue.
-      let fallbackWindow=null;
-      try{fallbackWindow=window.open('about:blank','_blank');}catch(_){}
-      if(fallbackWindow){try{fallbackWindow.document.write('<!doctype html><html lang="fr"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Préparation du rapport AuditIA</title><body style="font:16px system-ui;padding:24px;color:#28243a">Préparation de votre rapport AuditIA…</body></html>');fallbackWindow.document.close();}catch(_){}}
-
+      // IMPORTANT iOS PWA : ne PAS ouvrir d'onglet ici — cela mettrait la PWA en
+      // arrière-plan et figerait la génération (« Préparation… » bloqué). On génère
+      // tout dans l'app, puis on propose un bouton à toucher (geste utilisateur fiable).
       let host=document.getElementById('printReport');
       if(!host){host=document.createElement('div');host.id='printReport';document.body.appendChild(host);}
       host.innerHTML='<div class="r-page'+(mode==='simple'?' r-page-simple':'')+'" id="rPageCapture">'+(mode==='simple'?reportSimpleHtml(a,c):reportHtml(a,c))+'</div>';
-      pdfBusy=true;appNotice=(mode==='simple'?'Préparation du rapport express…':'Préparation du rapport complet…');renderApp();
+      pdfBusy=true;appNotice='';renderApp();
       try{
         await ensurePdfLibs();
         const el=document.getElementById('rPageCapture');
@@ -2145,19 +2153,31 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
           while(heightLeft>0){pos-=ph;pdf.addPage();pdf.addImage(img,'JPEG',0,pos,imgW,imgH);heightLeft-=ph;}
         }
         const base=((mode==='simple'?'Rapport-express-':'Rapport-complet-')+((c&&c.name)||'commerce')).normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/gi,'-').replace(/^-|-$/g,'');
-        pdf.save(base+'.pdf');
-        if(fallbackWindow&&!fallbackWindow.closed){try{fallbackWindow.close();}catch(_){}}
-        appNotice=(mode==='simple'?'Rapport express prêt : ':'Rapport complet prêt : ')+base+'.pdf. Sur iPhone, utilise le bouton de partage du document pour l’enregistrer dans Fichiers si le téléchargement ne démarre pas.';
+        const fname=base+'.pdf';
+        const blob=pdf.output('blob');
+        pdfBusy=false;host.innerHTML='';appNotice='';renderApp();
+        showPdfResult(blob,fname);
       }catch(e){
-        const css=[...document.querySelectorAll('style')].map(s=>s.textContent).join('\n');
-        const reportDoc='<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Rapport AuditIA</title><style>'+css+'\nbody{background:#fff!important;color:#222!important;margin:0;padding:12px}#printReport{position:static!important;left:auto!important;top:auto!important;width:100%!important;z-index:auto!important}.r-page{box-shadow:none!important;margin:0 auto!important;max-width:720px;width:100%!important}.report-toolbar{position:sticky;top:0;background:#30264f;color:#fff;padding:12px;display:flex;gap:8px;flex-wrap:wrap}.report-toolbar button{padding:10px 14px;border:0;border-radius:10px;font-weight:700}</style></head><body><div class="report-toolbar"><button onclick="window.print()">Imprimer / Enregistrer en PDF</button><button onclick="history.back()">Retour</button></div>'+host.innerHTML+'</body></html>';
-        if(fallbackWindow&&!fallbackWindow.closed&&fallbackWindow.document){
-          fallbackWindow.document.open();fallbackWindow.document.write(reportDoc);fallbackWindow.document.close();
-          appNotice='Le PDF automatique a échoué ; le rapport est ouvert dans un onglet. Touche « Imprimer / Enregistrer en PDF », ou Partager dans Safari.';
-        }else{
-          appNotice='Le PDF automatique a échoué ('+((e&&e.message)||'erreur inconnue').slice(0,100)+'). Ouvre AuditIA dans Safari plutôt que depuis l’icône de l’écran d’accueil, puis réessaie : iOS peut bloquer les fenêtres dans le mode application.';
-        }
-      }finally{pdfBusy=false;host.innerHTML='';renderApp();}
+        pdfBusy=false;host.innerHTML='';
+        appNotice='Le PDF n’a pas pu être généré ('+((e&&e.message)||'erreur inconnue').slice(0,90)+'). Réessaie dans un instant.';
+        renderApp();
+      }
+    }
+    function showPdfResult(blob,fname){
+      let url; try{ url=URL.createObjectURL(blob); }catch(_){ appNotice='PDF prêt mais impossible à ouvrir ici.'; renderApp(); return; }
+      const ov=document.createElement('div'); ov.className='pdf-result';
+      let canShareFiles=false; try{ canShareFiles=!!(navigator.canShare&&navigator.canShare({files:[new File([blob],fname,{type:'application/pdf'})]})); }catch(_){ canShareFiles=false; }
+      ov.innerHTML='<div class="pdf-result-card"><div class="pdf-result-ic">📄</div><b>Votre rapport est prêt</b><p class="pdf-result-name">'+escHtml(fname)+'</p>'
+        +(canShareFiles?'<button class="pdf-result-btn primary" data-share>Enregistrer / Partager le PDF</button>':'')
+        +'<a class="pdf-result-btn'+(canShareFiles?'':' primary')+'" href="'+url+'" target="_blank" rel="noopener" download="'+escHtml(fname)+'">Ouvrir le PDF</a>'
+        +'<button class="pdf-result-btn ghost" data-close>Fermer</button>'
+        +'<span class="pdf-result-tip">Sur iPhone : touche « Enregistrer / Partager » puis « Enregistrer dans Fichiers ». Sinon « Ouvrir le PDF », puis le bouton Partager de Safari.</span></div>';
+      document.body.appendChild(ov);
+      const cleanup=()=>{ try{ov.remove();}catch(_){}; setTimeout(()=>{try{URL.revokeObjectURL(url);}catch(_){}},60000); };
+      ov.addEventListener('click',e=>{ if(e.target===ov) cleanup(); });
+      const closeBtn=ov.querySelector('[data-close]'); if(closeBtn) closeBtn.addEventListener('click',cleanup);
+      const shareBtn=ov.querySelector('[data-share]');
+      if(shareBtn) shareBtn.addEventListener('click',async()=>{ try{ const file=new File([blob],fname,{type:'application/pdf'}); await navigator.share({files:[file],title:fname}); }catch(err){ if(err&&err.name!=='AbortError'){ try{ window.open(url,'_blank'); }catch(_){} } } });
     }
     function renderApp(){
       const completed=appAudits.filter(a=>a.status==='Terminé'||a.status==='Analysé').length;
