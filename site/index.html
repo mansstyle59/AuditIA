@@ -948,28 +948,24 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       .mobile-tabbar button{font-size:9px!important}
     }
 
-    /* iPhone polish: safe-area-aware top header, clear title, native spacing */
+    /* iPhone header: modest spacing, prevent narrow title column */
     @supports (padding-top: env(safe-area-inset-top)){
       body:has(.workspace-app){padding-top:0!important}
-      .workspace-app{padding-top:calc(env(safe-area-inset-top) + 18px)!important}
+      .workspace-app{padding-top:calc(env(safe-area-inset-top) + 8px)!important}
     }
-    .workspace-head{isolation:isolate;min-height:76px;overflow:visible;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
-    .workspace-head>div{min-width:0}
-    .workspace-head h1,.workspace-head p,.workspace-head .eyebrow{filter:none!important;opacity:1!important;text-shadow:none!important;transform:none!important}
-    .workspace-head h1{display:block!important;visibility:visible!important;color:#f8f6ff!important}
-    .workspace-head .eyebrow{color:#b9a7ff!important}
     @media(max-width:760px){
-      .workspace-app{padding-top:calc(env(safe-area-inset-top, 0px) + 18px)!important;padding-left:18px!important;padding-right:18px!important}
-      .workspace-head{grid-template-columns:42px minmax(0,1fr)!important;align-items:center!important;gap:12px!important;padding:7px 0 17px!important;margin-bottom:20px!important;min-height:88px}
-      .workspace-head>div:nth-child(2){min-width:0;align-self:center}
-      .workspace-head .eyebrow{font-size:9px!important;line-height:1.4!important;letter-spacing:1.25px!important;white-space:normal!important}
-      .workspace-head h1{font-size:26px!important;line-height:1.16!important;margin:3px 0 5px!important;letter-spacing:-.75px!important;overflow-wrap:anywhere}
-      .workspace-head p{font-size:11px!important;line-height:1.45!important;white-space:normal!important;overflow-wrap:anywhere;max-width:100%;margin:0!important}
-      .workspace-actions{margin-top:2px!important;gap:9px!important}
-      .workspace-actions .app-btn{min-height:42px!important;font-size:12px!important}
+      .workspace-app{padding-top:calc(env(safe-area-inset-top, 0px) + 8px)!important;padding-left:16px!important;padding-right:16px!important}
+      .workspace-head{display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:space-between!important;flex-wrap:wrap!important;gap:12px!important;padding:6px 0 14px!important;margin:0 0 18px!important;min-height:0!important}
+      .workspace-head>div:first-child{flex:1 1 190px!important;min-width:0!important}
+      .workspace-head .eyebrow{font-size:9px!important;line-height:1.35!important;letter-spacing:1.15px!important;white-space:normal!important}
+      .workspace-head h1{font-size:26px!important;line-height:1.12!important;letter-spacing:-.65px!important;margin:3px 0 4px!important;overflow-wrap:normal!important;word-break:normal!important}
+      .workspace-head p{font-size:11px!important;line-height:1.4!important;white-space:normal!important;overflow-wrap:anywhere!important;max-width:100%!important;margin:0!important}
+      .workspace-actions{flex:1 1 100%!important;display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important;width:100%!important;margin-top:1px!important}
+      .workspace-actions .app-btn{min-height:40px!important;font-size:12px!important;padding:9px 10px!important}
     }
     @media(max-width:390px){
       .workspace-app{padding-left:14px!important;padding-right:14px!important}
+      .workspace-head>div:first-child{flex-basis:160px!important}
       .workspace-head h1{font-size:24px!important}
     }
   </style>
