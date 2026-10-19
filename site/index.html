@@ -1056,8 +1056,56 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       page.querySelectorAll('[data-open-audit]').forEach(b=>b.addEventListener('click',()=>{activeAudit=b.dataset.openAudit;appView='Détail';renderApp()}));
       page.querySelectorAll('[data-audit-check]').forEach(el=>el.addEventListener('change',()=>{const audit=appAudits.find(a=>a.id===activeAudit);if(!audit)return;const list=(audit.checklist||[]).map((x,i)=>i===Number(el.dataset.auditCheck)?{...x,done:el.checked}:x);audit.checklist=list;const done=list.filter(x=>x.done).length;if(!audit.scan){audit.score=list.length?Math.round(done/list.length*100):0;audit.status=done===list.length?'Terminé':'En cours';}renderApp();const payload=audit.scan?{checklist:list,updated_at:new Date().toISOString()}:{checklist:list,score:audit.score,status:audit.status,updated_at:new Date().toISOString()};appClient.from('audits').update(payload).eq('id',audit.id).then(({error})=>{if(error){appNotice='Erreur d’enregistrement : '+error.message;renderApp();}});}));
       page.querySelectorAll('[data-save-notes]').forEach(form=>form.addEventListener('submit',e=>{e.preventDefault();const fd=new FormData(form);const notes=String(fd.get('notes')||'');const audit=appAudits.find(a=>a.id===activeAudit);if(audit)audit.notes=notes;appNotice='Notes enregistrées.';renderApp();appClient.from('audits').update({notes,updated_at:new Date().toISOString()}).eq('id',activeAudit).then(({error})=>{if(error){appNotice='Erreur : '+error.message;renderApp();}});}));
-      page.querySelectorAll('[data-delete-client]').forEach(b=>b.addEventListener('click',async()=>{if(!confirm('Supprimer ce client et ses audits associés ?'))return;const id=b.dataset.deleteClient;const au=await appClient.from('audits').delete().eq('client_id',id);const {error}=await appClient.from('clients').delete().eq('id',id);appNotice=error?'Erreur : '+error.message:(au.error?'Client supprimé. Audits liés : '+au.error.message:'Client et audits associés supprimés.');if(activeClient===id){activeClient=null;appView='Clients';}await refreshData();renderApp()}));
-      page.querySelectorAll('[data-delete-audit]').forEach(b=>b.addEventListener('click',async()=>{if(!confirm('Supprimer cet audit ?'))return;const {error}=await appClient.from('audits').delete().eq('id',b.dataset.deleteAudit);appNotice=error?'Erreur : '+error.message:'Audit supprimé.';await refreshData();renderApp()}));
+      page.querySelectorAll('[data-delete-client]').forEach(b=>b.addEventListener('click',async()=>{
+        const id=b.dataset.deleteClient;
+        const client=appClients.find(x=>String(x.id)===String(id));
+        if(!client){appNotice='Client introuvable. Actualise la liste et réessaie.';renderApp();return;}
+        const linked=appAudits.filter(a=>String(a.client_id)===String(id));
+        const auditLabel=linked.length===1?'1 audit associé':linked.length+' audits associés';
+        const warning='Supprimer définitivement le client « '+(client.name||'Commerce')+' » ?\\n\\n'+(linked.length?'Cela supprimera aussi '+auditLabel+' et leurs rapports/données enregistrées.':'Ce client ne possède aucun audit enregistré.')+'\\n\\nCette action est irréversible.';
+        if(!confirm(warning))return;
+        if(b.disabled)return;
+        b.disabled=true;const original=b.textContent;b.textContent='Suppression…';
+        try{
+          // Supprimer d’abord les audits. Si cette étape échoue, on conserve le client.
+          if(linked.length){
+            const {error:auditError}=await appClient.from('audits').delete().eq('client_id',id);
+            if(auditError)throw new Error('Les audits associés n’ont pas pu être supprimés. Le client a été conservé. '+auditError.message);
+          }
+          const {error:clientError}=await appClient.from('clients').delete().eq('id',id);
+          if(clientError)throw new Error('Les audits associés ont été supprimés, mais le client n’a pas pu être supprimé. Réessaie après vérification. '+clientError.message);
+          if(String(activeClient)===String(id))activeClient=null;
+          if(activeAudit&&linked.some(a=>String(a.id)===String(activeAudit)))activeAudit=null;
+          appView='Clients';
+          appNotice='Client « '+(client.name||'Commerce')+' » supprimé'+(linked.length?' avec '+auditLabel:'')+'.';
+          await refreshData();
+        }catch(err){
+          appNotice='Suppression incomplète : '+(err&&err.message?err.message:'erreur inconnue');
+          await refreshData();
+        }finally{
+          renderApp();
+        }
+      }));
+      page.querySelectorAll('[data-delete-audit]').forEach(b=>b.addEventListener('click',async()=>{
+        const id=b.dataset.deleteAudit;
+        const audit=appAudits.find(x=>String(x.id)===String(id));
+        if(!audit){appNotice='Audit introuvable. Actualise la liste et réessaie.';renderApp();return;}
+        const client=appClients.find(x=>String(x.id)===String(audit.client_id));
+        if(!confirm('Supprimer définitivement l’audit « '+(audit.title||'Audit de visibilité')+' »'+(client?' pour '+client.name:'')+' ?\\n\\nLes données et le rapport de cet audit seront supprimés. Le client et ses autres audits seront conservés.\\n\\nCette action est irréversible.'))return;
+        if(b.disabled)return;
+        b.disabled=true;b.textContent='Suppression…';
+        try{
+          const {error}=await appClient.from('audits').delete().eq('id',id);
+          if(error)throw new Error(error.message);
+          if(String(activeAudit)===String(id))activeAudit=null;
+          appView='Audits';
+          appNotice='Audit « '+(audit.title||'Audit de visibilité')+' » supprimé. Le client et ses autres audits sont conservés.';
+          await refreshData();
+        }catch(err){
+          appNotice='Audit non supprimé : '+(err&&err.message?err.message:'erreur inconnue');
+          await refreshData();
+        }finally{renderApp();}
+      }));
       page.querySelectorAll('[data-run-scan]').forEach(b=>b.addEventListener('click',()=>runScan(b.dataset.runScan)));
       page.querySelectorAll('[data-run-site]').forEach(b=>b.addEventListener('click',()=>runSiteScan(b.dataset.runSite)));
       page.querySelectorAll('[data-run-full]').forEach(b=>b.addEventListener('click',()=>runFullAudit(b.dataset.runFull)));
