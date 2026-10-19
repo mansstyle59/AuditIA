@@ -1708,7 +1708,7 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
         if(!html||html.length<200) return [];
         let results=[];
         try{ const doc=new DOMParser().parseFromString(html,'text/html'); results=[...doc.querySelectorAll('a.result__a')].map(a=>({title:(a.textContent||'').trim(),url:dec(a.getAttribute('href')||'')})).filter(r=>/^https?:/i.test(r.url)); }catch(e){}
-        if(!results.length){ const re=/uddg=([^&"'\\s)]+)/g; let m; const seen=new Set(); while((m=re.exec(html))){ let v; try{v=decodeURIComponent(m[1]);}catch(e){continue;} if(/^https?:/i.test(v)&&!seen.has(v)){seen.add(v);results.push({title:'',url:v});} } }
+        if(!results.length){ const re=/uddg=([^&"'s)]+)/g; let m; const seen=new Set(); while((m=re.exec(html))){ let v; try{v=decodeURIComponent(m[1]);}catch(e){continue;} if(/^https?:/i.test(v)&&!seen.has(v)){seen.add(v);results.push({title:'',url:v});} } }
         return results.slice(0,25);
       };
       // Try providers concurrently so one slow proxy cannot multiply the wait
