@@ -1,7 +1,7 @@
 /* AuditIA — service worker : chargement instantané + coquille hors-ligne.
    Stratégie « réseau d'abord » : quand on est en ligne, la dernière version
    est toujours récupérée et mise en cache ; hors ligne, on sert le cache. */
-const CACHE = 'auditia-v13';
+const CACHE = 'auditia-v14';
 const ASSETS = [
   './', './index.html', './manifest.webmanifest',
   './auditia-icon.svg', './favicon-32.png',
