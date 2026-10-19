@@ -1283,6 +1283,100 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
   .desktop-nav button,.mobile-tabbar button{transition:none!important}
 }
 
+
+/* AuditIA — finition visuelle globale : hiérarchie, surfaces et lisibilité */
+:root{
+  --ai-violet:#9a80ff;
+  --ai-violet-soft:#9a80ff24;
+  --ai-surface:#211d31;
+  --ai-surface-raised:#2a2540;
+  --ai-line:#ffffff13;
+}
+.workspace-app{color:#f7f5ff}
+.workspace-head{border-bottom:1px solid var(--ai-line)!important}
+.workspace-head .eyebrow,.eyebrow{letter-spacing:1.6px;font-weight:800}
+.workspace-head h1{letter-spacing:-1.35px!important}
+.app-content-title{display:flex;flex-direction:column;gap:5px}
+.app-content-title h2{line-height:1.15}
+.app-panel,.app-stat,.settings-preview,.integration-group,.social-platforms{
+  box-shadow:0 8px 28px #09071114;
+  transition:border-color .18s ease,background-color .18s ease;
+}
+.app-panel{border-color:#ffffff12!important}
+.app-stat{position:relative;overflow:hidden}
+.app-stat:before{
+  content:"";position:absolute;left:0;right:0;top:0;height:2px;
+  background:linear-gradient(90deg,#9879ff70,transparent 78%);
+}
+.app-stat strong{font-variant-numeric:tabular-nums;letter-spacing:-1px}
+.app-btn{transition:transform .16s ease,filter .16s ease,border-color .16s ease}
+.app-btn:hover{filter:brightness(1.08)}
+.app-btn:active{transform:scale(.985)}
+.app-btn.primary{background:linear-gradient(135deg,#987aff,#6b4de0)!important;box-shadow:0 7px 18px #7656df2b!important}
+.app-form label{line-height:1.4}
+.app-form input,.app-form select,.app-form textarea{color:#f7f5ff}
+.app-form input::placeholder,.app-form textarea::placeholder{color:#88819f}
+.app-form input:focus,.app-form select:focus,.app-form textarea:focus{
+  outline:2px solid #a28aff50!important;border-color:#9a80ff!important;
+  box-shadow:0 0 0 4px #9a80ff12;
+}
+.app-notice{border:1px solid #ffffff12}
+.app-empty{background:#ffffff03;line-height:1.65}
+.home-hero{gap:24px}
+.home-hero-copy>p{max-width:48ch;line-height:1.75}
+.home-hero h2{letter-spacing:-1.25px}
+.home-kicker{letter-spacing:1.25px}
+.home-visual{box-shadow:inset 0 1px 0 #ffffff09,0 14px 30px #09071120!important}
+.home-score-ring{filter:drop-shadow(0 4px 12px #9277ff18)}
+.home-section-heading{margin-top:28px;margin-bottom:14px}
+.home-section-heading h2{letter-spacing:-.6px}
+.home-text-link{display:inline-flex;align-items:center;gap:6px;color:#c8baff!important;font-weight:750}
+.home-text-link:active{opacity:.75}
+.home-recent-panel{overflow:hidden}
+.home-audit-row{border-bottom:1px solid #ffffff0e!important}
+.home-audit-row:last-child{border-bottom:0!important}
+.home-audit-mark{border:1px solid #9b80ff22}
+.home-open-btn{border-color:#9b80ff35!important;background:#9b80ff12!important;color:#e4dbff!important}
+.key-alert{border-radius:15px!important;border:1px solid #ffbd7a35!important}
+.app-topbar{border-bottom:1px solid #ffffff12!important}
+.app-topbar .tb-brand b{letter-spacing:-.5px}
+.app-topbar .tb-actions button{transition:transform .16s ease,background .16s ease}
+.app-topbar .tb-actions button:active{transform:scale(.94)}
+.sidebar-nav button,.desktop-nav button,.mobile-tabbar button{outline-offset:3px}
+.sidebar-nav button.active{box-shadow:inset 3px 0 0 #a68aff}
+.nav-count{font-variant-numeric:tabular-nums}
+.workspace-footnote{margin-top:28px}
+@media(max-width:760px){
+  .workspace-app{padding-left:14px!important;padding-right:14px!important}
+  .workspace-head{padding-bottom:15px!important;margin-bottom:17px!important}
+  .workspace-head h1{font-size:27px!important}
+  .workspace-head p{max-width:calc(100vw - 90px);overflow-wrap:anywhere}
+  .home-hero{padding-top:5px!important;gap:17px!important}
+  .home-hero h2{font-size:31px!important;line-height:1.1!important}
+  .home-hero-copy>p{font-size:13px;line-height:1.65}
+  .home-hero-actions{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .home-hero-actions .app-btn{min-height:43px!important;white-space:normal;line-height:1.3}
+  .home-visual{padding:15px!important}
+  .home-section-heading{margin-top:25px!important}
+  .app-stat,.app-panel{border-radius:15px!important}
+  .app-stats,.home-stats{gap:8px!important}
+  .home-stats .home-stat{min-height:116px!important}
+  .app-stat strong{font-size:25px!important}
+  .app-panel{padding:15px!important}
+  .app-form{gap:12px!important}
+  .workspace-footnote{margin-bottom:4px}
+}
+@media(max-width:380px){
+  .workspace-app{padding-left:11px!important;padding-right:11px!important}
+  .home-hero h2{font-size:28px!important}
+  .home-hero-actions{grid-template-columns:minmax(0,1fr)}
+  .home-stats .home-stat{padding:9px 7px!important}
+  .home-stats .home-stat>span{font-size:9px!important}
+}
+@media(prefers-reduced-motion:reduce){
+  .app-btn,.app-panel,.app-stat,.app-topbar .tb-actions button{transition:none!important}
+}
+
 </style>
 </head>
 <body>
