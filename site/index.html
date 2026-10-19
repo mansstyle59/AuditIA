@@ -1749,38 +1749,59 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       pdfLibsLoaded=true;
     }
     async function exportReport(auditId, mode){
-      if(pdfBusy) return; const a=appAudits.find(x=>x.id===auditId); if(!a) return;
+      if(pdfBusy) return;
+      const a=appAudits.find(x=>x.id===auditId);
+      if(!a){appNotice='Audit introuvable. Actualise la page puis réessaie.';renderApp();return;}
       const c=appClients.find(x=>x.id===a.client_id);
       mode=(mode==='simple')?'simple':'full';
+
+      // iOS/Safari bloque souvent window.open() après un await. Réserver l’onglet
+      // directement pendant le clic pour disposer d’un vrai secours si le PDF échoue.
+      let fallbackWindow=null;
+      try{fallbackWindow=window.open('about:blank','_blank');}catch(_){}
+      if(fallbackWindow){try{fallbackWindow.document.write('<!doctype html><html lang="fr"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Préparation du rapport AuditIA</title><body style="font:16px system-ui;padding:24px;color:#28243a">Préparation de votre rapport AuditIA…</body></html>');fallbackWindow.document.close();}catch(_){}}
+
       let host=document.getElementById('printReport');
-      if(!host){ host=document.createElement('div'); host.id='printReport'; document.body.appendChild(host); }
+      if(!host){host=document.createElement('div');host.id='printReport';document.body.appendChild(host);}
       host.innerHTML='<div class="r-page'+(mode==='simple'?' r-page-simple':'')+'" id="rPageCapture">'+(mode==='simple'?reportSimpleHtml(a,c):reportHtml(a,c))+'</div>';
-      pdfBusy=true; appNotice=(mode==='simple'?'Préparation du rapport express…':'Préparation du rapport complet…'); renderApp();
+      pdfBusy=true;appNotice=(mode==='simple'?'Préparation du rapport express…':'Préparation du rapport complet…');renderApp();
       try{
         await ensurePdfLibs();
         const el=document.getElementById('rPageCapture');
-        const canvas=await window.html2canvas(el,{scale:2,backgroundColor:'#ffffff',useCORS:true,logging:false,windowWidth:el.scrollWidth});
+        if(!el) throw new Error('Le contenu du rapport est introuvable.');
+        if(document.fonts&&document.fonts.ready){try{await document.fonts.ready;}catch(_){}}
+        const imgs=[...el.querySelectorAll('img')];
+        await Promise.all(imgs.map(img=>img.complete?Promise.resolve():new Promise(resolve=>{img.onload=resolve;img.onerror=resolve;setTimeout(resolve,2500);})));
+        const canvas=await window.html2canvas(el,{scale:2,backgroundColor:'#ffffff',useCORS:true,logging:false,windowWidth:el.scrollWidth,scrollX:0,scrollY:0});
+        if(!canvas.width||!canvas.height) throw new Error('Le rapport n’a pas pu être rendu en image.');
         const jsPDFctor=(window.jspdf&&window.jspdf.jsPDF)||window.jsPDF;
         const pdf=new jsPDFctor('p','mm','a4');
-        const pw=pdf.internal.pageSize.getWidth(), ph=pdf.internal.pageSize.getHeight();
+        const pw=pdf.internal.pageSize.getWidth(),ph=pdf.internal.pageSize.getHeight();
         const img=canvas.toDataURL('image/jpeg',0.92);
         if(mode==='simple'){
-          let imgW=pw, imgH=canvas.height*pw/canvas.width;
-          if(imgH>ph){ imgH=ph; imgW=canvas.width*ph/canvas.height; }
+          let imgW=pw,imgH=canvas.height*pw/canvas.width;
+          if(imgH>ph){imgH=ph;imgW=canvas.width*ph/canvas.height;}
           pdf.addImage(img,'JPEG',(pw-imgW)/2,0,imgW,imgH);
-        } else {
-          const imgW=pw, imgH=canvas.height*pw/canvas.width;
-          let heightLeft=imgH, pos=0;
-          pdf.addImage(img,'JPEG',0,0,imgW,imgH); heightLeft-=ph;
-          while(heightLeft>0){ pos-=ph; pdf.addPage(); pdf.addImage(img,'JPEG',0,pos,imgW,imgH); heightLeft-=ph; }
+        }else{
+          const imgW=pw,imgH=canvas.height*pw/canvas.width;
+          let heightLeft=imgH,pos=0;
+          pdf.addImage(img,'JPEG',0,0,imgW,imgH);heightLeft-=ph;
+          while(heightLeft>0){pos-=ph;pdf.addPage();pdf.addImage(img,'JPEG',0,pos,imgW,imgH);heightLeft-=ph;}
         }
-        const base=((mode==='simple'?'Rapport-express-':'Rapport-complet-')+((c&&c.name)||'commerce')).normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/gi,'-').replace(/^-|-$/g,'');
+        const base=((mode==='simple'?'Rapport-express-':'Rapport-complet-')+((c&&c.name)||'commerce')).normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/gi,'-').replace(/^-|-$/g,'');
         pdf.save(base+'.pdf');
-        appNotice=(mode==='simple'?'Rapport express (1 page) généré : ':'Rapport complet généré : ')+base+'.pdf (dans Fichiers / Téléchargements).';
+        if(fallbackWindow&&!fallbackWindow.closed){try{fallbackWindow.close();}catch(_){}}
+        appNotice=(mode==='simple'?'Rapport express prêt : ':'Rapport complet prêt : ')+base+'.pdf. Sur iPhone, utilise le bouton de partage du document pour l’enregistrer dans Fichiers si le téléchargement ne démarre pas.';
       }catch(e){
-        try{ const css=[...document.querySelectorAll('style')].map(s=>s.textContent).join('\n'); const w=window.open('about:blank','_blank'); if(w&&w.document){ w.document.write('<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Rapport AuditIA</title><style>'+css+'\n#printReport{position:static!important;left:auto!important}.r-page{box-shadow:none}</style></head><body style="background:#fff">'+host.innerHTML+'</body></html>'); w.document.close(); appNotice='Génération directe indisponible : le rapport s’est ouvert dans un onglet. Fais Partager → Imprimer → « Enregistrer au format PDF ».'; } else { appNotice='Impossible de générer le PDF ici (autorise les fenêtres, et réessaie en ligne).'; } }
-        catch(_){ appNotice='Export impossible : '+((e&&e.message)||'erreur').slice(0,80); }
-      } finally { pdfBusy=false; host.innerHTML=''; renderApp(); }
+        const css=[...document.querySelectorAll('style')].map(s=>s.textContent).join('\n');
+        const reportDoc='<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Rapport AuditIA</title><style>'+css+'\nbody{background:#fff!important;color:#222!important;margin:0;padding:12px}#printReport{position:static!important;left:auto!important;top:auto!important;width:100%!important;z-index:auto!important}.r-page{box-shadow:none!important;margin:0 auto!important;max-width:720px;width:100%!important}.report-toolbar{position:sticky;top:0;background:#30264f;color:#fff;padding:12px;display:flex;gap:8px;flex-wrap:wrap}.report-toolbar button{padding:10px 14px;border:0;border-radius:10px;font-weight:700}</style></head><body><div class="report-toolbar"><button onclick="window.print()">Imprimer / Enregistrer en PDF</button><button onclick="history.back()">Retour</button></div>'+host.innerHTML+'</body></html>';
+        if(fallbackWindow&&!fallbackWindow.closed&&fallbackWindow.document){
+          fallbackWindow.document.open();fallbackWindow.document.write(reportDoc);fallbackWindow.document.close();
+          appNotice='Le PDF automatique a échoué ; le rapport est ouvert dans un onglet. Touche « Imprimer / Enregistrer en PDF », ou Partager dans Safari.';
+        }else{
+          appNotice='Le PDF automatique a échoué ('+((e&&e.message)||'erreur inconnue').slice(0,100)+'). Ouvre AuditIA dans Safari plutôt que depuis l’icône de l’écran d’accueil, puis réessaie : iOS peut bloquer les fenêtres dans le mode application.';
+        }
+      }finally{pdfBusy=false;host.innerHTML='';renderApp();}
     }
     function renderApp(){
       const completed=appAudits.filter(a=>a.status==='Terminé'||a.status==='Analysé').length;
