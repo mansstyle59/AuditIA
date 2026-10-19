@@ -1,12 +1,14 @@
-/* AuditIA — service worker : chargement instantané + coquille hors-ligne.
-   Stratégie « réseau d'abord » : quand on est en ligne, la dernière version
-   est toujours récupérée et mise en cache ; hors ligne, on sert le cache. */
-const CACHE = 'auditia-v23';
+/* AuditIA — service worker : démarrage instantané + coquille hors-ligne.
+   Stratégie « cache d'abord, mise à jour en arrière-plan » (stale-while-revalidate) :
+   l'app s'affiche tout de suite depuis le cache, et la dernière version est
+   récupérée en arrière-plan pour la prochaine ouverture. */
+const CACHE = 'auditia-v24';
 const ASSETS = [
   './', './index.html', './manifest.webmanifest',
   './auditia-icon.svg', './favicon-32.png',
   './apple-touch-icon.png', './icon-192.png', './icon-512.png',
-  './vendor/html2canvas.min.js', './vendor/jspdf.umd.min.js'
+  './vendor/html2canvas.min.js', './vendor/jspdf.umd.min.js',
+  './vendor/supabase.js'
 ];
 
 self.addEventListener('install', e => {
@@ -27,15 +29,20 @@ self.addEventListener('fetch', e => {
   if (req.method !== 'GET') return;
   let url;
   try { url = new URL(req.url); } catch (_) { return; }
-  // Laisser passer tout ce qui n'est pas notre origine (Supabase, Google, Logo.dev, RDAP…)
+  // Laisser passer tout ce qui n'est pas notre origine (Google, Logo.dev, RDAP…)
   if (url.origin !== location.origin) return;
-  e.respondWith(
-    fetch(req)
-      .then(res => {
-        const copy = res.clone();
-        caches.open(CACHE).then(c => c.put(req, copy)).catch(() => {});
-        return res;
-      })
-      .catch(() => caches.match(req).then(r => r || caches.match('./index.html')))
-  );
+  e.respondWith((async () => {
+    const cached = await caches.match(req);
+    // Récupération réseau en arrière-plan : met le cache à jour pour la prochaine fois.
+    const network = fetch(req).then(res => {
+      const copy = res.clone();
+      caches.open(CACHE).then(c => c.put(req, copy)).catch(() => {});
+      return res;
+    }).catch(() => null);
+    // Si on a une copie en cache : on la sert IMMÉDIATEMENT (démarrage instantané).
+    if (cached) return cached;
+    // Sinon on attend le réseau, avec repli sur la coquille.
+    const net = await network;
+    return net || caches.match('./index.html');
+  })());
 });
