@@ -754,7 +754,15 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
     .cp-rank{flex:0 0 24px;width:24px;height:24px;border-radius:50%;background:#34334a;color:#cbbcff;font-weight:800;font-size:12px;display:grid;place-items:center}
     .cp-self .cp-rank{background:#1f4a3c;color:#9ae8c4}
     .cp-name{flex:1;min-width:0;font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    .cp-score{flex:0 0 auto;font-size:12px;color:#d7d4e4}.cp-score small{color:#aaa6bd}
+    .cp-score{flex:0 0 auto;font-size:12px;color:#d7d4e4;text-align:right;display:flex;flex-direction:column;gap:1px}.cp-score small{color:#aaa6bd;font-size:10px}
+    .cp-insight{margin:2px 0 12px;font-size:13px;line-height:1.5;color:#d7d4e4}.cp-insight b{color:#fff}
+    .cp-kpis{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px}
+    .cp-kpi{display:flex;flex-direction:column;gap:1px;background:#ffffff0d;border:1px solid #ffffff16;border-radius:11px;padding:7px 12px}
+    .cp-kpi b{font-size:15px;color:#fff;font-variant-numeric:tabular-nums;line-height:1.1}.cp-kpi small{font-size:10px;color:#aaa6bd}
+    .cp-mid{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px}
+    .cp-bar{display:block;height:5px;border-radius:5px;background:#ffffff14;overflow:hidden}
+    .cp-bar i{display:block;height:100%;border-radius:5px;background:linear-gradient(90deg,#8a70ff,#6a4ae6)}
+    .cp-self .cp-bar i{background:linear-gradient(90deg,#34d399,#1f9d6a)}
     @media(max-width:600px){.scan-scores{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.scan-metrics{grid-template-columns:minmax(0,1fr)}.scan-head .app-btn{width:100%}}
 
     /* ===== Test & validation des clés API ===== */
@@ -1035,6 +1043,8 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
     @keyframes pdfspin{to{transform:rotate(360deg)}}
     .pdf-overlay b{font-size:18px;letter-spacing:-.3px}
     .pdf-overlay span{font-size:13px;color:#b9b1d8;max-width:290px;line-height:1.5}
+    .pdf-overlay .pdf-cancel{margin-top:8px;background:#ffffff14;border:1px solid #ffffff24;color:#e8e1ff;border-radius:12px;padding:11px 24px;font-size:14px;font-weight:700;cursor:pointer}
+    .pdf-overlay .pdf-cancel:active{background:#ffffff2e}
 
     /* ============================================================
        ÉCRANS « PAGE » — moins de bulles, plus de structure (mobile)
@@ -1312,9 +1322,10 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       const navItems=[['Accueil','home'],['Clients','clients'],['Audits','audits'],['Rapports','reports'],['Réglages','settings','Paramètres']];
       const navActive = appView==='ClientDétail'?'Clients':appView==='Détail'?'Audits':appView;
       const headTitle = appView==='Accueil'?'Bonjour 👋':appView==='Paramètres'?'Réglages':appView==='ClientDétail'?'Fiche client':appView==='Détail'?'Dossier d’audit':appView;
-      page.innerHTML = '<div class="workspace-app">'+(pdfBusy?'<div class="pdf-overlay"><div class="pdf-spin"></div><b>Génération du PDF…</b><span>Reste sur cet écran quelques secondes : le fichier va s’ouvrir ou s’enregistrer automatiquement.</span></div>':'')+'<header class="app-topbar"><a class="tb-brand" href="#" data-app-view="Accueil"><img src="'+escHtml(currentLogo())+'" alt="" onerror="this.style.display=&#39;none&#39;"><div><b>'+escHtml(appSettings?.app_name||'AuditIA')+'</b><small>BY AFFIADS</small></div></a><div class="tb-actions"><button type="button" data-app-action="logout" aria-label="Quitter" title="Quitter"><span class="nav-icon">'+navIcon('logout')+'</span></button></div></header><div class="sidebar-backdrop" data-close-menu></div><aside class="workspace-sidebar" id="workspaceSidebar"><div class="sidebar-brand"><img src="'+escHtml(currentLogo())+'" alt="" onerror="this.style.display=&#39;none&#39;"><div><b>'+escHtml(appSettings?.app_name||'AuditIA')+'</b><small>BY AFFIADS</small></div></div><nav class="sidebar-nav" aria-label="Navigation principale">'+navItems.map(([v,ico,target])=>'<button type="button" class="'+(navActive===(target||v)?'active':'')+'" data-app-view="'+(target||v)+'"><span class="nav-icon">'+navIcon(ico)+'</span><span>'+v+'</span>'+(v==='Clients'?'<span class="nav-count">'+appClients.length+'</span>':v==='Audits'?'<span class="nav-count">'+appAudits.length+'</span>':'')+'</button>').join('')+'</nav><div class="sidebar-bottom">Auditer mieux.<br>Décider plus clairement.</div></aside><div class="workspace-layout"><main class="workspace-main"><div class="workspace-head"><div><div class="eyebrow">ESPACE AFFIADS</div><h1>'+escHtml(headTitle)+'</h1><p>'+escHtml(appSettings?.company_name||'AffiAds')+' · '+escHtml(appUser?.email||'')+'</p></div><div class="workspace-actions"><button class="app-btn" type="button" data-app-action="logout">'+navIcon('logout')+'<span>Quitter</span></button></div></div><nav class="desktop-nav" aria-label="Navigation principale">'+navItems.map(([v,ico,target])=>'<button type="button" class="'+(navActive===(target||v)?'active':'')+'" data-app-view="'+(target||v)+'">'+navIcon(ico)+'<span>'+v+'</span></button>').join('')+'</nav>'+keyAlertHtml()+appNoticeHtml()+body+'<p class="app-muted workspace-footnote">AuditIA · Espace privé</p></main></div><nav class="mobile-tabbar" aria-label="Navigation principale">'+navItems.map(([v,ico,target])=>'<button type="button" class="'+(navActive===(target||v)?'active':'')+'" data-app-view="'+(target||v)+'" aria-label="'+v+'" '+(navActive===(target||v)?'aria-current="page"':'')+'><span class="tab-icon">'+navIcon(ico)+'</span><span>'+v+'</span></button>').join('')+'</nav></div>';
+      page.innerHTML = '<div class="workspace-app">'+(pdfBusy?'<div class="pdf-overlay"><div class="pdf-spin"></div><b>Génération du PDF…</b><span>Quelques secondes… l’écran « rapport prêt » s’affichera ensuite.</span><button type="button" class="pdf-cancel" data-pdf-cancel>Annuler</button></div>':'')+'<header class="app-topbar"><a class="tb-brand" href="#" data-app-view="Accueil"><img src="'+escHtml(currentLogo())+'" alt="" onerror="this.style.display=&#39;none&#39;"><div><b>'+escHtml(appSettings?.app_name||'AuditIA')+'</b><small>BY AFFIADS</small></div></a><div class="tb-actions"><button type="button" data-app-action="logout" aria-label="Quitter" title="Quitter"><span class="nav-icon">'+navIcon('logout')+'</span></button></div></header><div class="sidebar-backdrop" data-close-menu></div><aside class="workspace-sidebar" id="workspaceSidebar"><div class="sidebar-brand"><img src="'+escHtml(currentLogo())+'" alt="" onerror="this.style.display=&#39;none&#39;"><div><b>'+escHtml(appSettings?.app_name||'AuditIA')+'</b><small>BY AFFIADS</small></div></div><nav class="sidebar-nav" aria-label="Navigation principale">'+navItems.map(([v,ico,target])=>'<button type="button" class="'+(navActive===(target||v)?'active':'')+'" data-app-view="'+(target||v)+'"><span class="nav-icon">'+navIcon(ico)+'</span><span>'+v+'</span>'+(v==='Clients'?'<span class="nav-count">'+appClients.length+'</span>':v==='Audits'?'<span class="nav-count">'+appAudits.length+'</span>':'')+'</button>').join('')+'</nav><div class="sidebar-bottom">Auditer mieux.<br>Décider plus clairement.</div></aside><div class="workspace-layout"><main class="workspace-main"><div class="workspace-head"><div><div class="eyebrow">ESPACE AFFIADS</div><h1>'+escHtml(headTitle)+'</h1><p>'+escHtml(appSettings?.company_name||'AffiAds')+' · '+escHtml(appUser?.email||'')+'</p></div><div class="workspace-actions"><button class="app-btn" type="button" data-app-action="logout">'+navIcon('logout')+'<span>Quitter</span></button></div></div><nav class="desktop-nav" aria-label="Navigation principale">'+navItems.map(([v,ico,target])=>'<button type="button" class="'+(navActive===(target||v)?'active':'')+'" data-app-view="'+(target||v)+'">'+navIcon(ico)+'<span>'+v+'</span></button>').join('')+'</nav>'+keyAlertHtml()+appNoticeHtml()+body+'<p class="app-muted workspace-footnote">AuditIA · Espace privé</p></main></div><nav class="mobile-tabbar" aria-label="Navigation principale">'+navItems.map(([v,ico,target])=>'<button type="button" class="'+(navActive===(target||v)?'active':'')+'" data-app-view="'+(target||v)+'" aria-label="'+v+'" '+(navActive===(target||v)?'aria-current="page"':'')+'><span class="tab-icon">'+navIcon(ico)+'</span><span>'+v+'</span></button>').join('')+'</nav></div>';
       clearTimeout(noticeTimer);
       if(appNotice && !/^Erreur/.test(appNotice)){ noticeTimer=setTimeout(()=>{ appNotice=''; renderApp(); },4500); }
+      { const cb=page.querySelector('[data-pdf-cancel]'); if(cb) cb.addEventListener('click',()=>{ pdfCancelled=true; pdfBusy=false; const h=document.getElementById('printReport'); if(h) h.innerHTML=''; appNotice='Génération annulée.'; renderApp(); }); }
       page.querySelectorAll('[data-app-view]').forEach(b=>b.addEventListener('click',()=>{appView=b.dataset.appView;activeAudit=null;activeClient=null;appNotice='';renderApp()}));
       page.querySelectorAll('[data-open-client]').forEach(b=>b.addEventListener('click',()=>{activeClient=b.dataset.openClient;appView='ClientDétail';appNotice='';renderApp();window.scrollTo(0,0);}));
       page.querySelectorAll('[data-new-audit-for]').forEach(b=>b.addEventListener('click',async()=>{const cid=b.dataset.newAuditFor;const row={user_id:appUser.id,client_id:cid,title:'Audit de visibilité numérique',status:'À démarrer',score:0,checklist:checklistTemplate.map(([label,detail])=>({label,detail,done:false}))};const {error}=await appClient.from('audits').insert(row);if(error){appNotice='Erreur : '+error.message;renderApp();return;}appNotice='Audit créé.';await refreshData();const mine=appAudits.filter(a=>a.client_id===cid);if(mine.length){activeAudit=mine[0].id;appView='Détail';}renderApp();window.scrollTo(0,0);}));
@@ -1770,9 +1781,31 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
     }
     function competitorsHtml(a,c){
       const cp=a&&a.site&&a.site.competitors; if(!cp||!cp.list||!cp.list.length) return '';
-      const rows=cp.list.map((x,i)=>'<div class="cp-row'+(x.isSelf?' cp-self':'')+'"><span class="cp-rank">'+(i+1)+'</span><span class="cp-name">'+escHtml(x.name)+(x.isSelf?' — vous':'')+'</span><span class="cp-score">'+(x.rating!=null?'★ '+x.rating:'—')+' <small>('+x.reviews+')</small></span></div>').join('');
-      const pos=cp.selfRank?('Vous êtes n°'+cp.selfRank+' sur '+cp.total+' commerces trouvés pour « '+cp.query+' ».'):('Votre commerce n’apparaît pas dans les '+cp.total+' résultats pour « '+cp.query+' ».');
-      return '<section class="app-panel cp-panel"><div class="eyebrow">CONCURRENTS LOCAUX</div><h3 style="margin:4px 0 4px">À qui vous vous comparez</h3><p class="app-muted" style="margin:0 0 10px">'+escHtml(pos)+'</p>'+rows+'<p class="scan-note">Commerces du même type dans la ville, classés par nombre d’avis (popularité). Source : Google Places. C’est un classement par avis, pas l’ordre exact de Google.</p></section>';
+      const list=cp.list;
+      const maxRev=Math.max(1,...list.map(x=>Number(x.reviews)||0));
+      const self=list.find(x=>x.isSelf);
+      const leader=list[0];
+      const ratings=list.filter(x=>x.rating!=null).map(x=>Number(x.rating));
+      const avgRating=ratings.length?(ratings.reduce((n,v)=>n+v,0)/ratings.length):null;
+      const avgRev=Math.round(list.reduce((n,x)=>n+(Number(x.reviews)||0),0)/list.length);
+      const rows=list.map((x,i)=>{
+        const rev=Number(x.reviews)||0; const pct=Math.max(4,Math.round(rev/maxRev*100));
+        return '<div class="cp-row'+(x.isSelf?' cp-self':'')+'"><span class="cp-rank">'+(i+1)+'</span>'
+          +'<div class="cp-mid"><span class="cp-name">'+escHtml(x.name)+(x.isSelf?' · vous':'')+'</span><span class="cp-bar"><i style="width:'+pct+'%"></i></span></div>'
+          +'<span class="cp-score">'+(x.rating!=null?'★ '+x.rating:'—')+'<small>'+rev+' avis</small></span></div>';
+      }).join('');
+      let insight;
+      if(self&&cp.selfRank){
+        if(cp.selfRank===1){ insight='Vous êtes <b>n°1</b> localement en nombre d’avis. Objectif : garder l’avance et soigner la note.'; }
+        else { const target=list[cp.selfRank-2]; const need=target?Math.max(1,(Number(target.reviews)||0)-(Number(self.reviews)||0)+1):null; insight='Vous êtes <b>n°'+cp.selfRank+' sur '+cp.total+'</b>'+(need!=null?' — il vous manque environ <b>'+need+' avis</b> pour dépasser le n°'+(cp.selfRank-1)+'.':'.'); }
+      } else { insight='Votre commerce <b>n’apparaît pas</b> dans les '+cp.total+' premiers résultats : priorité absolue à la visibilité locale (fiche Google + avis).'; }
+      const kpis='<div class="cp-kpis">'
+        +'<span class="cp-kpi"><b>'+(cp.selfRank?('n°'+cp.selfRank):'—')+'</b><small>votre rang</small></span>'
+        +'<span class="cp-kpi"><b>'+(leader?(Number(leader.reviews)||0):0)+'</b><small>avis du n°1</small></span>'
+        +(avgRating!=null?'<span class="cp-kpi"><b>★ '+avgRating.toFixed(1)+'</b><small>note moyenne</small></span>':'')
+        +'<span class="cp-kpi"><b>'+avgRev+'</b><small>avis / concurrent</small></span>'
+        +'</div>';
+      return '<section class="app-panel cp-panel"><div class="eyebrow">CONCURRENTS LOCAUX</div><h3 style="margin:4px 0 4px">Face à vos concurrents</h3><p class="cp-insight">'+insight+'</p>'+kpis+'<div class="cp-list">'+rows+'</div><p class="scan-note">Commerces du même type à '+escHtml(String((c&&c.city)||'proximité'))+', classés par nombre d’avis (popularité). Source : Google Places — classement par avis, pas l’ordre exact de Google.</p></section>';
     }
     /* Capture d'écran du site via WordPress mShots, récupérée en data-URL (pour l'afficher et l'inclure au PDF sans souci de CORS) */
     async function fetchScreenshot(site){
@@ -2106,7 +2139,7 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
         +'<div class="r-sign"><div class="r-sign-line" style="background:'+escHtml(col)+'"></div><b>'+escHtml(st.signature_name||st.company_name)+'</b><span>'+escHtml(st.signature_role||'')+'</span>'+[st.contact_email,st.phone,st.website].filter(Boolean).map(x=>'<span>'+escHtml(x)+'</span>').join('')+'</div>'
         +'<div class="r-foot">Aperçu généré par '+escHtml(st.app_name||'AuditIA')+' · '+escHtml(st.company_name||'AffiAds')+' · Analyse automatique Google &amp; web.</div>';
     }
-    let pdfLibsLoaded=false, pdfBusy=false;
+    let pdfLibsLoaded=false, pdfBusy=false, pdfCancelled=false;
     function loadScript(src){ return new Promise((res,rej)=>{ const s=document.createElement('script'); s.src=src; s.onload=()=>res(); s.onerror=()=>rej(new Error('chargement '+src)); document.head.appendChild(s); }); }
     async function ensurePdfLibs(){
       if(pdfLibsLoaded) return;
@@ -2128,15 +2161,18 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       let host=document.getElementById('printReport');
       if(!host){host=document.createElement('div');host.id='printReport';document.body.appendChild(host);}
       host.innerHTML='<div class="r-page'+(mode==='simple'?' r-page-simple':'')+'" id="rPageCapture">'+(mode==='simple'?reportSimpleHtml(a,c):reportHtml(a,c))+'</div>';
-      pdfBusy=true;appNotice='';renderApp();
+      pdfBusy=true;pdfCancelled=false;appNotice='';renderApp();
       try{
         await ensurePdfLibs();
+        if(pdfCancelled) return;
         const el=document.getElementById('rPageCapture');
         if(!el) throw new Error('Le contenu du rapport est introuvable.');
         if(document.fonts&&document.fonts.ready){try{await document.fonts.ready;}catch(_){}}
         const imgs=[...el.querySelectorAll('img')];
         await Promise.all(imgs.map(img=>img.complete?Promise.resolve():new Promise(resolve=>{img.onload=resolve;img.onerror=resolve;setTimeout(resolve,2500);})));
-        const canvas=await window.html2canvas(el,{scale:2,backgroundColor:'#ffffff',useCORS:true,logging:false,windowWidth:el.scrollWidth,scrollX:0,scrollY:0});
+        if(pdfCancelled) return;
+        const canvas=await window.html2canvas(el,{scale:(mode==='simple')?2:1.5,backgroundColor:'#ffffff',useCORS:true,logging:false,windowWidth:el.scrollWidth,scrollX:0,scrollY:0});
+        if(pdfCancelled) return;
         if(!canvas.width||!canvas.height) throw new Error('Le rapport n’a pas pu être rendu en image.');
         const jsPDFctor=(window.jspdf&&window.jspdf.jsPDF)||window.jsPDF;
         const pdf=new jsPDFctor('p','mm','a4');
