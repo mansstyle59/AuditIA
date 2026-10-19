@@ -1035,6 +1035,34 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
     @keyframes pdfspin{to{transform:rotate(360deg)}}
     .pdf-overlay b{font-size:18px;letter-spacing:-.3px}
     .pdf-overlay span{font-size:13px;color:#b9b1d8;max-width:290px;line-height:1.5}
+
+    /* ============================================================
+       ÉCRANS « PAGE » — moins de bulles, plus de structure (mobile)
+       Dernier bloc = priorité maximale. CSS seul, aucun markup touché.
+       ============================================================ */
+    @media(max-width:760px){
+      html,body{background:#242131 !important}
+      body{background:radial-gradient(ellipse at 100% -4%,#2d2850 0,transparent 42%),#242131 !important}
+      /* Accroche d'accueil : bannière de page, pas une bulle brillante */
+      .home-hero{border:0 !important;border-radius:0 !important;background:transparent !important;box-shadow:none !important;padding:2px 0 18px !important;margin:0 0 4px !important;border-bottom:1px solid #ffffff14 !important}
+      .home-hero:after{display:none !important}
+      .home-hero h2{font-size:30px !important}
+      .home-visual{border:1px solid #ffffff10 !important;border-radius:14px !important;background:#2b2840 !important;box-shadow:none !important}
+      .eyebrow{color:#b3a7e0 !important}
+      /* Trio de stats : discret, aligné */
+      .app-stats,.home-stats{gap:10px !important}
+      .app-stat,.home-stat{background:#2a2740 !important;border:1px solid #ffffff0d !important;border-radius:14px !important;box-shadow:none !important}
+      /* Panneaux = sections de page (surface discrète, pas de bulle contrastée) */
+      .app-panel,.add-toggle,.cd-edit,.integration-group,.settings-preview,.home-recent-panel,.cd-head,.scan-panel{background:#2a2740 !important;border:1px solid #ffffff0d !important;border-radius:14px !important;box-shadow:none !important;background-image:none !important}
+      /* Lignes de liste : traits de séparation, pas des pastilles */
+      .app-list{gap:0 !important}
+      .app-row{background:transparent !important;border:0 !important;border-bottom:1px solid #ffffff12 !important;border-radius:0 !important;padding:14px 2px !important}
+      .app-row:last-child{border-bottom:0 !important}
+      /* Champs de formulaire nets */
+      .app-form input,.app-form select,.app-form textarea{background:#201d2c !important;border:1px solid #ffffff1a !important;border-radius:10px !important}
+      /* Encart conseil : discret */
+      .home-bottom-tip{background:transparent !important;border:1px solid #ffffff0d !important;border-radius:14px !important}
+    }
   </style>
 </head>
 <body>
