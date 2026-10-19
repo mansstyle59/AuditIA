@@ -1001,23 +1001,23 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
     @media(max-width:760px){
       .workspace-app{padding-top:0 !important}
       .app-topbar{
-        display:flex;align-items:center;justify-content:space-between;gap:10px;
+        display:flex;align-items:center;justify-content:space-between;gap:12px;
         position:sticky;top:0;z-index:96;
-        margin:0 -14px 16px;
-        padding:calc(var(--safe-top) + 11px) 16px 12px;
+        margin:0 -14px 18px;
+        padding:calc(var(--safe-top) + 22px) 16px 15px;
         background:#201c30;
         border-bottom:1px solid #ffffff16;
         box-shadow:0 4px 18px #05030c45;
       }
-      .app-topbar .tb-brand{display:flex;align-items:center;gap:11px;min-width:0;text-decoration:none}
-      .app-topbar .tb-brand img{width:40px;height:40px;flex:0 0 40px;border-radius:12px;object-fit:contain;image-rendering:-webkit-optimize-contrast}
-      .app-topbar .tb-brand b{display:block;font-size:17px;font-weight:820;letter-spacing:-.4px;line-height:1.05;color:#f6f5fb}
-      .app-topbar .tb-brand small{display:block;font-size:9px;font-weight:800;letter-spacing:1.6px;color:#9a93b4}
-      .app-topbar .tb-actions{display:flex;gap:9px;flex:0 0 auto}
-      .app-topbar .tb-actions button{width:42px;height:42px;display:grid;place-items:center;border:1px solid #ffffff1c;border-radius:13px;background:#2f2a44;color:#e3dbff;cursor:pointer;padding:0}
-      .app-topbar .tb-actions button:active{background:#3a3457}
-      .app-topbar .tb-actions .nav-icon{width:22px;height:22px}
-      .app-topbar .tb-actions svg{width:22px!important;height:22px!important;fill:none!important;stroke:currentColor!important;stroke-width:2!important;stroke-linecap:round!important;stroke-linejoin:round!important}
+      .app-topbar .tb-brand{display:flex;align-items:center;gap:12px;min-width:0;text-decoration:none}
+      .app-topbar .tb-brand img{width:42px;height:42px;flex:0 0 42px;border-radius:13px;object-fit:contain;box-shadow:0 2px 10px #05030c55;image-rendering:-webkit-optimize-contrast}
+      .app-topbar .tb-brand b{display:block;font-size:18px;font-weight:830;letter-spacing:-.4px;line-height:1.05;color:#f6f5fb}
+      .app-topbar .tb-brand small{display:block;font-size:9px;font-weight:800;letter-spacing:1.7px;color:#a79fc2;margin-top:2px}
+      .app-topbar .tb-actions{display:flex;gap:10px;flex:0 0 auto}
+      .app-topbar .tb-actions button{width:44px;height:44px;display:grid;place-items:center;border:1px solid #ffffff1f;border-radius:14px;background:#312b47;color:#e8e1ff;cursor:pointer;padding:0;transition:background .15s}
+      .app-topbar .tb-actions button:active{background:#3d3660}
+      .app-topbar .tb-actions .nav-icon{width:22px;height:22px;display:grid;place-items:center}
+      .app-topbar .tb-actions svg{width:22px!important;height:22px!important;fill:none!important;stroke:currentColor!important;stroke-width:1.9!important;stroke-linecap:round!important;stroke-linejoin:round!important}
       /* La barre porte déjà les actions : on retire les doublons du titre */
       .workspace-head .workspace-actions{display:none !important}
       /* Titre de section plus net et contrasté sous la barre */
