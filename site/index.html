@@ -2188,9 +2188,9 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
     function pdfFooter(pdf,st){ const n=pdf.internal.getNumberOfPages(); for(let i=1;i<=n;i++){ pdf.setPage(i); pdf.setFont('helvetica','normal'); pdf.setFontSize(7.5); pdf.setTextColor(150,146,166); pdf.text('Rapport généré par '+(st.app_name||'AuditIA')+' · '+(st.company_name||'AffiAds'),16,291); pdf.text(i+'/'+n,194,291,{align:'right'}); } }
     function pdfHeadBand(pdf,K,st,a,title){ const col=hexToRgb(st.primary_color); pdf.setFillColor(col[0],col[1],col[2]); pdf.rect(0,0,K.W,24,'F'); K.setF('bold',15); pdf.setTextColor(255,255,255); pdf.text(String(st.app_name||'AuditIA'),K.M,13); K.setF('normal',9); pdf.text(title,K.M,19); K.setF('normal',9); pdf.text(new Date(a.updated_at||Date.now()).toLocaleDateString('fr-FR'),K.W-K.M,13,{align:'right'}); pdf.text(String(st.company_name||'AffiAds'),K.W-K.M,19,{align:'right'}); K.y=32; }
     function pdfClientVerdict(pdf,K,c,d,diag){ const idx=diag.index; const lab=visibilityLabel(idx); const ic=pdfScoreCol(idx);
-      K.para((c&&c.name)||'Commerce',{style:'bold',size:20}); K.para([c&&c.city,c&&(c.category||d.category)].filter(Boolean).join('   •   '),{color:K.MUT,size:10}); K.gap(2);
+      K.para((c&&c.name)||'Commerce',{style:'bold',size:20}); K.para([c&&c.city,c&&(c.category||d.category)].filter(Boolean).join('   •   '),{color:K.MUT,size:10}); K.para('Bilan de visibilité numérique · '+new Date(a.updated_at||Date.now()).toLocaleDateString('fr-FR'),{color:K.MUT,size:8}); K.gap(1);
       K.ensure(24); K.setF('bold',38); K.setT(ic); pdf.text(String(idx),K.M,K.y+13); K.setF('normal',11); K.setT(K.MUT); pdf.text('/100',K.M+String(idx).length*7+2,K.y+13); K.setF('bold',12); K.setT(ic); pdf.text(lab.t,K.M,K.y+20); K.y+=24;
-      K.para(visibilityVerdict(idx),{size:9.5}); K.gap(1);
+      K.para(visibilityVerdict(idx),{size:9.5}); K.para('Le score résume les signaux disponibles. SEO = visibilité dans les moteurs de recherche ; GEO = chances d’être cité par les assistants IA.',{size:8,color:K.MUT}); K.gap(1);
       const seoCol=pdfScoreCol(diag.seo.score), geoCol=pdfScoreCol(diag.geo.score);
       K.ensure(8); K.setF('bold',10); K.setT(K.DARK); pdf.text('SEO — Google',K.M,K.y+4); K.setT(seoCol); pdf.text(diag.seo.score+'/100',K.M+62,K.y+4,{align:'right'});
       K.setF('bold',10); K.setT(K.DARK); pdf.text('GEO — IA génératives',K.M+70,K.y+4); K.setT(geoCol); pdf.text(diag.geo.score+'/100',K.W-K.M,K.y+4,{align:'right'}); K.y+=9; }
@@ -2202,8 +2202,8 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       const pillar=(title,sub,p)=>{ K.heading(title,col); K.para(sub,{color:K.MUT,size:8.5}); K.gap(1);
         K.ensure(6); K.setF('bold',10); K.setT(K.DARK); pdf.text('Ce que vous avez',M,K.y+3.4); K.y+=5.6; if(p.have.length) p.have.forEach(x=>K.bullet(x.label,x.advice,[31,157,87])); else K.para('À construire entièrement sur cet axe.',{color:K.MUT,size:9});
         K.gap(1); K.ensure(6); K.setF('bold',10); K.setT(K.DARK); pdf.text('Ce qu’il vous manque',M,K.y+3.4); K.y+=5.6; if(p.miss.length) p.miss.forEach(x=>K.bullet(x.label,x.gap,[192,57,43])); else K.para('Rien de bloquant sur cet axe.',{color:K.MUT,size:9}); K.gap(2); };
-      pillar('SEO — être trouvé sur Google','Quand un client cherche votre activité près de chez lui, apparaissez-vous ?',diag.seo);
-      pillar('GEO — être cité par les IA','ChatGPT, Gemini et Perplexity recommandent de plus en plus de commerces. GEO, c’est être la réponse qu’elles donnent.',diag.geo);
+      pillar('SEO — être trouvé sur Google','Objectif : aider les clients proches à trouver votre commerce dans les résultats de recherche.',diag.seo);
+      pillar('GEO — être cité par les IA','Objectif : rendre les informations du commerce suffisamment claires et cohérentes pour être comprises et éventuellement reprises par les assistants IA.',diag.geo);
       K.heading('Fiche commerce',col);
       if(c&&(c.category||d.category)) K.kv('Catégorie',c.category||d.category);
       if(d.address) K.kv('Adresse',d.address);
@@ -2225,9 +2225,9 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       const K=pdfKit(pdf); const {W,M,CW}=K;
       pdfHeadBand(pdf,K,st,a,'Aperçu de visibilité');
       pdfClientVerdict(pdf,K,c,d,diag); K.hr();
-      K.heading('Vos points forts',col); if(diag.strengths.length) diag.strengths.slice(0,4).forEach(x=>K.bullet(x.label,'',[31,157,87])); else K.para('À construire sur tous les axes.',{color:K.MUT,size:9});
-      K.heading('Ce qu’il vous manque',col); if(diag.weaknesses.length) diag.weaknesses.slice(0,5).forEach(x=>K.bullet(x.label,'',[192,57,43])); else K.para('Rien de bloquant.',{color:K.MUT,size:9});
-      K.gap(2); K.ensure(22); pdf.setFillColor(246,243,255); pdf.setDrawColor(col[0],col[1],col[2]); pdf.setLineWidth(0.3); pdf.roundedRect(M,K.y,CW,20,3,3,'FD'); K.setF('bold',10); K.setT(col); pdf.text('Ceci est un aperçu gratuit.',M+4,K.y+7); K.setF('normal',8.5); K.setT([70,70,70]); pdf.splitTextToSize('Le rapport complet détaille chaque critère SEO et GEO, votre classement sur vos mots-clés, vos concurrents locaux et un plan d’action priorisé, étape par étape.',CW-8).slice(0,3).forEach((ln,i)=>pdf.text(ln,M+4,K.y+12+i*4)); K.y+=24;
+      K.heading('Vos points forts · à conserver',col); if(diag.strengths.length) diag.strengths.slice(0,3).forEach(x=>K.bullet(x.label,'',[31,157,87])); else K.para('Aucun point fort confirmé dans les données disponibles.',{color:K.MUT,size:8.5});
+      K.heading('Priorités · à améliorer',col); if(diag.weaknesses.length) diag.weaknesses.slice(0,4).forEach(x=>K.bullet(x.label,'',[192,57,43])); else K.para('Aucun manque majeur identifié dans les données disponibles.',{color:K.MUT,size:8.5});
+      K.gap(2); K.ensure(22); pdf.setFillColor(246,243,255); pdf.setDrawColor(col[0],col[1],col[2]); pdf.setLineWidth(0.3); pdf.roundedRect(M,K.y,CW,20,3,3,'FD'); K.setF('bold',10); K.setT(col); pdf.text('La prochaine étape',M+4,K.y+7); K.setF('normal',8.5); K.setT([70,70,70]); pdf.splitTextToSize('Commencez par corriger une priorité à la fois, puis mesurez à nouveau les résultats. Le rapport complet apporte les détails, les concurrents et un plan d’action.',CW-8).slice(0,3).forEach((ln,i)=>pdf.text(ln,M+4,K.y+12+i*4)); K.y+=24;
       K.setF('bold',10); K.setT(col); pdf.text(String(st.signature_name||st.company_name||'AffiAds'),M,K.y+4); K.y+=5; const contact=[st.contact_email,st.phone,st.website].filter(Boolean).join('   ·   '); if(contact){ K.setF('normal',9); K.setT(K.DARK); pdf.text(contact,M,K.y+3); }
       pdfFooter(pdf,st);
     }
