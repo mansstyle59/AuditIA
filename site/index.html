@@ -577,6 +577,12 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       .r-ring-wrap{display:inline-flex}
       .r-shot{display:block;width:100%;max-width:100%;height:auto;border:1px solid #e5e2f0;border-radius:8px}
       .r-tips{margin:0;padding-left:16px}.r-tips li{font-size:11.5px;margin-bottom:5px;color:#444;break-inside:avoid}
+      .r-imp{break-inside:avoid;margin-bottom:12px;padding:10px 12px;background:#faf9fd;border:1px solid #eee;border-left:3px solid #7657ed;border-radius:8px}
+      .r-imp-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:4px}
+      .r-imp-top b{font-size:13px;color:#2a2440}
+      .r-imp-tag{flex:0 0 auto;font-size:9px;font-weight:800;padding:2px 7px;border-radius:5px;background:#eef0f7;color:#5a68a8;white-space:nowrap}
+      .r-imp-high{background:#fbe3df;color:#c0392b}.r-imp-mid{background:#fdf0d8;color:#a06700}
+      .r-imp-why{font-size:11.5px;color:#555;margin:0 0 6px;line-height:1.45}
       .r-vis-label{font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px;vertical-align:middle}
       .r-vis-ok{background:#d8efe0;color:#1f7a4d}.r-vis-mid{background:#fdf0d8;color:#a06700}.r-vis-bad{background:#fbe3df;color:#c0392b}
       .r-rk{font-size:10.5px;font-weight:800;padding:2px 8px;border-radius:20px;white-space:nowrap}
@@ -719,6 +725,20 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
     .imp-col ul{list-style:none;margin:0;padding:0;display:grid;gap:7px}
     .imp-col li{font-size:12px;line-height:1.45;color:#d7d4e4;padding-left:14px;position:relative}
     .imp-col li::before{content:"→";position:absolute;left:0;color:#9a87ff;font-weight:800}
+    .imp-list{display:grid;gap:12px}
+    .imp-item{background:#3f3d57;border:1px solid #ffffff10;border-left:3px solid #6a6790;border-radius:13px;padding:13px 14px}
+    .imp-item.imp-high{border-left-color:#f87171}.imp-item.imp-mid{border-left-color:#fbbf24}.imp-item.imp-low{border-left-color:#8b7be8}
+    .imp-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:5px}
+    .imp-ax{font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#aaa6bd}
+    .imp-prio{font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px}
+    .imp-prio-high{background:#4a2330;color:#ffb4bd}.imp-prio-mid{background:#4a3f1f;color:#fbe0a6}.imp-prio-low{background:#35334a;color:#cbbcff}
+    .imp-title{font-size:14.5px;font-weight:800;margin:0 0 6px;line-height:1.3}
+    .imp-why{font-size:12.5px;line-height:1.5;color:#d7d4e4;margin:0 0 8px}.imp-why b{color:#fff}
+    .imp-how{font-size:12.5px;color:#cfccdd}.imp-how>b{display:block;margin-bottom:4px;color:#fff}
+    .imp-how ul{list-style:none;margin:0;padding:0;display:grid;gap:5px}
+    .imp-how li{padding-left:16px;position:relative;line-height:1.45}
+    .imp-how li::before{content:"✓";position:absolute;left:0;color:#6ee7b7;font-weight:800}
+    .imp-foot{margin-top:9px;font-size:10.5px;color:#9a94ad;border-top:1px solid #ffffff10;padding-top:7px}
     a.sp-chip{text-decoration:none}
     @media(max-width:600px){.imp-grid{grid-template-columns:minmax(0,1fr)}}
     /* ===== Classement mots-clés ===== */
@@ -908,8 +928,11 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
     }
     function improvementHtml(a,c){
       if(!(a&&a.site)) return '';
-      const t=googleSocialTips(a,c);
-      return '<section class="app-panel improve-panel"><div class="eyebrow">PLAN D’AMÉLIORATION</div><h3 style="margin:4px 0 10px">Fiche Google &amp; réseaux : quoi faire</h3><div class="imp-grid"><div class="imp-col"><b>📍 Fiche Google</b><ul>'+t.google.map(x=>'<li>'+escHtml(x)+'</li>').join('')+'</ul></div><div class="imp-col"><b>📱 Réseaux sociaux</b><ul>'+t.reseaux.map(x=>'<li>'+escHtml(x)+'</li>').join('')+'</ul></div></div></section>';
+      const plan=improvementPlan(a,c); if(!plan.length) return '';
+      const cls=p=>p==='Haute'?'high':p==='Moyenne'?'mid':'low';
+      const cards=plan.map((it,i)=>'<div class="imp-item imp-'+cls(it.priority)+'"><div class="imp-top"><span class="imp-ax">'+escHtml(it.axis)+'</span><span class="imp-prio imp-prio-'+cls(it.priority)+'">'+escHtml(it.priority)+'</span></div><h4 class="imp-title">'+(i+1)+'. '+escHtml(it.title)+'</h4><p class="imp-why"><b>Pourquoi : </b>'+escHtml(it.why)+'</p><div class="imp-how"><b>À faire :</b><ul>'+it.how.map(h=>'<li>'+escHtml(h)+'</li>').join('')+'</ul></div><div class="imp-foot">Impact '+escHtml(it.impact)+' · Priorité '+escHtml(it.priority)+'</div></div>').join('');
+      const highN=plan.filter(x=>x.priority==='Haute').length;
+      return '<section class="app-panel improve-panel"><div class="eyebrow">PLAN D’AMÉLIORATION DÉTAILLÉ</div><h3 style="margin:4px 0 4px">Ce qu’il faut faire, et pourquoi</h3><p class="app-muted" style="margin:0 0 12px">'+plan.length+' actions recommandées · '+highN+' prioritaire'+(highN>1?'s':'')+'. Chaque action est argumentée pour convaincre le client.</p><div class="imp-list">'+cards+'</div></section>';
     }
     const FORME_JURIDIQUE={'1000':'Entrepreneur individuel','5202':'SNC','5410':'SARL','5415':'SARL','5426':'EARL','5430':'SARL','5498':'SARL','5499':'SARL','5505':'SA','5510':'SA','5710':'SAS','5720':'SASU','9220':'Association','5385':'Société européenne','6540':'SCI','5308':'Société civile'};
     function legalRows(c){
@@ -1414,26 +1437,41 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       return null;
     }
     /* Conseils concrets pour améliorer la fiche Google et les réseaux, adaptés à ce qui manque */
-    function googleSocialTips(a,c){
-      const d=(c&&c.details)||{}; const si=a&&a.site; const socials=(si&&si.socials)||[];
-      const google=[]; const reseaux=[];
-      google.push(d.place_id||d.address||d.rating!=null?'Compléter la fiche à 100 % : description, catégories secondaires, zones desservies, attributs (accès, paiements).':'Créer et faire valider la fiche Google Business Profile (c’est gratuit et indispensable en local).');
-      if(d.rating==null) google.push('Obtenir les premiers avis Google (demander aux clients satisfaits, QR code en caisse).');
-      else if(d.rating<4.5) google.push('Répondre à TOUS les avis (positifs et négatifs) et viser plus d’avis récents pour monter la note.');
-      else google.push('Continuer à solliciter des avis récents et y répondre pour garder l’avantage.');
-      if(!(Array.isArray(d.hours)&&d.hours.length)) google.push('Renseigner les horaires (et les horaires exceptionnels) : Google les affiche directement.');
-      google.push('Publier des photos récentes (devanture, intérieur, produits/équipe) — les fiches avec photos reçoivent plus de clics.');
-      google.push('Utiliser les “posts” Google (actus, offres, événements) au moins 1 à 2 fois par mois.');
-      google.push('Activer la messagerie et la section Questions/Réponses, et y répondre vite.');
-      const majors=['Instagram','Facebook','TikTok']; const have=new Set(socials.map(s=>s.net));
-      const missing=majors.filter(m=>!have.has(m));
-      if(socials.length===0) reseaux.push('Créer au moins Instagram et Facebook (les clients locaux y vérifient l’activité et l’actualité).');
-      else if(missing.length) reseaux.push('Créer les réseaux manquants : '+missing.join(', ')+'.');
-      if(c&&c.website) reseaux.push('Afficher clairement les liens des réseaux sur le site (et le site dans la bio des réseaux).');
-      else reseaux.push('Comme il n’y a pas de site, soigner la bio des réseaux (adresse, horaires, lien de contact/réservation).');
-      reseaux.push('Publier régulièrement (2 à 3 fois par semaine) : coulisses, nouveautés, avis clients, offres.');
-      reseaux.push('Mettre les coordonnées et un bouton d’action (appeler / itinéraire / réserver) sur chaque profil.');
-      return {google,reseaux};
+    function improvementPlan(a,c){
+      const d=(c&&c.details)||{}; const si=(a&&a.site)||{}; const s=a&&a.scan;
+      const kw=targetKeywords(c); const city=String((c&&c.city)||'').trim(); const base=kw.base||'votre activité';
+      const hasGoogle=!!(d.place_id||d.address||d.rating!=null);
+      const rating=(d.rating!=null)?Number(d.rating):null; const reviews=Number(d.reviews||0);
+      const photos=(d.photoCount!=null)?Number(d.photoCount):null;
+      const hours=!!(Array.isArray(d.hours)&&d.hours.length);
+      const hasWeb=!!String((c&&c.website)||'').trim();
+      const perf=(s&&s.scores)?s.scores.performance:null;
+      const socials=(si.socials)||[]; const haveNet=new Set(socials.map(x=>x.net));
+      const missingNet=['Instagram','Facebook','TikTok'].filter(m=>!haveNet.has(m));
+      const dirs=(si.directories)||[]; const comp=si.competitors; const topComp=comp&&comp.list&&comp.list.find(x=>!x.isSelf);
+      const items=[]; const push=(axis,title,why,how,priority,impact)=>items.push({axis,title,why,how,priority,impact});
+      if(!hasGoogle) push('Fiche Google','Créer et faire valider la fiche Google Business Profile','La recherche locale (« '+base+(city?' '+city:'')+' ») passe d’abord par Google et Maps. Sans fiche validée, le commerce est absent des résultats et de la carte : c’est la première cause d’invisibilité.',['Créer la fiche sur google.com/business (nom exact, adresse, téléphone)','Choisir la bonne catégorie principale + 2 à 3 catégories secondaires','Faire valider la fiche (courrier, téléphone ou vidéo)','Remplir 100 % des champs dès la validation'],'Haute','Fort');
+      else push('Fiche Google','Compléter la fiche Google à 100 %','Une fiche complète est jugée plus fiable par Google et par les clients : elle remonte dans le classement local et reçoit bien plus de clics qu’une fiche à moitié vide.',['Rédiger une description avec vos services + la ville','Ajouter catégories secondaires, zone desservie et attributs (accès, paiements, Wi-Fi, terrasse…)','Renseigner les produits/services avec photos et prix','Ajouter un lien d’action (réserver / commander / prendre RDV)'],'Haute','Fort');
+      if(rating==null||reviews<10) push('Avis & réputation','Lancer une collecte d’avis Google','Les avis sont le 2ᵉ facteur du classement local et le 1er critère de confiance. Aujourd’hui : '+(reviews||0)+' avis'+(rating!=null?' ('+rating+'/5)':'')+'.'+(topComp?' Votre concurrent '+topComp.name+' en a déjà '+topComp.reviews+' — l’écart se rattrape avec une collecte régulière.':''),['QR code vers l’avis Google en caisse / à l’accueil','SMS ou e-mail après l’achat avec le lien court d’avis','Former l’équipe à demander un avis à l’oral aux clients contents','Objectif : 5 à 10 nouveaux avis par mois','Répondre à 100 % des avis (merci + réponse pro aux négatifs)'],'Haute','Fort');
+      else if(rating<4.3) push('Avis & réputation','Faire remonter la note Google','Note actuelle '+rating+'/5 : sous 4,3, elle freine le classement et les clients comparent avec les concurrents mieux notés'+(topComp&&topComp.rating?' (ex. '+topComp.name+' : ★ '+topComp.rating+')':'')+'.',['Répondre posément à chaque avis négatif et corriger les points récurrents','Solliciter activement les clients satisfaits (ils notent rarement d’eux-mêmes)','Viser une majorité d’avis récents (Google valorise la fraîcheur)'],'Haute','Fort');
+      if(photos!=null&&photos<10) push('Fiche Google','Ajouter des photos récentes (et régulièrement)','Les fiches avec beaucoup de photos récentes génèrent plus d’appels et d’itinéraires. Aujourd’hui : '+photos+' photo'+(photos>1?'s':'')+'.',['Devanture, intérieur, produits phares, équipe','Photo de couverture et logo soignés','Ajouter 2 à 3 nouvelles photos par mois pour montrer l’activité'],'Moyenne','Moyen');
+      if(!hours) push('Fiche Google','Renseigner les horaires (et exceptionnels)','Google affiche les horaires dans les résultats. Absents, ils font perdre des clients et des clics, surtout en soirée et les jours fériés.',['Saisir les horaires d’ouverture habituels','Renseigner les horaires exceptionnels (fêtes, congés)'],'Moyenne','Moyen');
+      push('Fiche Google','Publier des “posts” Google régulièrement','Les posts (offres, nouveautés, événements) gardent la fiche active — signal positif pour Google et accroche pour les clients.',['Publier 1 à 2 posts par mois (promo, nouveauté, événement)','Ajouter une photo + un bouton d’action à chaque post'],'À planifier','Moyen');
+      if(!hasWeb) push('Site web','Créer un site vitrine','70 à 80 % des clients vérifient en ligne avant de se déplacer. Sans site : perte de crédibilité, de référencement, et quasi-invisibilité pour les IA (ChatGPT, Gemini) qui citent surtout ce qui est écrit sur un site.',['Page d’accueil claire : qui, quoi, où, horaires, contact','Page services / menu avec photos (et prix si pertinent)','Page contact : carte, téléphone cliquable, itinéraire','Boutons « Appeler » / « Itinéraire » / « Réserver » visibles sur mobile','Site rapide, en HTTPS, pensé mobile d’abord'],'Haute','Fort');
+      else { if(perf!=null&&perf<50) push('Site web','Accélérer le site sur mobile','Performance mobile '+perf+'/100. Plus d’un visiteur sur deux quitte un site qui met plus de 3 s à charger, et Google pénalise les sites lents.',['Compresser et servir les images en WebP','Limiter les scripts et plugins tiers','Activer le cache + bon hébergement','Charger les images en différé (lazy-load)'],'Haute','Fort');
+        if(!(si.title&&si.metaDesc)) push('Site web','Optimiser les balises SEO','Sans titre ni description clairs, Google n’a pas de résumé à afficher et vous perdez des clics dans les résultats.',['Titre < 60 caractères avec activité + ville','Meta-description accrocheuse (140-160 car.) avec appel à l’action','Un seul H1 par page, structuré avec des sous-titres'],'Moyenne','Moyen'); }
+      if(hasWeb&&!si.localSchema) push('Visibilité IA (GEO)','Ajouter les données structurées (schema.org LocalBusiness)','LE levier pour être compris par Google ET par les IA. Les données structurées disent « qui, quoi, où, quand » ; sans elles, ChatGPT ou Gemini ont du mal à vous citer quand un client demande « meilleur '+base+(city?' à '+city:'')+' ».',['Ajouter un bloc JSON-LD « LocalBusiness » (nom, adresse, téléphone, horaires, position)','Reprendre exactement les coordonnées de Google (cohérence NAP)','Ajouter FAQ et avis structurés si possible'],'Haute','Fort');
+      if(socials.length===0) push('Réseaux sociaux','Créer Instagram et Facebook','Les clients locaux vérifient les réseaux pour voir si le commerce est actif. Une absence donne une impression d’abandon.',['Créer Instagram + Facebook avec bio complète (adresse, horaires, lien)','Publier les premières photos et une présentation','Relier ces profils au site et à la fiche Google'],'Moyenne','Moyen');
+      else if(missingNet.length) push('Réseaux sociaux','Compléter les réseaux manquants : '+missingNet.join(', '),'Être présent là où sont vos clients multiplie les points de contact et rassure avant la visite.',['Créer les profils manquants avec coordonnées et lien','Garder une identité visuelle cohérente (logo, couleurs)'],'À planifier','Moyen');
+      push('Réseaux sociaux','Publier régulièrement et donner envie de venir','La régularité transforme une page en vitrine vivante : coulisses, nouveautés, avis clients, offres.',['Publier 2 à 3 fois par semaine','Varier : produit, coulisses, témoignage client, offre','Coordonnées + bouton d’action (appeler / itinéraire / réserver) sur chaque profil',(hasWeb?'Afficher les réseaux sur le site et le site dans la bio':'Soigner la bio : adresse, horaires, lien de contact')],'À planifier','Moyen');
+      const mainKw=(kw.seo&&kw.seo[0])||(base+(city?' '+city:''));
+      const notRanked=si.rankings&&si.rankings.length&&!si.rankings.some(r=>r.pos!=null&&r.pos<=10);
+      const behind=comp&&comp.selfRank&&comp.selfRank>3;
+      if(notRanked||behind||!hasGoogle){ const arg=(comp&&comp.selfRank)?('Vous êtes classé n°'+comp.selfRank+' sur '+comp.total+' commerces du même type'+(topComp?', derrière des concurrents comme '+topComp.name+' ('+topComp.reviews+' avis)':'')+'.'):'Vous n’apparaissez pas dans les premiers résultats sur vos mots-clés clés.';
+        push('SEO local','Remonter sur « '+mainKw+' » (référencement local)',arg+' Le top 3 local capte l’essentiel des appels et des visites.',['Optimiser la fiche Google (catégories, description, photos, posts) — 1er levier local','Accélérer la collecte d’avis récents','Mêmes nom / adresse / téléphone partout (site, annuaires, Google)','Publier du contenu local sur le site (ville, quartiers, services)','Obtenir quelques liens locaux (presse, partenaires, associations)'],'Haute','Fort'); }
+      if(dirs.length<2) push('Annuaires & citations','S’inscrire sur les annuaires clés','Être référencé sur les grands annuaires renforce la cohérence des informations et la confiance (pour Google comme pour les IA).',['Pages Jaunes, Google Maps et annuaires de la ville','TripAdvisor / TheFork (resto), Planity (beauté), Doctolib (santé)…','Mettre partout EXACTEMENT les mêmes coordonnées (cohérence NAP)'],'Moyenne','Moyen');
+      const rank={'Haute':0,'Moyenne':1,'À planifier':2};
+      return items.sort((x,y)=>rank[x.priority]-rank[y.priority]);
     }
     async function runSiteScan(auditId){
       const a=appAudits.find(x=>x.id===auditId); if(!a) return;
@@ -1672,7 +1710,7 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
         +(a.site&&a.site.rankings&&a.site.rankings.length&&!a.site.rankings.every(r=>r.error)?(function(){const rk=a.site.rankings;const found=rk.filter(r=>r.found).length;return '<div class="r-section"><h2>Classement sur les mots-clés</h2><p class="r-verdict-meta" style="margin:0 0 8px;font-size:12px"><b>Trouvé sur '+found+'/'+rk.length+' recherches</b></p><table class="r-table">'+rk.map(r=>{const b=rankBadge(r);return '<tr><td>'+escHtml(r.kw)+'</td><td><span class="r-rk r-rk-'+b.c+'">'+escHtml(b.t)+'</span></td></tr>';}).join('')+'</table><p class="r-mini">Classement indicatif (recherche web), différent du classement Google exact qui dépend de la géolocalisation et de la carte locale.</p></div>';})():'')
         +(a.site&&a.site.competitors&&a.site.competitors.list&&a.site.competitors.list.length?(function(){const cp=a.site.competitors;const pos=cp.selfRank?('Classé n°'+cp.selfRank+' sur '+cp.total+' pour « '+cp.query+' »'):('Non classé dans les '+cp.total+' résultats pour « '+cp.query+' »');return '<div class="r-section"><h2>Concurrents locaux</h2><p class="r-verdict-meta" style="margin:0 0 8px;font-size:12px"><b>'+escHtml(pos)+'</b></p><table class="r-table">'+cp.list.map((x,i)=>'<tr'+(x.isSelf?' style="font-weight:800"':'')+'><td>'+(i+1)+'. '+escHtml(x.name)+(x.isSelf?' — vous':'')+'</td><td>'+(x.rating!=null?'★ '+x.rating:'—')+' ('+x.reviews+' avis)</td></tr>').join('')+'</table><p class="r-mini">Commerces du même type dans la ville, classés par nombre d’avis (popularité). Source : Google Places.</p></div>';})():'')
         +(a.site&&a.site.screenshot?'<div class="r-section"><h2>Aperçu du site</h2><img class="r-shot" src="'+a.site.screenshot+'" alt="Capture du site"></div>':'')
-        +(a.site?(function(){const t=googleSocialTips(a,c);return '<div class="r-section"><h2>Comment améliorer la fiche Google &amp; les réseaux</h2><div class="r-cols"><div class="r-col"><p class="r-tgt-sub">📍 Fiche Google</p><ul class="r-tips">'+t.google.map(x=>'<li>'+escHtml(x)+'</li>').join('')+'</ul></div><div class="r-col"><p class="r-tgt-sub">📱 Réseaux sociaux</p><ul class="r-tips">'+t.reseaux.map(x=>'<li>'+escHtml(x)+'</li>').join('')+'</ul></div></div></div>';})():'')
+        +(a.site?(function(){const plan=improvementPlan(a,c);if(!plan.length)return '';return '<div class="r-section"><h2>Plan d’amélioration détaillé</h2>'+plan.map((it,i)=>'<div class="r-imp"><div class="r-imp-top"><b>'+(i+1)+'. '+escHtml(it.title)+'</b><span class="r-imp-tag r-imp-'+(it.priority==='Haute'?'high':it.priority==='Moyenne'?'mid':'low')+'">'+escHtml(it.axis)+' · '+escHtml(it.priority)+'</span></div><p class="r-imp-why"><b>Pourquoi : </b>'+escHtml(it.why)+'</p><ul class="r-tips">'+it.how.map(h=>'<li>'+escHtml(h)+'</li>').join('')+'</ul></div>').join('')+'</div>';})():'')
         +(plan.length?'<div class="r-section"><h2>Plan d’action priorisé</h2><div class="r-plan">'+plan.map((p,i)=>'<div class="r-plan-item"><span class="r-plan-n">'+(i+1)+'</span><div class="r-plan-c"><b>'+escHtml(p.t)+'</b>'+(p.d?'<span>'+escHtml(p.d)+'</span>':'')+'</div>'+(p.axis?'<span class="r-axis-tag">'+escHtml(p.axis)+'</span>':'')+pill(p.p)+'</div>').join('')+'</div></div>':'')
         +(a.notes?'<div class="r-section"><h2>Notes & recommandations</h2><p class="r-notes">'+escHtml(a.notes)+'</p></div>':'')
         +'<div class="r-sign"><div class="r-sign-line" style="background:'+escHtml(col)+'"></div><b>'+escHtml(st.signature_name||st.company_name)+'</b><span>'+escHtml(st.signature_role||'')+'</span>'+[st.contact_email,st.phone,st.website].filter(Boolean).map(x=>'<span>'+escHtml(x)+'</span>').join('')+(st.signature_text?'<p>'+escHtml(st.signature_text)+'</p>':'')+'</div>'
