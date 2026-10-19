@@ -2151,69 +2151,118 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       if(!h2cOk()) throw new Error('html2canvas introuvable'); if(!pdfOk()) throw new Error('jsPDF introuvable');
       pdfLibsLoaded=true;
     }
-    // Le rendu d'un long rapport en une seule image peut saturer la mémoire iOS.
-    // On capture des tranches de hauteur limitée, une par page A4.
-    async function buildReportPdf(el, mode){
-      const ctor=(window.jspdf&&window.jspdf.jsPDF)||window.jsPDF;
-      const pdf=new ctor('p','mm','a4');
-      const pw=pdf.internal.pageSize.getWidth(),ph=pdf.internal.pageSize.getHeight();
-      const sourceWidth=Math.max(1,Math.ceil(el.getBoundingClientRect().width));
-      const sourceHeight=Math.max(1,Math.ceil(el.scrollHeight));
-      const pagePixels=Math.floor(sourceWidth*ph/pw);
-      const scale=1.25;
-      const totalPages=Math.ceil(sourceHeight/pagePixels);
-      if(totalPages>80) throw new Error('Rapport trop long pour le PDF mobile.');
-      for(let index=0;index<totalPages;index++){
-        if(pdfCancelled) throw new Error('Génération annulée.');
-        const y=index*pagePixels;
-        const h=Math.min(pagePixels,sourceHeight-y);
-        const canvas=await window.html2canvas(el,{
-          scale,backgroundColor:'#ffffff',useCORS:true,logging:false,
-          width:sourceWidth,height:h,x:0,y,
-          windowWidth:sourceWidth,windowHeight:Math.max(h,600),
-          scrollX:0,scrollY:0,imageTimeout:2000
-        });
-        if(!canvas.width||!canvas.height) throw new Error('Capture de la page '+(index+1)+' impossible.');
-        if(index)pdf.addPage();
-        const img=canvas.toDataURL('image/jpeg',0.84);
-        pdf.addImage(img,'JPEG',0,0,pw,Math.min(ph,h*pw/sourceWidth));
-        canvas.width=0;canvas.height=0;
-        await new Promise(resolve=>setTimeout(resolve,0));
-      }
-      return pdf;
+    /* ====== PDF natif (texte vectoriel jsPDF) : instantané, léger, fiable sur iPhone ====== */
+    async function ensureJsPdf(){
+      const ok=()=>!!((window.jspdf&&window.jspdf.jsPDF)||window.jsPDF);
+      if(ok()) return;
+      try{ await loadScript('./vendor/jspdf.umd.min.js'); }catch(e){}
+      if(!ok()){ await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'); }
+      if(!ok()) throw new Error('jsPDF introuvable');
     }
-    async function prepareReportForAudit(auditId, mode='full'){
-      const a=appAudits.find(x=>String(x.id)===String(auditId)); if(!a)return null;
-      const c=appClients.find(x=>String(x.id)===String(a.client_id));
-      const key=String(auditId)+':'+mode;
-      if(preparedReportBlobs.has(key))return preparedReportBlobs.get(key);
-      let host=document.getElementById('printReport');
-      if(!host){host=document.createElement('div');host.id='printReport';document.body.appendChild(host);}
-      host.innerHTML='<div class="r-page'+(mode==='simple'?' r-page-simple':'')+'" id="rPageCapture">'+(mode==='simple'?reportSimpleHtml(a,c):reportHtml(a,c))+'</div>';
-      try{
-        await ensurePdfLibs();
-        const el=document.getElementById('rPageCapture'); if(!el)throw new Error('Contenu du rapport introuvable.');
-        const pdf=await buildReportPdf(el,mode);
-        const blob=pdf.output('blob'); if(!blob||blob.size<100)throw new Error('PDF vide.');
-        preparedReportBlobs.set(key,{blob,fname:(((mode==='simple'?'Rapport-express-':'Rapport-complet-')+((c&&c.name)||'commerce')).normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').replace(/[^a-z0-9]+/gi,'-').replace(/^-|-$/g,''))+'.pdf'});
-        return preparedReportBlobs.get(key);
-      }finally{host.innerHTML='';}
+    function hexToRgb(h){ h=String(h||'#7657ed').replace('#',''); if(h.length===3)h=h.split('').map(x=>x+x).join(''); const n=parseInt(h,16); const v=isNaN(n)?0x7657ed:n; return [(v>>16)&255,(v>>8)&255,v&255]; }
+    function pdfScoreCol(v){ return v>=75?[31,157,87]:v>=50?[201,138,0]:[192,57,43]; }
+    function pdfKit(pdf){
+      const W=210,H=297,M=16,CW=W-2*M,PT=0.3528; let y=M;
+      const DARK=[32,28,46], MUT=[122,118,142], LINE=[228,225,238];
+      const setF=(s,sz)=>{pdf.setFont('helvetica',s||'normal');pdf.setFontSize(sz);};
+      const setT=c=>pdf.setTextColor(c[0],c[1],c[2]);
+      const lh=(sz,f)=>sz*PT*(f||1.35);
+      const K={W,H,M,CW,DARK,MUT,LINE,setF,setT,lh,
+        get y(){return y;}, set y(v){y=v;},
+        ensure(h){ if(y+h>H-M){ pdf.addPage(); y=M; } },
+        gap(h){ y+=h; },
+        para(str,o){ o=o||{}; const x=o.x||M; const sz=o.size||10; const col=o.color||DARK; const maxw=(o.w||CW)-(x-M); setF(o.style||'normal',sz); setT(col); const lines=pdf.splitTextToSize(String(str==null?'':str),maxw); const step=lh(sz,o.lh); lines.forEach(ln=>{ K.ensure(step); pdf.text(ln,x,y+sz*PT*0.8); y+=step; }); },
+        heading(str,col){ K.gap(3); K.ensure(10); setF('bold',12.5); setT(col||DARK); pdf.text(String(str),M,y+3.4); y+=5.6; pdf.setDrawColor((col||DARK)[0],(col||DARK)[1],(col||DARK)[2]); pdf.setLineWidth(0.5); pdf.line(M,y,M+16,y); y+=3.8; },
+        hr(){ K.ensure(3); pdf.setDrawColor(LINE[0],LINE[1],LINE[2]); pdf.setLineWidth(0.2); pdf.line(M,y,W-M,y); y+=3; },
+        bullet(label,desc,mkCol){ const sz=9.5; setF('bold',sz); const lbl=pdf.splitTextToSize(String(label),CW-6); let dl=[]; if(desc){ setF('normal',8.5); dl=pdf.splitTextToSize(String(desc),CW-6); } K.ensure(lh(sz)*lbl.length+lh(8.5)*dl.length+1); pdf.setFillColor(mkCol[0],mkCol[1],mkCol[2]); pdf.circle(M+1.3,y+1.7,0.9,'F'); setF('bold',sz); setT(DARK); lbl.forEach(ln=>{ pdf.text(ln,M+5,y+sz*PT*0.8); y+=lh(sz); }); if(dl.length){ setF('normal',8.5); setT(MUT); dl.forEach(ln=>{ pdf.text(ln,M+5,y+8.5*PT*0.8); y+=lh(8.5); }); } y+=1.4; },
+        kv(k,v){ const sz=9.5; setF('bold',sz); const vLines=pdf.splitTextToSize(String(v==null?'':v),CW-44); K.ensure(lh(sz)*vLines.length); setF('normal',sz); setT(MUT); pdf.text(String(k),M,y+sz*PT*0.8); setF('bold',sz); setT(DARK); vLines.forEach(ln=>{ pdf.text(ln,M+42,y+sz*PT*0.8); y+=lh(sz); }); },
+        rowLR(left,right){ const sz=9.5; setF('bold',sz); const rw=pdf.getTextWidth(String(right)); const leftMax=CW-rw-6; setF('normal',sz); const ll=pdf.splitTextToSize(String(left),leftMax); K.ensure(lh(sz)*ll.length); setT(DARK); ll.forEach((ln,i)=>{ setF('normal',sz); setT(DARK); pdf.text(ln,M,y+sz*PT*0.8); if(i===0){ setF('bold',sz); pdf.text(String(right),W-M,y+sz*PT*0.8,{align:'right'}); } y+=lh(sz); }); }
+      };
+      return K;
+    }
+    function pdfFooter(pdf,st){ const n=pdf.internal.getNumberOfPages(); for(let i=1;i<=n;i++){ pdf.setPage(i); pdf.setFont('helvetica','normal'); pdf.setFontSize(7.5); pdf.setTextColor(150,146,166); pdf.text('Rapport généré par '+(st.app_name||'AuditIA')+' · '+(st.company_name||'AffiAds'),16,291); pdf.text(i+'/'+n,194,291,{align:'right'}); } }
+    function pdfHeadBand(pdf,K,st,a,title){ const col=hexToRgb(st.primary_color); pdf.setFillColor(col[0],col[1],col[2]); pdf.rect(0,0,K.W,24,'F'); K.setF('bold',15); pdf.setTextColor(255,255,255); pdf.text(String(st.app_name||'AuditIA'),K.M,13); K.setF('normal',9); pdf.text(title,K.M,19); K.setF('normal',9); pdf.text(new Date(a.updated_at||Date.now()).toLocaleDateString('fr-FR'),K.W-K.M,13,{align:'right'}); pdf.text(String(st.company_name||'AffiAds'),K.W-K.M,19,{align:'right'}); K.y=32; }
+    function pdfClientVerdict(pdf,K,c,d,diag){ const idx=diag.index; const lab=visibilityLabel(idx); const ic=pdfScoreCol(idx);
+      K.para((c&&c.name)||'Commerce',{style:'bold',size:20}); K.para([c&&c.city,c&&(c.category||d.category)].filter(Boolean).join('   •   '),{color:K.MUT,size:10}); K.gap(2);
+      K.ensure(24); K.setF('bold',38); K.setT(ic); pdf.text(String(idx),K.M,K.y+13); K.setF('normal',11); K.setT(K.MUT); pdf.text('/100',K.M+String(idx).length*7+2,K.y+13); K.setF('bold',12); K.setT(ic); pdf.text(lab.t,K.M,K.y+20); K.y+=24;
+      K.para(visibilityVerdict(idx),{size:9.5}); K.gap(1);
+      const seoCol=pdfScoreCol(diag.seo.score), geoCol=pdfScoreCol(diag.geo.score);
+      K.ensure(8); K.setF('bold',10); K.setT(K.DARK); pdf.text('SEO — Google',K.M,K.y+4); K.setT(seoCol); pdf.text(diag.seo.score+'/100',K.M+62,K.y+4,{align:'right'});
+      K.setF('bold',10); K.setT(K.DARK); pdf.text('GEO — IA génératives',K.M+70,K.y+4); K.setT(geoCol); pdf.text(diag.geo.score+'/100',K.W-K.M,K.y+4,{align:'right'}); K.y+=9; }
+    function buildPdfFull(pdf,a,c){
+      const st={...defaultSettings(),...(appSettings||{})}; const d=(c&&c.details)||{}; const diag=visibilityAudit(a,c); const col=hexToRgb(st.primary_color);
+      const K=pdfKit(pdf); const {W,M,CW}=K;
+      pdfHeadBand(pdf,K,st,a,'Rapport de visibilité numérique');
+      pdfClientVerdict(pdf,K,c,d,diag); K.hr();
+      const pillar=(title,sub,p)=>{ K.heading(title,col); K.para(sub,{color:K.MUT,size:8.5}); K.gap(1);
+        K.ensure(6); K.setF('bold',10); K.setT(K.DARK); pdf.text('Ce que vous avez',M,K.y+3.4); K.y+=5.6; if(p.have.length) p.have.forEach(x=>K.bullet(x.label,x.advice,[31,157,87])); else K.para('À construire entièrement sur cet axe.',{color:K.MUT,size:9});
+        K.gap(1); K.ensure(6); K.setF('bold',10); K.setT(K.DARK); pdf.text('Ce qu’il vous manque',M,K.y+3.4); K.y+=5.6; if(p.miss.length) p.miss.forEach(x=>K.bullet(x.label,x.gap,[192,57,43])); else K.para('Rien de bloquant sur cet axe.',{color:K.MUT,size:9}); K.gap(2); };
+      pillar('SEO — être trouvé sur Google','Quand un client cherche votre activité près de chez lui, apparaissez-vous ?',diag.seo);
+      pillar('GEO — être cité par les IA','ChatGPT, Gemini et Perplexity recommandent de plus en plus de commerces. GEO, c’est être la réponse qu’elles donnent.',diag.geo);
+      K.heading('Fiche commerce',col);
+      if(c&&(c.category||d.category)) K.kv('Catégorie',c.category||d.category);
+      if(d.address) K.kv('Adresse',d.address);
+      if((c&&c.phone)||d.phone) K.kv('Téléphone',(c&&c.phone)||d.phone);
+      K.kv('Site internet',(c&&c.website)?('oui — '+c.website):'aucun');
+      if(d.rating!=null) K.kv('Note Google',String(d.rating).replace('.',',')+'/5  ('+(d.reviews||0)+' avis)');
+      if(d.photoCount!=null) K.kv('Photos Google',d.photoCount+(d.photoCount>=10?'+':'')+' photo'+(d.photoCount>1?'s':''));
+      const age=(typeof businessAge==='function')?businessAge(a,c):null; if(age&&age.hasData) K.kv(age.official?'Ouverture':'Ancienneté',(age.official?'depuis '+age.since:'présence en ligne depuis '+age.since));
+      const s=a&&a.scan; if(s&&s.scores){ K.heading('Performance du site (Google Lighthouse, mobile)',col); K.kv('Performance',s.scores.performance+'/100'); K.kv('Accessibilité',s.scores.accessibility+'/100'); K.kv('Bonnes pratiques',s.scores.bestPractices+'/100'); K.kv('SEO technique',s.scores.seo+'/100'); }
+      const cp=a&&a.site&&a.site.competitors; if(cp&&cp.list&&cp.list.length){ K.heading('Concurrents locaux',col); const self=cp.list.find(x=>x.isSelf); let ins; if(self&&cp.selfRank){ if(cp.selfRank===1) ins='Vous êtes n°1 localement en nombre d’avis.'; else { const t=cp.list[cp.selfRank-2]; const need=t?Math.max(1,(Number(t.reviews)||0)-(Number(self.reviews)||0)+1):null; ins='Vous êtes n°'+cp.selfRank+' sur '+cp.total+(need!=null?' — il manque environ '+need+' avis pour dépasser le n°'+(cp.selfRank-1)+'.':'.'); } } else ins='Votre commerce n’apparaît pas dans les '+cp.total+' premiers résultats : priorité à la visibilité locale.'; K.para(ins,{size:9.5}); K.gap(1); cp.list.slice(0,6).forEach((x,i)=>{ K.rowLR((i+1)+'. '+x.name+(x.isSelf?' (vous)':''),(x.rating!=null?String(x.rating).replace('.',',')+'/5':'—')+'  ·  '+(Number(x.reviews)||0)+' avis'); }); K.para('Classés par nombre d’avis (popularité). Source : Google Places — pas l’ordre exact de Google.',{size:7.5,color:K.MUT}); }
+      const rk=a&&a.site&&a.site.rankings; if(rk&&rk.length&&!rk.every(r=>r.error)){ K.heading('Classement sur les mots-clés',col); const found=rk.filter(r=>r.found).length; K.para('Trouvé sur '+found+' / '+rk.length+' recherches.',{size:9.5}); K.gap(1); rk.forEach(r=>{ const b=(typeof rankBadge==='function')?rankBadge(r):{t:(r.found?('n°'+r.pos):'non trouvé')}; K.rowLR(r.kw,b.t); }); K.para('Classement indicatif (recherche web), différent du classement Google exact.',{size:7.5,color:K.MUT}); }
+      const plan=(typeof improvementPlan==='function')?improvementPlan(a,c):[]; if(plan.length){ K.heading('Plan d’amélioration détaillé',col); plan.forEach((it,i)=>{ K.setF('bold',10); const hl=pdf.splitTextToSize((i+1)+'. '+it.title+'   ['+it.axis+' · '+it.priority+']',CW); K.ensure(K.lh(10)*hl.length+2); K.setT(K.DARK); hl.forEach(ln=>{ pdf.text(ln,M,K.y+3.4); K.y+=K.lh(10); }); if(it.why) K.para('Pourquoi : '+it.why,{size:8.5,color:K.MUT}); (it.how||[]).forEach(h=>K.bullet(h,'',col)); K.gap(1.5); }); }
+      if(a.notes){ K.heading('Notes',col); K.para(a.notes,{size:9.5}); }
+      K.gap(3); K.hr(); K.ensure(6); K.setF('bold',10); K.setT(col); pdf.text(String(st.signature_name||st.company_name||'AffiAds'),M,K.y+3.4); K.y+=5; if(st.signature_role) K.para(st.signature_role,{size:9,color:K.MUT}); const contact=[st.contact_email,st.phone,st.website].filter(Boolean).join('   ·   '); if(contact) K.para(contact,{size:9}); if(st.signature_text) K.para(st.signature_text,{size:8.5,color:K.MUT});
+      pdfFooter(pdf,st);
+    }
+    function buildPdfSimple(pdf,a,c){
+      const st={...defaultSettings(),...(appSettings||{})}; const d=(c&&c.details)||{}; const diag=visibilityAudit(a,c); const col=hexToRgb(st.primary_color);
+      const K=pdfKit(pdf); const {W,M,CW}=K;
+      pdfHeadBand(pdf,K,st,a,'Aperçu de visibilité');
+      pdfClientVerdict(pdf,K,c,d,diag); K.hr();
+      K.heading('Vos points forts',col); if(diag.strengths.length) diag.strengths.slice(0,4).forEach(x=>K.bullet(x.label,'',[31,157,87])); else K.para('À construire sur tous les axes.',{color:K.MUT,size:9});
+      K.heading('Ce qu’il vous manque',col); if(diag.weaknesses.length) diag.weaknesses.slice(0,5).forEach(x=>K.bullet(x.label,'',[192,57,43])); else K.para('Rien de bloquant.',{color:K.MUT,size:9});
+      K.gap(2); K.ensure(22); pdf.setFillColor(246,243,255); pdf.setDrawColor(col[0],col[1],col[2]); pdf.setLineWidth(0.3); pdf.roundedRect(M,K.y,CW,20,3,3,'FD'); K.setF('bold',10); K.setT(col); pdf.text('Ceci est un aperçu gratuit.',M+4,K.y+7); K.setF('normal',8.5); K.setT([70,70,70]); pdf.splitTextToSize('Le rapport complet détaille chaque critère SEO et GEO, votre classement sur vos mots-clés, vos concurrents locaux et un plan d’action priorisé, étape par étape.',CW-8).slice(0,3).forEach((ln,i)=>pdf.text(ln,M+4,K.y+12+i*4)); K.y+=24;
+      K.setF('bold',10); K.setT(col); pdf.text(String(st.signature_name||st.company_name||'AffiAds'),M,K.y+4); K.y+=5; const contact=[st.contact_email,st.phone,st.website].filter(Boolean).join('   ·   '); if(contact){ K.setF('normal',9); K.setT(K.DARK); pdf.text(contact,M,K.y+3); }
+      pdfFooter(pdf,st);
     }
     async function exportReport(auditId, mode){
-      if(pdfBusy)return;
-      const a=appAudits.find(x=>String(x.id)===String(auditId));
-      if(!a){appNotice='Audit introuvable. Actualise la page puis réessaie.';renderApp();return;}
-      mode=mode==='simple'?'simple':'full';
-      const key=String(auditId)+':'+mode;
-      const cached=preparedReportBlobs.get(key);
-      if(cached){showPdfResult(cached.blob,cached.fname);return;}
-      pdfBusy=true;pdfCancelled=false;appNotice='Préparation du rapport à la demande…';renderApp();
+      if(pdfBusy) return;
+      const a=appAudits.find(x=>x.id===auditId);
+      if(!a){appNotice='Audit introuvable. Réessaie.';renderApp();return;}
+      const c=appClients.find(x=>x.id===a.client_id);
+      mode=(mode==='simple')?'simple':'full';
+      pdfBusy=true;pdfCancelled=false;appNotice='';renderApp();
       try{
-        const result=await prepareReportForAudit(auditId,mode);
-        if(result)showPdfResult(result.blob,result.fname);
+        await ensureJsPdf();
+        if(pdfCancelled) return;
+        const jsPDFctor=(window.jspdf&&window.jspdf.jsPDF)||window.jsPDF;
+        const pdf=new jsPDFctor('p','mm','a4');
+        if(mode==='simple') buildPdfSimple(pdf,a,c); else buildPdfFull(pdf,a,c);
+        if(pdfCancelled) return;
+        const base=((mode==='simple'?'Rapport-express-':'Rapport-complet-')+((c&&c.name)||'commerce')).normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/gi,'-').replace(/^-|-$/g,'');
+        const fname=base+'.pdf';
+        const blob=pdf.output('blob');
+        pdfBusy=false;appNotice='';renderApp();
+        showPdfResult(blob,fname);
       }catch(e){
-        appNotice='Le PDF n’a pas pu être préparé : '+((e&&e.message)||'erreur inconnue').slice(0,100);
-      }finally{pdfBusy=false;const host=document.getElementById('printReport');if(host)host.innerHTML='';renderApp();}
+        pdfBusy=false;
+        appNotice='Le PDF n’a pas pu être généré ('+((e&&e.message)||'erreur inconnue').slice(0,90)+'). Réessaie.';
+        renderApp();
+      }
+    }
+    async function prepareReportForAudit(auditId, mode){
+      mode=(mode==='simple')?'simple':'full';
+      const a=appAudits.find(x=>String(x.id)===String(auditId)); if(!a) return null;
+      const c=appClients.find(x=>String(x.id)===String(a.client_id));
+      await ensureJsPdf();
+      const jsPDFctor=(window.jspdf&&window.jspdf.jsPDF)||window.jsPDF;
+      const pdf=new jsPDFctor('p','mm','a4');
+      if(mode==='simple') buildPdfSimple(pdf,a,c); else buildPdfFull(pdf,a,c);
+      const base=((mode==='simple'?'Rapport-express-':'Rapport-complet-')+((c&&c.name)||'commerce')).normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/gi,'-').replace(/^-|-$/g,'');
+      const res={blob:pdf.output('blob'),fname:base+'.pdf'};
+      preparedReportBlobs.set(String(auditId)+':'+mode,res);
+      return res;
     }
     function showPdfResult(blob,fname){
       let url; try{ url=URL.createObjectURL(blob); }catch(_){ appNotice='PDF prêt mais impossible à ouvrir ici.'; renderApp(); return; }
