@@ -2351,8 +2351,8 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       }catch(e){
         pdfBusy=false;
         try{console.error('[AuditIA PDF] Échec de génération',e&&e.stack||e);}catch(_){}
-        const pdfError=(e&&e.message)||'erreur inconnue';
-        appNotice='Le PDF n’a pas pu être généré ('+String(pdfError).slice(0,180)+'). Réessaie.';
+        const pdfError=(e&&e.stack)||((e&&e.message)||'erreur inconnue');
+        appNotice='Échec PDF — trace technique : '+String(pdfError).slice(0,500);
         renderApp();
       }
     }
