@@ -2167,17 +2167,17 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
         if(pdfCancelled) return;
         const el=document.getElementById('rPageCapture');
         if(!el) throw new Error('Le contenu du rapport est introuvable.');
-        if(document.fonts&&document.fonts.ready){try{await document.fonts.ready;}catch(_){}}
+        if(document.fonts&&document.fonts.ready){try{await Promise.race([document.fonts.ready,new Promise(r=>setTimeout(r,600))]);}catch(_){}}
         const imgs=[...el.querySelectorAll('img')];
-        await Promise.all(imgs.map(img=>img.complete?Promise.resolve():new Promise(resolve=>{img.onload=resolve;img.onerror=resolve;setTimeout(resolve,2500);})));
+        await Promise.all(imgs.map(img=>img.complete?Promise.resolve():new Promise(resolve=>{img.onload=resolve;img.onerror=resolve;setTimeout(resolve,900);})));
         if(pdfCancelled) return;
-        const canvas=await window.html2canvas(el,{scale:(mode==='simple')?2:1.5,backgroundColor:'#ffffff',useCORS:true,logging:false,windowWidth:el.scrollWidth,scrollX:0,scrollY:0});
+        const canvas=await window.html2canvas(el,{scale:(mode==='simple')?1.8:1.25,backgroundColor:'#ffffff',useCORS:true,logging:false,windowWidth:el.scrollWidth,scrollX:0,scrollY:0,imageTimeout:3000});
         if(pdfCancelled) return;
         if(!canvas.width||!canvas.height) throw new Error('Le rapport n’a pas pu être rendu en image.');
         const jsPDFctor=(window.jspdf&&window.jspdf.jsPDF)||window.jsPDF;
         const pdf=new jsPDFctor('p','mm','a4');
         const pw=pdf.internal.pageSize.getWidth(),ph=pdf.internal.pageSize.getHeight();
-        const img=canvas.toDataURL('image/jpeg',0.92);
+        const img=canvas.toDataURL('image/jpeg',0.82);
         if(mode==='simple'){
           let imgW=pw,imgH=canvas.height*pw/canvas.width;
           if(imgH>ph){imgH=ph;imgW=canvas.width*ph/canvas.height;}
