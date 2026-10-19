@@ -727,6 +727,14 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
     .rk-kw{font-size:13px;font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis}
     .rk-badge{flex:0 0 auto;font-size:11px;font-weight:800;padding:4px 9px;border-radius:20px}
     .rk-ok{background:#1f4a3c;color:#9ae8c4}.rk-mid{background:#4a3f1f;color:#fbe0a6}.rk-bad{background:#4a2330;color:#ffb4bd}.rk-no{background:#3a3850;color:#aaa6bd}
+    /* ===== Concurrents locaux ===== */
+    .cp-panel{margin-top:14px}
+    .cp-row{display:flex;align-items:center;gap:10px;background:#42445e;border:1px solid #ffffff0d;border-radius:11px;padding:9px 12px;margin-bottom:6px}
+    .cp-row.cp-self{background:#2c4a40;border-color:#2f6b52}
+    .cp-rank{flex:0 0 24px;width:24px;height:24px;border-radius:50%;background:#34334a;color:#cbbcff;font-weight:800;font-size:12px;display:grid;place-items:center}
+    .cp-self .cp-rank{background:#1f4a3c;color:#9ae8c4}
+    .cp-name{flex:1;min-width:0;font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .cp-score{flex:0 0 auto;font-size:12px;color:#d7d4e4}.cp-score small{color:#aaa6bd}
     @media(max-width:600px){.scan-scores{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.scan-metrics{grid-template-columns:minmax(0,1fr)}.scan-head .app-btn{width:100%}}
 
     /* ===== Test & validation des clés API ===== */
@@ -1338,6 +1346,24 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       const key=placesKey(); if(!key||!placeId) return null;
       try{ const r=await withTimeout(fetch('https://places.googleapis.com/v1/places/'+encodeURIComponent(placeId),{headers:{'X-Goog-Api-Key':key,'X-Goog-FieldMask':'photos'}}),12000); if(!r.ok) return null; const d=await r.json(); return Array.isArray(d.photos)?d.photos.length:0; }catch(e){ return null; }
     }
+    /* Concurrents locaux : commerces du même type dans la ville (Google Places), classés par avis */
+    async function fetchCompetitors(c){
+      const key=placesKey(); if(!key) return null;
+      const d=(c&&c.details)||{}; const city=String((c&&c.city)||'').trim();
+      const base=targetKeywords(c).base||String((c&&c.category)||d.category||'commerce').toLowerCase();
+      const query=(base+' '+city).trim();
+      try{
+        const r=await withTimeout(fetch('https://places.googleapis.com/v1/places:searchText',{method:'POST',headers:{'Content-Type':'application/json','X-Goog-Api-Key':key,'X-Goog-FieldMask':'places.id,places.displayName,places.rating,places.userRatingCount'},body:JSON.stringify({textQuery:query,languageCode:'fr',regionCode:'FR',maxResultCount:20})}),15000);
+        if(!r.ok) return null;
+        const data=await r.json(); const places=data.places||[]; if(!places.length) return null;
+        const selfId=d.place_id||''; const selfName=norm((c&&c.name)||'');
+        const seen=new Set(); let list=[];
+        places.forEach(p=>{ const id=p.id||''; if(seen.has(id))return; seen.add(id); const nm=(p.displayName&&p.displayName.text)||''; list.push({placeId:id,name:nm,rating:(typeof p.rating==='number')?p.rating:null,reviews:p.userRatingCount||0,isSelf:(selfId&&id===selfId)||(selfName&&norm(nm)===selfName)}); });
+        list.sort((a,b)=>(b.reviews-a.reviews)||((b.rating||0)-(a.rating||0)));
+        const idx=list.findIndex(x=>x.isSelf);
+        return { query, total:list.length, selfRank:idx>=0?idx+1:null, list:list.slice(0,8) };
+      }catch(e){ return null; }
+    }
     const norm=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
     function siteHost(c){ const w=String((c&&c.website)||'').trim(); if(!w) return ''; try{ return new URL(/^https?:\/\//i.test(w)?w:'https://'+w).hostname.replace(/^www\./,''); }catch(e){ return ''; } }
     /* Classement : pour chaque mot-clé client, à quelle position apparaît le commerce (recherche web réelle) */
@@ -1368,6 +1394,12 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       const rows=rk.map(r=>{const b=rankBadge(r);return '<div class="rk-row"><span class="rk-kw">'+escHtml(r.kw)+'</span><span class="rk-badge rk-'+b.c+'">'+escHtml(b.t)+(r.found&&r.matchType==='site'?' 🌐':r.found&&r.matchType==='annuaire'?' 📄':'')+'</span></div>';}).join('');
       const found=rk.filter(r=>r.found).length;
       return head+'<p class="app-muted" style="margin:0 0 10px">Trouvé sur '+found+' recherche'+(found>1?'s':'')+' sur '+rk.length+'.</p>'+rows+'<p class="scan-note">Classement indicatif (recherche web). Il peut différer du classement Google exact, qui dépend de la position du client et inclut la carte locale. 🌐 = via le site · 📄 = via un annuaire.</p></section>';
+    }
+    function competitorsHtml(a,c){
+      const cp=a&&a.site&&a.site.competitors; if(!cp||!cp.list||!cp.list.length) return '';
+      const rows=cp.list.map((x,i)=>'<div class="cp-row'+(x.isSelf?' cp-self':'')+'"><span class="cp-rank">'+(i+1)+'</span><span class="cp-name">'+escHtml(x.name)+(x.isSelf?' — vous':'')+'</span><span class="cp-score">'+(x.rating!=null?'★ '+x.rating:'—')+' <small>('+x.reviews+')</small></span></div>').join('');
+      const pos=cp.selfRank?('Vous êtes n°'+cp.selfRank+' sur '+cp.total+' commerces trouvés pour « '+cp.query+' ».'):('Votre commerce n’apparaît pas dans les '+cp.total+' résultats pour « '+cp.query+' ».');
+      return '<section class="app-panel cp-panel"><div class="eyebrow">CONCURRENTS LOCAUX</div><h3 style="margin:4px 0 4px">À qui vous vous comparez</h3><p class="app-muted" style="margin:0 0 10px">'+escHtml(pos)+'</p>'+rows+'<p class="scan-note">Commerces du même type dans la ville, classés par nombre d’avis (popularité). Source : Google Places. C’est un classement par avis, pas l’ordre exact de Google.</p></section>';
     }
     /* Capture d'écran du site via WordPress mShots, récupérée en data-URL (pour l'afficher et l'inclure au PDF sans souci de CORS) */
     async function fetchScreenshot(site){
@@ -1485,6 +1517,9 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
           setPhase('Capture d’écran du site…',76);
           try{ const shot=await fetchScreenshot(site); if(shot&&siteRes){ siteRes.screenshot=shot; await appClient.from('audits').update({site:siteRes}).eq('id',auditId); } else if(!shot){ issues.push('capture du site indisponible'); } }
           catch(e){}
+          setPhase('Analyse des concurrents locaux…',84);
+          try{ const cp=await fetchCompetitors(c); if(cp&&siteRes){ siteRes.competitors=cp; await appClient.from('audits').update({site:siteRes}).eq('id',auditId); } }
+          catch(e){}
           setPhase('Vérification du classement sur les mots-clés…',90);
           try{ const rk=await checkRankings(c); if(siteRes){ siteRes.rankings=rk; await appClient.from('audits').update({site:siteRes}).eq('id',auditId); } }
           catch(e){}
@@ -1501,6 +1536,9 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
           setPhase('Recherche de la présence sur le web (réseaux, annuaires)…',52);
           try{ const web=await findWebPresence(c); siteRes={hasWebsite:false,socials:web.socials||[],directories:web.directories||[],analyzedAt:new Date().toISOString(),finalUrl:null}; await appClient.from('audits').update({site:siteRes}).eq('id',auditId); }
           catch(e){ siteRes={hasWebsite:false,socials:[],directories:[],analyzedAt:new Date().toISOString(),finalUrl:null}; }
+          setPhase('Analyse des concurrents locaux…',72);
+          try{ const cp=await fetchCompetitors(c); if(cp){ siteRes.competitors=cp; await appClient.from('audits').update({site:siteRes}).eq('id',auditId); } }
+          catch(e){}
           setPhase('Vérification du classement sur les mots-clés…',85);
           try{ const rk=await checkRankings(c); siteRes.rankings=rk; await appClient.from('audits').update({site:siteRes}).eq('id',auditId); }
           catch(e){}
@@ -1632,6 +1670,7 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
         +(a.site?(function(){const si=a.site;const soc=(si.socials||[]);const sv=socialVisibility(a);const sig=[];if(si.booking&&si.booking.length)sig.push('Réservation en ligne ('+si.booking.join(', ')+')');if(si.whatsapp)sig.push('WhatsApp');if(si.tracking&&si.tracking.length)sig.push('Outils de suivi : '+si.tracking.join(', '));if(si.cms)sig.push('Technologie du site : '+si.cms);const dirs=(si.directories||[]);const web=c&&c.website?'✓ Site internet : '+c.website:'✗ Aucun site internet';return '<div class="r-section"><h2>Site, réseaux sociaux &amp; visibilité</h2><p class="r-sig-line" style="margin:0 0 4px"><b>'+escHtml(web)+'</b></p><p class="r-verdict-meta" style="margin:0 0 8px;font-size:12px"><b>'+escHtml(sv.label)+'</b></p>'+(soc.length?'<table class="r-table">'+soc.map(x=>'<tr><td>'+escHtml(x.net)+(x.source==='web'?' (web)':'')+'</td><td>'+escHtml(x.url)+'</td></tr>').join('')+'</table>':'<p class="r-notes">Aucun réseau social détecté. Recommandation : créer/relier au moins un profil (Instagram ou Facebook).</p>')+(dirs.length?'<p class="r-sig-line">Présent sur : '+escHtml(dirs.map(x=>x.name).join(' · '))+'</p>':'<p class="r-sig-line">Aucune présence notable sur les annuaires (Pages Jaunes, Maps, TripAdvisor…) — à créer.</p>')+(sig.length?'<p class="r-sig-line">Autres signaux : '+escHtml(sig.join(' · '))+'</p>':'')+'<p class="r-mini">Réseaux et annuaires cherchés sur le site et sur le web. « (web) » = à confirmer. Les statistiques privées ne sont pas publiques.</p></div>';})():'')
         +(function(){const kw=targetKeywords(c);const age=businessAge(a,c);const legal=legalRows(c);const rows=[];const cat=c&&(c.category||d.category);if(cat)rows.push(['Catégorie',cat]);if(d.primaryType)rows.push(['Type Google',String(d.primaryType).replace(/_/g,' ')]);if(age.hasData)rows.push([age.official?'Ouverture (officielle)':'Ancienneté estimée',(age.official?'depuis '+age.since:'présence en ligne depuis '+age.since)+(age.detail?' ('+age.detail+')':'')]);const legalHtml=legal.length?'<p class="r-tgt-sub">Informations légales (registre SIRENE)</p><table class="r-table">'+legal.map(([k,v])=>'<tr><td>'+escHtml(k)+'</td><td>'+escHtml(v)+'</td></tr>').join('')+'</table>':'';const kwHtml=kw.seo.length?'<p class="r-tgt-sub">Mots-clés cibles (recherche Google)</p><p class="r-kw">'+kw.seo.map(k=>'<span>'+escHtml(k)+'</span>').join('')+'</p>':'';const geoHtml=kw.geo.length?'<p class="r-tgt-sub">Questions types posées aux IA (GEO)</p><ul class="r-recs">'+kw.geo.map(q=>'<li>'+escHtml(q)+'</li>').join('')+'</ul>':'';return (rows.length||legalHtml||kwHtml||geoHtml)?'<div class="r-section"><h2>Profil, informations légales &amp; mots-clés</h2>'+(rows.length?'<table class="r-table">'+rows.map(([k,v])=>'<tr><td>'+escHtml(k)+'</td><td>'+escHtml(v)+'</td></tr>').join('')+'</table>':'')+legalHtml+kwHtml+geoHtml+'<p class="r-mini">Informations légales publiques (base SIRENE / INSEE). Les mots-clés sont des pistes pertinentes (catégorie + ville), pas des volumes de recherche mesurés.</p></div>':'';})()
         +(a.site&&a.site.rankings&&a.site.rankings.length&&!a.site.rankings.every(r=>r.error)?(function(){const rk=a.site.rankings;const found=rk.filter(r=>r.found).length;return '<div class="r-section"><h2>Classement sur les mots-clés</h2><p class="r-verdict-meta" style="margin:0 0 8px;font-size:12px"><b>Trouvé sur '+found+'/'+rk.length+' recherches</b></p><table class="r-table">'+rk.map(r=>{const b=rankBadge(r);return '<tr><td>'+escHtml(r.kw)+'</td><td><span class="r-rk r-rk-'+b.c+'">'+escHtml(b.t)+'</span></td></tr>';}).join('')+'</table><p class="r-mini">Classement indicatif (recherche web), différent du classement Google exact qui dépend de la géolocalisation et de la carte locale.</p></div>';})():'')
+        +(a.site&&a.site.competitors&&a.site.competitors.list&&a.site.competitors.list.length?(function(){const cp=a.site.competitors;const pos=cp.selfRank?('Classé n°'+cp.selfRank+' sur '+cp.total+' pour « '+cp.query+' »'):('Non classé dans les '+cp.total+' résultats pour « '+cp.query+' »');return '<div class="r-section"><h2>Concurrents locaux</h2><p class="r-verdict-meta" style="margin:0 0 8px;font-size:12px"><b>'+escHtml(pos)+'</b></p><table class="r-table">'+cp.list.map((x,i)=>'<tr'+(x.isSelf?' style="font-weight:800"':'')+'><td>'+(i+1)+'. '+escHtml(x.name)+(x.isSelf?' — vous':'')+'</td><td>'+(x.rating!=null?'★ '+x.rating:'—')+' ('+x.reviews+' avis)</td></tr>').join('')+'</table><p class="r-mini">Commerces du même type dans la ville, classés par nombre d’avis (popularité). Source : Google Places.</p></div>';})():'')
         +(a.site&&a.site.screenshot?'<div class="r-section"><h2>Aperçu du site</h2><img class="r-shot" src="'+a.site.screenshot+'" alt="Capture du site"></div>':'')
         +(a.site?(function(){const t=googleSocialTips(a,c);return '<div class="r-section"><h2>Comment améliorer la fiche Google &amp; les réseaux</h2><div class="r-cols"><div class="r-col"><p class="r-tgt-sub">📍 Fiche Google</p><ul class="r-tips">'+t.google.map(x=>'<li>'+escHtml(x)+'</li>').join('')+'</ul></div><div class="r-col"><p class="r-tgt-sub">📱 Réseaux sociaux</p><ul class="r-tips">'+t.reseaux.map(x=>'<li>'+escHtml(x)+'</li>').join('')+'</ul></div></div></div>';})():'')
         +(plan.length?'<div class="r-section"><h2>Plan d’action priorisé</h2><div class="r-plan">'+plan.map((p,i)=>'<div class="r-plan-item"><span class="r-plan-n">'+(i+1)+'</span><div class="r-plan-c"><b>'+escHtml(p.t)+'</b>'+(p.d?'<span>'+escHtml(p.d)+'</span>':'')+'</div>'+(p.axis?'<span class="r-axis-tag">'+escHtml(p.axis)+'</span>':'')+pill(p.p)+'</div>').join('')+'</div></div>':'')
@@ -1711,7 +1750,7 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
         const c=appClients.find(x=>x.id===a.client_id);
         const list=Array.isArray(a.checklist)?a.checklist:[];
         const analyzed=!!(a.site||a.scan||a.status==='Analysé');
-        const diagBlocks=analyzed?(visibilitySummaryHtml(a,c)+clientInfoHtml(c)+siteShotHtml(a)+scanPanelHtml(a,c)+socialPresenceHtml(a)+rankingsHtml(a)+targetingPanelHtml(a,c)+improvementHtml(a,c)+'<details class="cd-edit" style="margin-top:14px"><summary>Notes personnelles (facultatif)</summary><form class="app-form" data-save-notes style="padding:0 16px 16px"><label>Notes internes<textarea name="notes" placeholder="Remarques pour toi — n’apparaissent dans le rapport que si tu les remplis.">'+escHtml(a.notes||'')+'</textarea></label><button class="app-btn primary" type="submit">Enregistrer les notes</button></form></details><div class="detail-actions" style="margin-top:16px"><button class="app-btn primary" data-export-report="'+a.id+'">📄 Exporter le rapport (PDF)</button><button class="app-btn" data-delete-audit="'+a.id+'">Supprimer cet audit</button></div>'):'<div class="app-panel" style="margin-top:14px"><div class="app-empty">Rien n’est encore analysé. Touche <b>⚡ Analyser le commerce</b> ci-dessus : AuditIA récupère les données Google, lit le site, trouve les réseaux, les informations légales (SIRET) et la performance, puis génère le rapport complet.</div><div class="detail-actions" style="margin-top:14px"><button class="app-btn" data-delete-audit="'+a.id+'">Supprimer cet audit</button></div></div>';
+        const diagBlocks=analyzed?(visibilitySummaryHtml(a,c)+clientInfoHtml(c)+siteShotHtml(a)+scanPanelHtml(a,c)+socialPresenceHtml(a)+rankingsHtml(a)+competitorsHtml(a,c)+targetingPanelHtml(a,c)+improvementHtml(a,c)+'<details class="cd-edit" style="margin-top:14px"><summary>Notes personnelles (facultatif)</summary><form class="app-form" data-save-notes style="padding:0 16px 16px"><label>Notes internes<textarea name="notes" placeholder="Remarques pour toi — n’apparaissent dans le rapport que si tu les remplis.">'+escHtml(a.notes||'')+'</textarea></label><button class="app-btn primary" type="submit">Enregistrer les notes</button></form></details><div class="detail-actions" style="margin-top:16px"><button class="app-btn primary" data-export-report="'+a.id+'">📄 Exporter le rapport (PDF)</button><button class="app-btn" data-delete-audit="'+a.id+'">Supprimer cet audit</button></div>'):'<div class="app-panel" style="margin-top:14px"><div class="app-empty">Rien n’est encore analysé. Touche <b>⚡ Analyser le commerce</b> ci-dessus : AuditIA récupère les données Google, lit le site, trouve les réseaux, les informations légales (SIRET) et la performance, puis génère le rapport complet.</div><div class="detail-actions" style="margin-top:14px"><button class="app-btn" data-delete-audit="'+a.id+'">Supprimer cet audit</button></div></div>';
         body='<button class="app-btn" data-app-view="Audits">← Retour aux audits</button><section class="app-panel" style="margin-top:14px"><div class="eyebrow">DOSSIER D’AUDIT</div><h2 style="margin-top:8px">'+escHtml(c?.name||'Commerce')+'</h2><p>'+escHtml(c?.city||'')+' · '+escHtml(a.title)+'</p>'+analysePanelHtml(a,c)+diagBlocks+'</section>';
       }
       appShell(body);
