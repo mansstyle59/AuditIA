@@ -1218,6 +1218,71 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
   .sidebar-nav button,.desktop-nav button,.mobile-tabbar button{transition:none}
 }
 
+
+/* AuditIA — navigation premium, sans modifier les écrans ni leurs fonctions */
+.desktop-nav{
+  display:flex;align-items:center;gap:7px;flex-wrap:wrap;
+  margin:0 0 20px;padding:7px;
+  border:1px solid #ffffff12;border-radius:18px;
+  background:linear-gradient(135deg,#211b34dd,#171522e8);
+  box-shadow:inset 0 1px 0 #ffffff08;
+}
+.desktop-nav button{
+  display:inline-flex;align-items:center;justify-content:center;gap:9px;
+  min-height:44px;padding:0 15px;border:1px solid transparent;border-radius:13px;
+  background:transparent;color:#aaa4bf;font-size:13px;font-weight:750;
+  transition:background .18s ease,color .18s ease,border-color .18s ease,transform .18s ease;
+}
+.desktop-nav button svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.desktop-nav button:hover{background:#ffffff08;color:#f5f0ff}
+.desktop-nav button.active{
+  color:#eee7ff;border-color:#9278ff45;
+  background:linear-gradient(135deg,#7253dc42,#9b7bff1c);
+  box-shadow:inset 0 1px 0 #ffffff12,0 4px 14px #08051222;
+}
+.mobile-tabbar{
+  left:0!important;right:0!important;bottom:0!important;
+  grid-template-columns:repeat(5,minmax(0,1fr))!important;
+  gap:3px!important;padding:8px 8px calc(8px + env(safe-area-inset-bottom))!important;
+  border:1px solid #ffffff15!important;border-bottom:0!important;
+  border-radius:23px 23px 0 0!important;
+  background:rgba(25,22,39,.94)!important;
+  -webkit-backdrop-filter:blur(24px) saturate(155%)!important;
+  backdrop-filter:blur(24px) saturate(155%)!important;
+  box-shadow:0 -10px 35px #0805103d, inset 0 1px 0 #ffffff0d!important;
+}
+.mobile-tabbar button{
+  position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:5px;min-width:0;min-height:61px;padding:5px 2px;
+  border:1px solid transparent;border-radius:15px;background:transparent;
+  color:#9c96b2;font-size:10px;font-weight:700;
+}
+.mobile-tabbar button .tab-icon{width:28px;height:25px;color:inherit}
+.mobile-tabbar button .tab-icon svg{width:22px;height:22px}
+.mobile-tabbar button span:last-child{font-size:10px;letter-spacing:0}
+.mobile-tabbar button.active{
+  color:#d8caff;border-color:#9a7cff30;
+  background:linear-gradient(180deg,#8d6aff25,#7654db13);
+}
+.mobile-tabbar button.active:before{
+  content:"";position:absolute;top:0;left:30%;right:30%;height:2px;border-radius:0 0 4px 4px;
+  background:linear-gradient(90deg,#9b7bff,#d2b8ff);box-shadow:0 0 10px #a68aff70;
+}
+.mobile-tabbar button.active .tab-icon{color:#c5adff}
+.mobile-tabbar button:active{transform:scale(.97)}
+@media(max-width:760px){
+  .desktop-nav{display:none!important}
+  .workspace-app{padding-bottom:calc(94px + env(safe-area-inset-bottom))!important}
+  .workspace-head{grid-template-columns:minmax(0,1fr)!important}
+  .workspace-head .burger-btn{display:none!important}
+}
+@media(min-width:761px){
+  .mobile-tabbar{display:none!important}
+}
+@media(prefers-reduced-motion:reduce){
+  .desktop-nav button,.mobile-tabbar button{transition:none!important}
+}
+
 </style>
 </head>
 <body>
