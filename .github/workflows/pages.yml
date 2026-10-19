@@ -44,7 +44,7 @@ jobs:
           assets_block = re.search(r"const ASSETS\s*=\s*\[([\s\S]*?)\];", sw)
           if not assets_block:
               raise SystemExit("Service-worker ASSETS list not found")
-          assets = re.findall(r"['\\"]([^'\\"]+)['\\"]", assets_block.group(1))
+          assets = re.findall(r"""['"]([^'"]+)['"]""", assets_block.group(1))
           missing = [asset for asset in assets if asset not in ("./",) and not (root / asset.removeprefix("./")).is_file()]
           if missing:
               raise SystemExit("Missing service-worker assets: " + ", ".join(missing))
