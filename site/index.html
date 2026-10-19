@@ -2147,7 +2147,7 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
         +'<div class="r-foot">Aperçu généré par '+escHtml(st.app_name||'AuditIA')+' · '+escHtml(st.company_name||'AffiAds')+' · Analyse automatique Google &amp; web.</div>';
     }
     let pdfLibsLoaded=false, pdfBusy=false, pdfCancelled=false; const preparedReportBlobs=new Map();
-    function loadScript(src){ return new Promise((res,rej)=>{ const s=document.createElement('script'); s.src=src; s.onload=()=>res(); s.onerror=()=>rej(new Error('chargement '+src)); document.head.appendChild(s); }); }
+    function loadScript(src, timeoutMs=7000){ return new Promise((res,rej)=>{ const el=document.createElement('script'); let done=false; const finish=(err)=>{ if(done)return; done=true; clearTimeout(timer); el.onload=null; el.onerror=null; if(err){ try{el.remove();}catch(_){} rej(err); } else res(); }; const timer=setTimeout(()=>finish(new Error('délai dépassé au chargement du module PDF')),timeoutMs); el.src=src; el.onload=()=>finish(); el.onerror=()=>finish(new Error('chargement du module PDF impossible')); document.head.appendChild(el); }); }
     async function ensurePdfLibs(){
       if(pdfLibsLoaded) return;
       const h2cOk=()=>!!window.html2canvas; const pdfOk=()=>!!((window.jspdf&&window.jspdf.jsPDF)||window.jsPDF);
