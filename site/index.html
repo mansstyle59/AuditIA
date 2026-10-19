@@ -1971,11 +1971,16 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
         if(siteRes) payload.site=siteRes; if(scan) payload.scan=scan;
         const {error}=await appClient.from('audits').update(payload).eq('id',auditId);
         if(error) throw new Error(error.message);
-        if(fullAuditState){ fullAuditState.pct=100; fullAuditState.target=100; } tickProgress(); await wait(350);
-        await refreshData();
-        appNotice='Analyse terminée. Préparation du rapport complet…';renderApp();
-        try{ await prepareReportForAudit(auditId,'full'); }catch(pdfErr){ issues.push('préparation PDF à la demande : '+((pdfErr&&pdfErr.message)||'indisponible').slice(0,50)); }
-        appNotice=issues.length?('Analyse terminée (limites : '+issues.join(', ')+'). Rapport disponible à exporter.'):'Analyse complète terminée — rapport prêt à ouvrir ou enregistrer.';
+        if(fullAuditState){ fullAuditState.pct=100; fullAuditState.target=100; } tickProgress(); await wait(180);
+        // La sauvegarde de l'audit est confirmée : terminer l'indicateur sans attendre
+        // le rechargement réseau ni la préparation du PDF.
+        appAudits=appAudits.map(x=>String(x.id)===String(auditId)?{...x,...payload}:x);
+        if(newDetails&&c){ appClients=appClients.map(x=>String(x.id)===String(c.id)?{...x,details:newDetails}:x); }
+        appNotice=issues.length?('Analyse terminée (limites : '+issues.join(', ')+'). Rapport disponible à exporter.'):'Analyse complète terminée — vous pouvez exporter le rapport.';
+        stopFullTicker(); fullAuditState=null; recomputeKeyAlerts(); renderApp();
+        // Rafraîchissement non bloquant : une réponse lente de Supabase ne doit plus
+        // laisser l'écran d'analyse figé à 99 %. Le PDF est généré à la demande.
+        refreshData().then(()=>{ recomputeKeyAlerts(); renderApp(); }).catch(()=>{});
       }catch(e){ appNotice='Erreur pendant l’analyse : '+((e&&e.message)||'inconnue').slice(0,140); }
       finally{ stopFullTicker(); fullAuditState=null; recomputeKeyAlerts(); renderApp(); }
     }
