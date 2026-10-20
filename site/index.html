@@ -606,6 +606,22 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
     @keyframes auditia-spin{to{transform:rotate(360deg)}}
     @media(max-width:600px){.key-alert{flex-wrap:wrap}.key-alert .app-btn{width:100%}}
 
+    /* ===== Bannière des commerces autour de moi ===== */
+    .nearby-banner{position:relative;overflow:hidden;margin:20px 0 28px;padding:22px;border:1px solid #7969b7;border-radius:22px;background:radial-gradient(ellipse at 100% 0%,#6250a555,transparent 48%),linear-gradient(135deg,#30294f,#24213b);box-shadow:0 16px 40px #09071535}
+    .nearby-banner-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap}
+    .nearby-banner h2{margin:4px 0 6px;font-size:clamp(20px,3vw,27px);letter-spacing:-.7px}
+    .nearby-banner p{margin:0;color:var(--muted);font-size:13px;max-width:650px}
+    .nearby-load{flex:0 0 auto;min-height:44px}
+    .nearby-status{margin-top:12px;color:#cfc5ff;font-size:12px}
+    .nearby-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px}
+    .nearby-card{display:flex;align-items:center;gap:12px;min-width:0;padding:13px;border:1px solid #ffffff1c;border-radius:15px;background:#ffffff08}
+    .nearby-card-icon{width:42px;height:42px;flex:0 0 42px;display:grid;place-items:center;border-radius:13px;background:#4b3c7b;font-size:20px}
+    .nearby-card-main{min-width:0;flex:1}
+    .nearby-card-main b{display:block;font-size:13px;line-height:1.35;overflow-wrap:anywhere}
+    .nearby-card-main small{display:block;color:var(--muted);font-size:11px;line-height:1.4;margin-top:4px;overflow-wrap:anywhere}
+    .nearby-audit-btn{flex:0 0 auto;padding:9px 11px!important;font-size:12px!important}
+    @media(max-width:640px){.nearby-banner{padding:17px;margin:16px 0 22px}.nearby-banner-head{display:block}.nearby-load{width:100%;margin-top:13px}.nearby-list{grid-template-columns:1fr}.nearby-card{align-items:flex-start}.nearby-audit-btn{align-self:center;padding:9px!important}}
+
     /* ===== Recherche automatique de commerces (Google Places) ===== */
     .place-search{margin-bottom:14px}
     .ac-wrap{position:relative;margin-top:6px}
@@ -1663,6 +1679,8 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       }));
       page.querySelectorAll('[data-run-scan]').forEach(b=>b.addEventListener('click',()=>runScan(b.dataset.runScan)));
       page.querySelectorAll('[data-run-site]').forEach(b=>b.addEventListener('click',()=>runSiteScan(b.dataset.runSite)));
+      page.querySelectorAll('[data-nearby-load]').forEach(b=>b.addEventListener('click',loadNearbyBusinesses));
+      page.querySelectorAll('[data-nearby-audit]').forEach(b=>b.addEventListener('click',()=>createAuditFromNearby(Number(b.dataset.nearbyAudit),b)));
       page.querySelectorAll('[data-run-full]').forEach(b=>b.addEventListener('click',()=>runFullAudit(b.dataset.runFull)));
       page.querySelectorAll('[data-export-report]').forEach(b=>b.addEventListener('click',()=>exportReport(b.dataset.exportReport,b.dataset.mode)));
       page.querySelectorAll('[data-audit-filter]').forEach(inp=>inp.addEventListener('input',()=>{auditFilter=inp.value;const pos=inp.selectionStart;renderApp();const n=document.querySelector('[data-audit-filter]');if(n){n.focus();try{n.setSelectionRange(pos,pos);}catch(e){}}}));
@@ -1790,6 +1808,61 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       else placeMsg='Fiche chargée. Ce commerce n’a pas de site web public connu.';
       renderApp();
     }
+    let nearbyBusinesses=[];
+    let nearbyStatus='';
+    let nearbyBusy=false;
+    function nearbyBannerHtml(){
+      const rows=nearbyBusinesses.map((p,i)=>'<article class="nearby-card"><span class="nearby-card-icon" aria-hidden="true">'+(p.category==='Restaurant'?'🍽️':p.category==='Beauté & bien-être'?'✂️':p.category==='Automobile'?'🚗':p.category==='Artisan'?'🛠️':p.category==='Hébergement'?'🏨':'🏪')+'</span><div class="nearby-card-main"><b>'+escHtml(p.name||'Commerce')+'</b><small>'+escHtml([p.category,p.address].filter(Boolean).join(' · '))+(p.rating!=null?' · ★ '+p.rating+' ('+(p.reviews||0)+')':'')+'</small></div><button type="button" class="app-btn primary nearby-audit-btn" data-nearby-audit="'+i+'">Analyser ↗</button></article>').join('');
+      return '<section class="nearby-banner"><div class="nearby-banner-head"><div><div class="eyebrow">PROSPECTION LOCALE</div><h2>Les commerces autour de vous</h2><p>Repérez les établissements proches et lancez leur analyse AuditIA en un seul clic. Votre position n’est utilisée qu’après votre autorisation.</p></div><button type="button" class="app-btn primary nearby-load" data-nearby-load '+(nearbyBusy?'disabled':'')+'>'+(nearbyBusy?'Recherche en cours…':'⌖ Trouver les commerces autour de moi')+'</button></div>'+(nearbyStatus?'<div class="nearby-status" role="status">'+escHtml(nearbyStatus)+'</div>':'')+(rows?'<div class="nearby-list">'+rows+'</div>':'')+'</section>';
+    }
+    function getBrowserPosition(){
+      return new Promise((resolve,reject)=>{
+        if(!navigator.geolocation){reject(new Error('La géolocalisation n’est pas disponible sur cet appareil.'));return;}
+        navigator.geolocation.getCurrentPosition(
+          pos=>resolve({latitude:pos.coords.latitude,longitude:pos.coords.longitude}),
+          err=>reject(new Error(err.code===1?'Autorise la localisation dans Safari pour trouver les commerces proches.':err.code===2?'Position indisponible. Vérifie que la localisation est activée.':'La demande de position a expiré. Réessaie.')),
+          {enableHighAccuracy:true,timeout:12000,maximumAge:60000}
+        );
+      });
+    }
+    async function loadNearbyBusinesses(){
+      if(nearbyBusy)return;
+      const key=placesKey();
+      if(!key){nearbyStatus='Active et teste ta clé Google Places dans Réglages pour utiliser cette fonction.';renderApp();return;}
+      nearbyBusy=true;nearbyStatus='Autorise la localisation si Safari te le demande…';renderApp();
+      try{
+        const pos=await getBrowserPosition();
+        nearbyStatus='Recherche des établissements proches…';renderApp();
+        const r=await withTimeout(fetch('https://places.googleapis.com/v1/places:searchNearby',{
+          method:'POST',
+          headers:{'Content-Type':'application/json','X-Goog-Api-Key':key,'X-Goog-FieldMask':'places.id,places.displayName,places.formattedAddress,places.addressComponents,places.primaryType,places.types,places.nationalPhoneNumber,places.websiteUri,places.rating,places.userRatingCount,places.businessStatus,places.regularOpeningHours'},
+          body:JSON.stringify({includedTypes:['restaurant','cafe','bakery','store','shopping_mall','beauty_salon','hair_salon','car_repair','plumber','electrician','florist','pharmacy','clothing_store','lodging'],maxResultCount:10,rankPreference:'DISTANCE',languageCode:'fr',regionCode:'FR',locationRestriction:{circle:{center:pos,radius:5000}}})
+        }),15000);
+        if(!r.ok){const d=await r.json().catch(()=>null);throw new Error(r.status===403?'Google refuse la recherche à proximité : vérifie Places API (New) et les restrictions de la clé.':(d&&d.error&&d.error.message)||('Erreur Google Places HTTP '+r.status));}
+        const d=await r.json();
+        nearbyBusinesses=(d.places||[]).map(normalizePlace).filter(p=>p.placeId&&p.name);
+        nearbyStatus=nearbyBusinesses.length?nearbyBusinesses.length+' commerce'+(nearbyBusinesses.length>1?'s':'')+' trouvé'+(nearbyBusinesses.length>1?'s':'')+' dans un rayon de 5 km.':'Aucun commerce trouvé dans ce rayon. Réessaie ou utilise « Trouver un commerce ».';
+        keyStoreSet('places',true,key);recomputeKeyAlerts();
+      }catch(e){nearbyStatus=(e&&e.message)||'Impossible de trouver les commerces proches. Réessaie.';}
+      finally{nearbyBusy=false;renderApp();}
+    }
+    async function createAuditFromNearby(index,button){
+      const p=nearbyBusinesses[index];if(!p||button&&button.disabled)return;
+      if(button){button.disabled=true;button.textContent='Préparation…';}
+      try{
+        const row={user_id:appUser.id,name:p.name,city:p.city||p.address||'À proximité',category:p.category||'Autre',website:p.website||null,phone:p.phone||null,details:{place_id:p.placeId,address:p.address||'',category:p.category||'Autre',primaryType:p.primaryType||'',phone:p.phone||null,rating:p.rating,reviews:p.reviews||0,status:p.status||'',hours:p.hours||null,website:p.website||null,source:'Google Places — commerces à proximité',fetchedAt:new Date().toISOString()}};
+        const ins=await appClient.from('clients').insert(row).select('id').single();
+        if(ins.error)throw new Error(ins.error.message);
+        const auditRow={user_id:appUser.id,client_id:String(ins.data.id),title:'Audit de visibilité numérique',status:'À démarrer',score:0,checklist:checklistTemplate.map(([label,detail])=>({label,detail,done:false}))};
+        const ai=await appClient.from('audits').insert(auditRow).select('id').single();
+        if(ai.error)throw new Error(ai.error.message);
+        const auditId=ai.data.id;
+        appNotice='Commerce ajouté. L’analyse AuditIA démarre…';await refreshData();activeAudit=auditId;appView='Détail';renderApp();window.scrollTo(0,0);
+        await runFullAudit(auditId);
+      }catch(e){nearbyStatus='Impossible de lancer l’analyse : '+((e&&e.message)||'erreur inconnue');renderApp();}
+      finally{const b=document.querySelector('[data-nearby-audit="'+index+'"]');if(b){b.disabled=false;b.textContent='Analyser ↗';}}
+    }
+
     let acSeq=0;
     async function autocompletePlaces(val){
       const box=document.getElementById('acList'); if(!box) return;
@@ -2551,7 +2624,7 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       if(appView==='Accueil'){
         const latest=appAudits.slice(0,4);
         const completedPct=appAudits.length?Math.round(completed/appAudits.length*100):0;
-        body='<section class="home-hero"><div class="home-hero-copy"><div class="home-kicker"><span class="home-kicker-dot"></span> AUDIT INTELLIGENT · SEO &amp; VISIBILITÉ LOCALE</div><h2>La visibilité de vos clients,<br><em>sous contrôle.</em></h2><p>Analysez leur présence en ligne, repérez les priorités et transformez chaque audit en plan d’action concret.</p><div class="home-hero-actions"><button class="app-btn primary" data-app-view="Clients">＋ Ajouter un commerce</button><button class="app-btn home-secondary" data-app-view="Audits">Voir mes audits <span aria-hidden="true">→</span></button></div></div><div class="home-visual" aria-label="Aperçu des indicateurs AuditIA"><div class="home-visual-top"><span>APERÇU DE L’ACTIVITÉ</span><span class="home-live-dot"></span></div><div class="home-visual-score"><div class="home-score-ring"><div><strong>'+completedPct+'<small>%</small></strong><span>terminés</span></div></div><div class="home-score-copy"><b>Vos audits</b><span>'+appAudits.length+' dossier'+(appAudits.length>1?'s':'')+' au total</span><span class="home-score-caption">'+(appAudits.length?'Suivez votre activité en un coup d’œil':'Votre tableau de bord est prêt')+'</span></div></div><div class="home-visual-bottom"><span><i class="home-mini-icon">✓</i> Suivi centralisé</span><span><i class="home-mini-icon">↗</i> Actions ciblées</span></div></div></section><div class="home-section-heading"><div><div class="eyebrow">EN UN COUP D’ŒIL</div><h2>Votre activité</h2></div><button class="home-text-link" data-app-view="Rapports">Voir les rapports <span aria-hidden="true">→</span></button></div><div class="app-stats home-stats"><article class="app-stat home-stat"><span><i class="home-stat-icon">♙</i>Commerces enregistrés</span><strong>'+appClients.length+'</strong><small>Votre portefeuille clients</small></article><article class="app-stat home-stat"><span><i class="home-stat-icon violet">▤</i>Audits créés</span><strong>'+appAudits.length+'</strong><small>Dossiers suivis</small></article><article class="app-stat home-stat"><span><i class="home-stat-icon orange">✓</i>Audits terminés</span><strong>'+completed+'</strong><small>'+completedPct+' % des audits créés</small></article></div><div class="home-section-heading home-recent-heading"><div><div class="eyebrow">SUIVI</div><h2>Derniers audits</h2><p>Retrouvez rapidement vos dossiers récents.</p></div><button class="home-text-link" data-app-view="Audits">Tous les audits <span aria-hidden="true">→</span></button></div><section class="app-panel home-recent-panel">'+(latest.length?'<div class="app-list">'+latest.map(a=>{const cl=appClients.find(x=>x.id===a.client_id);const status=String(a.status||'À démarrer');return '<div class="app-row home-audit-row"><div class="home-audit-mark">▤</div><div class="home-audit-info"><b>'+escHtml(cl?.name||'Commerce')+'</b><small>'+escHtml(a.title||'Audit de visibilité')+' · '+escHtml(status)+'</small></div><div class="home-audit-score"><b>'+(Number(a.score)||0)+'</b><small>/ 100</small></div><button class="app-btn home-open-btn" data-open-audit="'+a.id+'">Ouvrir <span aria-hidden="true">→</span></button></div>'}).join('')+'</div>':'<div class="home-empty-state"><div class="home-empty-symbol">✦</div><h3>Votre premier audit commence ici</h3><p>Ajoutez un commerce pour créer votre premier dossier et suivre sa visibilité numérique.</p><button class="app-btn primary" data-app-view="Clients">Ajouter mon premier commerce</button></div>')+'</section>';
+        body='<section class="home-hero"><div class="home-hero-copy"><div class="home-kicker"><span class="home-kicker-dot"></span> AUDIT INTELLIGENT · SEO &amp; VISIBILITÉ LOCALE</div><h2>La visibilité de vos clients,<br><em>sous contrôle.</em></h2><p>Analysez leur présence en ligne, repérez les priorités et transformez chaque audit en plan d’action concret.</p><div class="home-hero-actions"><button class="app-btn primary" data-app-view="Clients">＋ Ajouter un commerce</button><button class="app-btn home-secondary" data-app-view="Audits">Voir mes audits <span aria-hidden="true">→</span></button></div></div><div class="home-visual" aria-label="Aperçu des indicateurs AuditIA"><div class="home-visual-top"><span>APERÇU DE L’ACTIVITÉ</span><span class="home-live-dot"></span></div><div class="home-visual-score"><div class="home-score-ring"><div><strong>'+completedPct+'<small>%</small></strong><span>terminés</span></div></div><div class="home-score-copy"><b>Vos audits</b><span>'+appAudits.length+' dossier'+(appAudits.length>1?'s':'')+' au total</span><span class="home-score-caption">'+(appAudits.length?'Suivez votre activité en un coup d’œil':'Votre tableau de bord est prêt')+'</span></div></div><div class="home-visual-bottom"><span><i class="home-mini-icon">✓</i> Suivi centralisé</span><span><i class="home-mini-icon">↗</i> Actions ciblées</span></div></div></section><div class="home-section-heading"><div><div class="eyebrow">EN UN COUP D’ŒIL</div><h2>Votre activité</h2></div><button class="home-text-link" data-app-view="Rapports">Voir les rapports <span aria-hidden="true">→</span></button></div><div class="app-stats home-stats"><article class="app-stat home-stat"><span><i class="home-stat-icon">♙</i>Commerces enregistrés</span><strong>'+appClients.length+'</strong><small>Votre portefeuille clients</small></article><article class="app-stat home-stat"><span><i class="home-stat-icon violet">▤</i>Audits créés</span><strong>'+appAudits.length+'</strong><small>Dossiers suivis</small></article><article class="app-stat home-stat"><span><i class="home-stat-icon orange">✓</i>Audits terminés</span><strong>'+completed+'</strong><small>'+completedPct+' % des audits créés</small></article></div>'+nearbyBannerHtml()+'<div class="home-section-heading home-recent-heading"><div><div class="eyebrow">SUIVI</div><h2>Derniers audits</h2><p>Retrouvez rapidement vos dossiers récents.</p></div><button class="home-text-link" data-app-view="Audits">Tous les audits <span aria-hidden="true">→</span></button></div><section class="app-panel home-recent-panel">'+(latest.length?'<div class="app-list">'+latest.map(a=>{const cl=appClients.find(x=>x.id===a.client_id);const status=String(a.status||'À démarrer');return '<div class="app-row home-audit-row"><div class="home-audit-mark">▤</div><div class="home-audit-info"><b>'+escHtml(cl?.name||'Commerce')+'</b><small>'+escHtml(a.title||'Audit de visibilité')+' · '+escHtml(status)+'</small></div><div class="home-audit-score"><b>'+(Number(a.score)||0)+'</b><small>/ 100</small></div><button class="app-btn home-open-btn" data-open-audit="'+a.id+'">Ouvrir <span aria-hidden="true">→</span></button></div>'}).join('')+'</div>':'<div class="home-empty-state"><div class="home-empty-symbol">✦</div><h3>Votre premier audit commence ici</h3><p>Ajoutez un commerce pour créer votre premier dossier et suivre sa visibilité numérique.</p><button class="app-btn primary" data-app-view="Clients">Ajouter mon premier commerce</button></div>')+'</section>';
       } else if(appView==='Clients'){
         const cd=clientDraft||{}; const catOpts=['Commerce','Restaurant','Artisan','Beauté & bien-être','Automobile','Hébergement','Autre'].map(o=>'<option'+(cd.category===o?' selected':'')+'>'+o+'</option>').join('');
         const addForm='<div class="add-client">'+placeSearchHtml()+'<section class="app-panel"><h3 style="margin:0 0 4px">Ou saisir à la main</h3><form class="app-form" data-create-client style="margin-top:10px"><label>Nom du commerce<input name="name" required maxlength="120" placeholder="Ex. Boulangerie du Centre" value="'+escHtml(cd.name||'')+'"></label><label>Ville<input name="city" required maxlength="100" placeholder="Ex. Azille" value="'+escHtml(cd.city||'')+'"></label><label>Catégorie<select name="category">'+catOpts+'</select></label><label>Site web (facultatif)<input name="website" type="text" placeholder="https://exemple.fr" value="'+escHtml(cd.website||'')+'"></label><button class="app-btn primary" type="submit">Enregistrer le client</button>'+(cd.name?'<button class="app-btn" type="button" data-clear-draft>Vider</button>':'')+'</form></section></div>';
