@@ -1,0 +1,17 @@
+# Secrets and local environment files
+.env
+.env.*
+!.env.example
+!.env.sample
+*.pem
+*.key
+*.p12
+*.pfx
+secrets/
+.local/
+.vercel/
+.supabase/
+# Local tooling and OS files
+node_modules/
+.DS_Store
+Thumbs.db
