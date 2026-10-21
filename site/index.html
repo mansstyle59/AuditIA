@@ -2032,6 +2032,94 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       .workspace-main:has(>.home-hero)>.home-hero .home-kicker{font-size:7px!important;letter-spacing:.65px!important}
     }
 
+
+    /* AuditIA — système d’espacement unifié v54 */
+    .workspace-main{display:block!important;min-width:0!important;width:100%!important;min-height:0!important}
+    .workspace-head{position:relative!important;display:flex!important;align-items:center!important;justify-content:space-between!important;gap:14px!important;margin:0 0 18px!important;padding:4px 0 15px!important;border-bottom:1px solid rgba(255,255,255,.08)!important}
+    .workspace-head h1{margin:4px 0 5px!important;font-size:clamp(28px,4vw,38px)!important;line-height:1.12!important;letter-spacing:-1.1px!important}
+    .workspace-head p{margin:0!important;line-height:1.45!important;overflow-wrap:anywhere!important}
+    .workspace-main>.desktop-nav{margin:0 0 18px!important}
+    .workspace-main>.key-alert,.workspace-main>.app-notice{margin:0 0 14px!important}
+    .workspace-main>.app-content-title{margin:0 0 18px!important;padding:0!important}
+    .workspace-main>.app-grid,.workspace-main>.app-stats,.workspace-main>.app-settings-grid{margin-top:0!important}
+    .workspace-main>.app-grid{align-items:start!important;gap:14px!important}
+    .workspace-main>.app-grid>.app-panel{align-self:start!important}
+    .workspace-main>.app-panel,.workspace-main>form>.app-settings-grid>.app-panel,.workspace-main>.app-settings-grid>.app-panel{min-width:0!important}
+    .workspace-main>.app-panel[style*="margin-top:14px"]{margin-top:14px!important}
+    .workspace-main>.app-panel[style*="margin-bottom:14px"]{margin-bottom:14px!important}
+    .app-content-title h2,.app-panel h2{line-height:1.22!important;letter-spacing:-.55px!important}
+    .app-content-title p,.app-panel p{line-height:1.55!important}
+    .app-stats{align-items:stretch!important;gap:12px!important}
+    .app-stat,.app-panel,.client-card,.add-toggle,.settings-preview,.integration-group,.cd-edit{border-radius:18px!important}
+    .app-stat,.app-panel{box-shadow:0 8px 24px rgba(0,0,0,.12)!important}
+    .app-form{gap:14px!important}
+    .app-form label{gap:6px!important}
+    .app-form input,.app-form select,.app-form textarea{box-sizing:border-box!important;max-width:100%!important}
+    .app-row{min-width:0!important;overflow-wrap:anywhere!important}
+    .workspace-footnote{margin:24px 0 0!important;padding-top:14px!important}
+    /* Hero : flux naturel, aucune remontée artificielle sous l’en-tête fixe */
+    .workspace-main:has(>.home-hero){display:block!important;min-height:0!important}
+    .workspace-main:has(>.home-hero)>.workspace-head{margin:0 0 18px!important;padding:4px 0 15px!important}
+    .workspace-main:has(>.home-hero)>.home-hero{position:relative!important;top:auto!important;transform:none!important;margin:0 0 24px!important}
+    .home-hero{overflow:hidden!important}
+    .home-hero-art{min-width:0!important}
+    @media(max-width:760px){
+      .workspace-app{padding:0 14px calc(112px + env(safe-area-inset-bottom))!important}
+      .workspace-main{padding:0!important}
+      .workspace-head{display:block!important;margin:0 0 18px!important;padding:4px 0 15px!important}
+      .workspace-head h1{font-size:30px!important;line-height:1.12!important;margin:4px 0 5px!important}
+      .workspace-head p{font-size:12px!important;white-space:normal!important}
+      .workspace-actions{display:none!important}
+      .workspace-main>.app-content-title{margin:0 0 16px!important}
+      .workspace-main>.app-grid{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:12px!important}
+      .workspace-main>.app-grid>.app-panel{margin:0!important}
+      .workspace-main>.app-stats{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:8px!important;margin:0 0 16px!important}
+      .workspace-main>.app-stats>.app-stat{min-width:0!important;min-height:112px!important;padding:12px 10px!important;border-radius:16px!important}
+      .workspace-main>.app-stats>.app-stat span{font-size:10px!important;line-height:1.35!important;min-height:0!important}
+      .workspace-main>.app-stats>.app-stat strong{font-size:25px!important;margin-top:8px!important}
+      .workspace-main>.app-panel{margin-top:0!important;margin-bottom:14px!important;padding:16px!important}
+      .workspace-main>.app-panel h2{font-size:19px!important;margin:0 0 12px!important}
+      .workspace-main>.app-settings-grid{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:12px!important}
+      .workspace-main>form[data-settings-form]{display:block!important}
+      .workspace-main>form[data-settings-form]>.app-settings-grid{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:12px!important}
+      .workspace-main>form[data-settings-form]>.app-panel{margin-top:12px!important}
+      .app-form{gap:13px!important}
+      .app-form input,.app-form select,.app-form textarea{min-height:48px!important;font-size:16px!important}
+      .app-form textarea{min-height:100px!important}
+      .app-row{align-items:flex-start!important;gap:10px!important;padding:12px!important}
+      .app-row>div{min-width:0!important}
+      .app-row .app-btn{flex-shrink:0!important}
+      .client-cards{gap:10px!important}
+      .client-card{width:100%!important;box-sizing:border-box!important}
+      .add-toggle{margin:0 0 14px!important}
+      .workspace-main:has(>.home-hero)>.workspace-head{margin-bottom:14px!important;padding-bottom:13px!important}
+      .workspace-main:has(>.home-hero)>.home-hero{margin:0 0 20px!important;padding:0!important;border-radius:22px!important}
+      .home-hero-copy{padding:0 16px 18px!important}
+      .home-hero-art{height:clamp(145px,40vw,178px)!important;margin:0!important;border-radius:21px 21px 0 0!important}
+      .home-kicker{max-width:100%!important;white-space:normal!important;line-height:1.45!important}
+      .home-hero h2{font-size:clamp(27px,7.2vw,34px)!important;line-height:1.08!important;letter-spacing:-1.1px!important;margin:14px 0 10px!important}
+      .home-hero-copy>p{font-size:14px!important;line-height:1.55!important;margin:0!important}
+      .home-hero-actions{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;gap:9px!important;margin-top:16px!important}
+      .home-hero-actions .app-btn{min-width:0!important;min-height:48px!important;padding:9px 8px!important;font-size:12px!important;line-height:1.25!important;white-space:normal!important}
+      .home-visual{margin:0 12px 14px!important;padding:14px!important}
+      .home-visual-score{gap:14px!important}
+      .home-section-heading{display:flex!important;align-items:flex-end!important;justify-content:space-between!important;gap:10px!important;margin:0 0 12px!important}
+      .home-section-heading h2{font-size:21px!important}
+      .home-text-link{font-size:12px!important;white-space:normal!important;text-align:right!important}
+      .home-stats{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important}
+      .home-stats .home-stat{min-height:120px!important}
+      .workspace-footnote{margin-top:20px!important}
+    }
+    @media(max-width:390px){
+      .workspace-app{padding-left:12px!important;padding-right:12px!important}
+      .workspace-main:has(>.home-hero)>.home-hero{margin-top:0!important}
+      .home-hero-art{height:132px!important}
+      .home-hero-copy{padding-left:13px!important;padding-right:13px!important}
+      .home-hero-actions{grid-template-columns:minmax(0,1fr)!important}
+      .workspace-main>.app-stats{gap:6px!important}
+      .workspace-main>.app-stats>.app-stat{padding:10px 8px!important}
+    }
+
 </style>
 </head>
 <body>
