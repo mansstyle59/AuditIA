@@ -2039,6 +2039,67 @@ input.app-control,select.app-control,textarea.app-control{
   .app-btn,.sidebar-nav button,.desktop-nav button{transition:none!important}
 }
 
+
+
+/* AuditIA v52 — correctifs transversaux après contrôle iPhone */
+.workspace-app{min-height:100dvh!important}
+.workspace-main{display:block!important;min-width:0!important}
+.workspace-head{
+  min-height:0!important;height:auto!important;max-height:none!important;
+  padding:3px 0 14px!important;margin:0 0 12px!important;
+  align-content:start!important;row-gap:0!important;
+}
+.workspace-head>div:first-child{min-height:0!important;height:auto!important}
+.workspace-head .eyebrow{margin:0 0 6px!important}
+.workspace-head h1{margin:0 0 5px!important}
+.workspace-head p{margin:0!important}
+.home-hero{margin-top:0!important}
+@media(max-width:760px){
+  .workspace-app{
+    padding-top:8px!important;
+    padding-bottom:calc(128px + env(safe-area-inset-bottom, 0px))!important;
+  }
+  .workspace-head{
+    display:flex!important;flex-direction:column!important;align-items:flex-start!important;
+    justify-content:flex-start!important;gap:0!important;
+    padding:2px 0 12px!important;margin:0 0 12px!important;
+    border-bottom:1px solid rgba(173,157,231,.13)!important;
+  }
+  .workspace-head .workspace-actions{display:none!important}
+  .workspace-head .eyebrow{margin:0 0 6px!important}
+  .workspace-head h1{font-size:clamp(27px,7vw,35px)!important;line-height:1.08!important;margin:0 0 6px!important}
+  .workspace-head p{font-size:12px!important;line-height:1.4!important;white-space:normal!important}
+  .home-hero{margin:0 0 16px!important}
+  .home-hero-copy{padding:96px 15px 0!important}
+  .home-hero:before{height:165px!important}
+  .home-hero-actions{margin-top:13px!important}
+  .home-visual{margin-top:11px!important}
+  .app-panel{scroll-margin-top:12px}
+  .mobile-tabbar{
+    bottom:0!important;left:8px!important;right:8px!important;
+    padding:6px 5px calc(7px + env(safe-area-inset-bottom, 0px))!important;
+    min-height:0!important;border-radius:22px 22px 18px 18px!important;
+    border:1px solid rgba(173,157,231,.24)!important;
+    background:rgba(23,19,38,.96)!important;
+  }
+  .mobile-tabbar button{min-height:56px!important}
+  .mobile-tabbar button .tab-icon{width:29px!important;height:28px!important}
+  .mobile-tabbar button .tab-icon svg{width:22px!important;height:22px!important}
+  .mobile-tabbar button span:last-child{font-size:9px!important}
+  .app-panel,.integration-group,.settings-preview{min-width:0!important;max-width:100%!important}
+  .app-form input,.app-form select,.app-form textarea{max-width:100%;box-sizing:border-box}
+  .detail-actions,.settings-actions{padding-bottom:4px}
+}
+@media(max-width:390px){
+  .workspace-app{padding-left:12px!important;padding-right:12px!important}
+  .home-hero-copy{padding:84px 13px 0!important}
+  .home-hero:before{height:145px!important}
+  .home-hero h2{font-size:28px!important}
+  .home-hero-actions{grid-template-columns:1fr 1fr!important;margin:13px 12px 0!important}
+  .home-hero-actions .app-btn{min-height:44px!important;font-size:10px!important}
+  .home-visual{margin:11px 12px 0!important}
+}
+
 </style>
 </head>
 <body>
