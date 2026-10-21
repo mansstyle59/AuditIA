@@ -1883,6 +1883,60 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
     }
     @media(prefers-reduced-motion:reduce){.home-hero-art .ha-chart-right,.home-hero-art .ha-chart-left,.home-hero-art .ha-spark{animation:none!important}}
 
+
+    /* AuditIA — espacement corrigé et système visuel commun à toutes les pages */
+    .workspace-main{display:block!important;min-height:0!important}
+    .workspace-head{margin-bottom:12px!important;padding-bottom:14px!important}
+    .workspace-head + .desktop-nav{margin-top:0!important}
+    .desktop-nav{margin-bottom:14px!important}
+    .workspace-footnote{margin-top:24px!important}
+    .app-content-title{margin-top:0!important;margin-bottom:16px!important}
+    .app-content-title h2{line-height:1.2!important;letter-spacing:-.55px}
+    .app-content-title p{line-height:1.55!important}
+    .app-panel,.client-card,.settings-preview,.integration-group,.add-toggle,.cd-edit{border-radius:16px!important}
+    .app-panel{padding:clamp(14px,2.4vw,20px)!important}
+    .app-form{gap:13px!important}
+    .app-form label,.app-form .field-label{line-height:1.45}
+    .app-form input,.app-form select,.app-form textarea{width:100%;max-width:100%;min-height:46px;border-radius:12px!important}
+    .app-form textarea{min-height:104px}
+    .app-btn{min-height:43px;transition:background .18s,border-color .18s,transform .18s,filter .18s}
+    .app-btn:focus-visible,.app-form input:focus-visible,.app-form select:focus-visible,.app-form textarea:focus-visible,
+    .desktop-nav button:focus-visible,.mobile-tabbar button:focus-visible{outline:2px solid #b5a4ff!important;outline-offset:3px}
+    .app-list{gap:9px!important}
+    .app-row{min-width:0}
+    .app-muted,.app-panel p{line-height:1.6}
+    .app-stats{align-items:stretch}
+    .app-stat{min-width:0}
+    .app-stat strong{font-variant-numeric:tabular-nums}
+    .home-hero{margin-top:0!important}
+    @media(max-width:760px){
+      .workspace-app{padding-top:8px!important;padding-left:14px!important;padding-right:14px!important}
+      .workspace-head{margin-top:0!important;margin-bottom:8px!important;padding:2px 0 12px!important;gap:0!important}
+      .workspace-head h1{margin-top:3px!important;margin-bottom:5px!important}
+      .workspace-head p{margin-top:0!important}
+      .workspace-head .workspace-actions{margin-top:10px!important}
+      .desktop-nav{display:none!important}
+      .workspace-main > .home-hero{margin-top:0!important}
+      .home-hero{margin-bottom:22px!important}
+      .app-content-title{gap:8px!important;margin-bottom:14px!important}
+      .app-content-title h2{font-size:22px!important}
+      .app-panel,.client-card,.settings-preview,.integration-group,.add-toggle,.cd-edit{border-radius:14px!important}
+      .app-panel{padding:14px!important}
+      .app-form{gap:11px!important}
+      .app-form input,.app-form select,.app-form textarea{font-size:16px!important}
+      .app-stats{gap:8px!important}
+      .app-stat{padding:12px!important}
+      .app-row{gap:9px!important;padding:12px!important}
+      .mobile-tabbar{z-index:200!important}
+      .workspace-footnote{margin-bottom:8px!important}
+    }
+    @media(max-width:390px){
+      .workspace-app{padding-left:11px!important;padding-right:11px!important}
+      .workspace-head h1{font-size:27px!important}
+      .app-panel{padding:12px!important}
+      .app-row{gap:7px!important}
+    }
+
 </style>
 </head>
 <body>
