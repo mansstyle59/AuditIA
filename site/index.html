@@ -1608,6 +1608,39 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
  .mobile-tabbar button span:last-child{font-size:9px!important}
 }
 
+
+    /* AuditIA: tableau de bord local inspiré des standards d’audit concurrents */
+    .info-panel{padding:clamp(16px,2.5vw,24px);background:linear-gradient(145deg,#282641,#1b1a32);border-color:#504771}
+    .audit-section-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:18px}
+    .audit-section-head h3{font-size:clamp(19px,2.6vw,24px);letter-spacing:-.6px}
+    .audit-section-head p{margin:4px 0 0;color:var(--muted);font-size:12px;max-width:55ch}
+    .audit-source-badge{flex:0 0 auto;font-size:10px;font-weight:800;padding:5px 9px;border:1px solid #526d65;border-radius:999px;color:#9ae8c4;background:#1c3a32}
+    .audit-insight-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:13px}
+    .audit-profile-data,.audit-reputation{min-width:0;border:1px solid #ffffff14;border-radius:15px;padding:15px;background:#ffffff04}
+    .audit-profile-data h4,.audit-reputation h4,.audit-roadmap h4,.audit-source-actions h4{font-size:13px;margin:0 0 12px;color:#e5defe;letter-spacing:-.1px}
+    .audit-profile-data .info-grid{gap:6px}
+    .audit-profile-data .info-row{background:#ffffff05;padding:9px 10px;border-radius:9px;gap:12px}
+    .audit-insight-score{display:flex;align-items:center;gap:12px;min-width:0}
+    .audit-insight-ring{--audit-progress:0%;width:88px;height:88px;flex:0 0 88px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(#a68aff var(--audit-progress),#393653 0);position:relative}
+    .audit-insight-ring:before{content:"";position:absolute;inset:7px;border-radius:50%;background:#23213c}
+    .audit-insight-ring strong{position:relative;font-size:22px;letter-spacing:-.8px}
+    .audit-insight-ring small{font-size:10px;color:#aaa6bd;font-weight:600;margin-left:2px}
+    .audit-insight-score-copy{display:grid;gap:4px;min-width:0}
+    .audit-insight-score-copy b{font-size:13px}.audit-insight-score-copy span{font-size:11px;color:var(--muted);line-height:1.4}
+    .audit-insight-empty{padding:14px;border:1px dashed #5b5478;border-radius:12px;font-size:12px;line-height:1.5;color:var(--muted)}
+    .audit-disclaimer{font-size:10.5px!important;color:#aaa6bd!important;line-height:1.5;margin:12px 0 0}
+    .audit-roadmap,.audit-source-actions{margin-top:14px;border-top:1px solid #ffffff12;padding-top:15px}
+    .audit-roadmap>p{margin:-6px 0 12px;font-size:11.5px;color:var(--muted)}
+    .audit-step{display:flex;align-items:center;gap:11px;padding:11px 0;border-top:1px solid #ffffff0d}
+    .audit-step-number{flex:0 0 27px;width:27px;height:27px;display:grid;place-items:center;border-radius:9px;background:#403765;color:#d9ccff;font-weight:850;font-size:12px}
+    .audit-step>div{flex:1;min-width:0}.audit-step b{display:block;font-size:12.5px}.audit-step small{display:block;color:var(--muted);font-size:11px;line-height:1.4;margin-top:2px}
+    .audit-step-tag{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;border:1px solid #4c456a;background:#24213c;color:#bcb0ef;border-radius:7px;padding:4px 6px;flex:0 0 auto}
+    .audit-source-links{display:flex;flex-wrap:wrap;gap:8px}
+    .audit-source-link{display:inline-flex;align-items:center;justify-content:center;padding:9px 11px;border:1px solid #4b456b;border-radius:10px;background:#2e2a49;color:#d8d0ff;text-decoration:none;font-size:11px;font-weight:750;min-height:38px}
+    .audit-source-link:hover{border-color:#9a87ff;background:#383055}
+    @media(max-width:620px){.audit-insight-grid{grid-template-columns:minmax(0,1fr)}.audit-section-head{gap:8px}.audit-insight-ring{width:78px;height:78px;flex-basis:78px}.audit-step{align-items:flex-start}.audit-step-tag{margin-left:auto}.audit-source-links>*{flex:1}}
+    @media(prefers-reduced-motion:reduce){.audit-source-link{transition:none}}
+
 </style>
 </head>
 <body>
@@ -2120,7 +2153,26 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       if(d.domainCreated) rows.push(['Domaine créé le', new Date(d.domainCreated).toLocaleDateString('fr-FR')+' · indice d’ancienneté']);
       if(!rows.length) return '';
       const hours=(d.hours&&d.hours.length)?'<div class="info-hours"><b>Horaires</b><div>'+d.hours.map(h=>'<span>'+escHtml(h)+'</span>').join('')+'</div></div>':'';
-      return '<section class="app-panel info-panel"><div class="eyebrow">FICHE COMMERCE · GOOGLE</div><h3 style="margin:4px 0 10px">Informations publiques</h3><div class="info-grid">'+rows.map(([k,v])=>'<div class="info-row"><span>'+escHtml(k)+'</span><b>'+escHtml(v)+'</b></div>').join('')+'</div>'+hours+'<p class="scan-note">Source : Google Places. Le nom du propriétaire et la date d’ouverture ne sont pas fournis par Google.</p></section>';
+      const rating=d.rating==null?null:Number(d.rating), reviews=d.reviews==null?null:Number(d.reviews);
+      const profileScore=rating==null?null:Math.round(Math.max(0,Math.min(5,rating))*20);
+      const grade=profileScore==null?'À compléter':profileScore>=80?'Très bonne note':profileScore>=60?'À renforcer':'Priorité réputation';
+      const reputation=rating==null
+        ? '<div class="audit-insight-empty">La note Google n’est pas disponible pour cette fiche. Les données restent inchangées.</div>'
+        : '<div class="audit-insight-score"><div class="audit-insight-ring" style="--audit-progress:'+profileScore+'%"><strong>'+profileScore+'<small>/100</small></strong></div><div class="audit-insight-score-copy"><b>'+grade+'</b><span>Note publique : '+rating.toLocaleString('fr-FR',{maximumFractionDigits:1})+'/5</span><span>'+(reviews==null?'Volume d’avis non disponible':reviews.toLocaleString('fr-FR')+' avis publics')+'</span></div></div>';
+      const checklist=[
+        {title:'Profil de commerce',detail:'Vérifier catégorie, adresse, téléphone et horaires',type:'Profil'},
+        {title:'Réputation locale',detail:'Examiner la note, le volume d’avis et les réponses aux avis',type:'Avis'},
+        {title:'Site web',detail:'Mesurer performances, accessibilité et référencement avec l’analyse du site',type:'Site'},
+        {title:'Visibilité locale',detail:'Comparer les informations publiques et les signaux disponibles',type:'Local'}
+      ];
+      const steps=checklist.map((item,i)=>'<div class="audit-step"><span class="audit-step-number">'+(i+1)+'</span><div><b>'+item.title+'</b><small>'+item.detail+'</small></div><span class="audit-step-tag">'+item.type+'</span></div>').join('');
+      const urls=[
+        {label:'Profil Google',url:'https://www.google.com/search?q='+encodeURIComponent((c.name||'')+' '+(d.address||''))},
+        {label:'Avis Google',url:'https://www.google.com/search?q='+encodeURIComponent((c.name||'')+' avis')},
+        {label:'Recherche locale',url:'https://www.google.com/maps/search/'+encodeURIComponent((c.category||d.category||'commerce')+' near '+(d.address||''))}
+      ];
+      const links=urls.map(x=>'<a class="audit-source-link" href="'+x.url+'" target="_blank" rel="noopener noreferrer">'+x.label+' ↗</a>').join('');
+      return '<section class="app-panel info-panel"><div class="audit-section-head"><div><div class="eyebrow">FICHE COMMERCE · DONNÉES PUBLIQUES</div><h3 style="margin:4px 0 4px">Vue d’ensemble du commerce</h3><p>Les indicateurs ci-dessous s’appuient sur les informations réellement disponibles.</p></div><span class="audit-source-badge">Google Places</span></div><div class="audit-insight-grid"><div class="audit-profile-data"><h4>Informations vérifiables</h4><div class="info-grid">'+rows.map(([k,v])=>'<div class="info-row"><span>'+escHtml(k)+'</span><b>'+escHtml(v)+'</b></div>').join('')+'</div>'+hours+'</div><div class="audit-reputation"><h4>Signal de réputation</h4>'+reputation+'<p class="audit-disclaimer">Ce score décrit uniquement la note Google connue, pas le score global de visibilité ni le classement du commerce.</p></div></div><div class="audit-roadmap"><h4>Parcours d’audit recommandé</h4><p>Une lecture claire, inspirée des rapports d’audit local : profil, réputation, site et visibilité.</p>'+steps+'</div><div class="audit-source-actions"><h4>Vérifier les sources publiques</h4><div class="audit-source-links">'+links+'</div></div><p class="scan-note">Source : Google Places et liens de recherche publics. Les recherches servent à vérifier les informations ; elles ne prétendent pas mesurer le classement, le taux de réponse aux avis ni la cohérence multi-annuaire automatiquement.</p></section>';
     }
     function sparkline(vals){
       if(!vals||vals.length<2) return '';
