@@ -622,6 +622,60 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
     .nearby-audit-btn{flex:0 0 auto;padding:9px 11px!important;font-size:12px!important}
     @media(max-width:640px){.nearby-banner{padding:17px;margin:16px 0 22px}.nearby-banner-head{display:block}.nearby-load{width:100%;margin-top:13px}.nearby-list{grid-template-columns:1fr}.nearby-card{align-items:flex-start}.nearby-audit-btn{align-self:center;padding:9px!important}}
 
+
+    /* ===== AuditIA UX uplift: competitor-informed, preserving current flows ===== */
+    :root{
+      --ai-bg:#100f25;--ai-surface:#1b1a35;--ai-surface-2:#242241;
+      --ai-line:#383557;--ai-accent:#a68aff;--ai-good:#6fe0b4;
+      --ai-warn:#ffd27a;--ai-danger:#ff929e;
+    }
+    .workspace-app{color:var(--text)}
+    .app-panel,.app-stat{border-color:var(--ai-line)}
+    .app-panel h2,.app-panel h3{letter-spacing:-.3px}
+    .app-muted,.app-panel p{line-height:1.55}
+    .app-btn{transition:transform .16s ease,filter .16s ease,box-shadow .16s ease}
+    .app-btn:hover{filter:brightness(1.08);transform:translateY(-1px)}
+    .app-btn:focus-visible,.ac-input:focus-visible,.app-filter:focus-visible{outline:3px solid #a68aff99;outline-offset:2px}
+    .place-search{position:relative;overflow:visible;padding:clamp(17px,3vw,24px)!important;
+      background:radial-gradient(ellipse at 100% 0%,#7657ed20,transparent 45%),linear-gradient(145deg,#201e3c,#19172f)!important;
+      border-color:#66578f!important;box-shadow:0 15px 38px #05041135}
+    .place-search:before{content:"";display:block;width:42px;height:4px;border-radius:99px;background:linear-gradient(90deg,#a68aff,#ffad72);margin-bottom:16px}
+    .place-search h2{font-size:clamp(20px,3vw,26px)!important;line-height:1.2}
+    .place-search .app-muted{max-width:62ch}
+    .ac-wrap{margin-top:12px}
+    .ac-input{min-height:56px;padding:15px 48px 15px 16px;background:#121128;border-color:#5d5683;
+      border-radius:15px;box-shadow:inset 0 1px 0 #ffffff08;font-size:16px}
+    .ac-input:focus{outline:3px solid #a68aff38;border-color:#a68aff}
+    .ac-list{gap:7px;margin-top:9px}
+    .ac-item{padding:13px 14px;border-radius:13px;background:#282543;border-color:#49446b;transition:background .15s,border-color .15s,transform .15s}
+    .ac-item:hover{background:#332d53;border-color:#8e79db;transform:translateY(-1px)}
+    .ac-item b{font-size:14px}.ac-item small{font-size:12px;line-height:1.45}
+    .ac-msg{padding:12px 2px}
+    .nearby-banner{border-color:#594d86;background:radial-gradient(ellipse at 100% 0%,#7657ed26,transparent 48%),linear-gradient(135deg,#201d3c,#15142b);box-shadow:0 16px 38px #05041130}
+    .nearby-banner h2{letter-spacing:-.6px}
+    .nearby-card{background:#ffffff06;border-color:#ffffff17}
+    .nearby-card:hover{border-color:#8b78d5;background:#ffffff0a}
+    .app-content-title{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;margin:4px 0 16px}
+    .app-content-title h2{font-size:clamp(22px,3vw,28px);letter-spacing:-.8px;margin:0}
+    .app-content-title p{margin:5px 0 0;color:var(--muted);font-size:13px}
+    .app-stat{background:linear-gradient(145deg,#252343,#1b1a33);box-shadow:0 7px 22px #06051518}
+    .app-stat strong{letter-spacing:-1.2px}
+    .app-row{transition:border-color .15s,background .15s}
+    .app-row:hover{border-color:#6c5aa0;background:#393451}
+    .info-row{align-items:flex-start}
+    .info-row span{white-space:normal}
+    .info-row b{font-weight:750}
+    @media(max-width:640px){
+      .place-search{padding:17px!important;border-radius:18px!important}
+      .ac-input{min-height:54px}
+      .app-content-title{align-items:flex-start;flex-direction:column}
+      .nearby-card{padding:11px}
+    }
+    @media(prefers-reduced-motion:reduce){
+      .app-btn,.ac-item,.app-row{transition:none!important}
+      html{scroll-behavior:auto}
+    }
+
     /* ===== Recherche automatique de commerces (Google Places) ===== */
     .place-search{margin-bottom:14px}
     .ac-wrap{position:relative;margin-top:6px}
