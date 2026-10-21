@@ -5,7 +5,7 @@
 const CACHE = 'auditia-v45';
 const ASSETS = [
   './', './index.html', './manifest.webmanifest',
-  './auditia-icon.svg', './favicon-32.png',
+  './auditia-icon.svg', './auditia-dashboard-hero.png', './favicon-32.png',
   './apple-touch-icon.png', './icon-192.png', './icon-512.png',
   './vendor/html2canvas.min.js', './vendor/jspdf.umd.min.js',
   './vendor/supabase.js'
