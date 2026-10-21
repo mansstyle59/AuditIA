@@ -2006,6 +2006,32 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
     }
     @media(prefers-reduced-motion:reduce){.home-hero-art *{animation:none!important}}
 
+
+    /* Splash mobile repensé : le hero remonte juste après le salut */
+    @media(max-width:760px){
+      .workspace-main:has(>.home-hero)>.home-hero{
+        margin-top:-500px!important;margin-bottom:20px!important;
+        border:1px solid rgba(169,143,255,.32)!important;border-radius:24px!important;
+        background:radial-gradient(ellipse at 50% 0%,rgba(131,91,255,.24),transparent 48%),linear-gradient(155deg,#211b3c 0%,#19172d 54%,#151424 100%)!important;
+        box-shadow:0 20px 55px rgba(0,0,0,.25),inset 0 1px rgba(255,255,255,.06)!important;
+      }
+      .workspace-main:has(>.home-hero)>.home-hero .home-hero-art{height:clamp(138px,39vw,175px)!important;margin:0 -1px 2px!important;border-radius:23px 23px 0 0!important;background:radial-gradient(ellipse at 50% 70%,rgba(140,103,255,.3),transparent 62%),linear-gradient(135deg,#272047,#1a172e)!important}
+      .workspace-main:has(>.home-hero)>.home-hero .home-hero-copy{padding:0 17px 20px!important}
+      .workspace-main:has(>.home-hero)>.home-hero .home-kicker{font-size:8px!important;letter-spacing:.85px!important;padding:7px 9px!important;white-space:normal!important;width:fit-content!important}
+      .workspace-main:has(>.home-hero)>.home-hero h2{font-size:clamp(26px,7vw,33px)!important;line-height:1.06!important;letter-spacing:-1.3px!important;margin:14px 0 10px!important}
+      .workspace-main:has(>.home-hero)>.home-hero .home-hero-copy>p{font-size:13px!important;line-height:1.55!important;margin:0!important}
+      .workspace-main:has(>.home-hero)>.home-hero .home-hero-actions{margin-top:15px!important;gap:8px!important}
+      .workspace-main:has(>.home-hero)>.home-hero .home-hero-actions .app-btn{min-height:47px!important;padding:9px 8px!important;font-size:11px!important;border-radius:13px!important;justify-content:center!important;text-align:center!important}
+      .workspace-main:has(>.home-hero)>.home-visual{margin:0 14px 18px!important}
+      .workspace-main:has(>.home-hero)>.home-hero+.home-section-heading{margin-top:0!important}
+    }
+    @media(max-width:390px){
+      .workspace-main:has(>.home-hero)>.home-hero{margin-top:-500px!important}
+      .workspace-main:has(>.home-hero)>.home-hero .home-hero-art{height:132px!important}
+      .workspace-main:has(>.home-hero)>.home-hero .home-hero-copy{padding-left:14px!important;padding-right:14px!important}
+      .workspace-main:has(>.home-hero)>.home-hero .home-kicker{font-size:7px!important;letter-spacing:.65px!important}
+    }
+
 </style>
 </head>
 <body>
