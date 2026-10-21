@@ -2539,6 +2539,129 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
 }
 @media(prefers-reduced-motion:reduce){.workspace-main>.home-hero .home-hero-actions .app-btn,.workspace-main .home-stats .home-stat{transition:none!important}.workspace-main .home-stats .home-stat:hover,.workspace-main>.home-hero .home-hero-actions .app-btn.primary:hover{transform:none!important}}
 
+
+/* Cohérence visuelle globale — toutes les pages de l'espace AuditIA */
+.workspace-app{
+  --ui-accent:#a78bfa;--ui-accent-strong:#7958ed;--ui-border:rgba(176,157,255,.17);
+}
+.workspace-main{isolation:isolate}
+.workspace-main>.app-panel,
+.workspace-main>.app-grid>.app-panel,
+.workspace-main>.app-settings-grid>.app-panel,
+.workspace-main>form>.app-panel,
+.workspace-main>form>.app-settings-grid>.app-panel,
+.workspace-main>.app-content-title{
+  border:1px solid rgba(176,157,255,.15)!important;
+  border-radius:20px!important;
+  background:linear-gradient(145deg,rgba(35,31,57,.97),rgba(25,24,42,.98))!important;
+  box-shadow:inset 0 1px rgba(255,255,255,.035),0 10px 28px rgba(4,3,15,.10)!important;
+}
+.workspace-main>.app-content-title{padding:clamp(16px,2.4vw,24px)!important;margin-bottom:16px!important}
+.workspace-main>.app-panel h2,
+.workspace-main>.app-panel h3,
+.workspace-main>.app-grid>.app-panel h2,
+.workspace-main>.app-settings-grid>.app-panel h2{
+  color:#f4f0ff!important;letter-spacing:-.45px!important;
+}
+.workspace-main .eyebrow,
+.workspace-main .app-content-title .eyebrow{
+  color:#b9a7ff!important;letter-spacing:1.45px!important;font-weight:800!important;
+}
+.workspace-main .app-muted,
+.workspace-main .scan-note,
+.workspace-main .app-panel p{color:#bdb8d1}
+.workspace-main .app-stat,
+.workspace-main .app-settings-grid>.app-panel,
+.workspace-main .app-grid>.app-panel,
+.workspace-main .client-card,
+.workspace-main .cd-edit,
+.workspace-main .integration-group,
+.workspace-main .settings-preview,
+.workspace-main .scan-panel,
+.workspace-main .add-toggle,
+.workspace-main .app-empty{
+  border:1px solid rgba(176,157,255,.14)!important;
+  border-radius:17px!important;
+  background:linear-gradient(145deg,rgba(39,34,62,.94),rgba(27,26,46,.97))!important;
+  box-shadow:inset 0 1px rgba(255,255,255,.025)!important;
+}
+.workspace-main .app-stat{padding:18px!important}
+.workspace-main .app-stat>span,
+.workspace-main .app-stat small{color:#bdb7d1!important}
+.workspace-main .app-stat strong{color:#f7f4ff!important}
+.workspace-main .app-btn,
+.workspace-main button.app-btn,
+.workspace-main .app-form button{
+  border-radius:12px!important;transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease!important;
+}
+.workspace-main .app-btn.primary,
+.workspace-main button.app-btn.primary{
+  background:linear-gradient(125deg,#a78bfa,#7957e9 62%,#6243d1)!important;
+  color:#fff!important;border:1px solid rgba(220,205,255,.24)!important;
+  box-shadow:0 7px 20px rgba(103,73,222,.19),inset 0 1px rgba(255,255,255,.12)!important;
+}
+.workspace-main .app-btn:not(.primary),
+.workspace-main button.app-btn:not(.primary){
+  border-color:rgba(190,176,255,.2)!important;
+}
+.workspace-main .app-btn:focus-visible,
+.workspace-main button:focus-visible,
+.workspace-main input:focus-visible,
+.workspace-main select:focus-visible,
+.workspace-main textarea:focus-visible{
+  outline:2px solid #b7a4ff!important;outline-offset:2px!important;
+}
+.workspace-main input,
+.workspace-main select,
+.workspace-main textarea{
+  color:#f4f0ff!important;background:rgba(15,14,28,.52)!important;
+  border-color:rgba(176,157,255,.2)!important;border-radius:11px!important;
+}
+.workspace-main input::placeholder,
+.workspace-main textarea::placeholder{color:#89839f!important}
+.workspace-main .app-list>.app-list-row,
+.workspace-main .app-list>div,
+.workspace-main .home-audit-row,
+.workspace-main .client-row{
+  border-color:rgba(176,157,255,.12)!important;
+}
+.workspace-main .app-table th,
+.workspace-main table th{color:#c7baff!important}
+.workspace-main .app-table td,
+.workspace-main table td{border-color:rgba(176,157,255,.11)!important}
+.workspace-main .status-pill,
+.workspace-main .app-badge{border-radius:999px!important}
+.workspace-main .app-empty{padding:22px!important;color:#bdb7d1!important;text-align:center}
+.workspace-main .app-content-title h2{font-size:clamp(24px,3vw,32px)!important;letter-spacing:-.9px!important}
+.workspace-main .app-content-title p{max-width:66ch!important;color:#bdb8d1!important;line-height:1.65!important}
+.workspace-main .api-section-heading,
+.workspace-main .audit-section-head{align-items:flex-start}
+.workspace-main .api-section-heading>span,
+.workspace-main .audit-section-head>span{border-radius:13px!important}
+@media(max-width:760px){
+ .workspace-main>.app-panel,
+ .workspace-main>.app-grid>.app-panel,
+ .workspace-main>.app-settings-grid>.app-panel,
+ .workspace-main>form>.app-settings-grid>.app-panel,
+ .workspace-main .app-settings-grid>.app-panel,
+ .workspace-main .app-grid>.app-panel,
+ .workspace-main .app-stat,
+ .workspace-main .client-card,
+ .workspace-main .cd-edit,
+ .workspace-main .integration-group,
+ .workspace-main .settings-preview,
+ .workspace-main .scan-panel,
+ .workspace-main .add-toggle{border-radius:15px!important}
+ .workspace-main>.app-content-title{padding:17px!important;border-radius:17px!important}
+ .workspace-main .app-stat{padding:14px!important}
+ .workspace-main .app-content-title h2{font-size:26px!important}
+ .workspace-main .app-panel h2{font-size:18px!important}
+ .workspace-main .app-btn{min-height:43px}
+}
+@media(prefers-reduced-motion:reduce){
+ .workspace-main .app-btn,.workspace-main button.app-btn{transition:none!important}
+}
+
 </style>
 </head>
 <body>
