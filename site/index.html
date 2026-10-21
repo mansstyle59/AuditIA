@@ -1962,6 +1962,21 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       .workspace-main>.app-stats{margin-bottom:16px!important}
     }
 
+
+    /* Dernier correctif iPhone : supprimer le vide résiduel au-dessus du hero */
+    @media(max-width:760px){
+      .workspace-main:has(>.home-hero)>.home-hero{
+        margin-top:-230px!important;
+        position:relative!important;
+      }
+      .workspace-main:has(>.home-hero)>.home-hero .home-hero-art{
+        margin-top:0!important;
+      }
+      .workspace-main:has(>.home-hero)>.home-hero+.home-section-heading{
+        margin-top:0!important;
+      }
+    }
+
 </style>
 </head>
 <body>
