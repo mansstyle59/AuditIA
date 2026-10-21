@@ -2332,7 +2332,7 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       try{ const r=await withTimeout(fetch('https://places.googleapis.com/v1/places/'+encodeURIComponent(placeId),{headers:{'X-Goog-Api-Key':key,'X-Goog-FieldMask':'photos'}}),12000); if(!r.ok) return null; const d=await r.json(); return Array.isArray(d.photos)?d.photos.length:0; }catch(e){ return null; }
     }
     /* Concurrents locaux : commerces du même type dans la ville (Google Places), classés par avis */
-    async async function fetchCompetitors(c){
+    async function fetchCompetitors(c){
       const key=placesKey(); if(!key) return null;
       const d=(c&&c.details)||{}; const city=String((c&&c.city)||'').trim();
       const base=targetKeywords(c).base||String((c&&c.category)||d.category||'commerce').toLowerCase();
