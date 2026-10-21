@@ -2100,6 +2100,56 @@ input.app-control,select.app-control,textarea.app-control{
   .home-visual{margin:11px 12px 0!important}
 }
 
+
+
+/* AuditIA v53 — correction ciblée après capture réelle iPhone */
+@media(max-width:760px){
+  /* Empêche le bloc d'identité de s'étirer et de créer un grand vide */
+  .workspace-head{
+    display:block!important;
+    height:auto!important;min-height:0!important;max-height:none!important;
+    padding:2px 0 12px!important;margin:0 0 12px!important;
+    align-content:initial!important;justify-content:flex-start!important;
+  }
+  .workspace-head>div:first-child{
+    display:block!important;flex:none!important;flex-grow:0!important;flex-shrink:1!important;
+    height:auto!important;min-height:0!important;max-height:none!important;
+    padding:0!important;margin:0!important;
+  }
+  .workspace-head .eyebrow{display:block!important;margin:0 0 6px!important}
+  .workspace-head h1{display:block!important;margin:0 0 6px!important}
+  .workspace-head p{display:block!important;margin:0!important}
+  .workspace-head .workspace-actions{display:none!important}
+  /* Barre fixe compacte : hauteur bornée, 5 onglets sur une seule rangée */
+  .mobile-tabbar{
+    position:fixed!important;display:grid!important;
+    grid-template-columns:repeat(5,minmax(0,1fr))!important;
+    grid-auto-rows:58px!important;align-content:center!important;align-items:center!important;
+    height:auto!important;min-height:0!important;max-height:calc(108px + env(safe-area-inset-bottom, 0px))!important;
+    box-sizing:border-box!important;overflow:hidden!important;
+    left:9px!important;right:9px!important;bottom:calc(6px + env(safe-area-inset-bottom, 0px))!important;
+    padding:5px!important;gap:2px!important;
+    border:1px solid rgba(173,157,231,.24)!important;border-radius:22px!important;
+    background:rgba(23,19,38,.97)!important;
+    box-shadow:0 8px 28px rgba(8,6,17,.4),inset 0 1px rgba(255,255,255,.05)!important;
+  }
+  .mobile-tabbar button{
+    display:flex!important;align-self:center!important;justify-self:stretch!important;
+    width:100%!important;height:56px!important;min-height:56px!important;max-height:56px!important;
+    padding:3px 1px!important;margin:0!important;gap:3px!important;
+    flex-direction:column!important;align-items:center!important;justify-content:center!important;
+  }
+  .mobile-tabbar button .tab-icon{width:29px!important;height:28px!important}
+  .mobile-tabbar button span:last-child{font-size:9px!important;line-height:1.2!important}
+  .workspace-app{
+    padding-bottom:calc(112px + env(safe-area-inset-bottom, 0px))!important;
+  }
+}
+@media(max-width:390px){
+  .mobile-tabbar{left:6px!important;right:6px!important;padding:4px!important}
+  .mobile-tabbar button{height:54px!important;min-height:54px!important;max-height:54px!important}
+}
+
 </style>
 </head>
 <body>
