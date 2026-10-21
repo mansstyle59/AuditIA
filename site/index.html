@@ -1977,6 +1977,35 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       }
     }
 
+
+    /* Splash / accueil AuditIA — composition plus compacte et plus premium */
+    .workspace-main:has(>.home-hero){display:flex!important;flex-direction:column!important;gap:0!important;min-height:0!important}
+    .workspace-main:has(>.home-hero)>.workspace-head{flex:0 0 auto!important;min-height:0!important;height:auto!important;margin:0 0 18px!important;padding:0 0 14px!important}
+    .workspace-main:has(>.home-hero)>.home-hero{flex:0 0 auto!important;margin:0 0 24px!important;position:relative!important}
+    .home-hero{isolation:isolate!important;border:1px solid rgba(167,139,250,.22)!important;background:radial-gradient(ellipse at 80% 0%,rgba(119,82,235,.22),transparent 42%),linear-gradient(145deg,#201b3a 0%,#19172d 55%,#151424 100%)!important;box-shadow:0 22px 60px rgba(0,0,0,.22),inset 0 1px rgba(255,255,255,.045)!important}
+    .home-hero-art{background:radial-gradient(ellipse at 50% 75%,rgba(132,91,255,.28),transparent 62%),linear-gradient(135deg,rgba(48,35,85,.55),rgba(20,18,37,.1))!important}
+    .home-hero-art:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(16,14,29,.12),transparent 25%,transparent 75%,rgba(16,14,29,.12));pointer-events:none}
+    .home-kicker{box-shadow:0 6px 22px rgba(5,4,16,.14)!important}
+    .home-hero h2{letter-spacing:-.055em!important;text-wrap:balance}
+    .home-hero h2 em{font-style:normal!important;text-shadow:0 4px 24px rgba(148,110,255,.16)}
+    .home-hero-copy>p{color:#c5c0d9!important}
+    .home-hero-actions .app-btn.primary{box-shadow:0 9px 26px rgba(108,64,240,.24)!important}
+    .home-hero-actions .home-secondary{background:rgba(255,255,255,.035)!important;border-color:rgba(179,160,255,.25)!important}
+    .home-visual{border-color:rgba(172,151,255,.18)!important;background:linear-gradient(145deg,rgba(25,22,45,.92),rgba(19,18,34,.96))!important;box-shadow:inset 0 1px rgba(255,255,255,.035)!important}
+    .home-visual-top{letter-spacing:2px}
+    @media(max-width:760px){
+      .workspace-main:has(>.home-hero)>.workspace-head{margin-bottom:12px!important;padding-bottom:12px!important}
+      .workspace-main:has(>.home-hero)>.home-hero{margin-top:0!important;margin-bottom:20px!important}
+      .home-hero-art{height:clamp(145px,42vw,190px)!important;margin-bottom:4px!important}
+      .home-hero-copy{padding:0 17px 20px!important}
+      .home-hero h2{font-size:clamp(27px,7.1vw,34px)!important;line-height:1.07!important;margin:15px 0 11px!important}
+      .home-hero-copy>p{font-size:13px!important;line-height:1.58!important}
+      .home-hero-actions{margin-top:17px!important;gap:9px!important}
+      .home-hero-actions .app-btn{min-height:49px!important;border-radius:14px!important}
+      .home-visual{margin:0 17px 20px!important}
+    }
+    @media(prefers-reduced-motion:reduce){.home-hero-art *{animation:none!important}}
+
 </style>
 </head>
 <body>
