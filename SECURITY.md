@@ -18,5 +18,11 @@ Le projet actuel est un site statique GitHub Pages et ne déclare actuellement a
 4. applique un rate limit côté serveur (par utilisateur et/ou IP) et renvoie `429` en cas de dépassement ;
 5. journalise les refus sans enregistrer les clés ni les données sensibles.
 
+## État de déploiement
+- Edge Function : `auditia-secure-api` (active, JWT vérifié dans le code de la fonction).
+- Limiteur : `public.auditia_consume_rate_limit`, exécutable uniquement par `service_role`.
+- Table `public.auditia_api_rate_limits` : RLS activé, aucun accès direct accordé aux rôles `anon` et `authenticated`.
+- Index ajouté sur `public.audits(client_id)`.
+
 ## Vérifications recommandées
 Dans Supabase Auth, activer la protection contre les mots de passe compromis (« Leaked password protection »). Le contrôle de sécurité Supabase a signalé cette option comme désactivée lors du dernier audit.
