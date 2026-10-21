@@ -2662,6 +2662,76 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
  .workspace-main .app-btn,.workspace-main button.app-btn{transition:none!important}
 }
 
+
+/* Refondation complète du Splash Home Screen — direction éditoriale premium */
+.workspace-main>.home-hero{
+  display:grid!important;grid-template-columns:minmax(0,1.04fr) minmax(270px,.96fr)!important;
+  gap:0!important;align-items:stretch!important;position:relative!important;isolation:isolate!important;
+  overflow:hidden!important;padding:0!important;margin:2px 0 30px!important;
+  border:1px solid rgba(174,151,255,.25)!important;border-radius:30px!important;
+  background:radial-gradient(ellipse at 82% 12%,rgba(119,81,242,.20),transparent 37%),linear-gradient(135deg,#211d3b 0%,#19182d 52%,#121522 100%)!important;
+  box-shadow:0 28px 68px rgba(3,3,15,.32),inset 0 1px rgba(255,255,255,.07)!important;
+}
+.workspace-main>.home-hero:before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:.22;background-image:linear-gradient(rgba(190,176,255,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(190,176,255,.055) 1px,transparent 1px);background-size:35px 35px;mask-image:linear-gradient(120deg,transparent 2%,#000 100%)}
+.workspace-main>.home-hero:after{content:"";position:absolute;right:-165px;top:-190px;width:390px;height:390px;border-radius:50%;border:1px solid rgba(183,158,255,.17);box-shadow:0 0 0 34px rgba(183,158,255,.025),0 0 0 70px rgba(183,158,255,.018);z-index:-1}
+.workspace-main>.home-hero .home-hero-copy{display:flex!important;flex-direction:column!important;align-items:flex-start!important;justify-content:center!important;min-width:0!important;padding:clamp(25px,3.5vw,45px)!important}
+.workspace-main>.home-hero .home-hero-art{display:block!important;order:0!important;position:relative!important;width:100%!important;height:clamp(165px,21vw,230px)!important;flex:none!important;margin:0 0 23px!important;overflow:hidden!important;border:1px solid rgba(184,160,255,.15)!important;border-radius:21px!important;background:radial-gradient(ellipse at 50% 78%,rgba(125,89,247,.25),transparent 59%),linear-gradient(145deg,rgba(45,35,78,.75),rgba(16,18,34,.54))!important}
+.workspace-main>.home-hero .home-hero-art:after{content:"";position:absolute;inset:auto 0 0;height:50px;background:linear-gradient(180deg,transparent,rgba(25,22,44,.8));pointer-events:none}
+.workspace-main>.home-hero .home-hero-art svg{display:block!important;width:100%!important;height:100%!important;max-width:680px!important;margin:auto!important}
+.workspace-main>.home-hero .home-kicker{order:1!important;display:inline-flex!important;align-items:center!important;gap:9px!important;width:max-content;max-width:100%;padding:9px 13px!important;border:1px solid rgba(177,155,255,.23)!important;border-radius:999px!important;background:rgba(124,98,218,.12)!important;color:#d2c5ff!important;font-size:9px!important;font-weight:800!important;letter-spacing:1.2px!important}
+.workspace-main>.home-hero .home-hero-copy h2{order:2!important;max-width:620px!important;margin:20px 0 15px!important;font-size:clamp(35px,4.2vw,53px)!important;line-height:1.015!important;letter-spacing:-2.1px!important;font-weight:850!important;color:#fbf9ff!important}
+.workspace-main>.home-hero .home-hero-copy h2 em{color:#b9a4ff!important;text-shadow:0 0 30px rgba(153,117,255,.18)}
+.workspace-main>.home-hero .home-hero-copy>p{order:3!important;max-width:48ch!important;margin:0!important;color:#c3bed5!important;font-size:14px!important;line-height:1.8!important}
+.workspace-main>.home-hero .home-hero-actions{order:4!important;display:flex!important;flex-wrap:wrap!important;gap:11px!important;margin-top:27px!important}
+.workspace-main>.home-hero .home-hero-actions .app-btn{min-height:51px!important;padding:0 18px!important;border-radius:14px!important;font-size:13px!important;font-weight:780!important;transition:transform .2s ease,box-shadow .2s ease!important}
+.workspace-main>.home-hero .home-hero-actions .app-btn.primary{background:linear-gradient(120deg,#b09aff,#815cf0 55%,#6645d8)!important;border:1px solid rgba(224,211,255,.35)!important;box-shadow:0 11px 28px rgba(103,73,222,.3),inset 0 1px rgba(255,255,255,.22)!important}
+.workspace-main>.home-hero .home-hero-actions .app-btn.primary:hover{transform:translateY(-2px);box-shadow:0 15px 34px rgba(103,73,222,.38)!important}
+.workspace-main>.home-hero .home-hero-actions .home-secondary{background:rgba(255,255,255,.045)!important;border:1px solid rgba(195,181,255,.23)!important;color:#f0ebff!important}
+.workspace-main>.home-hero .home-visual{align-self:stretch!important;display:flex!important;flex-direction:column!important;justify-content:center!important;position:relative!important;overflow:hidden!important;min-width:0!important;margin:22px!important;padding:clamp(20px,2.5vw,30px)!important;border:1px solid rgba(185,168,255,.18)!important;border-radius:24px!important;background:linear-gradient(155deg,rgba(18,18,34,.87),rgba(29,25,51,.94))!important;box-shadow:inset 0 1px rgba(255,255,255,.065),0 22px 45px rgba(4,3,15,.19)!important}
+.workspace-main>.home-hero .home-visual:before{content:"";position:absolute;top:0;left:22px;right:22px;height:1px;background:linear-gradient(90deg,transparent,rgba(184,161,255,.48),transparent)}
+.workspace-main>.home-hero .home-visual-top{font-size:9px!important;letter-spacing:1.4px!important;color:#c3b9e1!important}
+.workspace-main>.home-hero .home-score-ring{filter:drop-shadow(0 0 19px rgba(154,125,255,.19))!important}
+.workspace-main>.home-hero .home-score-ring:before{background:#19172b!important}
+.workspace-main>.home-hero .home-visual-bottom{gap:10px!important;flex-wrap:wrap!important;color:#c9c2dc!important}
+.workspace-main>.home-hero .home-mini-icon{border-radius:8px!important;background:rgba(151,126,255,.13)!important;color:#c7b5ff!important}
+.workspace-main>.home-section-heading{margin-top:31px!important;margin-bottom:15px!important}
+.workspace-main>.home-section-heading h2{font-size:24px!important;letter-spacing:-.8px!important}
+.workspace-main .home-stats .home-stat{padding:21px!important;border-radius:19px!important;background:linear-gradient(145deg,rgba(39,34,62,.96),rgba(24,23,42,.98))!important;border:1px solid rgba(176,157,255,.16)!important;box-shadow:inset 0 1px rgba(255,255,255,.035),0 10px 28px rgba(4,3,15,.10)!important}
+.workspace-main .home-stats .home-stat strong{font-size:clamp(28px,3vw,36px)!important}
+.workspace-main .home-stats .home-stat>span{color:#c5bedc!important}
+.workspace-main .home-recent-panel{border:1px solid rgba(176,157,255,.16)!important;border-radius:21px!important;background:linear-gradient(145deg,rgba(30,27,49,.97),rgba(21,21,37,.99))!important;box-shadow:0 14px 34px rgba(4,3,15,.13)!important}
+@media(max-width:900px) and (min-width:761px){
+ .workspace-main>.home-hero{grid-template-columns:minmax(0,1fr)!important}
+ .workspace-main>.home-hero .home-hero-copy{padding:28px!important}
+ .workspace-main>.home-hero .home-hero-art{height:180px!important}
+ .workspace-main>.home-hero .home-visual{margin:0 28px 28px!important}
+}
+@media(max-width:760px){
+ .workspace-main>.home-hero{grid-template-columns:minmax(0,1fr)!important;gap:0!important;border-radius:25px!important;margin:3px 0 24px!important}
+ .workspace-main>.home-hero .home-hero-copy{padding:0 20px 25px!important}
+ .workspace-main>.home-hero .home-hero-art{height:clamp(155px,45vw,205px)!important;margin:0 -20px 22px!important;width:calc(100% + 40px)!important;border-radius:24px 24px 16px 16px!important;border-left:0!important;border-right:0!important;border-top:0!important}
+ .workspace-main>.home-hero .home-hero-art svg{width:110%!important;max-width:none!important;transform:translateX(-5%)}
+ .workspace-main>.home-hero .home-kicker{font-size:8px!important;letter-spacing:.9px!important;padding:8px 10px!important;gap:7px!important}
+ .workspace-main>.home-hero .home-hero-copy h2{font-size:clamp(33px,9vw,41px)!important;line-height:1.035!important;letter-spacing:-1.45px!important;margin:16px 0 12px!important}
+ .workspace-main>.home-hero .home-hero-copy>p{font-size:13px!important;line-height:1.7!important}
+ .workspace-main>.home-hero .home-hero-actions{display:grid!important;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr)!important;gap:9px!important;margin-top:22px!important}
+ .workspace-main>.home-hero .home-hero-actions .app-btn{min-width:0!important;min-height:51px!important;padding:10px 9px!important;font-size:12px!important;white-space:normal!important;line-height:1.25!important}
+ .workspace-main>.home-hero .home-visual{margin:0 14px 17px!important;padding:18px!important;border-radius:19px!important}
+ .workspace-main>.home-hero .home-visual-score{gap:13px!important;margin:19px 0!important}
+ .workspace-main>.home-hero .home-score-ring{width:92px!important;height:92px!important;flex-basis:92px!important}
+ .workspace-main>.home-hero .home-score-ring strong{font-size:25px!important}
+ .workspace-main>.home-section-heading{margin-top:27px!important}
+ .workspace-main>.home-section-heading h2{font-size:22px!important}
+ .workspace-main .home-stats .home-stat{padding:15px!important;border-radius:15px!important}
+ .workspace-main .home-recent-panel{border-radius:17px!important}
+}
+@media(max-width:390px){
+ .workspace-main>.home-hero .home-hero-copy{padding-left:15px!important;padding-right:15px!important}
+ .workspace-main>.home-hero .home-hero-art{margin-left:-15px!important;margin-right:-15px!important;width:calc(100% + 30px)!important;height:145px!important}
+ .workspace-main>.home-hero .home-hero-actions{grid-template-columns:minmax(0,1fr)!important}
+}
+@media(prefers-reduced-motion:reduce){.workspace-main>.home-hero .home-hero-actions .app-btn{transition:none!important}.workspace-main>.home-hero .home-hero-actions .app-btn.primary:hover{transform:none!important}}
+
 </style>
 </head>
 <body>
