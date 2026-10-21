@@ -2120,6 +2120,71 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       .workspace-main>.app-stats>.app-stat{padding:10px 8px!important}
     }
 
+
+    /* AuditIA — hero banners raffinées v56 */
+    .workspace-head{
+      position:relative!important;isolation:isolate!important;overflow:hidden!important;
+      min-height:102px!important;padding:19px 20px!important;margin:0 0 20px!important;
+      border:1px solid rgba(169,145,255,.18)!important;border-radius:20px!important;
+      background:radial-gradient(ellipse at 92% 0%,rgba(128,92,245,.17),transparent 44%),linear-gradient(112deg,rgba(37,31,65,.92),rgba(24,22,42,.96))!important;
+      box-shadow:0 10px 28px rgba(4,3,14,.12)!important;
+    }
+    .workspace-head:after{
+      content:"";position:absolute;z-index:-1;width:150px;height:150px;right:-40px;top:-82px;
+      border:1px solid rgba(176,153,255,.18);border-radius:50%;
+      box-shadow:0 0 0 18px rgba(176,153,255,.035),0 0 0 38px rgba(176,153,255,.025);
+      pointer-events:none;
+    }
+    .workspace-head>div:first-of-type{min-width:0;position:relative;z-index:1}
+    .workspace-head .eyebrow{display:flex!important;align-items:center;gap:8px!important;color:#b8a6ff!important;font-size:10px!important;letter-spacing:1.7px!important;font-weight:850!important}
+    .workspace-head .eyebrow:before{content:"";width:6px;height:6px;flex:0 0 6px;border-radius:50%;background:#83e1ba;box-shadow:0 0 0 4px rgba(131,225,186,.1)}
+    .workspace-head h1{font-size:clamp(27px,3.4vw,35px)!important;line-height:1.12!important;letter-spacing:-1.25px!important;margin:8px 0 5px!important;font-weight:830!important}
+    .workspace-head p{color:#aaa5c2!important;font-size:12px!important;line-height:1.45!important}
+    .workspace-head .workspace-actions{position:relative;z-index:1}
+    .workspace-head .workspace-actions .app-btn{min-height:42px!important;border-radius:12px!important;background:rgba(255,255,255,.045)!important;border:1px solid rgba(181,164,255,.22)!important}
+    .workspace-main:has(>.home-hero)>.workspace-head{min-height:0!important;margin-bottom:16px!important;padding:15px 17px!important}
+    /* Accueil : illustration cadrée, davantage de profondeur et meilleure hiérarchie */
+    .home-hero{
+      border:1px solid rgba(175,151,255,.25)!important;
+      background:radial-gradient(ellipse at 78% 6%,rgba(139,99,255,.2),transparent 40%),linear-gradient(145deg,#211c3b 0%,#1a172d 56%,#151424 100%)!important;
+      box-shadow:0 18px 46px rgba(5,3,18,.22),inset 0 1px 0 rgba(255,255,255,.035)!important;
+    }
+    .home-hero:after{width:290px!important;height:290px!important;right:-135px!important;bottom:-205px!important;border-color:rgba(177,151,255,.2)!important;box-shadow:0 0 0 26px rgba(177,151,255,.035),0 0 0 54px rgba(177,151,255,.025)!important}
+    .home-hero-art{
+      position:relative!important;isolation:isolate!important;overflow:hidden!important;
+      background:radial-gradient(ellipse at 50% 75%,rgba(145,109,255,.28),transparent 57%),linear-gradient(135deg,rgba(55,42,94,.65),rgba(22,19,40,.12))!important;
+    }
+    .home-hero-art:after{content:"";position:absolute;inset:12px 14px 4px;border:1px solid rgba(183,160,255,.12);border-radius:15px;pointer-events:none}
+    .home-hero-art svg{filter:drop-shadow(0 8px 18px rgba(5,3,18,.16));transform:scale(.96);transform-origin:center}
+    .home-hero-copy{position:relative;z-index:1}
+    .home-kicker{display:inline-flex!important;align-items:center!important;gap:8px!important;border:1px solid rgba(173,151,255,.22)!important;background:rgba(117,85,218,.11)!important;border-radius:999px!important;color:#cfc4ff!important}
+    .home-hero h2{font-size:clamp(29px,4.2vw,44px)!important;line-height:1.06!important;letter-spacing:-1.8px!important;text-wrap:balance!important}
+    .home-hero h2 em{color:#b8a0ff!important;text-shadow:0 5px 28px rgba(145,108,255,.22)!important}
+    .home-hero-copy>p{max-width:560px!important;color:#c4bfd8!important;font-size:14px!important;line-height:1.7!important}
+    .home-hero-actions .app-btn.primary{background:linear-gradient(125deg,#b13af3 0%,#7547f5 52%,#4d45f6 100%)!important;color:#fff!important;box-shadow:0 9px 25px rgba(107,63,236,.24),inset 0 1px 0 rgba(255,255,255,.16)!important}
+    .home-hero-actions .home-secondary{background:rgba(255,255,255,.035)!important;border-color:rgba(179,160,255,.25)!important;color:#f4f0ff!important}
+    .home-visual{border-color:rgba(173,151,255,.2)!important;background:linear-gradient(145deg,rgba(19,17,34,.86),rgba(26,23,44,.94))!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.035)!important}
+    .home-visual-top{color:#aaa2c5!important;letter-spacing:1.7px!important}
+    .home-score-ring{filter:drop-shadow(0 4px 14px rgba(146,108,255,.12))}
+    .home-section-heading{gap:12px!important}
+    .home-section-heading .eyebrow{color:#ad9bfa!important}
+    @media(max-width:760px){
+      .workspace-head{min-height:0!important;padding:15px 15px 14px!important;margin:0 0 17px!important;border-radius:17px!important}
+      .workspace-head h1{font-size:28px!important;letter-spacing:-1.1px!important;margin:7px 0 4px!important}
+      .workspace-head p{font-size:11px!important}
+      .workspace-main:has(>.home-hero)>.workspace-head{padding:13px 14px!important;margin-bottom:14px!important}
+      .home-hero{border-radius:21px!important}
+      .home-hero-art:after{inset:9px 9px 3px;border-radius:12px}
+      .home-hero-art svg{transform:scale(.98)}
+      .home-hero h2{font-size:clamp(28px,7.3vw,36px)!important;letter-spacing:-1.3px!important}
+      .home-hero-copy>p{font-size:14px!important;line-height:1.6!important}
+      .home-visual{border-radius:17px!important}
+    }
+    @media(max-width:390px){
+      .workspace-head{padding:13px!important}
+      .home-hero-art:after{inset:7px 7px 2px}
+    }
+
 </style>
 </head>
 <body>
