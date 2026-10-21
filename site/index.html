@@ -1641,6 +1641,17 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
     @media(max-width:620px){.audit-insight-grid{grid-template-columns:minmax(0,1fr)}.audit-section-head{gap:8px}.audit-insight-ring{width:78px;height:78px;flex-basis:78px}.audit-step{align-items:flex-start}.audit-step-tag{margin-left:auto}.audit-source-links>*{flex:1}}
     @media(prefers-reduced-motion:reduce){.audit-source-link{transition:none}}
 
+
+    /* Benchmark concurrentiel : liens publics et comparaison lisible */
+    .cp-meta{display:block;color:var(--muted);font-size:11px;margin-top:3px}
+    .cp-links{display:flex;flex-wrap:wrap;gap:10px;margin-top:5px;font-size:11px}
+    .cp-link{color:#c9bcff;text-decoration:none;font-weight:750}
+    .cp-link:hover{text-decoration:underline;text-underline-offset:3px}
+    .cp-no-link{color:var(--muted)}
+    .cp-mid{min-width:0;flex:1}
+    .cp-row{align-items:flex-start}
+    .cp-score{padding-top:2px}
+    @media(max-width:620px){.cp-links{gap:8px}.cp-row{gap:8px}.cp-rank{width:23px;flex-basis:23px}.cp-score{min-width:56px}}
 </style>
 </head>
 <body>
@@ -2321,21 +2332,30 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       try{ const r=await withTimeout(fetch('https://places.googleapis.com/v1/places/'+encodeURIComponent(placeId),{headers:{'X-Goog-Api-Key':key,'X-Goog-FieldMask':'photos'}}),12000); if(!r.ok) return null; const d=await r.json(); return Array.isArray(d.photos)?d.photos.length:0; }catch(e){ return null; }
     }
     /* Concurrents locaux : commerces du même type dans la ville (Google Places), classés par avis */
-    async function fetchCompetitors(c){
+    async async function fetchCompetitors(c){
       const key=placesKey(); if(!key) return null;
       const d=(c&&c.details)||{}; const city=String((c&&c.city)||'').trim();
       const base=targetKeywords(c).base||String((c&&c.category)||d.category||'commerce').toLowerCase();
       const query=(base+' '+city).trim();
       try{
-        const r=await withTimeout(fetch('https://places.googleapis.com/v1/places:searchText',{method:'POST',headers:{'Content-Type':'application/json','X-Goog-Api-Key':key,'X-Goog-FieldMask':'places.id,places.displayName,places.rating,places.userRatingCount'},body:JSON.stringify({textQuery:query,languageCode:'fr',regionCode:'FR',maxResultCount:20})}),15000);
+        const r=await withTimeout(fetch('https://places.googleapis.com/v1/places:searchText',{method:'POST',headers:{'Content-Type':'application/json','X-Goog-Api-Key':key,'X-Goog-FieldMask':'places.id,places.displayName,places.rating,places.userRatingCount,places.websiteUri,places.primaryTypeDisplayName,places.businessStatus,places.googleMapsUri'},body:JSON.stringify({textQuery:query,languageCode:'fr',regionCode:'FR',maxResultCount:20})}),15000);
         if(!r.ok) return null;
         const data=await r.json(); const places=data.places||[]; if(!places.length) return null;
         const selfId=d.place_id||''; const selfName=norm((c&&c.name)||'');
-        const seen=new Set(); let list=[];
-        places.forEach(p=>{ const id=p.id||''; if(seen.has(id))return; seen.add(id); const nm=(p.displayName&&p.displayName.text)||''; list.push({placeId:id,name:nm,rating:(typeof p.rating==='number')?p.rating:null,reviews:p.userRatingCount||0,isSelf:(selfId&&id===selfId)||(selfName&&norm(nm)===selfName)}); });
-        list.sort((a,b)=>(b.reviews-a.reviews)||((b.rating||0)-(a.rating||0)));
-        const idx=list.findIndex(x=>x.isSelf);
-        return { query, total:list.length, selfRank:idx>=0?idx+1:null, list:list.slice(0,8) };
+        const seen=new Set(); const all=[];
+        places.forEach(p=>{
+          const id=p.id||'', nm=(p.displayName&&p.displayName.text)||'';
+          if(!nm||(id&&seen.has(id))) return; if(id) seen.add(id);
+          const website=String(p.websiteUri||'').startsWith('http')?p.websiteUri:'';
+          all.push({placeId:id,name:nm,rating:(typeof p.rating==='number')?p.rating:null,reviews:Number(p.userRatingCount)||0,website,primaryType:(p.primaryTypeDisplayName&&p.primaryTypeDisplayName.text)||'',businessStatus:p.businessStatus||'',mapsUrl:p.googleMapsUri||'',isSelf:(!!selfId&&id===selfId)||(!selfId&&!!selfName&&norm(nm)===selfName)});
+        });
+        all.sort((a,b)=>(b.reviews-a.reviews)||((b.rating||0)-(a.rating||0))||a.name.localeCompare(b.name,'fr'));
+        all.forEach((x,i)=>x.rank=i+1);
+        const self=all.find(x=>x.isSelf)||null, top=all.slice(0,8);
+        if(self&&!top.some(x=>x.isSelf)){top.pop();top.push(self);top.sort((a,b)=>a.rank-b.rank);}
+        const ahead=self?all.filter(x=>x.rank<self.rank).sort((a,b)=>a.rank-b.rank):[];
+        const nextAhead=ahead.length?ahead[ahead.length-1]:null, rated=all.filter(x=>x.rating!=null);
+        return {query,total:all.length,selfRank:self?self.rank:null,selfFound:!!self,leader:all[0]||null,nextAhead,averageRating:rated.length?rated.reduce((n,x)=>n+x.rating,0)/rated.length:null,averageReviews:all.length?Math.round(all.reduce((n,x)=>n+x.reviews,0)/all.length):0,list:top};
       }catch(e){ return null; }
     }
     const norm=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
@@ -2378,31 +2398,24 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
     }
     function competitorsHtml(a,c){
       const cp=a&&a.site&&a.site.competitors; if(!cp||!cp.list||!cp.list.length) return '';
-      const list=cp.list;
-      const maxRev=Math.max(1,...list.map(x=>Number(x.reviews)||0));
-      const self=list.find(x=>x.isSelf);
-      const leader=list[0];
+      const list=cp.list, maxRev=Math.max(1,...list.map(x=>Number(x.reviews)||0));
+      const self=list.find(x=>x.isSelf), leader=cp.leader||list[0];
       const ratings=list.filter(x=>x.rating!=null).map(x=>Number(x.rating));
-      const avgRating=ratings.length?(ratings.reduce((n,v)=>n+v,0)/ratings.length):null;
-      const avgRev=Math.round(list.reduce((n,x)=>n+(Number(x.reviews)||0),0)/list.length);
+      const avgRating=cp.averageRating!=null?Number(cp.averageRating):(ratings.length?ratings.reduce((n,v)=>n+v,0)/ratings.length:null);
+      const avgRev=cp.averageReviews!=null?Number(cp.averageReviews):Math.round(list.reduce((n,x)=>n+(Number(x.reviews)||0),0)/list.length);
       const rows=list.map((x,i)=>{
-        const rev=Number(x.reviews)||0; const pct=Math.max(4,Math.round(rev/maxRev*100));
-        return '<div class="cp-row'+(x.isSelf?' cp-self':'')+'"><span class="cp-rank">'+(i+1)+'</span>'
-          +'<div class="cp-mid"><span class="cp-name">'+escHtml(x.name)+(x.isSelf?' · vous':'')+'</span><span class="cp-bar"><i style="width:'+pct+'%"></i></span></div>'
-          +'<span class="cp-score">'+(x.rating!=null?'★ '+x.rating:'—')+'<small>'+rev+' avis</small></span></div>';
+        const rev=Number(x.reviews)||0, pct=Math.max(4,Math.round(rev/maxRev*100)), rank=x.rank||i+1;
+        const status=x.businessStatus==='OPERATIONAL'?'En activité':x.businessStatus==='CLOSED_TEMPORARILY'?'Fermé temporairement':x.businessStatus==='CLOSED_PERMANENTLY'?'Fermé définitivement':'';
+        const links=(x.website?'<a class="cp-link" href="'+escHtml(x.website)+'" target="_blank" rel="noopener noreferrer">Site web ↗</a>':'<span class="cp-no-link">Site non trouvé</span>')+(x.mapsUrl?'<a class="cp-link" href="'+escHtml(x.mapsUrl)+'" target="_blank" rel="noopener noreferrer">Google Maps ↗</a>':'');
+        return '<div class="cp-row'+(x.isSelf?' cp-self':'')+'"><span class="cp-rank">'+rank+'</span><div class="cp-mid"><span class="cp-name">'+escHtml(x.name)+(x.isSelf?' · vous':'')+'</span><span class="cp-bar"><i style="width:'+pct+'%"></i></span><span class="cp-meta">'+escHtml([x.primaryType,status].filter(Boolean).join(' · '))+'</span><span class="cp-links">'+links+'</span></div><span class="cp-score">'+(x.rating!=null?'★ '+Number(x.rating).toFixed(1):'—')+'<small>'+rev+' avis</small></span></div>';
       }).join('');
       let insight;
       if(self&&cp.selfRank){
-        if(cp.selfRank===1){ insight='Vous êtes <b>n°1</b> localement en nombre d’avis. Objectif : garder l’avance et soigner la note.'; }
-        else { const target=list[cp.selfRank-2]; const need=target?Math.max(1,(Number(target.reviews)||0)-(Number(self.reviews)||0)+1):null; insight='Vous êtes <b>n°'+cp.selfRank+' sur '+cp.total+'</b>'+(need!=null?' — il vous manque environ <b>'+need+' avis</b> pour dépasser le n°'+(cp.selfRank-1)+'.':'.'); }
-      } else { insight='Votre commerce <b>n’apparaît pas</b> dans les '+cp.total+' premiers résultats : priorité absolue à la visibilité locale (fiche Google + avis).'; }
-      const kpis='<div class="cp-kpis">'
-        +'<span class="cp-kpi"><b>'+(cp.selfRank?('n°'+cp.selfRank):'—')+'</b><small>votre rang</small></span>'
-        +'<span class="cp-kpi"><b>'+(leader?(Number(leader.reviews)||0):0)+'</b><small>avis du n°1</small></span>'
-        +(avgRating!=null?'<span class="cp-kpi"><b>★ '+avgRating.toFixed(1)+'</b><small>note moyenne</small></span>':'')
-        +'<span class="cp-kpi"><b>'+avgRev+'</b><small>avis / concurrent</small></span>'
-        +'</div>';
-      return '<section class="app-panel cp-panel"><div class="eyebrow">CONCURRENTS LOCAUX</div><h3 style="margin:4px 0 4px">Face à vos concurrents</h3><p class="cp-insight">'+insight+'</p>'+kpis+'<div class="cp-list">'+rows+'</div><p class="scan-note">Commerces du même type à '+escHtml(String((c&&c.city)||'proximité'))+', classés par nombre d’avis (popularité). Source : Google Places — classement par avis, pas l’ordre exact de Google.</p></section>';
+        if(cp.selfRank===1) insight='Votre commerce a le plus grand volume d’avis parmi les résultats analysés. Cela ne représente pas le classement Google Maps en temps réel.';
+        else {const target=cp.nextAhead, need=target?Math.max(1,(Number(target.reviews)||0)-(Number(self.reviews)||0)+1):null; insight='Rang de volume d’avis : <b>'+cp.selfRank+' sur '+cp.total+'</b>'+(need!=null?' — environ <b>'+need+' avis supplémentaires</b> pour dépasser '+escHtml(target.name)+'.':'.');}
+      } else insight='Votre commerce n’a pas été identifié avec certitude dans les résultats comparés. Vérifiez le nom et la fiche Google avant d’interpréter cet écart.';
+      const kpis='<div class="cp-kpis"><span class="cp-kpi"><b>'+(cp.selfRank?('n°'+cp.selfRank):'—')+'</b><small>rang d’avis</small></span><span class="cp-kpi"><b>'+(leader?(Number(leader.reviews)||0):0)+'</b><small>avis du leader d’avis</small></span>'+(avgRating!=null?'<span class="cp-kpi"><b>★ '+Number(avgRating).toFixed(1)+'</b><small>note moyenne</small></span>':'')+'<span class="cp-kpi"><b>'+avgRev+'</b><small>avis / commerce</small></span></div>';
+      return '<section class="app-panel cp-panel"><div class="eyebrow">BENCHMARK CONCURRENTIEL</div><h3 style="margin:4px 0 4px">Comparer les commerces du secteur</h3><p class="cp-insight">'+insight+'</p>'+kpis+'<div class="cp-list">'+rows+'</div><p class="scan-note">Échantillon Google Places pour « '+escHtml(cp.query||((c&&c.category)||'activité')+' '+((c&&c.city)||''))+' », trié par volume d’avis puis note. Ce n’est pas le classement exact de Google Maps. Les liens et sites sont des données publiques lorsqu’ils sont disponibles.</p></section>';
     }
     /* Capture d'écran du site via WordPress mShots, récupérée en data-URL (pour l'afficher et l'inclure au PDF sans souci de CORS) */
     async function fetchScreenshot(site){
@@ -2431,13 +2444,13 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       const dirs=(si.directories)||[]; const comp=si.competitors; const topComp=comp&&comp.list&&comp.list.find(x=>!x.isSelf);
       const items=[]; const push=(axis,title,why,how,priority,impact)=>items.push({axis,title,why,how,priority,impact});
       if(!hasGoogle) push('Fiche Google','Créer et faire valider la fiche Google Business Profile','La recherche locale (« '+base+(city?' '+city:'')+' ») passe d’abord par Google et Maps. Sans fiche validée, le commerce est absent des résultats et de la carte : c’est la première cause d’invisibilité.',['Créer la fiche sur google.com/business (nom exact, adresse, téléphone)','Choisir la bonne catégorie principale + 2 à 3 catégories secondaires','Faire valider la fiche (courrier, téléphone ou vidéo)','Remplir 100 % des champs dès la validation'],'Haute','Fort');
-      else push('Fiche Google','Compléter la fiche Google à 100 %','Une fiche complète est jugée plus fiable par Google et par les clients : elle remonte dans le classement local et reçoit bien plus de clics qu’une fiche à moitié vide.',['Rédiger une description avec vos services + la ville','Ajouter catégories secondaires, zone desservie et attributs (accès, paiements, Wi-Fi, terrasse…)','Renseigner les produits/services avec photos et prix','Ajouter un lien d’action (réserver / commander / prendre RDV)'],'Haute','Fort');
-      if(rating==null||reviews<10) push('Avis & réputation','Lancer une collecte d’avis Google','Les avis sont le 2ᵉ facteur du classement local et le 1er critère de confiance. Aujourd’hui : '+(reviews||0)+' avis'+(rating!=null?' ('+rating+'/5)':'')+'.'+(topComp?' Votre concurrent '+topComp.name+' en a déjà '+topComp.reviews+' — l’écart se rattrape avec une collecte régulière.':''),['QR code vers l’avis Google en caisse / à l’accueil','SMS ou e-mail après l’achat avec le lien court d’avis','Former l’équipe à demander un avis à l’oral aux clients contents','Objectif : 5 à 10 nouveaux avis par mois','Répondre à 100 % des avis (merci + réponse pro aux négatifs)'],'Haute','Fort');
-      else if(rating<4.3) push('Avis & réputation','Faire remonter la note Google','Note actuelle '+rating+'/5 : sous 4,3, elle freine le classement et les clients comparent avec les concurrents mieux notés'+(topComp&&topComp.rating?' (ex. '+topComp.name+' : ★ '+topComp.rating+')':'')+'.',['Répondre posément à chaque avis négatif et corriger les points récurrents','Solliciter activement les clients satisfaits (ils notent rarement d’eux-mêmes)','Viser une majorité d’avis récents (Google valorise la fraîcheur)'],'Haute','Fort');
+      else push('Fiche Google','Compléter la fiche Google à 100 %','Une fiche complète aide les clients à vérifier rapidement les informations essentielles. Son effet sur la position dépend aussi de la pertinence, de la distance et de la notoriété.',['Rédiger une description avec vos services + la ville','Ajouter catégories secondaires, zone desservie et attributs (accès, paiements, Wi-Fi, terrasse…)','Renseigner les produits/services avec photos et prix','Ajouter un lien d’action (réserver / commander / prendre RDV)'],'Haute','Fort');
+      if(rating==null||reviews<10) push('Avis & réputation','Lancer une collecte d’avis Google','Les avis contribuent à la confiance des clients et constituent un signal parmi d’autres pour la visibilité locale. Aujourd’hui : '+(reviews||0)+' avis'+(rating!=null?' ('+rating+'/5)':'')+'.'+(topComp?' Votre concurrent '+topComp.name+' en a déjà '+topComp.reviews+' — l’écart se rattrape avec une collecte régulière.':''),['QR code vers l’avis Google en caisse / à l’accueil','SMS ou e-mail après l’achat avec le lien court d’avis','Former l’équipe à demander un avis à l’oral aux clients contents','Objectif : 5 à 10 nouveaux avis par mois','Répondre à 100 % des avis (merci + réponse pro aux négatifs)'],'Haute','Fort');
+      else if(rating<4.3) push('Avis & réputation','Faire remonter la note Google','Note actuelle '+rating+'/5 : une note plus basse peut réduire la confiance des clients et rendre la comparaison moins favorable'+(topComp&&topComp.rating?' (ex. '+topComp.name+' : ★ '+topComp.rating+')':'')+'.',['Répondre posément à chaque avis négatif et corriger les points récurrents','Solliciter activement les clients satisfaits (ils notent rarement d’eux-mêmes)','Viser une majorité d’avis récents (Google valorise la fraîcheur)'],'Haute','Fort');
       if(photos!=null&&photos<10) push('Fiche Google','Ajouter des photos récentes (et régulièrement)','Les fiches avec beaucoup de photos récentes génèrent plus d’appels et d’itinéraires. Aujourd’hui : '+photos+' photo'+(photos>1?'s':'')+'.',['Devanture, intérieur, produits phares, équipe','Photo de couverture et logo soignés','Ajouter 2 à 3 nouvelles photos par mois pour montrer l’activité'],'Moyenne','Moyen');
       if(!hours) push('Fiche Google','Renseigner les horaires (et exceptionnels)','Google affiche les horaires dans les résultats. Absents, ils font perdre des clients et des clics, surtout en soirée et les jours fériés.',['Saisir les horaires d’ouverture habituels','Renseigner les horaires exceptionnels (fêtes, congés)'],'Moyenne','Moyen');
-      push('Fiche Google','Publier des “posts” Google régulièrement','Les posts (offres, nouveautés, événements) gardent la fiche active — signal positif pour Google et accroche pour les clients.',['Publier 1 à 2 posts par mois (promo, nouveauté, événement)','Ajouter une photo + un bouton d’action à chaque post'],'À planifier','Moyen');
-      if(!hasWeb) push('Site web','Créer un site vitrine','70 à 80 % des clients vérifient en ligne avant de se déplacer. Sans site : perte de crédibilité, de référencement, et quasi-invisibilité pour les IA (ChatGPT, Gemini) qui citent surtout ce qui est écrit sur un site.',['Page d’accueil claire : qui, quoi, où, horaires, contact','Page services / menu avec photos (et prix si pertinent)','Page contact : carte, téléphone cliquable, itinéraire','Boutons « Appeler » / « Itinéraire » / « Réserver » visibles sur mobile','Site rapide, en HTTPS, pensé mobile d’abord'],'Haute','Fort');
+      push('Fiche Google','Publier des “posts” Google régulièrement','Les posts permettent de présenter les offres, nouveautés et événements aux personnes qui consultent la fiche ; leur effet sur le classement n’est pas garanti.',['Publier 1 à 2 posts par mois (promo, nouveauté, événement)','Ajouter une photo + un bouton d’action à chaque post'],'À planifier','Moyen');
+      if(!hasWeb) push('Site web','Créer un site vitrine','Sans site web, les clients disposent de moins d’informations pour vérifier les services, les horaires et les coordonnées. Un site clair peut aussi fournir des informations structurées aux moteurs de recherche et aux assistants IA.',['Page d’accueil claire : qui, quoi, où, horaires, contact','Page services / menu avec photos (et prix si pertinent)','Page contact : carte, téléphone cliquable, itinéraire','Boutons « Appeler » / « Itinéraire » / « Réserver » visibles sur mobile','Site rapide, en HTTPS, pensé mobile d’abord'],'Haute','Fort');
       else { if(perf!=null&&perf<50) push('Site web','Accélérer le site sur mobile','Performance mobile '+perf+'/100. Plus d’un visiteur sur deux quitte un site qui met plus de 3 s à charger, et Google pénalise les sites lents.',['Compresser et servir les images en WebP','Limiter les scripts et plugins tiers','Activer le cache + bon hébergement','Charger les images en différé (lazy-load)'],'Haute','Fort');
         if(!(si.title&&si.metaDesc)) push('Site web','Optimiser les balises SEO','Sans titre ni description clairs, Google n’a pas de résumé à afficher et vous perdez des clics dans les résultats.',['Titre < 60 caractères avec activité + ville','Meta-description accrocheuse (140-160 car.) avec appel à l’action','Un seul H1 par page, structuré avec des sous-titres'],'Moyenne','Moyen'); }
       if(hasWeb&&!si.localSchema) push('Visibilité IA (GEO)','Ajouter les données structurées (schema.org LocalBusiness)','LE levier pour être compris par Google ET par les IA. Les données structurées disent « qui, quoi, où, quand » ; sans elles, ChatGPT ou Gemini ont du mal à vous citer quand un client demande « meilleur '+base+(city?' à '+city:'')+' ».',['Ajouter un bloc JSON-LD « LocalBusiness » (nom, adresse, téléphone, horaires, position)','Reprendre exactement les coordonnées de Google (cohérence NAP)','Ajouter FAQ et avis structurés si possible'],'Haute','Fort');
@@ -2674,8 +2687,8 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       if(d.rating!=null) kf.push([(d.reviews||0)+' avis','★ '+d.rating+'/5']);
       else kf.push([(d.reviews||0)+' avis','note —']);
       const cp=a&&a.site&&a.site.competitors;
-      if(cp&&cp.selfRank) kf.push(['classement local','n°'+cp.selfRank+' / '+cp.total]);
-      else if(cp&&cp.total) kf.push(['classement local','hors top '+cp.total]);
+      if(cp&&cp.selfRank) kf.push(['rang du volume d’avis','n°'+cp.selfRank+' / '+cp.total]);
+      else if(cp&&cp.total) kf.push(['comparaison d’avis','commerce non identifié']);
       const rk=a&&a.site&&a.site.rankings;
       if(rk&&rk.length&&!rk.every(r=>r.error)){ const f=rk.filter(r=>r.found).length; kf.push(['mots-clés trouvés',f+' / '+rk.length]); }
       const kfHtml=kf.length?'<div class="vis-kf">'+kf.map(([k,v])=>'<span class="vis-kf-item"><b>'+escHtml(v)+'</b><small>'+escHtml(k)+'</small></span>').join('')+'</div>':'';
@@ -2810,7 +2823,7 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       if(d.photoCount!=null) K.kv('Photos Google',d.photoCount+(d.photoCount>=10?'+':'')+' photo'+(d.photoCount>1?'s':''));
       const age=(typeof businessAge==='function')?businessAge(a,c):null; if(age&&age.hasData) K.kv(age.official?'Ouverture':'Ancienneté',(age.official?'depuis '+age.since:'présence en ligne depuis '+age.since));
       const s=a&&a.scan; if(s&&s.scores){ K.heading('Performance du site (Google Lighthouse, mobile)',col); K.kv('Performance',s.scores.performance+'/100'); K.kv('Accessibilité',s.scores.accessibility+'/100'); K.kv('Bonnes pratiques',s.scores.bestPractices+'/100'); K.kv('SEO technique',s.scores.seo+'/100'); }
-      const cp=a&&a.site&&a.site.competitors; if(cp&&cp.list&&cp.list.length){ K.heading('Concurrents locaux',col); const self=cp.list.find(x=>x.isSelf); let ins; if(self&&cp.selfRank){ if(cp.selfRank===1) ins='Vous êtes n°1 localement en nombre d’avis.'; else { const t=cp.list[cp.selfRank-2]; const need=t?Math.max(1,(Number(t.reviews)||0)-(Number(self.reviews)||0)+1):null; ins='Vous êtes n°'+cp.selfRank+' sur '+cp.total+(need!=null?' — il manque environ '+need+' avis pour dépasser le n°'+(cp.selfRank-1)+'.':'.'); } } else ins='Votre commerce n’apparaît pas dans les '+cp.total+' premiers résultats : priorité à la visibilité locale.'; K.para(ins,{size:9.5}); K.gap(1); cp.list.slice(0,6).forEach((x,i)=>{ K.rowLR((i+1)+'. '+x.name+(x.isSelf?' (vous)':''),(x.rating!=null?String(x.rating).replace('.',',')+'/5':'—')+'  ·  '+(Number(x.reviews)||0)+' avis'); }); K.para('Classés par nombre d’avis (popularité). Source : Google Places — pas l’ordre exact de Google.',{size:7.5,color:K.MUT}); }
+      const cp=a&&a.site&&a.site.competitors; if(cp&&cp.list&&cp.list.length){ K.heading('Concurrents locaux',col); const self=cp.list.find(x=>x.isSelf); let ins; if(self&&cp.selfRank){ if(cp.selfRank===1) ins='Votre commerce a le volume d’avis le plus élevé parmi les résultats analysés.'; else { const t=cp.nextAhead; const need=t?Math.max(1,(Number(t.reviews)||0)-(Number(self.reviews)||0)+1):null; ins='Rang de volume d’avis : '+cp.selfRank+' sur '+cp.total+(need!=null?' — environ '+need+' avis supplémentaires pour dépasser '+t.name+'.':'.'); } } else ins='Le commerce n’a pas été identifié avec certitude dans l’échantillon comparé.'; K.para(ins,{size:9.5}); K.gap(1); cp.list.slice(0,6).forEach((x,i)=>{ K.rowLR((i+1)+'. '+x.name+(x.isSelf?' (vous)':''),(x.rating!=null?String(x.rating).replace('.',',')+'/5':'—')+'  ·  '+(Number(x.reviews)||0)+' avis'); }); K.para('Échantillon Google Places trié par volume d’avis puis note. Ce classement de popularité ne représente pas l’ordre exact de Google Maps.',{size:7.5,color:K.MUT}); }
       const rk=a&&a.site&&a.site.rankings; if(rk&&rk.length&&!rk.every(r=>r.error)){ K.heading('Classement sur les mots-clés',col); const found=rk.filter(r=>r.found).length; K.para('Trouvé sur '+found+' / '+rk.length+' recherches.',{size:9.5}); K.gap(1); rk.forEach(r=>{ const b=(typeof rankBadge==='function')?rankBadge(r):{t:(r.found?('n°'+r.pos):'non trouvé')}; K.rowLR(r.kw,b.t); }); K.para('Classement indicatif (recherche web), différent du classement Google exact.',{size:7.5,color:K.MUT}); }
       const plan=(typeof improvementPlan==='function')?improvementPlan(a,c):[]; if(plan.length){ K.heading('Plan d’amélioration détaillé',col); plan.forEach((it,i)=>{ K.setF('bold',10); const hl=pdf.splitTextToSize((i+1)+'. '+it.title+'   ['+it.axis+' · '+it.priority+']',CW); K.ensure(K.lh(10)*hl.length+2); K.setT(K.DARK); hl.forEach(ln=>{ pdf.text(ln,M,K.y+3.4); K.y+=K.lh(10); }); if(it.why) K.para('Pourquoi : '+it.why,{size:8.5,color:K.MUT}); (it.how||[]).forEach(h=>K.bullet(h,'',col)); K.gap(1.5); }); }
       if(a.notes){ K.heading('Notes',col); K.para(a.notes,{size:9.5}); }
