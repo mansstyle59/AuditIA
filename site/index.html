@@ -1937,6 +1937,31 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       .app-row{gap:7px!important}
     }
 
+
+    /* Correctif définitif des grands espaces : même départ visuel sur chaque onglet */
+    @media(max-width:760px){
+      .workspace-main{display:block!important;min-height:0!important}
+      .workspace-main>.desktop-nav{display:none!important;height:0!important;min-height:0!important;margin:0!important;padding:0!important;border:0!important;overflow:hidden!important}
+      .workspace-main>.workspace-head{margin-bottom:10px!important;padding-bottom:12px!important}
+      .workspace-main>.app-content-title,
+      .workspace-main>.app-grid,
+      .workspace-main>.app-panel,
+      .workspace-main>form,
+      .workspace-main>.app-settings-grid,
+      .workspace-main>.home-hero,
+      .workspace-main>.home-section-heading,
+      .workspace-main>.app-stats,
+      .workspace-main>section{margin-top:0!important}
+      .workspace-main>.home-hero{padding-top:0!important}
+      .workspace-main>.app-content-title{padding-top:0!important}
+      .workspace-main>.app-grid{align-items:start!important}
+      .workspace-main>.app-grid>.app-panel,
+      .workspace-main>.app-settings-grid>.app-panel{align-self:start!important}
+      .workspace-main>.app-panel[style*="margin-bottom:14px"]{margin-top:0!important}
+      .workspace-main>.app-content-title+.app-stats{margin-top:0!important}
+      .workspace-main>.app-stats{margin-bottom:16px!important}
+    }
+
 </style>
 </head>
 <body>
@@ -2130,7 +2155,7 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       clearTimeout(noticeTimer);
       if(appNotice && !/^Erreur/.test(appNotice)){ noticeTimer=setTimeout(()=>{ appNotice=''; renderApp(); },4500); }
       { const cb=page.querySelector('[data-pdf-cancel]'); if(cb) cb.addEventListener('click',()=>{ pdfCancelled=true; pdfBusy=false; const h=document.getElementById('printReport'); if(h) h.innerHTML=''; appNotice='Génération annulée.'; renderApp(); }); }
-      page.querySelectorAll('[data-app-view]').forEach(b=>b.addEventListener('click',()=>{appView=b.dataset.appView;activeAudit=null;activeClient=null;appNotice='';renderApp()}));
+      page.querySelectorAll('[data-app-view]').forEach(b=>b.addEventListener('click',()=>{appView=b.dataset.appView;activeAudit=null;activeClient=null;appNotice='';renderApp();window.scrollTo(0,0)}));
       page.querySelectorAll('[data-open-client]').forEach(b=>b.addEventListener('click',()=>{activeClient=b.dataset.openClient;appView='ClientDétail';appNotice='';renderApp();window.scrollTo(0,0);}));
       page.querySelectorAll('[data-new-audit-for]').forEach(b=>b.addEventListener('click',async()=>{const cid=b.dataset.newAuditFor;const row={user_id:appUser.id,client_id:cid,title:'Audit de visibilité numérique',status:'À démarrer',score:0,checklist:checklistTemplate.map(([label,detail])=>({label,detail,done:false}))};const {error}=await appClient.from('audits').insert(row);if(error){appNotice='Erreur : '+error.message;renderApp();return;}appNotice='Audit créé.';await refreshData();const mine=appAudits.filter(a=>a.client_id===cid);if(mine.length){activeAudit=mine[0].id;appView='Détail';}renderApp();window.scrollTo(0,0);}));
       page.querySelectorAll('[data-edit-client-form]').forEach(f=>f.addEventListener('submit',async e=>{e.preventDefault();const fd=new FormData(f);const id=f.dataset.id;let website=String(fd.get('website')||'').trim();if(website&&!/^https?:\/\//i.test(website))website='https://'+website;const upd={name:String(fd.get('name')||'').trim(),city:String(fd.get('city')||'').trim(),category:String(fd.get('category')||'Autre'),website:website||null};const {error}=await appClient.from('clients').update(upd).eq('id',id);appNotice=error?'Erreur : '+error.message:'Fiche client mise à jour.';await refreshData();renderApp();}));
