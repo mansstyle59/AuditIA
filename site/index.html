@@ -1456,6 +1456,50 @@ td,th{border-color:#e3e8f2!important}
 }
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
 
+
+/* Correctifs de contraste pour les styles historiques qui utilisent des couleurs codées en dur */
+.workspace-app,.workspace-main,.workspace-head,.workspace-head *{color:#17213e}
+.workspace-head .eyebrow,.workspace-head .muted,.workspace-head p{color:#687493!important}
+.app-topbar .tb-brand b,.app-topbar .tb-brand small{color:#17213e!important}
+.workspace-app .app-stat,.workspace-app .app-panel,.workspace-app .client-card,
+.workspace-app .add-toggle,.workspace-app .cd-edit,.workspace-app .integration-card,
+.workspace-app .workspace-card,.workspace-app .audit-card,.workspace-app .report-card{
+ background:#fff!important;color:#17213e!important;border-color:#e3e8f3!important;
+ box-shadow:0 8px 28px rgba(31,45,85,.055)!important;
+}
+.workspace-app .app-stat *, .workspace-app .app-panel *, .workspace-app .client-card *,
+.workspace-app .workspace-card *, .workspace-app .audit-card *, .workspace-app .report-card *{
+ border-color:#e3e8f3;
+}
+.workspace-app .app-stat p,.workspace-app .app-panel p,.workspace-app .client-card p,
+.workspace-app .workspace-card p,.workspace-app .audit-card p,.workspace-app .report-card p,
+.workspace-app .workspace-head .subtitle{color:#687493!important}
+.workspace-app .sidebar-nav button,.workspace-app .mobile-nav button,
+.workspace-app .sidebar-nav button span,.workspace-app .mobile-nav button span{
+ color:#687493!important
+}
+.workspace-app .sidebar-nav button.active,.workspace-app .mobile-nav button.active{
+ background:#eeeaff!important;color:#5d4bdf!important
+}
+.workspace-app .mobile-nav,.workspace-app .sidebar-nav{
+ background:rgba(255,255,255,.97)!important;border-color:#e3e8f3!important;
+ box-shadow:0 -8px 28px rgba(31,45,85,.08)!important
+}
+.workspace-app .mobile-nav svg,.workspace-app .sidebar-nav svg{color:inherit}
+.workspace-app .hero,.workspace-app .hero-card,.workspace-app .activity-card{
+ background:#fff!important;color:#17213e!important
+}
+.workspace-app [style*="color:#f8f6ff"],.workspace-app [style*="color: #f8f6ff"],
+.workspace-app [style*="color:#f7f5ff"],.workspace-app [style*="color: #f7f5ff"],
+.workspace-app [style*="color:#f3f2f8"],.workspace-app [style*="color: #f3f2f8"]{
+ color:#17213e!important
+}
+.workspace-app [style*="background:#262343"],.workspace-app [style*="background: #262343"],
+.workspace-app [style*="background:#2a2838"],.workspace-app [style*="background: #2a2838"],
+.workspace-app [style*="background:#211d31"],.workspace-app [style*="background: #211d31"]{
+ background:#fff!important
+}
+
 </style>
 </head>
 <body>
