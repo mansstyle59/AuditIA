@@ -2732,6 +2732,33 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
 }
 @media(prefers-reduced-motion:reduce){.workspace-main>.home-hero .home-hero-actions .app-btn{transition:none!important}.workspace-main>.home-hero .home-hero-actions .app-btn.primary:hover{transform:none!important}}
 
+
+/* Refonte premium de l’écran de démarrage / chargement de session */
+body:has(#authRoot .auth-loading){background:#0d0c1d!important}
+body:has(#authRoot .auth-loading) #authRoot{min-height:100svh;display:flex;flex-direction:column}
+body:has(#authRoot .auth-loading) .login-page{box-sizing:border-box;min-height:100svh!important;width:100%;flex:1;justify-content:center!important;padding:clamp(24px,7vh,80px) 20px 30px!important;position:relative;overflow:hidden;background:radial-gradient(ellipse at 50% 36%,rgba(107,75,218,.15),transparent 38%),radial-gradient(ellipse at 0% 0%,rgba(90,65,173,.09),transparent 32%),#0d0c1d!important}
+body:has(#authRoot .auth-loading) .login-page:before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.16;background-image:linear-gradient(rgba(183,164,255,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(183,164,255,.055) 1px,transparent 1px);background-size:40px 40px;mask-image:radial-gradient(ellipse at center,#000,transparent 72%)}
+body:has(#authRoot .auth-loading) .login-brand{position:relative;z-index:1;gap:16px;margin:0 auto 36px!important}
+body:has(#authRoot .auth-loading) .login-mark{width:68px;height:68px;flex-basis:68px;border-radius:22px;background:linear-gradient(145deg,#9270ff 0%,#6544df 58%,#4430ad 100%);box-shadow:0 12px 34px rgba(99,68,226,.32),inset 0 1px rgba(255,255,255,.28);font-size:39px}
+body:has(#authRoot .auth-loading) .login-mark span{color:#ff9b55}
+body:has(#authRoot .auth-loading) .login-wordmark{font-size:clamp(36px,8vw,50px);letter-spacing:-2.3px;text-shadow:0 5px 28px rgba(0,0,0,.2)}
+body:has(#authRoot .auth-loading) .login-card.auth-loading{box-sizing:border-box;position:relative;z-index:1;width:min(100%,540px);min-height:220px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:23px;margin:0 auto;padding:34px 26px!important;border:1px solid rgba(190,174,255,.20);border-radius:28px;background:linear-gradient(145deg,rgba(31,29,52,.97),rgba(21,21,38,.98));box-shadow:0 28px 80px rgba(0,0,0,.28),inset 0 1px rgba(255,255,255,.06);backdrop-filter:blur(18px)}
+body:has(#authRoot .auth-loading) .auth-spinner{width:48px;height:48px;border:3px solid rgba(159,139,231,.22);border-top-color:#a78bfa;border-right-color:#7654e8;border-radius:50%;box-shadow:0 0 28px rgba(131,95,243,.14);animation:auditia-spin .9s cubic-bezier(.5,.1,.5,.9) infinite}
+body:has(#authRoot .auth-loading) .login-subtitle{margin:0!important;color:#e2ddf2;font-size:clamp(16px,3.8vw,20px);font-weight:600;letter-spacing:-.25px;line-height:1.45}
+body:has(#authRoot .auth-loading) .login-foot{position:relative;z-index:1;margin:30px auto 0!important;color:#9b93b6;font-size:13px;letter-spacing:.1px}
+body:has(#authRoot .auth-loading) .login-status{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;gap:8px;margin:10px auto 0!important;color:#77718f;font-size:12px}
+body:has(#authRoot .auth-loading) .login-status:before{content:"";width:7px;height:7px;border-radius:50%;background:#66d8a4;box-shadow:0 0 12px rgba(102,216,164,.45)}
+@media(max-width:600px){
+ body:has(#authRoot .auth-loading) .login-page{padding:24px 16px calc(32px + env(safe-area-inset-bottom))!important}
+ body:has(#authRoot .auth-loading) .login-brand{gap:13px;margin-bottom:30px!important}
+ body:has(#authRoot .auth-loading) .login-mark{width:60px;height:60px;flex-basis:60px;border-radius:19px;font-size:35px}
+ body:has(#authRoot .auth-loading) .login-wordmark{font-size:clamp(33px,9vw,43px)}
+ body:has(#authRoot .auth-loading) .login-card.auth-loading{min-height:190px;padding:28px 18px!important;border-radius:23px;gap:20px}
+ body:has(#authRoot .auth-loading) .auth-spinner{width:42px;height:42px}
+ body:has(#authRoot .auth-loading) .login-foot{margin-top:25px!important;font-size:12px}
+}
+@media(prefers-reduced-motion:reduce){body:has(#authRoot .auth-loading) .auth-spinner{animation:none;border-top-color:#a78bfa}}
+
 </style>
 </head>
 <body>
