@@ -1394,6 +1394,68 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
 }
 
 
+
+/* AuditIA — refonte claire professionnelle, sans toucher à la logique métier */
+:root{
+ --bg:#f4f6fc; --panel:#ffffff; --panel2:#f8f9ff; --text:#17213e;
+ --muted:#687493; --purple:#6655e8; --orange:#f59e55; --line:#e2e7f2;
+ --ai-violet:#6655e8; --ai-violet-soft:#6655e81a; --ai-surface:#ffffff;
+ --ai-surface-raised:#f8f9ff; --ai-line:#e2e7f2;
+ color-scheme:light;
+}
+html,body{background:#f4f6fc!important;color:#17213e!important}
+body{
+ background:linear-gradient(180deg,#f9faff 0%,#f1f4fb 100%)!important;
+ color:#17213e!important;
+}
+body:before,body:after{opacity:.12!important;pointer-events:none!important}
+header,nav,aside,.sidebar,.app-sidebar,.app-topbar,.topbar,.bottom-nav,.mobile-nav{
+ color:#17213e;
+}
+.app-panel,.panel,.card,.app-card,.app-stat,.modal,.modal-content,.settings-card,
+.audit-card,.client-card,.report-card,.commercial-card,.empty-state,.table-wrap{
+ background:#fff!important;color:#17213e!important;border-color:#e3e8f3!important;
+ box-shadow:0 8px 28px rgba(31,45,85,.055)!important;
+}
+input,select,textarea,button:not(.primary):not(.btn-primary),.app-input{
+ color:#17213e;
+}
+input,select,textarea{
+ background:#fff!important;border-color:#dfe5f1!important;
+}
+input::placeholder,textarea::placeholder{color:#8b96b1!important;opacity:1}
+h1,h2,h3,h4,h5,strong,label,.app-title{color:#17213e}
+p,.muted,.subtle,.help-text,.app-muted{color:#687493}
+a{color:#5e50d9}
+button.primary,.primary,.btn-primary,.app-btn-primary,.app-primary{
+ background:linear-gradient(135deg,#7967f5,#5d4bdf)!important;color:#fff!important;
+ border-color:transparent!important;box-shadow:0 7px 18px rgba(102,85,232,.18)!important;
+}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{
+ outline:3px solid #8b7cf6!important;outline-offset:2px
+}
+.app-topbar,.tb-actions,.app-header{
+ background:rgba(255,255,255,.92)!important;border-color:#e4e8f2!important;
+ backdrop-filter:blur(18px)
+}
+nav button, .nav-item, .sidebar a, .sidebar button{
+ color:#687493
+}
+nav button.active,.nav-item.active,.sidebar .active{
+ color:#5d4bdf!important;background:#eeeaff!important
+}
+hr,.divider{border-color:#e3e8f2!important}
+table{color:#17213e}
+th{background:#f4f6fc!important;color:#53607f!important}
+td,th{border-color:#e3e8f2!important}
+.badge,.chip,.tag{border-color:#e1e5f1}
+@media(max-width:700px){
+ body{padding-bottom:env(safe-area-inset-bottom,0px)}
+ .app-panel,.panel,.card,.app-card{border-radius:18px!important}
+ input,select,textarea,button{max-width:100%}
+}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+
 </style>
 </head>
 <body>
