@@ -772,16 +772,49 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
     .pil-list li.ok::before{content:"✓";position:absolute;left:0;color:#34d399;font-weight:800}
     .pil-list li.no::before{content:"✗";position:absolute;left:0;color:#fb7185;font-weight:800}
     @media(max-width:600px){.pil-grid{grid-template-columns:minmax(0,1fr)}}
-    /* ===== Analyse complète : bouton + barre de progression ===== */
-    .analyse-panel{margin-top:14px;border:1px solid #5a4fb0!important;background:linear-gradient(180deg,#3a3566,#322e4e)!important}
+    /* ===== Analyse complète : expérience de progression premium inspirée de Genius ===== */
+    .analyse-panel{position:relative;isolation:isolate;overflow:hidden;margin-top:14px;border:1px solid #7e9dc755!important;border-radius:26px!important;background:radial-gradient(ellipse at 0% 0%,#3566d655,transparent 42%),radial-gradient(ellipse at 100% 10%,#20c7b32b,transparent 40%),linear-gradient(145deg,#0b1737 0%,#17264a 52%,#101d3c 100%)!important;box-shadow:0 24px 60px #02091f55,inset 0 1px 0 #ffffff12!important;color:#f4f7ff}
+    .analyse-panel:before{content:"";position:absolute;inset:0;z-index:-1;opacity:.22;background-image:linear-gradient(#9bb9ff12 1px,transparent 1px),linear-gradient(90deg,#9bb9ff12 1px,transparent 1px);background-size:42px 42px;mask-image:linear-gradient(to bottom,black,transparent 88%);pointer-events:none}
+    .analyse-panel .eyebrow{color:#9abaff;letter-spacing:.14em}
+    .ap-title-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:5px 0 14px}
+    .ap-title-row h3{margin:0!important;font-size:clamp(20px,4vw,25px);letter-spacing:-.6px;color:#fff}
+    .ap-live{display:inline-flex;align-items:center;gap:7px;border:1px solid #ffffff18;background:#ffffff0b;border-radius:999px;padding:8px 11px;color:#d9e6ff;font-size:11px;font-weight:750;white-space:nowrap}
+    .ap-live-dot{width:8px;height:8px;border-radius:50%;background:#3ce0ba;box-shadow:0 0 0 5px #3ce0ba20;animation:apPulse 1.8s ease-in-out infinite}
+    .ap-timer{font-size:12px;color:#c0cde7;white-space:nowrap}
+    .ap-client{font-size:clamp(23px,5vw,30px);font-weight:800;letter-spacing:-.9px;line-height:1.15;margin:0 0 17px;color:#fff;overflow-wrap:anywhere}
+    .ap-bar-wrap{height:10px;border-radius:99px;background:#ffffff13;overflow:hidden;border:1px solid #ffffff0b}
+    .ap-bar{height:100%;width:3%;border-radius:99px;background:linear-gradient(90deg,#4d72ff 0%,#2aaee0 55%,#35d6ad 100%);box-shadow:0 0 18px #38cdbb70;transition:width .35s ease}
+    .ap-meta{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-top:9px}
+    .ap-meta b{font-size:12px;font-weight:800;letter-spacing:.14em;color:#8db6ff}
+    .ap-meta span{font-size:12px;color:#b4c2de}
+    .ap-phase{font-size:clamp(16px,3.6vw,19px);font-weight:750;line-height:1.35;color:#f4f7ff;margin:6px 0 5px}
+    .ap-subphase{font-size:13px;line-height:1.5;color:#b4c2de;margin:0 0 16px}
+    .ap-email{display:flex;align-items:center;gap:12px;width:100%;padding:13px 14px;margin:15px 0 17px;border:1px solid #38d6bd80;border-radius:17px;background:linear-gradient(110deg,#1b82752b,#2e9b9b12);color:#eafffc;text-align:left}
+    .ap-email-icon{flex:0 0 30px;width:30px;height:30px;display:grid;place-items:center;border-radius:10px;background:#38d6bd18;color:#66e7d1;font-size:19px}
+    .ap-email-copy{min-width:0;flex:1;font-size:13px;line-height:1.35}.ap-email-copy b{display:block;font-size:14px;margin-bottom:2px;color:#fff}
+    .ap-email-chevron{color:#73e5d3;font-size:20px}
+    .ap-visual{position:relative;height:220px;border-radius:19px;overflow:hidden;background:radial-gradient(ellipse at 50% 60%,#2e6db65c,transparent 44%),linear-gradient(145deg,#0e2049,#102a58 60%,#153a62);border:1px solid #ffffff0b;margin:0 0 13px}
+    .ap-map-lines{position:absolute;inset:0;opacity:.42;background:linear-gradient(0deg,transparent 24%,#8db4e32a 25%,#8db4e32a 26%,transparent 27%,transparent 49%,#8db4e320 50%,#8db4e320 51%,transparent 52%,transparent 74%,#8db4e320 75%,#8db4e320 76%,transparent 77%),linear-gradient(90deg,transparent 24%,#8db4e320 25%,#8db4e320 26%,transparent 27%,transparent 49%,#8db4e320 50%,#8db4e320 51%,transparent 52%,transparent 74%,#8db4e320 75%,#8db4e320 76%,transparent 77%);transform:rotate(-8deg) scale(1.2)}
+    .ap-radar{position:absolute;width:184px;height:184px;left:50%;top:48%;transform:translate(-50%,-50%);border:1px solid #9ebcff3b;border-radius:50%;background:repeating-radial-gradient(circle,transparent 0 20px,#a4c4ff28 21px 22px)}
+    .ap-radar:before,.ap-radar:after{content:"";position:absolute;background:#a4c4ff2c}
+    .ap-radar:before{height:1px;width:230px;left:-24px;top:50%}.ap-radar:after{width:1px;height:230px;left:50%;top:-24px}
+    .ap-sweep{position:absolute;width:92px;height:92px;left:50%;top:50%;transform-origin:0 0;background:linear-gradient(135deg,#36d8b970,#36d8b700 72%);clip-path:polygon(0 0,100% 0,100% 100%);animation:apSweep 5s linear infinite}
+    .ap-center-dot{position:absolute;left:50%;top:48%;width:13px;height:13px;border-radius:50%;transform:translate(-50%,-50%);background:#3be0bc;border:3px solid #c8fff4;box-shadow:0 0 0 7px #3be0bc2b,0 0 20px #3be0bcaa}
+    .ap-node{position:absolute;max-width:44%;padding:8px 10px;border:1px solid #7298df66;border-radius:13px;background:#091735df;color:#dce8ff;font-size:11px;font-weight:750;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;box-shadow:0 8px 20px #0002}
+    .ap-node.n1{left:12px;top:17px;border-color:#39dfbc}.ap-node.n2{right:12px;top:57px}.ap-node.n3{left:12px;bottom:38px}.ap-node.n4{right:12px;bottom:14px}
+    .ap-skeletons{display:grid;gap:8px;margin:13px 10px 18px}
+    .ap-skeleton{height:7px;border-radius:99px;background:linear-gradient(90deg,#5689d8b0,#36d6b1);transform-origin:left;animation:apSkeleton 1.6s ease-in-out infinite alternate}
+    .ap-skeleton:nth-child(1){width:91%}.ap-skeleton:nth-child(2){width:68%;animation-delay:.2s}.ap-skeleton:nth-child(3){width:82%;animation-delay:.4s}
+    .ap-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:14px}
+    .ap-stat{min-width:0;text-align:center;padding:12px 5px 10px;border-radius:17px;border:1px solid #ffffff1b;background:linear-gradient(145deg,#ffffff13,#ffffff07);box-shadow:inset 0 1px 0 #ffffff08}
+    .ap-stat b{display:block;font-size:clamp(22px,5vw,29px);line-height:1.1;color:#fff;letter-spacing:-.7px}.ap-stat span{display:block;font-size:11px;line-height:1.3;color:#b4c2de;margin-top:5px}
     .ap-cta{width:100%;min-height:52px;font-size:16px;font-weight:800}
-    .ap-last{font-size:11.5px;color:#aaa6bd;margin:10px 0 0;text-align:center}
-    .ap-bar-wrap{height:14px;border-radius:10px;background:#2a2740;overflow:hidden;border:1px solid #ffffff12}
-    .ap-bar{height:100%;width:3%;border-radius:10px;background:linear-gradient(90deg,#8b78ff,#b9a4ff);transition:width .2s ease}
-    .ap-meta{display:flex;align-items:baseline;justify-content:space-between;margin-top:9px}
-    .ap-meta b{font-size:24px;font-weight:800;color:#cbbcff}
-    .ap-meta span{font-size:12.5px;color:#aaa6bd}
-    .ap-phase{font-size:12.5px;color:#d7d4e4;margin:8px 0 0}
+    .ap-last{font-size:11.5px;color:#b4c2de;margin:10px 0 0;text-align:center}
+    @keyframes apPulse{50%{box-shadow:0 0 0 8px #3ce0ba08;opacity:.72}}
+    @keyframes apSweep{to{transform:rotate(360deg)}}
+    @keyframes apSkeleton{to{opacity:.45;transform:scaleX(.92)}}
+    @media(max-width:420px){.ap-visual{height:190px}.ap-email{padding:11px}.ap-node{font-size:10px;padding:7px 8px}.ap-stat span{font-size:10px}}
+    @media(prefers-reduced-motion:reduce){.ap-live-dot,.ap-sweep,.ap-skeleton{animation:none!important}.ap-bar{transition:none!important}}
     /* ===== Verdict visibilité sociale + ciblage/mots-clés ===== */
     .sv-verdict{display:inline-block;font-size:12.5px;font-weight:800;padding:6px 12px;border-radius:20px;margin:4px 0 10px}
     .sv-ok{background:#1f4a3c;color:#9ae8c4}.sv-mid{background:#4a3f1f;color:#fbe0a6}.sv-bad{background:#4a2330;color:#ffb4bd}.sv-no{background:#3a3850;color:#aaa6bd}
@@ -2759,7 +2792,9 @@ body:has(#authRoot .auth-loading) .login-status:before{content:"";width:7px;heig
 }
 @media(prefers-reduced-motion:reduce){body:has(#authRoot .auth-loading) .auth-spinner{animation:none;border-top-color:#a78bfa}}
 
+
 </style>
+  <link rel="stylesheet" href="./auditia-design-system.css?v=1">
 </head>
 <body>
   <div class="status-safe" aria-hidden="true"></div>
@@ -3619,7 +3654,10 @@ body:has(#authRoot .auth-loading) .login-status:before{content:"";width:7px;heig
       const bar=el.querySelector('[data-ap-bar]'); if(bar) bar.style.width=shown+'%';
       const pc=el.querySelector('[data-ap-pct]'); if(pc) pc.textContent=shown+'%';
       const ph=el.querySelector('[data-ap-phase]'); if(ph) ph.textContent=fullAuditState.phase;
+      const step=el.querySelector('[data-ap-step]'); if(step){ const p=fullAuditState.pct; step.textContent='ÉTAPE '+(p<18?1:p<40?2:p<90?3:4)+' SUR 4'; }
       const eta=el.querySelector('[data-ap-eta]'); if(eta){ const elapsed=(Date.now()-fullAuditState.startedAt)/1000; const rem=Math.max(0,Math.round(fullAuditState.estTotal-elapsed)); eta.textContent=(fullAuditState.pct>=99?'finalisation…':(rem>0?'≈ '+rem+' s restantes':'presque terminé…')); }
+      const statValues=el.querySelectorAll('[data-ap-stat]'); if(statValues.length){ const audit=appAudits.find(x=>String(x.id)===String(fullAuditState.id)); const site=audit&&audit.site; const vals=[site&&site.competitors&&Array.isArray(site.competitors.list)?site.competitors.list.length:0,site&&Array.isArray(site.rankings)?site.rankings.length:0,site&&Array.isArray(site.socials)?site.socials.length:0]; statValues.forEach((node,i)=>{node.textContent=String(vals[i]);}); }
+      const nodes=el.querySelectorAll('[data-ap-node]'); if(nodes.length){ const names=fullAuditState.phase.toLowerCase().includes('concurrent')?['Concurrents repérés','Analyse du marché','Comparaison locale','Google Maps']:fullAuditState.phase.toLowerCase().includes('performance')?['PageSpeed mobile','SEO technique','Accessibilité','Bonnes pratiques']:['Site web','Google Business','Réseaux sociaux','Présence locale']; nodes.forEach((node,i)=>{node.textContent=names[i];}); }
     }
     function setPhase(phase,target){ if(fullAuditState){ fullAuditState.phase=phase; fullAuditState.target=target; } }
     async function runFullAudit(auditId){
@@ -3703,7 +3741,10 @@ body:has(#authRoot .auth-loading) .login-status:before{content:"";width:7px;heig
     }
     function analysePanelHtml(a,c){
       if(fullAuditState&&fullAuditState.id===a.id){
-        return '<section class="app-panel analyse-panel" data-ap-root><div class="eyebrow">ANALYSE EN COURS</div><h3 style="margin:4px 0 12px">Analyse complète du commerce</h3><div class="ap-bar-wrap"><div class="ap-bar" data-ap-bar style="width:3%"></div></div><div class="ap-meta"><b data-ap-pct>3%</b><span data-ap-eta>…</span></div><p class="ap-phase" data-ap-phase>Préparation…</p></section>';
+        const phase=fullAuditState.phase||'Préparation de l’analyse…';
+        const business=escHtml((c&&c.name)||'votre commerce');
+        const nodes=['Site web','Google Business','Réseaux sociaux','Présence locale'];
+        return '<section class="app-panel analyse-panel" data-ap-root><div class="ap-title-row"><span class="ap-live"><i class="ap-live-dot"></i> Analyse gratuite</span><span class="ap-timer"><b data-ap-eta>≈ 2 min</b></span></div><h3 class="ap-client">'+business+'</h3><div class="ap-bar-wrap"><div class="ap-bar" data-ap-bar style="width:3%"></div></div><div class="ap-meta"><b data-ap-step>ÉTAPE 1 SUR 4</b><span data-ap-pct>3%</span></div><h4 class="ap-phase" data-ap-phase>'+escHtml(phase)+'</h4><p class="ap-subphase">Les chiffres apparaissent au fur et à mesure que les informations sont trouvées.</p><div class="ap-email"><span class="ap-email-icon">➤</span><span class="ap-email-copy"><b>Vous ne voulez pas attendre ?</b>Retrouvez les résultats dans votre rapport après l’analyse.</span><span class="ap-email-chevron">⌄</span></div><div class="ap-visual" aria-hidden="true"><div class="ap-map-lines"></div><div class="ap-radar"><div class="ap-sweep"></div></div><div class="ap-center-dot"></div>'+nodes.map((n,i)=>'<span class="ap-node n'+(i+1)+'" data-ap-node>'+n+'</span>').join('')+'</div><div class="ap-skeletons" aria-hidden="true"><div class="ap-skeleton"></div><div class="ap-skeleton"></div><div class="ap-skeleton"></div></div><div class="ap-stats"><div class="ap-stat"><b data-ap-stat>0</b><span>concurrents</span></div><div class="ap-stat"><b data-ap-stat>0</b><span>recherches</span></div><div class="ap-stat"><b data-ap-stat>0</b><span>présences détectées</span></div></div></section>';
       }
       const site=String((c&&c.website)||'').trim(); const analyzed=!!(a.scan||a.site);
       const sub=site?'Lecture du site, détection des réseaux, performance Google et diagnostic SEO &amp; GEO — en une seule fois.':'Ce commerce n’a pas de site : l’analyse se base sur les données Google. Ajoute un site pour l’analyse complète (performance, réseaux, GEO).';
