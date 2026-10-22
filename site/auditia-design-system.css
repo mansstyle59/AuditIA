@@ -23,6 +23,36 @@
       background:rgba(7,19,43,.88)!important;backdrop-filter:blur(22px) saturate(145%)!important;
       box-shadow:0 12px 35px rgba(0,7,22,.14)!important;
     }
+    /* Fix iPhone header softness: keep blur on the background out of the content layer. */
+    .app-topbar{
+      background:#09162f!important;
+      -webkit-backdrop-filter:none!important;
+      backdrop-filter:none!important;
+      filter:none!important;
+      opacity:1!important;
+      isolation:isolate!important;
+      transform:none!important;
+    }
+    .app-topbar *{
+      filter:none!important;
+      opacity:1!important;
+      text-shadow:none!important;
+    }
+    .app-topbar .tb-brand img{
+      display:block!important;
+      width:42px!important;height:42px!important;
+      object-fit:contain!important;
+      image-rendering:auto!important;
+      filter:none!important;
+      opacity:1!important;
+      transform:translateZ(0);
+    }
+    .app-topbar .tb-brand b,.app-topbar .tb-brand small{
+      -webkit-font-smoothing:antialiased!important;
+      text-rendering:geometricPrecision!important;
+      filter:none!important;
+      opacity:1!important;
+    }
     .tb-brand b,.sidebar-brand b{letter-spacing:-.45px!important;color:#f8fbff!important}
     .tb-brand small,.sidebar-brand small{color:#9fb6d8!important;letter-spacing:1.8px!important}
     .tb-brand img{filter:drop-shadow(0 4px 12px rgba(66,129,255,.22))}
