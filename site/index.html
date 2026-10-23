@@ -3892,6 +3892,91 @@ body:has(.ai-chat-page){background:radial-gradient(ellipse at 82% 0%,rgba(39,73,
 }
 @media(max-width:390px){.ai-chat-intro{min-height:330px;padding:20px 14px}.ai-chat-intro h2{font-size:29px}.ai-chat-intro p{font-size:12px;max-width:70%}.ai-chat-suggestion{min-height:113px;font-size:11px}.ai-chat-bullets li{font-size:9px}}
 </style>
+
+<style id="auditia-global-responsive-repair">
+/* Global responsive repair: prevent fixed-width children and horizontal overflow on every signed-in screen. */
+*,*::before,*::after{box-sizing:border-box}
+html{width:100%;max-width:100%;overflow-x:clip;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{width:100%;max-width:100%;min-width:0;margin:0;overflow-x:clip}
+img,svg,video,canvas,iframe{max-width:100%}
+button,input,select,textarea{font:inherit;max-width:100%}
+.wrap,main.wrap,.login-page,.workspace-app,.workspace-layout,.workspace-main,.workspace-head,.workspace-sidebar,.app-content,.app-content-title,.ai-chat-page,.ai-chat-shell{min-width:0;max-width:100%}
+.workspace-app{width:100%;overflow-x:clip}
+.workspace-layout,.workspace-main{width:100%;min-width:0}
+.workspace-main>*{min-width:0;max-width:100%}
+.app-panel,.app-stat,.app-row,.app-grid,.app-form,.app-content-title,.app-list,.app-settings-grid,.settings-preview{min-width:0;max-width:100%}
+.app-panel,.app-row,.app-stat{overflow-wrap:anywhere}
+.app-form input,.app-form select,.app-form textarea,.app-form button,.app-btn{min-width:0;max-width:100%}
+table{width:100%;max-width:100%;border-collapse:collapse}
+pre,code{white-space:pre-wrap;overflow-wrap:anywhere}
+@media(max-width:760px){
+  html,body{overflow-x:clip!important}
+  main.wrap:has(.workspace-app){width:100%!important;max-width:100%!important;padding:0!important;margin:0!important}
+  .login-page:has(.workspace-app){width:100%!important;max-width:100%!important;overflow-x:clip!important}
+  .workspace-app{width:100%!important;max-width:100%!important;padding:8px 12px calc(112px + env(safe-area-inset-bottom))!important;margin:0!important;overflow-x:clip!important}
+  .workspace-layout,.workspace-main{width:100%!important;max-width:100%!important;min-width:0!important}
+  .workspace-main{overflow-wrap:anywhere}
+  .workspace-head{width:100%;grid-template-columns:42px minmax(0,1fr)!important}
+  .workspace-head>*{min-width:0}
+  .workspace-head h1,.workspace-head p,.app-content-title h2,.app-content-title p{max-width:100%;overflow-wrap:anywhere;word-break:normal}
+  .workspace-actions{min-width:0;flex-wrap:wrap}
+  .workspace-actions .app-btn{min-width:0;white-space:normal}
+  .app-stats{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+  .app-grid,.app-settings-grid{grid-template-columns:minmax(0,1fr)!important}
+  .app-stat,.app-panel{min-width:0;padding:clamp(10px,3.5vw,15px)!important}
+  .app-row{width:100%;min-width:0;flex-wrap:wrap}
+  .app-row>*{min-width:0;max-width:100%}
+  .app-row .app-btn{white-space:normal!important;overflow-wrap:anywhere}
+  .app-content-title{align-items:flex-start;flex-wrap:wrap}
+  .app-content-title>*{min-width:0;max-width:100%}
+  .app-form input,.app-form select,.app-form textarea{width:100%!important;min-width:0!important}
+  .app-topbar{width:100%!important;max-width:100%!important;margin:0 0 14px!important;padding:calc(env(safe-area-inset-top) + 10px) 12px 12px!important;gap:8px!important;overflow:hidden}
+  .app-topbar .burger-btn{flex:0 0 42px!important;width:42px!important;height:42px!important}
+  .app-topbar .tb-actions{flex:0 1 auto!important;min-width:0!important;gap:7px!important}
+  .app-topbar .tb-actions button{min-width:40px!important;width:auto!important;height:42px!important;padding:0 10px!important;flex:0 1 auto!important;white-space:nowrap!important}
+  .app-topbar .tb-actions button svg{flex:0 0 20px;width:20px!important;height:20px!important}
+  .ai-chat-page,.ai-chat-shell{width:100%!important;max-width:100%!important;min-width:0!important}
+  .ai-chat-shell{overflow:visible!important}
+  .ai-chat-header{width:100%;min-width:0;flex-wrap:wrap}
+  .ai-chat-brand{flex:1 1 180px;min-width:0}
+  .ai-chat-brand b{overflow-wrap:anywhere}
+  .ai-chat-status{flex:0 1 auto;max-width:45%}
+  .ai-chat-intro{width:100%;min-width:0;min-height:0!important;padding:18px 16px 20px!important;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start}
+  .ai-chat-intro:after{right:8px!important;top:44px!important;width:min(48%,190px)!important;height:160px!important;background-position:center right!important;background-size:contain!important}
+  .ai-chat-intro:before{align-self:flex-start;max-width:100%;margin-bottom:0!important;font-size:9px!important;letter-spacing:1px!important}
+  .ai-chat-intro h2{max-width:100%!important;width:100%;margin-top:164px!important;font-size:clamp(28px,8vw,38px)!important;line-height:1.08!important;letter-spacing:-1px!important;overflow-wrap:anywhere}
+  .ai-chat-intro p{max-width:100%!important;width:100%;margin:12px 0 0!important;font-size:13px!important;line-height:1.55!important;overflow-wrap:anywhere}
+  .ai-chat-suggestions{width:100%;grid-template-columns:repeat(2,minmax(0,1fr))!important;min-width:0}
+  .ai-chat-suggestion{min-width:0;width:100%;white-space:normal;overflow-wrap:anywhere}
+  .ai-chat-result,.ai-chat-disclaimer,.ai-chat-composer-wrap,.ai-chat-history{width:100%;min-width:0;max-width:100%;overflow-wrap:anywhere}
+  .ai-chat-bullets{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .ai-chat-bullets li{min-width:0;overflow-wrap:anywhere}
+  .ai-chat-composer{width:100%;min-width:0;gap:5px}
+  .ai-chat-composer textarea{width:100%;min-width:0;max-width:100%}
+  .ai-chat-send{flex:0 0 44px}
+  .mobile-tabbar{left:8px!important;right:8px!important;width:auto!important;max-width:calc(100% - 16px)!important;overflow:hidden}
+  .mobile-tabbar button{min-width:0!important;padding-left:2px!important;padding-right:2px!important}
+  .mobile-tabbar button span:last-child{max-width:100%;overflow:hidden;text-overflow:ellipsis}
+  .app-table-wrap,.table-wrap,.report-table-wrap{max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+}
+@media(max-width:420px){
+  .workspace-app{padding-left:10px!important;padding-right:10px!important}
+  .app-topbar .tb-actions button span{display:none!important}
+  .app-topbar .tb-actions button{width:42px!important;flex:0 0 42px!important;padding:0!important}
+  .app-topbar .tb-actions{gap:6px!important}
+  .ai-chat-header{padding-left:2px!important;padding-right:2px!important}
+  .ai-chat-status{max-width:124px;font-size:8px!important}
+  .ai-chat-intro:after{width:46%!important;height:145px!important;top:48px!important;right:4px!important}
+  .ai-chat-intro h2{margin-top:150px!important;font-size:clamp(27px,8.4vw,34px)!important}
+  .ai-chat-suggestion{padding:12px 7px!important}
+  .app-stats{gap:6px!important}
+  .app-stat span{overflow-wrap:anywhere}
+}
+@media(min-width:761px){
+  .workspace-app{width:min(1120px,calc(100% - 40px));margin-inline:auto}
+  .ai-chat-page{width:100%}
+}
+</style>
 </head>
 <body>
   <div class="status-safe" aria-hidden="true"></div>
