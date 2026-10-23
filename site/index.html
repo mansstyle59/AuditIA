@@ -3660,6 +3660,45 @@ body,.workspace-app{background:#0e0d16!important;color:#f6f3ff!important}
 .schema-bar b.geo{background:linear-gradient(90deg,#5d46b8,#8de3bb)}
 .report-meter{display:block;height:4px;margin-top:7px;border-radius:99px;background:#2a2444;overflow:hidden}
 .report-meter i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#7a62e4,#c4b6ff)}
+.workspace-main>.home-hero{
+  border:1px solid rgba(196,181,253,.2)!important;
+  background:radial-gradient(ellipse at 50% -8%,rgba(168,140,255,.4),transparent 48%),linear-gradient(180deg,#2b234e 0%,#161226 74%)!important;
+  box-shadow:0 22px 48px rgba(0,0,0,.28)!important;
+}
+.workspace-main>.home-hero .home-visual{
+  background:rgba(8,7,16,.42)!important;
+  border:1px solid rgba(255,255,255,.08)!important;
+  box-shadow:inset 0 1px rgba(255,255,255,.05)!important;
+}
+.workspace-main .home-section-heading{margin:6px 2px 12px!important}
+.workspace-main .home-section-heading h2{font-size:18px!important;letter-spacing:-.03em!important;font-weight:720!important}
+.workspace-main .home-stats{gap:10px!important}
+.workspace-main .home-stats .home-stat{
+  min-height:0!important;
+  padding:16px 14px!important;
+  border-radius:18px!important;
+  background:linear-gradient(180deg,#1d1832,#14111f)!important;
+  border:1px solid rgba(186,170,230,.14)!important;
+  box-shadow:none!important;
+}
+.workspace-main .home-stats .home-stat>strong{font-size:32px!important;letter-spacing:-.05em!important}
+.workspace-main .app-panel.home-analytics-panel,
+.workspace-main .home-next-steps,
+.workspace-main .home-recent-panel{
+  background:linear-gradient(180deg,#1c1830,#14111f)!important;
+  border:1px solid rgba(186,170,230,.14)!important;
+  border-radius:20px!important;
+  box-shadow:none!important;
+}
+.workspace-main>.home-hero .home-hero-actions .app-btn.primary{
+  background:linear-gradient(180deg,#b7a6ff,#7a62e4)!important;
+  border:0!important;
+  box-shadow:0 10px 24px rgba(90,64,190,.28)!important;
+}
+@media(max-width:760px){
+  .workspace-main .home-stats{grid-template-columns:1fr!important}
+  .workspace-main .home-stats .home-stat{min-height:0!important;padding:14px 14px!important}
+}
 .schema-bar b{transform-origin:left center;animation:schema-grow .7s ease}
 .schema-donut .meter{stroke-dasharray:226.2 226.2;stroke-dashoffset:226.2;animation:schema-donut .8s ease forwards}
 .prog-line{stroke-dasharray:100;stroke-dashoffset:100;animation:schema-line .9s ease forwards}
