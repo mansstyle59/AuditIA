@@ -3912,7 +3912,7 @@ body:has(#authRoot .auth-loading) .login-foot,body:has(#authRoot .auth-loading) 
         if(hasWeb){
           setPhase('Lecture du site et détection des réseaux…',20);
           try{ const html=await readSiteHtml(site); siteRes=analyzeSite(html,site); siteRes.hasWebsite=true; }
-          catch(e){ issues.push('lecture du site impossible'); }
+          catch(e){ markPhaseLimited('Lecture du site et détection des réseaux…'); issues.push('lecture du site impossible'); }
           setPhase('Recherche de la présence sur le web (réseaux, annuaires)…',32);
           try{ const web=await findWebPresence(c); const base=siteRes||{socials:[],hasWebsite:true,analyzedAt:new Date().toISOString(),finalUrl:site}; base.socials=base.socials||[]; const have=new Set(base.socials.map(s=>s.net)); (web.socials||[]).forEach(w=>{ if(!have.has(w.net)){ have.add(w.net); base.socials.push(w); } }); base.directories=web.directories||[]; siteRes=base; }
           catch(e){}
@@ -3929,7 +3929,7 @@ body:has(#authRoot .auth-loading) .login-foot,body:has(#authRoot .auth-loading) 
           if(newDetails){ try{ await appClient.from('clients').update({details:newDetails}).eq('id',c.id); }catch(e){} }
           setPhase('Mesure de la performance (Google PageSpeed)…',66);
           try{ scan=await fetchPagespeed(site); }
-          catch(e){ issues.push('performance indisponible ('+((e&&e.message)||'').slice(0,40)+')'); }
+          catch(e){ markPhaseLimited('Mesure de la performance (Google PageSpeed)…'); issues.push('performance indisponible ('+((e&&e.message)||'').slice(0,40)+')'); }
           setPhase('Capture d’écran du site…',76);
           try{ const shot=await fetchScreenshot(site); if(shot&&siteRes){ siteRes.screenshot=shot; await appClient.from('audits').update({site:siteRes}).eq('id',auditId); } else if(!shot){ issues.push('capture du site indisponible'); } }
           catch(e){}
