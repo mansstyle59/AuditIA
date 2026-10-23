@@ -3604,6 +3604,11 @@ body:has(.splash) .splash{position:relative;width:min(100%,380px);margin:0 auto;
 .audit-kpis span{display:block;margin-top:4px;color:#c9c2de;font-size:11px}
 .audits-page .add-toggle{margin-bottom:14px}
 .audits-page .add-toggle .app-panel{margin:0;border:0;box-shadow:none;background:transparent}
+.report-list{display:grid;gap:10px}
+.report-card{padding:12px;border:1px solid rgba(255,255,255,.1);border-radius:16px;background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.02))}
+.report-top{display:grid;grid-template-columns:42px minmax(0,1fr) auto;gap:10px;align-items:center}
+.report-actions{display:grid;grid-template-columns:1fr 1.2fr auto;gap:8px;margin-top:12px}
+.report-actions .app-btn{min-height:40px;padding:0 10px}
 </style>
 </head>
 <body>
@@ -4930,11 +4935,10 @@ body:has(.splash) .splash{position:relative;width:min(100%,380px);margin:0 auto;
     function pdfHeadBand(pdf,K,st,a,title){ const col=hexToRgb(st.primary_color); pdf.setFillColor(250,249,253); pdf.rect(0,0,K.W,K.H,'F'); pdf.setFillColor(col[0],col[1],col[2]); pdf.rect(0,0,K.W,28,'F'); pdf.setFillColor(255,255,255); pdf.roundedRect(K.M,6,2.2,16,1,1,'F'); K.setF('bold',15); pdf.setTextColor(255,255,255); pdf.text(String(st.app_name||'AuditIA'),K.M+6,13); K.setF('normal',8.5); pdf.text(title,K.M+6,20); K.setF('normal',8); pdf.text(new Date(a.updated_at||Date.now()).toLocaleDateString('fr-FR'),K.W-K.M,12,{align:'right'}); pdf.text(String(st.company_name||'AffiAds'),K.W-K.M,20,{align:'right'}); K.y=36; }
     function pdfClientVerdict(pdf,K,a,c,d,diag){ const idx=diag.index; const lab=visibilityLabel(idx); const ic=pdfScoreCol(idx);
       K.para((c&&c.name)||'Commerce',{style:'bold',size:21}); K.para([c&&c.city,c&&(c.category||d.category)].filter(Boolean).join('   ·   '),{color:K.MUT,size:9.5}); K.para('BILAN DE VISIBILITÉ NUMÉRIQUE  ·  '+new Date(a.updated_at||Date.now()).toLocaleDateString('fr-FR'),{color:K.MUT,size:7.5}); K.gap(2);
-      K.ensure(27); pdf.setFillColor(244,241,252); pdf.roundedRect(K.M,K.y,K.CW,23,3,3,'F'); K.setF('bold',34); K.setT(ic); pdf.text(String(idx),K.M+5,K.y+13); K.setF('normal',10); K.setT(K.MUT); pdf.text('/100',K.M+5+String(idx).length*8.5,K.y+13); K.setF('bold',11); K.setT(ic); pdf.text(lab.t,K.M+43,K.y+13); K.y+=27;
+      K.ensure(27); pdf.setFillColor(244,241,252); pdf.roundedRect(K.M,K.y,K.CW,23,3,3,'F'); pdf.setFillColor(ic[0],ic[1],ic[2]); pdf.rect(K.M,K.y,2,23,'F'); K.setF('bold',34); K.setT(ic); pdf.text(String(idx),K.M+5,K.y+13); K.setF('normal',10); K.setT(K.MUT); pdf.text('/100',K.M+5+String(idx).length*8.5,K.y+13); K.setF('bold',11); K.setT(ic); pdf.text(lab.t,K.M+43,K.y+13); K.y+=27;
       K.para(visibilityVerdict(idx),{size:9.5}); K.para('Le score résume les signaux disponibles. SEO = visibilité dans les moteurs de recherche ; GEO = chances d’être cité par les assistants IA.',{size:8,color:K.MUT}); K.gap(1);
-      const seoCol=pdfScoreCol(diag.seo.score), geoCol=pdfScoreCol(diag.geo.score);
-      K.ensure(8); K.setF('bold',10); K.setT(K.DARK); pdf.text('SEO — Google',K.M,K.y+4); K.setT(seoCol); pdf.text(diag.seo.score+'/100',K.M+62,K.y+4,{align:'right'});
-      K.setF('bold',10); K.setT(K.DARK); pdf.text('GEO — IA génératives',K.M+70,K.y+4); K.setT(geoCol); pdf.text(diag.geo.score+'/100',K.W-K.M,K.y+4,{align:'right'}); K.y+=9; }
+      const bar=(label,score,x,w)=>{ const col=pdfScoreCol(score); K.setF('bold',9); K.setT(K.DARK); pdf.text(label,x,K.y+3.2); K.setT(col); pdf.text(score+'/100',x+w,K.y+3.2,{align:'right'}); pdf.setFillColor(230,226,240); pdf.roundedRect(x,K.y+4.6,w,2.1,1,1,'F'); pdf.setFillColor(col[0],col[1],col[2]); pdf.roundedRect(x,K.y+4.6,Math.max(1.4,w*Math.max(0,Math.min(100,Number(score)||0))/100),2.1,1,1,'F'); };
+      K.ensure(12); const gap=6, bw=(K.CW-gap)/2; bar('SEO — Google',diag.seo.score,K.M,bw); bar('GEO — IA',diag.geo.score,K.M+bw+gap,bw); K.y+=12; }
     function buildPdfFull(pdf,a,c){
       const st={...defaultSettings(),...(appSettings||{})}; const d=(c&&c.details)||{}; const diag=visibilityAudit(a,c); const col=hexToRgb(st.primary_color);
       const K=pdfKit(pdf); const {W,M,CW}=K;
@@ -5035,6 +5039,14 @@ body:has(.splash) .splash{position:relative;width:min(100%,380px);margin:0 auto;
       const initial=escHtml(((c&&c.name)||'?').charAt(0).toUpperCase());
       return '<article class="audit-card'+(done?' is-done':'')+'"><span class="audit-mark">'+initial+'</span><div class="audit-copy"><b>'+escHtml((c&&c.name)||'Commerce')+'</b><small>'+escHtml([c&&c.city,a.title].filter(Boolean).join(' · '))+'</small></div><span class="audit-state">'+(done?'<b>'+score+'</b><small>/100</small>':'<em>À analyser</em>')+'</span><button class="app-btn'+(done?'':' primary')+'" type="button" data-open-audit="'+a.id+'"'+(done?'':' data-start-audit="1"')+'>'+(done?'Ouvrir':'Analyser')+'</button></article>';
     }
+    function reportCardHtml(a){
+      const done=!!(a.site||a.scan||a.status==='Analysé'||a.status==='Terminé');
+      if(!done) return auditRowHtml(a);
+      const c=appClients.find(x=>x.id===a.client_id);
+      const score=Number(a.score)||0;
+      const initial=escHtml(((c&&c.name)||'?').charAt(0).toUpperCase());
+      return '<article class="report-card"><div class="report-top"><span class="audit-mark">'+initial+'</span><div class="audit-copy"><b>'+escHtml((c&&c.name)||'Commerce')+'</b><small>'+escHtml([c&&c.city,a.title].filter(Boolean).join(' · '))+'</small></div><span class="audit-state"><b>'+score+'</b><small>/100</small></span></div><div class="report-actions"><button class="app-btn" type="button" data-export-report="'+a.id+'" data-mode="simple">Express</button><button class="app-btn primary" type="button" data-export-report="'+a.id+'" data-mode="full">PDF complet</button><button class="app-btn" type="button" data-open-audit="'+a.id+'">Dossier</button></div></article>';
+    }
     function renderApp(){
       const completed=appAudits.filter(a=>a.status==='Terminé'||a.status==='Analysé').length;
       let body='';
@@ -5068,7 +5080,9 @@ body:has(.splash) .splash{position:relative;width:min(100%,380px);margin:0 auto;
         const auditList=(function(){const q=auditFilter.trim().toLowerCase();const rows=appAudits.filter(a=>{if(!q)return true;const c=appClients.find(x=>x.id===a.client_id);const d=c&&c.details||{};return norm([(c?.name||''),(c?.city||''),(c?.category||''),(d.category||''),(a.title||''),(a.status||''),String(a.score||'')].join(' ')).includes(norm(q));});return rows.length?'<div class="audit-list">'+rows.map(auditRowHtml).join('')+'</div>':'<div class="app-empty">'+(appAudits.length?'Aucun audit ne correspond à « '+escHtml(auditFilter)+' ».':'Aucun audit pour le moment. Crée le premier dossier ci-dessus.')+'</div>';})();
         body='<div class="audits-page"><div class="app-content-title"><div><h2>Audits</h2><p>Chaque dossier part d’un commerce. Le score n’apparaît qu’après une analyse réelle.</p></div></div><div class="audit-kpis"><article><b>'+appAudits.length+'</b><span>Dossiers</span></article><article><b>'+ready+'</b><span>Analysés</span></article><article><b>'+waiting+'</b><span>À lancer</span></article></div><details class="add-toggle"'+(appAudits.length?'':' open')+'><summary>＋ Nouvel audit</summary><section class="app-panel">'+createForm+'</section></details><section class="app-panel"><h2>Dossiers</h2>'+(appAudits.length?'<input class="app-filter" data-audit-filter placeholder="Rechercher un commerce, une ville, un statut…" value="'+escHtml(auditFilter)+'">':'')+auditList+'</section></div>';
       } else if(appView==='Rapports'){
-        body='<div class="app-content-title"><div><h2>Rapports & résultats</h2><p>Synthèse de l’activité d’audit.</p></div></div><div class="app-stats"><article class="app-stat"><span>Total des audits</span><strong>'+appAudits.length+'</strong></article><article class="app-stat"><span>Terminés</span><strong>'+completed+'</strong></article><article class="app-stat"><span>Clients</span><strong>'+appClients.length+'</strong></article></div><section class="app-panel"><h2>Historique des audits</h2>'+(appAudits.length?'<input class="app-filter" data-audit-filter placeholder="Rechercher un rapport, un commerce, une ville…" value="'+escHtml(auditFilter)+'">':'')+(function(){const q=norm(auditFilter);const rows=appAudits.filter(a=>{if(!q)return true;const c=appClients.find(x=>x.id===a.client_id);const d=c&&c.details||{};return norm([(c&&c.name)||'',(c&&c.city)||'',(c&&c.category)||'',(d.category||''),(a.title||''),(a.status||''),String(a.score||'')].join(' ')).includes(q);});return rows.length?'<div class="audit-list">'+rows.map(auditRowHtml).join('')+'</div>':'<div class="app-empty">'+(appAudits.length?'Aucun rapport pour « '+escHtml(auditFilter)+' ».':'Les rapports apparaîtront ici lorsque tu auras créé des audits.')+'</div>';})()+'</section>';
+        const readyReports=appAudits.filter(a=>a.site||a.scan||a.status==='Analysé'||a.status==='Terminé').length;
+        const reportList=(function(){const q=norm(auditFilter);const rows=appAudits.filter(a=>{if(!q)return true;const c=appClients.find(x=>x.id===a.client_id);const d=c&&c.details||{};return norm([(c&&c.name)||'',(c&&c.city)||'',(c&&c.category)||'',(d.category||''),(a.title||''),(a.status||''),String(a.score||'')].join(' ')).includes(q);});return rows.length?'<div class="report-list">'+rows.map(reportCardHtml).join('')+'</div>':'<div class="app-empty">'+(appAudits.length?'Aucun rapport pour « '+escHtml(auditFilter)+' ».':'Les rapports apparaissent ici après un audit.')+'</div>';})();
+        body='<div class="reports-page"><div class="app-content-title"><div><h2>Rapports</h2><p>L’express tient sur une page. Le PDF complet reprend le même moteur, avec le détail.</p></div></div><div class="audit-kpis"><article><b>'+appAudits.length+'</b><span>Dossiers</span></article><article><b>'+readyReports+'</b><span>Prêts à exporter</span></article><article><b>'+Math.max(0,appAudits.length-readyReports)+'</b><span>Sans analyse</span></article></div><section class="app-panel"><h2>Exporter</h2>'+(appAudits.length?'<input class="app-filter" data-audit-filter placeholder="Rechercher un commerce, une ville…" value="'+escHtml(auditFilter)+'">':'')+reportList+'</section></div>';
       } else if(appView==='Profil') {
          const meta=appUser?.user_metadata||{};
          const displayName=String(meta.display_name||meta.full_name||'');
