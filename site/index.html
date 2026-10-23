@@ -4412,6 +4412,105 @@ body:has(.workspace-app) .login-page:has(.workspace-app){min-height:0!important;
   .home-v118-action-card{gap:10px!important}
 }
 </style>
+
+<style id="auditia-header-nav-v120">
+/* Header and navigation system: one brand, one primary mobile navigation. */
+@media(max-width:760px){
+  .app-topbar{
+    display:flex!important;align-items:center!important;gap:10px!important;
+    min-height:76px!important;margin:0 -10px 18px!important;
+    padding:calc(env(safe-area-inset-top,0px) + 10px) 14px 12px!important;
+    background:#151321!important;border:0!important;
+    border-bottom:1px solid rgba(191,177,255,.15)!important;
+    box-shadow:0 8px 22px rgba(0,0,0,.14)!important;
+    border-radius:0!important;
+  }
+  .app-topbar .topbar-menu-btn{
+    flex:0 0 42px!important;width:42px!important;height:42px!important;
+    display:grid!important;place-items:center!important;padding:0!important;
+    border-radius:13px!important;background:#211d32!important;
+    border:1px solid rgba(194,179,255,.19)!important;color:#f6f2ff!important;
+  }
+  .app-topbar .tb-brand{
+    display:flex!important;align-items:center!important;gap:9px!important;
+    flex:1 1 auto!important;min-width:0!important;text-decoration:none!important;
+  }
+  .app-topbar .tb-brand img{
+    display:block!important;width:37px!important;height:37px!important;
+    flex:0 0 37px!important;object-fit:contain!important;border-radius:11px!important;
+    box-shadow:0 3px 12px rgba(105,71,255,.2)!important;
+  }
+  .app-topbar .tb-brand span{display:block!important;min-width:0!important}
+  .app-topbar .tb-brand b{
+    display:block!important;color:#faf8ff!important;font-size:17px!important;
+    font-weight:850!important;letter-spacing:-.45px!important;line-height:1.1!important;
+  }
+  .app-topbar .tb-brand small{
+    display:block!important;margin-top:3px!important;color:#a9a0c5!important;
+    font-size:8px!important;font-weight:800!important;letter-spacing:1.25px!important;
+    white-space:nowrap!important;
+  }
+  .app-topbar .tb-actions{display:flex!important;align-items:center!important;gap:7px!important;flex:0 0 auto!important}
+  .app-topbar .tb-actions button{
+    display:flex!important;align-items:center!important;justify-content:center!important;
+    gap:7px!important;min-width:40px!important;height:42px!important;
+    padding:0 10px!important;border-radius:13px!important;
+    color:#e9e3ff!important;background:#211d32!important;
+    border:1px solid rgba(194,179,255,.16)!important;
+  }
+  .app-topbar .tb-actions button svg{width:18px!important;height:18px!important;flex:0 0 18px!important}
+  .mobile-tabbar{
+    display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;
+    align-items:stretch!important;gap:4px!important;
+    left:10px!important;right:10px!important;bottom:calc(8px + env(safe-area-inset-bottom))!important;
+    width:auto!important;max-width:none!important;padding:5px!important;
+    border:1px solid rgba(177,157,255,.22)!important;border-radius:19px!important;
+    background:rgba(20,18,34,.97)!important;
+    -webkit-backdrop-filter:blur(18px)!important;backdrop-filter:blur(18px)!important;
+    box-shadow:0 12px 32px rgba(0,0,0,.38)!important;overflow:hidden!important;
+  }
+  .mobile-tabbar button{
+    display:flex!important;min-width:0!important;min-height:56px!important;
+    flex-direction:column!important;align-items:center!important;justify-content:center!important;
+    gap:4px!important;padding:5px 2px!important;border:1px solid transparent!important;
+    border-radius:13px!important;background:transparent!important;color:#a8a1bd!important;
+  }
+  .mobile-tabbar button .tab-icon{display:grid!important;place-items:center!important;font-size:18px!important;line-height:1!important}
+  .mobile-tabbar button .tab-icon svg{width:19px!important;height:19px!important}
+  .mobile-tabbar button span:last-child{
+    display:block!important;max-width:100%!important;overflow:hidden!important;
+    text-overflow:ellipsis!important;white-space:nowrap!important;
+    font-size:10px!important;font-weight:700!important;line-height:1.15!important;
+  }
+  .mobile-tabbar button.active{
+    color:#f6f1ff!important;background:linear-gradient(145deg,rgba(117,79,237,.30),rgba(75,54,132,.25))!important;
+    border-color:rgba(177,157,255,.24)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.06)!important;
+  }
+  .mobile-tabbar button.active .tab-icon{color:#c4adff!important}
+  /* Four core destinations are always visible. Secondary tools remain in the side menu. */
+  .mobile-tabbar button[data-app-view="Accueil"],
+  .mobile-tabbar button[data-app-view="Clients"],
+  .mobile-tabbar button[data-app-view="Audits"],
+  .mobile-tabbar button[data-app-view="Rapports"]{display:flex!important}
+  .mobile-tabbar button[data-app-view="Studio"],
+  .mobile-tabbar button[data-app-view="Paramètres"],
+  .mobile-tabbar button[data-app-view="Assistant"]{display:none!important}
+}
+@media(max-width:420px){
+  .app-topbar{gap:7px!important;padding-left:10px!important;padding-right:10px!important}
+  .app-topbar .tb-brand{gap:7px!important}
+  .app-topbar .tb-brand img{width:34px!important;height:34px!important;flex-basis:34px!important}
+  .app-topbar .tb-brand b{font-size:16px!important}
+  .app-topbar .tb-brand small{font-size:7px!important;letter-spacing:1px!important}
+  .app-topbar .tb-actions{gap:5px!important}
+  .app-topbar .tb-actions button{width:38px!important;min-width:38px!important;height:40px!important;padding:0!important;flex:0 0 38px!important}
+  .app-topbar .tb-actions button span{display:none!important}
+  .mobile-tabbar{left:8px!important;right:8px!important}
+}
+@media(prefers-reduced-motion:reduce){
+  .mobile-tabbar,.mobile-tabbar button,.app-topbar .tb-actions button{transition:none!important}
+}
+</style>
 </head>
 <body>
   <div class="status-safe" aria-hidden="true"></div>
@@ -4648,7 +4747,7 @@ body:has(.workspace-app) .login-page:has(.workspace-app){min-height:0!important;
       const headTitle = appView==='Accueil'?'Accueil':appView==='Assistant'?'Audit Chat IA':appView==='Paramètres'?'Réglages':appView==='Profil'?'Mon profil':appView==='ClientDétail'?'Fiche client':appView==='Détail'?'Dossier d’audit':appView;
       const headLead = appView==='Assistant'?'Conseils et actions à partir des données réellement disponibles.':appView==='Clients'?(appClients.length?appClients.length+' commerce'+(appClients.length>1?'s':'')+' suivi'+(appClients.length>1?'s':'')+'.':'Ajoute un commerce pour commencer.'):appView==='Audits'?'Un dossier par commerce. Le score n’apparaît qu’après une analyse.':appView==='Rapports'?'Schémas et PDF, uniquement à partir des audits analysés.':appView==='Studio'?'Contenus et argumentaire à partir des dossiers.':appView==='Paramètres'?'Identité, signature et connexions des rapports.':appView==='Profil'?'Ton nom et ton accès. L’e-mail ne se change pas ici.':appView==='ClientDétail'?(function(){const c=appClients.find(x=>x.id===activeClient);return c?[c.name,c.city].filter(Boolean).join(' · '):'Fiche d’un commerce.';})():appView==='Détail'?(function(){const a=appAudits.find(x=>x.id===activeAudit);const c=a&&appClients.find(x=>x.id===a.client_id);return c?[c.name,c.city].filter(Boolean).join(' · '):'Le score n’apparaît qu’après l’analyse.';})():'';
       const showEyebrow = sectionLabel.trim().toLowerCase()!==headTitle.trim().toLowerCase();
-      page.innerHTML = '<div class="workspace-app">'+(pdfBusy?'<div class="pdf-overlay"><div class="pdf-spin"></div><b>Génération du PDF…</b><span>Quelques secondes… l’écran « rapport prêt » s’affichera ensuite.</span><button type="button" class="pdf-cancel" data-pdf-cancel>Annuler</button></div>':'')+'<header class="app-topbar"><button class="burger-btn topbar-menu-btn" type="button" data-toggle-menu aria-label="Ouvrir le menu" aria-controls="workspaceSidebar" aria-expanded="false">'+navIcon('menu')+'</button><div class="tb-actions"><button class="app-btn topbar-profile-btn'+(appView==='Profil'?' is-active':'')+'" type="button" data-app-view="Profil" aria-label="Ouvrir le profil">'+navIcon('profile')+'<span>Profil</span></button><button class="app-btn topbar-logout-btn" type="button" data-app-action="logout" aria-label="Déconnecter" title="Déconnecter">'+navIcon('logout')+'<span>Déconnecter</span></button></div></header><div class="sidebar-backdrop" data-close-menu></div><aside class="workspace-sidebar" id="workspaceSidebar"><div class="sidebar-brand"><img src="'+escHtml(currentLogo())+'" alt="" onerror="this.style.display=&#39;none&#39;"><div><b>'+escHtml(appSettings?.app_name||'AuditIA')+'</b><small>BY AFFIADS</small></div></div><nav class="sidebar-nav" aria-label="Navigation principale">'+navItems.map(([v,ico,target])=>'<button type="button" class="'+(navActive===(target||v)?'active':'')+'" data-app-view="'+(target||v)+'"><span class="nav-icon">'+navIcon(ico)+'</span><span>'+v+'</span>'+(v==='Clients'?'<span class="nav-count">'+appClients.length+'</span>':v==='Audits'?'<span class="nav-count">'+appAudits.length+'</span>':'')+'</button>').join('')+'</nav><div class="sidebar-bottom">Auditer mieux.<br>Décider plus clairement.</div></aside><div class="workspace-layout"><main class="workspace-main"><div class="workspace-head"><div>'+(showEyebrow?'<div class="eyebrow">'+escHtml(sectionLabel)+'</div>':'')+(appView==='Accueil'?'<p class="page-title">'+escHtml(headTitle)+'</p>':'<h1>'+escHtml(headTitle)+'</h1>')+'<p>'+escHtml(headLead)+'</p></div><div class="workspace-actions desktop-account-actions"><button class="app-btn'+(appView==='Profil'?' is-active':'')+'" type="button" data-app-view="Profil">'+navIcon('profile')+'<span>Profil</span></button><button class="app-btn" type="button" data-app-action="logout">'+navIcon('logout')+'<span>Déconnecter</span></button></div></div><nav class="desktop-nav" aria-label="Navigation principale">'+navItems.map(([v,ico,target])=>'<button type="button" class="'+(navActive===(target||v)?'active':'')+'" data-app-view="'+(target||v)+'">'+navIcon(ico)+'<span>'+v+'</span></button>').join('')+'</nav>'+keyAlertHtml()+appNoticeHtml()+body+'<p class="app-muted workspace-footnote">AuditIA · Espace privé</p></main></div><nav class="mobile-tabbar" aria-label="Navigation principale">'+navItems.map(([v,ico,target])=>'<button type="button" class="'+(navActive===(target||v)?'active':'')+'" data-app-view="'+(target||v)+'" aria-label="'+v+'" '+(navActive===(target||v)?'aria-current="page"':'')+'><span class="tab-icon">'+navIcon(ico)+'</span><span>'+v+'</span></button>').join('')+'</nav></div>';
+      page.innerHTML = '<div class="workspace-app">'+(pdfBusy?'<div class="pdf-overlay"><div class="pdf-spin"></div><b>Génération du PDF…</b><span>Quelques secondes… l’écran « rapport prêt » s’affichera ensuite.</span><button type="button" class="pdf-cancel" data-pdf-cancel>Annuler</button></div>':'')+'<header class="app-topbar"><button class="burger-btn topbar-menu-btn" type="button" data-toggle-menu aria-label="Ouvrir le menu" aria-controls="workspaceSidebar" aria-expanded="false">'+navIcon('menu')+'</button><a class="tb-brand" href="./" aria-label="AuditIA — accueil"><img src="./auditia-icon.svg" alt=""><span><b>AuditIA</b><small>ESPACE DE TRAVAIL</small></span></a><div class="tb-actions"><button class="app-btn topbar-profile-btn'+(appView==='Profil'?' is-active':'')+'" type="button" data-app-view="Profil" aria-label="Ouvrir le profil">'+navIcon('profile')+'<span>Profil</span></button><button class="app-btn topbar-logout-btn" type="button" data-app-action="logout" aria-label="Déconnecter" title="Déconnecter">'+navIcon('logout')+'<span>Déconnecter</span></button></div></header><div class="sidebar-backdrop" data-close-menu></div><aside class="workspace-sidebar" id="workspaceSidebar"><div class="sidebar-brand"><img src="'+escHtml(currentLogo())+'" alt="" onerror="this.style.display=&#39;none&#39;"><div><b>'+escHtml(appSettings?.app_name||'AuditIA')+'</b><small>BY AFFIADS</small></div></div><nav class="sidebar-nav" aria-label="Navigation principale">'+navItems.map(([v,ico,target])=>'<button type="button" class="'+(navActive===(target||v)?'active':'')+'" data-app-view="'+(target||v)+'"><span class="nav-icon">'+navIcon(ico)+'</span><span>'+v+'</span>'+(v==='Clients'?'<span class="nav-count">'+appClients.length+'</span>':v==='Audits'?'<span class="nav-count">'+appAudits.length+'</span>':'')+'</button>').join('')+'</nav><div class="sidebar-bottom">Auditer mieux.<br>Décider plus clairement.</div></aside><div class="workspace-layout"><main class="workspace-main"><div class="workspace-head"><div>'+(showEyebrow?'<div class="eyebrow">'+escHtml(sectionLabel)+'</div>':'')+(appView==='Accueil'?'<p class="page-title">'+escHtml(headTitle)+'</p>':'<h1>'+escHtml(headTitle)+'</h1>')+'<p>'+escHtml(headLead)+'</p></div><div class="workspace-actions desktop-account-actions"><button class="app-btn'+(appView==='Profil'?' is-active':'')+'" type="button" data-app-view="Profil">'+navIcon('profile')+'<span>Profil</span></button><button class="app-btn" type="button" data-app-action="logout">'+navIcon('logout')+'<span>Déconnecter</span></button></div></div><nav class="desktop-nav" aria-label="Navigation principale">'+navItems.map(([v,ico,target])=>'<button type="button" class="'+(navActive===(target||v)?'active':'')+'" data-app-view="'+(target||v)+'">'+navIcon(ico)+'<span>'+v+'</span></button>').join('')+'</nav>'+keyAlertHtml()+appNoticeHtml()+body+'<p class="app-muted workspace-footnote">AuditIA · Espace privé</p></main></div><nav class="mobile-tabbar" aria-label="Navigation principale">'+navItems.map(([v,ico,target])=>'<button type="button" class="'+(navActive===(target||v)?'active':'')+'" data-app-view="'+(target||v)+'" aria-label="'+v+'" '+(navActive===(target||v)?'aria-current="page"':'')+'><span class="tab-icon">'+navIcon(ico)+'</span><span>'+v+'</span></button>').join('')+'</nav></div>';
 
       page.insertAdjacentHTML('beforeend', `
         <button type="button" class="ai-float-launcher" data-ai-float-toggle aria-label="Ouvrir Audit Chat IA" aria-expanded="false" aria-controls="auditChatFloatPanel" title="Parler à Audit Chat IA">
