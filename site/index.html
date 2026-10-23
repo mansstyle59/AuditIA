@@ -4601,6 +4601,52 @@ body:has(.workspace-app) .login-page:has(.workspace-app){min-height:0!important;
   .workspace-main{scroll-margin-top:calc(74px + env(safe-area-inset-top,0px))!important}
 }
 </style>
+
+<style id="auditia-mobile-header-offset-fix-v124">
+/* Final mobile header geometry: the burger sits immediately below the iPhone status area. */
+@media(max-width:760px){
+  /* A transformed/contained ancestor can offset position:fixed; remove that source. */
+  body:has(.workspace-app),
+  body:has(.workspace-app) main.wrap,
+  body:has(.workspace-app) .login-page,
+  body:has(.workspace-app) .workspace-app{
+    transform:none!important;filter:none!important;perspective:none!important;
+    contain:none!important;
+  }
+  body:has(.workspace-app) .status-safe,
+  body:has(.workspace-app) header.wrap.top,
+  body:has(.workspace-app) main.wrap>.login-page:not(:has(.workspace-app)){
+    display:none!important;
+  }
+  .app-topbar{
+    position:fixed!important;inset:0 0 auto 0!important;
+    width:100vw!important;max-width:none!important;min-width:0!important;
+    box-sizing:border-box!important;
+    height:calc(56px + env(safe-area-inset-top,0px))!important;
+    min-height:calc(56px + env(safe-area-inset-top,0px))!important;
+    margin:0!important;
+    padding:calc(env(safe-area-inset-top,0px) + 6px) max(14px,env(safe-area-inset-left,0px)) 6px max(14px,env(safe-area-inset-left,0px))!important;
+    display:flex!important;align-items:center!important;justify-content:flex-start!important;
+    background:#151321!important;border:0!important;
+    border-bottom:1px solid rgba(191,177,255,.16)!important;
+    border-radius:0!important;box-shadow:0 4px 14px rgba(0,0,0,.18)!important;
+    opacity:1!important;transform:none!important;filter:none!important;
+    -webkit-backdrop-filter:none!important;backdrop-filter:none!important;
+    overflow:visible!important;transition:none!important;animation:none!important;
+  }
+  .app-topbar .tb-brand,.app-topbar .tb-actions{display:none!important}
+  .app-topbar .topbar-menu-btn{
+    display:grid!important;place-items:center!important;
+    flex:0 0 44px!important;width:44px!important;height:44px!important;
+    margin:0!important;padding:0!important;
+  }
+  .workspace-app{
+    padding-top:calc(56px + env(safe-area-inset-top,0px))!important;
+    scroll-padding-top:calc(66px + env(safe-area-inset-top,0px))!important;
+  }
+  .workspace-main{scroll-margin-top:calc(66px + env(safe-area-inset-top,0px))!important}
+}
+</style>
 </head>
 <body>
   <div class="status-safe" aria-hidden="true"></div>
