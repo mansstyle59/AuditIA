@@ -2973,7 +2973,22 @@ body:has(#authRoot .auth-loading) .login-foot,body:has(#authRoot .auth-loading) 
       body.menu-open { overflow: hidden !important; }
     }
 
-    </style>
+    
+    /* AuditIA Live Scan — étapes réelles de l'analyse */
+    .ap-live-steps{display:grid;gap:9px;margin:18px 0 4px}
+    .ap-live-step{display:grid;grid-template-columns:24px minmax(0,1fr) auto;gap:10px;align-items:center;padding:11px 12px;border:1px solid rgba(255,255,255,.09);border-radius:13px;background:rgba(255,255,255,.035);font-size:13px}
+    .ap-live-step .ap-step-icon{display:grid;place-items:center;width:23px;height:23px;border-radius:50%;background:rgba(255,255,255,.08);color:#aaa6bd;font-weight:800}
+    .ap-live-step .ap-step-status{font-size:11px;color:#aaa6bd;text-align:right}
+    .ap-live-step.is-active{border-color:rgba(154,128,255,.55);background:rgba(154,128,255,.11)}
+    .ap-live-step.is-active .ap-step-icon{background:#8b70f5;color:white;box-shadow:0 0 0 4px rgba(139,112,245,.12)}
+    .ap-live-step.is-done .ap-step-icon{background:rgba(74,190,139,.16);color:#80e0b4}
+    .ap-live-step.is-done .ap-step-status{color:#80e0b4}
+    .ap-live-step.is-limited .ap-step-icon{background:rgba(255,173,114,.14);color:#ffbd8d}
+    .ap-live-step.is-limited .ap-step-status{color:#ffbd8d}
+    .ap-live-summary{font-size:12px;color:#aaa6bd;margin-top:12px;line-height:1.5}
+    @media(max-width:480px){.ap-live-step{padding:10px;grid-template-columns:23px minmax(0,1fr)}.ap-live-step .ap-step-status{grid-column:2;text-align:left}}
+
+</style>
 </head>
 <body>
   <div class="status-safe" aria-hidden="true"></div>
@@ -3865,15 +3880,32 @@ body:has(#authRoot .auth-loading) .login-foot,body:has(#authRoot .auth-loading) 
       const bar=el.querySelector('[data-ap-bar]'); if(bar) bar.style.width=shown+'%';
       const pc=el.querySelector('[data-ap-pct]'); if(pc) pc.textContent=shown+'%';
       const ph=el.querySelector('[data-ap-phase]'); if(ph) ph.textContent=fullAuditState.phase;
+      const steps=el.querySelector('[data-ap-steps]');
+      if(steps) steps.innerHTML=fullAuditState.steps.map((st,i)=>'<div class="ap-live-step '+(st.status==='active'?'is-active':st.status==='done'?'is-done':st.status==='limited'?'is-limited':'')+'"><span class="ap-step-icon">'+(st.status==='done'?'✓':st.status==='active'?'↻':st.status==='limited'?'!':String(i+1))+'</span><span>'+escHtml(st.label)+'</span><span class="ap-step-status">'+(st.status==='done'?'Terminé':st.status==='active'?'En cours':st.status==='limited'?'Partiel / indisponible':'À venir')+'</span></div>').join('');
       const eta=el.querySelector('[data-ap-eta]'); if(eta){ const elapsed=(Date.now()-fullAuditState.startedAt)/1000; const rem=Math.max(0,Math.round(fullAuditState.estTotal-elapsed)); eta.textContent=(fullAuditState.pct>=99?'finalisation…':(rem>0?'≈ '+rem+' s restantes':'presque terminé…')); }
     }
-    function setPhase(phase,target){ if(fullAuditState){ fullAuditState.phase=phase; fullAuditState.target=target; } }
+    function setPhase(phase,target){
+      if(!fullAuditState) return;
+      const prev=fullAuditState.steps.find(st=>st.status==='active');
+      if(prev) prev.status='done';
+      const label=String(phase||'').replace(/&amp;/g,'&');
+      let step=fullAuditState.steps.find(st=>st.label===label);
+      if(!step){ step={label,status:'active'}; fullAuditState.steps.push(step); }
+      else step.status='active';
+      fullAuditState.phase=label; fullAuditState.target=target;
+    }
+    function markPhaseLimited(phase){
+      if(!fullAuditState) return;
+      const label=String(phase||'').replace(/&amp;/g,'&');
+      const step=fullAuditState.steps.find(st=>st.label===label);
+      if(step && step.status==='active') step.status='limited';
+    }
     async function runFullAudit(auditId){
       const a=appAudits.find(x=>x.id===auditId); if(!a||fullAuditState) return;
       const c=appClients.find(x=>x.id===a.client_id);
       let site=String((c&&c.website)||'').trim(); const hasWeb=!!site; if(hasWeb&&!/^https?:\/\//i.test(site)) site='https://'+site;
       const wait=ms=>new Promise(r=>setTimeout(r,ms));
-      fullAuditState={id:auditId,pct:2,target:hasWeb?12:26,phase:'Récupération des données Google du commerce…',startedAt:Date.now(),estTotal:hasWeb?78:42};
+      fullAuditState={id:auditId,pct:2,target:hasWeb?12:26,phase:'Préparation de l’audit…',startedAt:Date.now(),estTotal:hasWeb?78:42,steps:[{label:'Préparation et données du commerce',status:'active'}]};
       appNotice=''; renderApp(); stopFullTicker(); fullAuditTimer=setInterval(tickProgress,170);
       let siteRes=a.site||null, scan=a.scan||null, newDetails=null, issues=[];
       try{
@@ -3949,7 +3981,7 @@ body:has(#authRoot .auth-loading) .login-foot,body:has(#authRoot .auth-loading) 
     }
     function analysePanelHtml(a,c){
       if(fullAuditState&&fullAuditState.id===a.id){
-        return '<section class="app-panel analyse-panel" data-ap-root><div class="eyebrow">ANALYSE EN COURS</div><h3 style="margin:4px 0 12px">Analyse complète du commerce</h3><div class="ap-bar-wrap"><div class="ap-bar" data-ap-bar style="width:3%"></div></div><div class="ap-meta"><b data-ap-pct>3%</b><span data-ap-eta>…</span></div><p class="ap-phase" data-ap-phase>Préparation…</p></section>';
+        return '<section class="app-panel analyse-panel" data-ap-root><div class="eyebrow">AUDITIA LIVE SCAN</div><h3 style="margin:4px 0 12px">Analyse du commerce en direct</h3><div class="ap-bar-wrap"><div class="ap-bar" data-ap-bar style="width:3%"></div></div><div class="ap-meta"><b data-ap-pct>3%</b><span data-ap-eta>Initialisation…</span></div><p class="ap-phase" data-ap-phase>Préparation de l’audit…</p><div class="ap-live-steps" data-ap-steps aria-live="polite"><div class="ap-live-step is-active"><span class="ap-step-icon">↻</span><span>Préparation et données du commerce</span><span class="ap-step-status">En cours</span></div></div><p class="ap-live-summary">Les statuts suivent les vérifications lancées. Une source indisponible peut limiter certaines mesures sans annuler les autres contrôles.</p></section>';
       }
       const site=String((c&&c.website)||'').trim(); const analyzed=!!(a.scan||a.site);
       const sub=site?'Lecture du site, détection des réseaux, performance Google et diagnostic SEO &amp; GEO — en une seule fois.':'Ce commerce n’a pas de site : l’analyse se base sur les données Google. Ajoute un site pour l’analyse complète (performance, réseaux, GEO).';
