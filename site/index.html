@@ -4213,6 +4213,77 @@ input[type="search"],input[type="tel"],input[type="url"],input[type="number"],
   }
 }
 </style>
+
+<style id="auditia-layout-coherence-v117">
+/* Canonical responsive layout rules. Keep one clear header model and shared spacing across workspace pages. */
+:root{
+  --ai-space-1:4px;--ai-space-2:8px;--ai-space-3:12px;--ai-space-4:16px;
+  --ai-space-5:20px;--ai-space-6:24px;--ai-radius-card:22px;
+  --ai-border:1px solid rgba(173,157,255,.22);
+  --ai-surface:#151426;--ai-surface-raised:#1d1a32;
+}
+.workspace-app,.workspace-layout,.workspace-main{min-width:0;max-width:100%}
+.workspace-main{gap:var(--ai-space-5)}
+.workspace-main>section,.workspace-main>.app-panel,.workspace-main>.app-content{
+  min-width:0;max-width:100%;
+}
+.workspace-main .app-panel,.workspace-main .app-stat,.workspace-main .app-row,
+.workspace-main .app-grid,.workspace-main .app-form,.workspace-main .settings-preview{
+  border-radius:var(--ai-radius-card);
+}
+.workspace-main .app-panel,.workspace-main .app-stat,.workspace-main .app-row{
+  border-color:rgba(173,157,255,.22);
+}
+.workspace-main :is(input,select,textarea){
+  min-width:0;max-width:100%;font-size:16px;
+}
+.workspace-main :is(button,.app-btn){max-width:100%;overflow-wrap:anywhere}
+@media(max-width:760px){
+  /* The header is sticky in document flow: do not reserve extra space for an old fixed header. */
+  .workspace-app{padding-top:8px!important}
+  .app-topbar{
+    position:sticky!important;top:0!important;z-index:150!important;
+    display:flex!important;width:100%!important;max-width:100%!important;
+    margin:0 0 16px!important;
+    padding:calc(env(safe-area-inset-top,0px) + 10px) 12px 12px!important;
+    min-height:0!important;
+    background:#201c30!important;
+    border-bottom:1px solid rgba(255,255,255,.09)!important;
+    box-shadow:0 1px 0 rgba(255,255,255,.05)!important;
+    -webkit-backdrop-filter:none!important;backdrop-filter:none!important;
+    filter:none!important;transform:none!important;-webkit-transform:none!important;
+    will-change:auto!important;contain:none!important;isolation:isolate;
+    transition:none!important;animation:none!important;
+  }
+  .app-topbar *{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+  .workspace-main{gap:16px!important}
+  .workspace-main>.home-hero{margin:0 0 16px!important}
+  .workspace-main .app-panel,.workspace-main .app-stat,.workspace-main .app-row{
+    border-radius:20px!important;
+  }
+  .workspace-main .app-grid,.workspace-main .app-settings-grid{
+    gap:10px!important;
+  }
+  .ai-float-launcher{
+    right:12px!important;bottom:calc(18px + env(safe-area-inset-bottom))!important;
+    width:52px!important;height:52px!important;
+  }
+  .ai-float-robot{width:39px!important;height:39px!important}
+  .ai-float-panel{
+    right:8px!important;bottom:calc(80px + env(safe-area-inset-bottom))!important;
+    width:calc(100vw - 16px)!important;
+    height:min(68dvh,560px)!important;min-height:300px!important;
+  }
+}
+@media(max-width:420px){
+  .app-topbar{padding-left:10px!important;padding-right:10px!important}
+  .workspace-app{padding-left:10px!important;padding-right:10px!important}
+}
+@media(prefers-reduced-motion:reduce){
+  .ai-float-launcher:before,.ai-float-robot,.ai-float-panel{animation:none!important}
+  *,*::before,*::after{scroll-behavior:auto!important;transition:none!important}
+}
+</style>
 </head>
 <body>
   <div class="status-safe" aria-hidden="true"></div>
