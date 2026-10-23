@@ -4016,6 +4016,60 @@ input[type="search"],input[type="tel"],input[type="url"],input[type="number"],
 }
 /* Keep pinch-to-zoom available for accessibility; do not use maximum-scale=1. */
 </style>
+
+<style id="auditia-ios-header-stability">
+/* iOS Safari: use a fixed, compositor-stable top bar instead of sticky positioning. */
+@media(max-width:760px){
+  .app-topbar{
+    position:fixed!important;
+    top:0!important;
+    left:0!important;
+    right:0!important;
+    z-index:140!important;
+    display:flex!important;
+    width:100%!important;
+    max-width:100%!important;
+    margin:0!important;
+    padding:calc(var(--safe-top) + 12px) 12px 12px!important;
+    min-height:calc(var(--safe-top) + 68px)!important;
+    gap:8px!important;
+    background:#201c30!important;
+    border-bottom:1px solid #ffffff16!important;
+    box-shadow:0 3px 12px rgba(5,3,12,.24)!important;
+    transform:translateZ(0);
+    -webkit-transform:translateZ(0);
+    backface-visibility:hidden;
+    -webkit-backface-visibility:hidden;
+    will-change:transform;
+    transition:none!important;
+    animation:none!important;
+  }
+  .workspace-app{
+    padding-top:calc(var(--safe-top) + 78px)!important;
+    overflow:visible!important;
+  }
+  .login-page:has(.workspace-app){
+    overflow:visible!important;
+    transform:none!important;
+    filter:none!important;
+    perspective:none!important;
+  }
+  .workspace-app .app-topbar,
+  .app-topbar *{
+    scroll-behavior:auto;
+  }
+  html{scroll-padding-top:calc(var(--safe-top) + 82px)}
+}
+@media(max-width:420px){
+  .app-topbar{
+    padding-left:10px!important;
+    padding-right:10px!important;
+  }
+  .workspace-app{
+    padding-top:calc(var(--safe-top) + 78px)!important;
+  }
+}
+</style>
 </head>
 <body>
   <div class="status-safe" aria-hidden="true"></div>
