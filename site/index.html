@@ -4186,6 +4186,32 @@ input[type="search"],input[type="tel"],input[type="url"],input[type="number"],
   .workspace-main>.home-hero h2{font-size:clamp(27px,7.5vw,31px)!important}
 }
 </style>
+
+<style id="auditia-header-clear-v115">
+/* iPhone Safari: lower the top bar within the safe area and avoid sticky compositing blur. */
+@media(max-width:760px){
+  .app-topbar{
+    position:relative!important;
+    top:auto!important;
+    margin-top:0!important;
+    padding-top:calc(env(safe-area-inset-top, 0px) + 24px)!important;
+    padding-bottom:16px!important;
+    background-color:#201c30!important;
+    -webkit-backdrop-filter:none!important;
+    backdrop-filter:none!important;
+    filter:none!important;
+    transform:none!important;
+    -webkit-transform:none!important;
+    box-shadow:0 1px 0 #ffffff12!important;
+    isolation:isolate;
+  }
+  .app-topbar *{
+    -webkit-backdrop-filter:none!important;
+    backdrop-filter:none!important;
+    filter:none;
+  }
+}
+</style>
 </head>
 <body>
   <div class="status-safe" aria-hidden="true"></div>
