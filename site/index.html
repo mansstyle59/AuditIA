@@ -3660,6 +3660,17 @@ body,.workspace-app{background:#0e0d16!important;color:#f6f3ff!important}
 .schema-bar b.geo{background:linear-gradient(90deg,#5d46b8,#8de3bb)}
 .report-meter{display:block;height:4px;margin-top:7px;border-radius:99px;background:#2a2444;overflow:hidden}
 .report-meter i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#7a62e4,#c4b6ff)}
+.schema-bar b{transform-origin:left center;animation:schema-grow .7s ease}
+.schema-donut .meter{stroke-dasharray:226.2 226.2;stroke-dashoffset:226.2;animation:schema-donut .8s ease forwards}
+.prog-line{stroke-dasharray:100;stroke-dashoffset:100;animation:schema-line .9s ease forwards}
+@keyframes schema-grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes schema-donut{to{stroke-dashoffset:var(--donut-off)}}
+@keyframes schema-line{to{stroke-dashoffset:0}}
+@media(prefers-reduced-motion:reduce){
+  .schema-bar b,.schema-donut .meter,.prog-line{animation:none}
+  .schema-donut .meter{stroke-dashoffset:var(--donut-off)}
+  .prog-line{stroke-dashoffset:0}
+}
 </style>
 </head>
 <body>
@@ -5110,15 +5121,16 @@ body,.workspace-app{background:#0e0d16!important;color:#f6f3ff!important}
       const dots=pts.map((p,i)=>'<g><circle cx="'+x(i).toFixed(1)+'" cy="'+y(p.score).toFixed(1)+'" r="4" fill="#c4b5fd"/><text x="'+x(i).toFixed(1)+'" y="'+(y(p.score)-8).toFixed(1)+'" text-anchor="middle" fill="#f4f1ff" font-size="10" font-weight="700">'+p.score+'</text><text x="'+x(i).toFixed(1)+'" y="'+(h-6)+'" text-anchor="middle" fill="#b7b0c8" font-size="9">'+escHtml(new Date(p.t).toLocaleDateString('fr-FR',{day:'2-digit',month:'short'}))+'</text><title>'+escHtml(p.name+' · '+p.score+'/100')+'</title></g>').join('');
       const delta=pts.length>1?pts[pts.length-1].score-pts[0].score:null;
       const note=pts.length<2?'Une seule mesure enregistrée. Relance l’analyse plus tard pour comparer les scores réels.':((delta>0?'+':'')+delta+' point'+(Math.abs(delta)>1?'s':'')+' entre la première et la dernière mesure affichée.');
-      return '<section class="app-panel prog-card"><div class="prog-head"><div><div class="eyebrow">PROGRESSION</div><h3>Scores enregistrés</h3></div>'+(delta==null?'':'<b class="'+(delta>=0?'up':'down')+'">'+(delta>0?'+':'')+delta+'</b>')+'</div><svg class="prog-svg" viewBox="0 0 '+w+' '+h+'" role="img" aria-label="Évolution des scores d’audit"><line x1="'+pad+'" y1="'+(h-22)+'" x2="'+(w-pad)+'" y2="'+(h-22)+'" stroke="#ffffff22"/><path d="'+d+'" fill="none" stroke="#c4b5fd" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>'+dots+'</svg><p class="app-muted">'+escHtml(note)+'</p></section>';
+      return '<section class="app-panel prog-card"><div class="prog-head"><div><div class="eyebrow">PROGRESSION</div><h3>Scores enregistrés</h3></div>'+(delta==null?'':'<b class="'+(delta>=0?'up':'down')+'">'+(delta>0?'+':'')+delta+'</b>')+'</div><svg class="prog-svg" viewBox="0 0 '+w+' '+h+'" role="img" aria-label="Évolution des scores d’audit"><line x1="'+pad+'" y1="'+(h-22)+'" x2="'+(w-pad)+'" y2="'+(h-22)+'" stroke="#ffffff22"/><path class="prog-line" pathLength="100" d="'+d+'" fill="none" stroke="#c4b5fd" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>'+dots+'</svg><p class="app-muted">'+escHtml(note)+'</p></section>';
     }
-    function reportBoardHtml(){
+    function reportBoardHtml(source){
+      const rows=source||appAudits;
       const isDone=a=>a&&(a.site||a.scan||a.status==='Analysé'||a.status==='Terminé');
-      const done=appAudits.filter(isDone).slice().sort((a,b)=>new Date(b.updated_at||b.created_at||0)-new Date(a.updated_at||a.created_at||0));
-      const wait=Math.max(0,appAudits.length-done.length);
-      const pct=appAudits.length?Math.round(done.length/appAudits.length*100):0;
-      const circ=226.2, dash=appAudits.length?circ*done.length/appAudits.length:0;
-      const donut='<svg class="schema-donut" viewBox="0 0 100 100" role="img" aria-label="'+pct+' pour cent des dossiers sont analysés"><circle cx="50" cy="50" r="36" fill="none" stroke="#2a2444" stroke-width="10"/><circle cx="50" cy="50" r="36" fill="none" stroke="#a894ff" stroke-width="10" stroke-linecap="round" stroke-dasharray="'+dash.toFixed(1)+' '+(circ-dash).toFixed(1)+'" transform="rotate(-90 50 50)"/><text x="50" y="54" text-anchor="middle" fill="#f6f3ff" font-size="16" font-weight="700">'+pct+'%</text></svg>';
+      const done=rows.filter(isDone).slice().sort((a,b)=>new Date(b.updated_at||b.created_at||0)-new Date(a.updated_at||a.created_at||0));
+      const wait=Math.max(0,rows.length-done.length);
+      const pct=rows.length?Math.round(done.length/rows.length*100):0;
+      const circ=226.2, dash=rows.length?circ*done.length/rows.length:0;
+      const donut='<svg class="schema-donut" viewBox="0 0 100 100" role="img" aria-label="'+pct+' pour cent des dossiers sont analysés"><circle cx="50" cy="50" r="36" fill="none" stroke="#2a2444" stroke-width="10"/><circle class="meter" style="--donut-off:'+(circ-dash).toFixed(1)+'" cx="50" cy="50" r="36" fill="none" stroke="#a894ff" stroke-width="10" stroke-linecap="round" transform="rotate(-90 50 50)"/><text x="50" y="54" text-anchor="middle" fill="#f6f3ff" font-size="16" font-weight="700">'+pct+'%</text></svg>';
       const seen=new Set();
       const bars=done.filter(a=>{const id=String(a.client_id);if(seen.has(id))return false;seen.add(id);return true;}).slice(0,6).map(a=>{const c=appClients.find(x=>x.id===a.client_id);const score=Math.max(0,Math.min(100,Number(a.score)||0));return '<div class="schema-bar"><span>'+escHtml((c&&c.name)||'Commerce')+'</span><i><b style="width:'+score+'%"></b></i><em>'+score+'</em></div>';}).join('')||'<p class="app-muted">Aucun score à comparer.</p>';
       let axes='';
@@ -5137,7 +5149,7 @@ body,.workspace-app{background:#0e0d16!important;color:#f6f3ff!important}
         const sc=scanned.scan.scores, c=appClients.find(x=>x.id===scanned.client_id);
         light=[['Performance',sc.performance],['Accessibilité',sc.accessibility],['Bonnes pratiques',sc.bestPractices],['SEO technique',sc.seo]].filter(([,v])=>v!=null).map(([k,v])=>{const n=Math.max(0,Math.min(100,Number(v)||0));return '<div class="schema-bar"><span>'+k+'</span><i><b style="width:'+n+'%"></b></i><em>'+n+'</em></div>';}).join('')+'<p class="app-muted">Google Lighthouse · '+escHtml((c&&c.name)||'Commerce')+'</p>';
       }
-      return '<div class="schema-grid">'+progressChartHtml(appAudits)+'<section class="app-panel schema-card"><div class="eyebrow">RÉPARTITION</div><h3>Dossiers analysés</h3><div class="schema-split">'+donut+'<div class="schema-legend"><p><b>'+done.length+'</b><span>analysés</span></p><p><b>'+wait+'</b><span>en attente</span></p></div></div></section><section class="app-panel schema-card"><div class="eyebrow">COMPARAISON</div><h3>Dernier score par commerce</h3>'+bars+'</section>'+(axes?'<section class="app-panel schema-card"><div class="eyebrow">AXES</div><h3>SEO et GEO</h3>'+axes+'</section>':'')+(light?'<section class="app-panel schema-card"><div class="eyebrow">PERFORMANCE</div><h3>Site mesuré</h3>'+light+'</section>':'')+'</div>';
+      return '<div class="schema-grid">'+progressChartHtml(rows)+'<section class="app-panel schema-card"><div class="eyebrow">RÉPARTITION</div><h3>Dossiers analysés</h3><div class="schema-split">'+donut+'<div class="schema-legend"><p><b>'+done.length+'</b><span>analysés</span></p><p><b>'+wait+'</b><span>en attente</span></p></div></div></section><section class="app-panel schema-card"><div class="eyebrow">COMPARAISON</div><h3>Dernier score par commerce</h3>'+bars+'</section>'+(axes?'<section class="app-panel schema-card"><div class="eyebrow">AXES</div><h3>SEO et GEO</h3>'+axes+'</section>':'')+(light?'<section class="app-panel schema-card"><div class="eyebrow">PERFORMANCE</div><h3>Site mesuré</h3>'+light+'</section>':'')+'</div>';
     }
     function auditRowHtml(a){
       const c=appClients.find(x=>x.id===a.client_id);
@@ -5187,9 +5199,11 @@ body,.workspace-app{background:#0e0d16!important;color:#f6f3ff!important}
         const auditList=(function(){const q=auditFilter.trim().toLowerCase();const rows=appAudits.filter(a=>{if(!q)return true;const c=appClients.find(x=>x.id===a.client_id);const d=c&&c.details||{};return norm([(c?.name||''),(c?.city||''),(c?.category||''),(d.category||''),(a.title||''),(a.status||''),String(a.score||'')].join(' ')).includes(norm(q));});return rows.length?'<div class="audit-list">'+rows.map(auditRowHtml).join('')+'</div>':'<div class="app-empty">'+(appAudits.length?'Aucun audit ne correspond à « '+escHtml(auditFilter)+' ».':'Aucun audit pour le moment. Crée le premier dossier ci-dessus.')+'</div>';})();
         body='<div class="audits-page"><div class="app-content-title"><div><h2>Audits</h2><p>Chaque dossier part d’un commerce. Le score n’apparaît qu’après une analyse réelle.</p></div></div><div class="audit-kpis"><article><b>'+appAudits.length+'</b><span>Dossiers</span></article><article><b>'+ready+'</b><span>Analysés</span></article><article><b>'+waiting+'</b><span>À lancer</span></article></div><details class="add-toggle"'+(appAudits.length?'':' open')+'><summary>＋ Nouvel audit</summary><section class="app-panel">'+createForm+'</section></details><section class="app-panel"><h2>Dossiers</h2>'+(appAudits.length?'<input class="app-filter" data-audit-filter placeholder="Rechercher un commerce, une ville, un statut…" value="'+escHtml(auditFilter)+'">':'')+auditList+'</section></div>';
       } else if(appView==='Rapports'){
-        const readyReports=appAudits.filter(a=>a.site||a.scan||a.status==='Analysé'||a.status==='Terminé').length;
-        const reportList=(function(){const q=norm(auditFilter);const rows=appAudits.filter(a=>{if(!q)return true;const c=appClients.find(x=>x.id===a.client_id);const d=c&&c.details||{};return norm([(c&&c.name)||'',(c&&c.city)||'',(c&&c.category)||'',(d.category||''),(a.title||''),(a.status||''),String(a.score||'')].join(' ')).includes(q);});return rows.length?'<div class="report-list">'+rows.map(reportCardHtml).join('')+'</div>':'<div class="app-empty">'+(appAudits.length?'Aucun rapport pour « '+escHtml(auditFilter)+' ».':'Les rapports apparaissent ici après un audit.')+'</div>';})();
-        body='<div class="reports-page"><div class="app-content-title"><div><h2>Rapports</h2><p>Les schémas reprennent uniquement les audits déjà analysés. Rien n’est estimé.</p></div></div><div class="audit-kpis"><article><b>'+appAudits.length+'</b><span>Dossiers</span></article><article><b>'+readyReports+'</b><span>Prêts à exporter</span></article><article><b>'+Math.max(0,appAudits.length-readyReports)+'</b><span>Sans analyse</span></article></div>'+reportBoardHtml()+'<section class="app-panel"><h2>Exporter</h2>'+(appAudits.length?'<input class="app-filter" data-audit-filter placeholder="Rechercher un commerce, une ville…" value="'+escHtml(auditFilter)+'">':'')+reportList+'</section></div>';
+        const q=norm(auditFilter);
+        const reportRows=appAudits.filter(a=>{if(!q)return true;const c=appClients.find(x=>x.id===a.client_id);const d=c&&c.details||{};return norm([(c&&c.name)||'',(c&&c.city)||'',(c&&c.category)||'',(d.category||''),(a.title||''),(a.status||''),String(a.score||'')].join(' ')).includes(q);});
+        const readyReports=reportRows.filter(a=>a.site||a.scan||a.status==='Analysé'||a.status==='Terminé').length;
+        const reportList=reportRows.length?'<div class="report-list">'+reportRows.map(reportCardHtml).join('')+'</div>':'<div class="app-empty">'+(appAudits.length?'Aucun rapport pour « '+escHtml(auditFilter)+' ».':'Les rapports apparaissent ici après un audit.')+'</div>';
+        body='<div class="reports-page"><div class="app-content-title"><div><h2>Rapports</h2><p>Les schémas suivent la recherche et n’utilisent que les audits déjà analysés.</p></div></div><div class="audit-kpis"><article><b>'+reportRows.length+'</b><span>Dossiers</span></article><article><b>'+readyReports+'</b><span>Prêts à exporter</span></article><article><b>'+Math.max(0,reportRows.length-readyReports)+'</b><span>Sans analyse</span></article></div>'+(appAudits.length?'<input class="app-filter" data-audit-filter placeholder="Filtrer les graphiques par commerce, ville…" value="'+escHtml(auditFilter)+'">':'')+reportBoardHtml(reportRows)+'<section class="app-panel"><h2>Exporter</h2>'+reportList+'</section></div>';
       } else if(appView==='Profil') {
          const meta=appUser?.user_metadata||{};
          const displayName=String(meta.display_name||meta.full_name||'');
