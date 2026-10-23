@@ -4070,7 +4070,47 @@ input[type="search"],input[type="tel"],input[type="url"],input[type="number"],
   }
 }
 </style>
-</head>
+<style id="auditia-premium-floating-chat">
+.ai-float-launcher{position:fixed;right:18px;bottom:calc(20px + env(safe-area-inset-bottom));z-index:180;display:grid;place-items:center;width:64px;height:64px;border:1px solid #c2b1ff99;border-radius:50%;padding:0;background:radial-gradient(circle at 32% 22%,#b9a8ff,#7847ff 48%,#3a2ac2);box-shadow:0 10px 30px #603eff6b,inset 0 1px 0 #ffffffa6;cursor:pointer;isolation:isolate;transition:transform .22s ease,box-shadow .22s ease}
+.ai-float-launcher:hover{transform:translateY(-3px) scale(1.03)}
+.ai-float-launcher:before{content:"";position:absolute;inset:-5px;border:1px solid #a489ff52;border-radius:50%;animation:aiFloatPulse 2.8s ease-out infinite;pointer-events:none}
+.ai-float-launcher:after{content:"";position:absolute;right:1px;top:2px;width:10px;height:10px;border-radius:50%;background:#5cf0bd;border:2px solid #17142c}
+.ai-float-robot{width:48px;height:48px;animation:aiRobotBob 3s ease-in-out infinite;filter:drop-shadow(0 3px 4px #24165d55)}
+.ai-float-panel{position:fixed;right:18px;bottom:calc(98px + env(safe-area-inset-bottom));z-index:179;width:min(390px,calc(100vw - 28px));height:min(590px,calc(100dvh - 145px));min-height:340px;display:flex;flex-direction:column;overflow:hidden;border:1px solid #9d89ff70;border-radius:25px;background:radial-gradient(ellipse at 90% 0%,#5e3aca40,transparent 45%),#0e1020;box-shadow:0 24px 80px #0009;transform-origin:bottom right;animation:aiPanelIn .18s ease-out}
+.ai-float-panel[hidden]{display:none!important}
+.ai-float-head{display:flex;align-items:center;gap:11px;padding:15px;border-bottom:1px solid #ffffff12;background:#15152a}
+.ai-float-avatar{display:grid;place-items:center;flex:0 0 42px;width:42px;height:42px;border-radius:15px;background:linear-gradient(145deg,#aa8cff,#6034ec)}
+.ai-float-avatar svg{width:34px;height:34px}
+.ai-float-head-copy{min-width:0;flex:1}
+.ai-float-head-copy b{display:block;color:#fbfaff;font-size:14px;font-weight:850}
+.ai-float-head-copy small{display:flex;align-items:center;gap:6px;margin-top:3px;color:#a9a6c9;font-size:11px}
+.ai-float-head-copy small:before{content:"";width:6px;height:6px;border-radius:50%;background:#53e5b3}
+.ai-float-close{display:grid;place-items:center;width:36px;height:36px;border:1px solid #ffffff19;border-radius:12px;background:#ffffff08;color:#dcd7f7;font-size:22px;cursor:pointer}
+.ai-float-body{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;padding:16px 13px 10px;scrollbar-width:thin}
+.ai-float-welcome{padding:2px 2px 14px;color:#e5e2f7;font-size:13px;line-height:1.55}
+.ai-float-welcome strong{display:block;margin-bottom:5px;font-size:17px;color:#fff}
+.ai-float-suggestions{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:13px}
+.ai-float-suggestion{border:1px solid #8271d84d;border-radius:999px;background:#1b1932;color:#dcd6ff;padding:9px 11px;font-size:11px;line-height:1.25;text-align:left;cursor:pointer}
+.ai-float-suggestion:hover{background:#2a2250;border-color:#a18cff}
+.ai-float-messages{display:flex;flex-direction:column;gap:10px}
+.ai-float-msg{max-width:94%;padding:11px 12px;border:1px solid #ffffff10;border-radius:15px;background:#191a2c;color:#dedcf0;font-size:12px;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere}
+.ai-float-msg.user{align-self:flex-end;background:linear-gradient(135deg,#4b2fa0,#263b8c);color:#fff;border-bottom-right-radius:5px}
+.ai-float-msg.assistant{align-self:flex-start;border-bottom-left-radius:5px}
+.ai-float-msg small{display:block;margin-bottom:4px;color:#a99bff;font-size:10px;font-weight:800}
+.ai-float-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.ai-float-actions button{border:1px solid #8572d84d;border-radius:999px;background:#211d3a;color:#dcd4ff;padding:7px 9px;font-size:10px;cursor:pointer}
+.ai-float-compose-wrap{padding:10px;border-top:1px solid #ffffff12;background:#111222}
+.ai-float-compose{display:flex;align-items:flex-end;gap:7px;padding:6px;border:1px solid #514778;border-radius:17px;background:#17172b}
+.ai-float-compose textarea{display:block;flex:1;width:100%;min-width:0;max-height:100px;min-height:42px;resize:none;border:0!important;outline:0!important;box-shadow:none!important;background:transparent!important;color:#fff!important;padding:10px 9px!important;font-size:16px!important;line-height:1.4}
+.ai-float-compose textarea::placeholder{color:#9e9bbd}
+.ai-float-send{display:grid;place-items:center;flex:0 0 42px;width:42px;height:42px;border:0;border-radius:13px;background:linear-gradient(145deg,#a68aff,#6e3cff);color:#fff;font-size:20px;cursor:pointer}
+.ai-float-foot{padding:0 12px 10px;background:#111222;color:#777795;font-size:9px;text-align:center}
+@keyframes aiRobotBob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-4px) rotate(2deg)}}
+@keyframes aiFloatPulse{0%{transform:scale(.92);opacity:.7}75%,100%{transform:scale(1.2);opacity:0}}
+@keyframes aiPanelIn{from{opacity:0;transform:translateY(8px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+@media(max-width:760px){.ai-float-launcher{right:14px;bottom:calc(82px + env(safe-area-inset-bottom));width:58px;height:58px}.ai-float-robot{width:43px;height:43px}.ai-float-panel{right:8px;bottom:calc(151px + env(safe-area-inset-bottom));width:calc(100vw - 16px);height:min(64dvh,560px);min-height:320px;border-radius:22px}.ai-float-head{padding:12px}.ai-float-body{padding:13px 11px 8px}.ai-float-compose-wrap{padding:8px}}
+@media(prefers-reduced-motion:reduce){.ai-float-launcher:before,.ai-float-robot,.ai-float-panel{animation:none!important}}
+</style></head>
 <body>
   <div class="status-safe" aria-hidden="true"></div>
   <header class="wrap top">
@@ -4307,6 +4347,40 @@ input[type="search"],input[type="tel"],input[type="url"],input[type="number"],
       const headLead = appView==='Assistant'?'Conseils et actions à partir des données réellement disponibles.':appView==='Clients'?(appClients.length?appClients.length+' commerce'+(appClients.length>1?'s':'')+' suivi'+(appClients.length>1?'s':'')+'.':'Ajoute un commerce pour commencer.'):appView==='Audits'?'Un dossier par commerce. Le score n’apparaît qu’après une analyse.':appView==='Rapports'?'Schémas et PDF, uniquement à partir des audits analysés.':appView==='Studio'?'Contenus et argumentaire à partir des dossiers.':appView==='Paramètres'?'Identité, signature et connexions des rapports.':appView==='Profil'?'Ton nom et ton accès. L’e-mail ne se change pas ici.':appView==='ClientDétail'?(function(){const c=appClients.find(x=>x.id===activeClient);return c?[c.name,c.city].filter(Boolean).join(' · '):'Fiche d’un commerce.';})():appView==='Détail'?(function(){const a=appAudits.find(x=>x.id===activeAudit);const c=a&&appClients.find(x=>x.id===a.client_id);return c?[c.name,c.city].filter(Boolean).join(' · '):'Le score n’apparaît qu’après l’analyse.';})():'';
       const showEyebrow = sectionLabel.trim().toLowerCase()!==headTitle.trim().toLowerCase();
       page.innerHTML = '<div class="workspace-app">'+(pdfBusy?'<div class="pdf-overlay"><div class="pdf-spin"></div><b>Génération du PDF…</b><span>Quelques secondes… l’écran « rapport prêt » s’affichera ensuite.</span><button type="button" class="pdf-cancel" data-pdf-cancel>Annuler</button></div>':'')+'<header class="app-topbar"><button class="burger-btn topbar-menu-btn" type="button" data-toggle-menu aria-label="Ouvrir le menu" aria-controls="workspaceSidebar" aria-expanded="false">'+navIcon('menu')+'</button><div class="tb-actions"><button class="app-btn topbar-profile-btn'+(appView==='Profil'?' is-active':'')+'" type="button" data-app-view="Profil" aria-label="Ouvrir le profil">'+navIcon('profile')+'<span>Profil</span></button><button class="app-btn topbar-logout-btn" type="button" data-app-action="logout" aria-label="Déconnecter" title="Déconnecter">'+navIcon('logout')+'<span>Déconnecter</span></button></div></header><div class="sidebar-backdrop" data-close-menu></div><aside class="workspace-sidebar" id="workspaceSidebar"><div class="sidebar-brand"><img src="'+escHtml(currentLogo())+'" alt="" onerror="this.style.display=&#39;none&#39;"><div><b>'+escHtml(appSettings?.app_name||'AuditIA')+'</b><small>BY AFFIADS</small></div></div><nav class="sidebar-nav" aria-label="Navigation principale">'+navItems.map(([v,ico,target])=>'<button type="button" class="'+(navActive===(target||v)?'active':'')+'" data-app-view="'+(target||v)+'"><span class="nav-icon">'+navIcon(ico)+'</span><span>'+v+'</span>'+(v==='Clients'?'<span class="nav-count">'+appClients.length+'</span>':v==='Audits'?'<span class="nav-count">'+appAudits.length+'</span>':'')+'</button>').join('')+'</nav><div class="sidebar-bottom">Auditer mieux.<br>Décider plus clairement.</div></aside><div class="workspace-layout"><main class="workspace-main"><div class="workspace-head"><div>'+(showEyebrow?'<div class="eyebrow">'+escHtml(sectionLabel)+'</div>':'')+(appView==='Accueil'?'<p class="page-title">'+escHtml(headTitle)+'</p>':'<h1>'+escHtml(headTitle)+'</h1>')+'<p>'+escHtml(headLead)+'</p></div><div class="workspace-actions desktop-account-actions"><button class="app-btn'+(appView==='Profil'?' is-active':'')+'" type="button" data-app-view="Profil">'+navIcon('profile')+'<span>Profil</span></button><button class="app-btn" type="button" data-app-action="logout">'+navIcon('logout')+'<span>Déconnecter</span></button></div></div><nav class="desktop-nav" aria-label="Navigation principale">'+navItems.map(([v,ico,target])=>'<button type="button" class="'+(navActive===(target||v)?'active':'')+'" data-app-view="'+(target||v)+'">'+navIcon(ico)+'<span>'+v+'</span></button>').join('')+'</nav>'+keyAlertHtml()+appNoticeHtml()+body+'<p class="app-muted workspace-footnote">AuditIA · Espace privé</p></main></div><nav class="mobile-tabbar" aria-label="Navigation principale">'+navItems.map(([v,ico,target])=>'<button type="button" class="'+(navActive===(target||v)?'active':'')+'" data-app-view="'+(target||v)+'" aria-label="'+v+'" '+(navActive===(target||v)?'aria-current="page"':'')+'><span class="tab-icon">'+navIcon(ico)+'</span><span>'+v+'</span></button>').join('')+'</nav></div>';
+
+      page.insertAdjacentHTML('beforeend', `
+        <button type="button" class="ai-float-launcher" data-ai-float-toggle aria-label="Ouvrir Audit Chat IA" aria-expanded="false" aria-controls="auditChatFloatPanel" title="Parler à Audit Chat IA">
+          <svg class="ai-float-robot" viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="afr-metal" x1="15" y1="10" x2="85" y2="92"><stop stop-color="#fff"/><stop offset=".5" stop-color="#c7d5ff"/><stop offset="1" stop-color="#7186f8"/></linearGradient><linearGradient id="afr-face" x1="20" y1="25" x2="80" y2="75"><stop stop-color="#18204e"/><stop offset="1" stop-color="#05091d"/></linearGradient></defs><path d="M50 6v10" stroke="#e8edff" stroke-width="4" stroke-linecap="round"/><circle cx="50" cy="5" r="4" fill="#dfe8ff"/><rect x="15" y="18" width="70" height="58" rx="22" fill="url(#afr-metal)" stroke="#fff" stroke-width="2"/><rect x="21" y="25" width="58" height="43" rx="16" fill="url(#afr-face)" stroke="#627aff" stroke-width="1.5"/><path d="M31 43q5-9 10 0M59 43q5-9 10 0" fill="none" stroke="#5ed0ff" stroke-width="4" stroke-linecap="round"/><path d="M39 55q11 9 22 0" fill="none" stroke="#a2aaff" stroke-width="2.5" stroke-linecap="round"/><path d="M30 76h40l6 12H24Z" fill="url(#afr-metal)"/><circle cx="34" cy="83" r="2.5" fill="#5ed0ff"/><circle cx="66" cy="83" r="2.5" fill="#5ed0ff"/></svg>
+        </button>
+        <section class="ai-float-panel" id="auditChatFloatPanel" data-ai-float-panel role="dialog" aria-label="Audit Chat IA" aria-modal="false" hidden>
+          <header class="ai-float-head"><div class="ai-float-avatar"><svg viewBox="0 0 100 100" aria-hidden="true"><rect x="15" y="17" width="70" height="60" rx="23" fill="#d5e0ff"/><rect x="22" y="25" width="56" height="42" rx="15" fill="#0b1231"/><path d="M32 43q5-9 10 0M58 43q5-9 10 0" stroke="#5ed0ff" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M39 55q11 8 22 0" stroke="#b6baff" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></div><div class="ai-float-head-copy"><b>Audit Chat IA</b><small>À votre écoute · données de vos dossiers</small></div><button type="button" class="ai-float-close" data-ai-float-close aria-label="Fermer le chat">×</button></header>
+          <div class="ai-float-body" data-ai-float-body><div class="ai-float-welcome"><strong>Bonjour 👋</strong>Je peux vous aider à comprendre vos audits, choisir la prochaine action et préparer un rapport à partir des informations déjà présentes dans AuditIA.</div><div class="ai-float-suggestions"><button type="button" class="ai-float-suggestion" data-ai-float-prompt="Quels audits traiter en priorité ?">Quoi traiter en priorité ?</button><button type="button" class="ai-float-suggestion" data-ai-float-prompt="Comment préparer un rapport client ?">Préparer un rapport</button><button type="button" class="ai-float-suggestion" data-ai-float-prompt="Quels sont mes derniers résultats ?">Mes derniers résultats</button></div><div class="ai-float-messages" data-ai-float-messages aria-live="polite"></div></div>
+          <div class="ai-float-compose-wrap"><form class="ai-float-compose" data-ai-float-form><textarea data-ai-float-input rows="1" maxlength="1200" aria-label="Votre message" placeholder="Écrivez votre question…"></textarea><button class="ai-float-send" type="submit" aria-label="Envoyer le message">➤</button></form></div><div class="ai-float-foot">Réponses basées sur les données disponibles · à vérifier si nécessaire</div>
+        </section>`);
+      {
+        const launcher=page.querySelector('[data-ai-float-toggle]');
+        const panel=page.querySelector('[data-ai-float-panel]');
+        const close=page.querySelector('[data-ai-float-close]');
+        const form=page.querySelector('[data-ai-float-form]');
+        const input=page.querySelector('[data-ai-float-input]');
+        const messages=page.querySelector('[data-ai-float-messages]');
+        const msgBody=page.querySelector('[data-ai-float-body]');
+        const setOpen=(open)=>{if(!launcher||!panel)return;panel.hidden=!open;launcher.setAttribute('aria-expanded',String(open));launcher.setAttribute('aria-label',open?'Fermer Audit Chat IA':'Ouvrir Audit Chat IA');if(open&&input)input.focus({preventScroll:true});};
+        if(launcher)launcher.addEventListener('click',()=>setOpen(panel?.hidden));
+        if(close)close.addEventListener('click',()=>{setOpen(false);launcher?.focus({preventScroll:true});});
+        page.querySelectorAll('[data-ai-float-prompt]').forEach(b=>b.addEventListener('click',()=>{if(input){input.value=b.dataset.aiFloatPrompt||'';input.focus({preventScroll:true});}}));
+        if(form)form.addEventListener('submit',e=>{
+          e.preventDefault();const raw=(input?.value||'').trim();if(!raw||!messages)return;
+          const q=raw.slice(0,1200);const user=document.createElement('div');user.className='ai-float-msg user';user.textContent=q;messages.appendChild(user);
+          if(input){input.value='';input.style.height='42px';}
+          const reply=buildAuditIAAssistantReply(q);const bot=document.createElement('div');bot.className='ai-float-msg assistant';const label=document.createElement('small');label.textContent='Audit Chat IA';bot.appendChild(label);bot.appendChild(document.createTextNode(reply.text));messages.appendChild(bot);
+          if(reply.actions&&reply.actions.length){const actions=document.createElement('div');actions.className='ai-float-actions';reply.actions.forEach(a=>{const btn=document.createElement('button');btn.type='button';btn.textContent=a.label;btn.addEventListener('click',()=>{appView=a.view;activeAudit=null;activeClient=null;appNotice='';renderApp();window.scrollTo(0,0);});actions.appendChild(btn)});bot.appendChild(actions);}
+          if(msgBody)msgBody.scrollTop=msgBody.scrollHeight;
+        });
+        if(input)input.addEventListener('input',()=>{input.style.height='42px';input.style.height=Math.min(input.scrollHeight,100)+'px';});
+        if(!window.__auditChatEscapeBound){window.__auditChatEscapeBound=true;document.addEventListener('keydown',e=>{if(e.key==='Escape'){const p=document.querySelector('[data-ai-float-panel]');if(p&&!p.hidden){p.hidden=true;document.querySelector('[data-ai-float-toggle]')?.setAttribute('aria-expanded','false');}}});}
+      }
+
       clearTimeout(noticeTimer);
       { const main=page.querySelector('.workspace-main'); if(main&&appView!==lastPaintedView){ main.classList.add('is-entering'); lastPaintedView=appView; } }
       if(appNotice && !/^Erreur/.test(appNotice)){ noticeTimer=setTimeout(()=>{ appNotice=''; renderApp(); },4500); }
@@ -5694,7 +5768,7 @@ input[type="search"],input[type="tel"],input[type="url"],input[type="number"],
     async function openWorkspace(client,user){
       appClient=client;appUser=user;
       if(!user||String(user.email||'').toLowerCase()!==ADMIN_EMAIL){await client.auth.signOut();throw new Error('Ce compte n’est pas autorisé à accéder à AuditIA.')}
-      await refreshData();appView='Assistant';activeAudit=null;appNotice='';renderApp();
+      await refreshData();appView='Accueil';activeAudit=null;appNotice='';renderApp();
       void checkKeysHealth();
     }
     /* ----- écrans de connexion (rendus dans #authRoot) ----- */
