@@ -4375,6 +4375,43 @@ input[type="search"],input[type="tel"],input[type="url"],input[type="number"],
   .home-v118 *{transition:none!important;animation:none!important}
 }
 </style>
+
+<style id="auditia-spacing-cleanup-v119">
+/* One coherent vertical rhythm across the signed-in app. */
+body:has(.workspace-app)>.foot,
+body:has(.workspace-app)>footer.foot{display:none!important}
+body:has(.workspace-app) main.wrap:has(.workspace-app){min-height:0!important;height:auto!important}
+body:has(.workspace-app) .login-page:has(.workspace-app){min-height:0!important;height:auto!important}
+.workspace-app{min-height:0!important}
+.workspace-main{min-height:0!important;padding-bottom:24px!important;gap:16px!important}
+.workspace-main>.workspace-head{margin:0 0 8px!important}
+.workspace-main>.desktop-nav{margin:0 0 10px!important}
+.workspace-main>.workspace-footnote{margin:12px 0 0!important;padding:12px 0 0!important;border-top:1px solid rgba(255,255,255,.07);font-size:11px;line-height:1.5}
+.home-v118{gap:20px!important}
+.home-v118-hero{margin:0!important}
+.home-v118-footer{display:none!important}
+.home-v118-section,.home-v118-lower-grid{margin:0!important}
+.home-v118-recent-section{margin-bottom:0!important}
+@media(max-width:760px){
+  .workspace-app{padding-top:0!important;padding-bottom:calc(24px + env(safe-area-inset-bottom))!important}
+  .app-topbar{margin-bottom:12px!important}
+  .workspace-main{padding-bottom:18px!important;gap:14px!important}
+  .workspace-main>.workspace-head{margin:0 0 6px!important}
+  .home-v118{gap:17px!important}
+  .home-v118-section{gap:10px!important}
+  .home-v118-section-heading{align-items:flex-start!important}
+  .home-v118-section-heading p{margin-top:5px!important}
+  .home-v118-lower-grid{gap:12px!important}
+  .home-v118-panel{padding:16px!important}
+  .home-v118-recent{margin:0!important}
+  .workspace-main>.workspace-footnote{margin-top:8px!important;padding-top:10px!important}
+}
+@media(max-width:390px){
+  .home-v118{gap:15px!important}
+  .home-v118-section-heading h2{font-size:21px!important}
+  .home-v118-action-card{gap:10px!important}
+}
+</style>
 </head>
 <body>
   <div class="status-safe" aria-hidden="true"></div>
