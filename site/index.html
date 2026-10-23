@@ -4416,7 +4416,7 @@ input[type="search"],input[type="tel"],input[type="url"],input[type="number"],
     }
     function appShell(body) {
       const page = document.querySelector('.login-page');
-      const navItems=[['Assistant','assistant'],['Accueil','home'],['Clients','clients'],['Audits','audits'],['Rapports','reports'],['Studio','sparkles'],['Réglages','settings','Paramètres']];
+      const navItems=[['Accueil','home'],['Clients','clients'],['Audits','audits'],['Rapports','reports'],['Studio','sparkles'],['Réglages','settings','Paramètres']];
       const sectionLabel = appView==='ClientDétail'?'Clients':appView==='Détail'?'Audits':appView==='Paramètres'?'Réglages':appView==='Profil'?'Profil':appView==='Assistant'?'Assistant':appView;
       const navActive = appView==='ClientDétail'?'Clients':appView==='Détail'?'Audits':appView;
       const headTitle = appView==='Accueil'?'Accueil':appView==='Assistant'?'Audit Chat IA':appView==='Paramètres'?'Réglages':appView==='Profil'?'Mon profil':appView==='ClientDétail'?'Fiche client':appView==='Détail'?'Dossier d’audit':appView;
@@ -4441,10 +4441,10 @@ input[type="search"],input[type="tel"],input[type="url"],input[type="number"],
         const input=page.querySelector('[data-ai-float-input]');
         const messages=page.querySelector('[data-ai-float-messages]');
         const msgBody=page.querySelector('[data-ai-float-body]');
-        const setOpen=(open)=>{if(!launcher||!panel)return;panel.hidden=!open;launcher.setAttribute('aria-expanded',String(open));launcher.setAttribute('aria-label',open?'Fermer Audit Chat IA':'Ouvrir Audit Chat IA');if(open&&input)input.focus({preventScroll:true});};
+        const setOpen=(open)=>{if(!launcher||!panel)return;panel.hidden=!open;launcher.setAttribute('aria-expanded',String(open));launcher.setAttribute('aria-label',open?'Fermer Audit Chat IA':'Ouvrir Audit Chat IA');/* Keep the keyboard closed when the launcher opens the chat. Focus only after an explicit tap in the composer. */};
         if(launcher)launcher.addEventListener('click',()=>setOpen(panel?.hidden));
         if(close)close.addEventListener('click',()=>{setOpen(false);launcher?.focus({preventScroll:true});});
-        page.querySelectorAll('[data-ai-float-prompt]').forEach(b=>b.addEventListener('click',()=>{if(input){input.value=b.dataset.aiFloatPrompt||'';input.focus({preventScroll:true});}}));
+        page.querySelectorAll('[data-ai-float-prompt]').forEach(b=>b.addEventListener('click',()=>{if(input){input.value=b.dataset.aiFloatPrompt||'';}}));
         if(form)form.addEventListener('submit',e=>{
           e.preventDefault();const raw=(input?.value||'').trim();if(!raw||!messages)return;
           const q=raw.slice(0,1200);const user=document.createElement('div');user.className='ai-float-msg user';user.textContent=q;messages.appendChild(user);
@@ -5774,18 +5774,7 @@ input[type="search"],input[type="tel"],input[type="url"],input[type="number"],
     function renderApp(){
       const completed=appAudits.filter(a=>a.status==='Terminé'||a.status==='Analysé').length;
       let body='';
-      if(appView==='Assistant'){
-        const known=appClients.length;
-        const analysed=appAudits.filter(a=>a.site||a.scan||a.status==='Analysé'||a.status==='Terminé');
-        const pending=appAudits.filter(a=>!analysed.includes(a));
-        const suggestions=[
-          'Analyser un commerce',
-          'Préparer un rapport',
-          'Optimiser un commerce',
-          'Mes derniers résultats'
-        ];
-        body='<section class="ai-chat-page"><div class="ai-chat-shell" data-ai-chat><header class="ai-chat-header"><div class="ai-chat-brand"><span class="ai-chat-orb" aria-hidden="true">✳</span><div><b>Audit Chat IA</b><small>Votre assistant audit & visibilité locale</small></div></div><span class="ai-chat-status">Données locales disponibles</span></header><div class="ai-chat-intro"><div class="ai-chat-mascot" aria-hidden="true">✦</div><h2>Je suis <span>Audit Chat IA</span> 👋</h2><p>Je vous aide à comprendre vos audits, choisir la prochaine action et préparer vos livrables. Je distingue toujours les données vérifiées des pistes à confirmer.</p></div><div class="ai-chat-suggest-label">POUR COMMENCER</div><div class="ai-chat-suggestions">'+suggestions.map((x,i)=>'<button class="ai-chat-suggestion" type="button" data-ai-prompt="'+escHtml(x)+'">'+['↗','＋','▤','↗'][i]+' &nbsp; '+escHtml(x)+'</button>').join('')+'</div><div class="ai-chat-history" id="aiChatHistory" aria-live="polite"><div class="ai-chat-msg assistant"><small>Assistant</small>Je peux déjà analyser la liste de vos dossiers enregistrés, expliquer le fonctionnement d’AuditIA et vous guider vers les bonnes actions. Pour des métriques SEO ou des performances, je m’appuie sur les résultats présents dans les dossiers — je n’invente pas de mesures.</div></div><div class="ai-chat-result"><b>Votre espace en un coup d’œil</b><ul class="ai-chat-bullets"><li><strong>'+known+'</strong>Commerces<br>dans la base</li><li><strong>'+appAudits.length+'</strong>Audits<br>enregistrés</li><li><strong>'+pending.length+'</strong>En cours<br>ou à compléter</li><li><strong>'+analysed.length+'</strong>Rapports<br>avec résultats</li></ul><p>Ces nombres proviennent des données déjà chargées dans cette session.</p></div><div class="ai-chat-disclaimer"><strong>Bon à savoir</strong><br>Je m’appuie uniquement sur les données présentes dans vos dossiers. Je n’invente pas d’informations et je vous indique ce qui doit être confirmé.</div><form class="ai-chat-composer-wrap" id="aiChatForm"><div class="ai-chat-composer"><textarea id="aiChatInput" rows="1" maxlength="1200" aria-label="Écrire à l’assistant" placeholder="Posez votre question à Audit Chat IA…"></textarea><button class="ai-chat-send" type="submit">Envoyer ↑</button></div></form></div></section>';
-      } else if(appView==='Accueil'){
+      if(appView==='Accueil'){
         const latest=appAudits.slice(0,4);
         const completedPct=appAudits.length?Math.round(completed/appAudits.length*100):0;
         const scoredAudits=appAudits.filter(a=>a.site||a.scan||a.status==='Analysé'||a.status==='Terminé');
