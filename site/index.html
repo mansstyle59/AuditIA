@@ -627,6 +627,8 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
     .nearby-card-main{min-width:0;flex:1}
     .nearby-card-main b{display:block;font-size:13px;line-height:1.35;overflow-wrap:anywhere}
     .nearby-card-main small{display:block;color:var(--muted);font-size:11px;line-height:1.4;margin-top:4px;overflow-wrap:anywhere}
+    .nearby-priority{display:inline-flex;align-items:center;gap:5px;margin-top:7px;padding:4px 7px;border:1px solid #a68aff55;border-radius:7px;background:#a68aff12;color:#d7caff;font-size:10px;font-weight:800}
+    .nearby-evidence{display:block!important;color:#c9c2df!important;font-size:10px!important;margin-top:5px!important}
     .nearby-audit-btn{flex:0 0 auto;padding:9px 11px!important;font-size:12px!important}
     @media(max-width:640px){.nearby-banner{padding:17px;margin:16px 0 22px}.nearby-banner-head{display:block}.nearby-load{width:100%;margin-top:13px}.nearby-list{grid-template-columns:1fr}.nearby-card{align-items:flex-start}.nearby-audit-btn{align-self:center;padding:9px!important}}
 
@@ -3176,9 +3178,20 @@ body:has(#authRoot .auth-loading) .login-status:before{content:"";width:7px;heig
     let nearbyBusinesses=[];
     let nearbyStatus='';
     let nearbyBusy=false;
+    function nearbyOpportunity(p){
+      const reasons=[]; let score=0;
+      if(!p.website){score+=35;reasons.push('aucun site web trouvé dans Google Places');}
+      if(!Array.isArray(p.hours)||!p.hours.length){score+=15;reasons.push('horaires non renseignés dans la fiche');}
+      if(p.rating==null){score+=15;reasons.push('note Google indisponible');}
+      else if(p.rating<4){score+=20;reasons.push('note Google sous 4/5');}
+      if(Number(p.reviews||0)<10){score+=15;reasons.push('moins de 10 avis Google');}
+      else if(Number(p.reviews||0)<30){score+=8;reasons.push('moins de 30 avis Google');}
+      if(p.status==='CLOSED_PERMANENTLY'){score=0;reasons.splice(0,reasons.length,'établissement signalé fermé définitivement');}
+      return {score:Math.min(100,score),reasons:reasons.slice(0,3),closed:p.status==='CLOSED_PERMANENTLY'};
+    }
     function nearbyBannerHtml(){
-      const rows=nearbyBusinesses.map((p,i)=>'<article class="nearby-card"><span class="nearby-card-icon" aria-hidden="true">'+(p.category==='Restaurant'?'🍽️':p.category==='Beauté & bien-être'?'✂️':p.category==='Automobile'?'🚗':p.category==='Artisan'?'🛠️':p.category==='Hébergement'?'🏨':'🏪')+'</span><div class="nearby-card-main"><b>'+escHtml(p.name||'Commerce')+'</b><small>'+escHtml([p.category,p.address].filter(Boolean).join(' · '))+(p.rating!=null?' · ★ '+p.rating+' ('+(p.reviews||0)+')':'')+'</small></div><button type="button" class="app-btn primary nearby-audit-btn" data-nearby-audit="'+i+'">Analyser ↗</button></article>').join('');
-      return '<section class="nearby-banner"><div class="nearby-banner-head"><div><div class="eyebrow">PROSPECTION LOCALE</div><h2>Les commerces autour de vous</h2><p>Repérez les établissements proches et lancez leur analyse AuditIA en un seul clic. Votre position n’est utilisée qu’après votre autorisation.</p></div><button type="button" class="app-btn primary nearby-load" data-nearby-load '+(nearbyBusy?'disabled':'')+'>'+(nearbyBusy?'Recherche en cours…':'⌖ Trouver les commerces autour de moi')+'</button></div>'+(nearbyStatus?'<div class="nearby-status" role="status">'+escHtml(nearbyStatus)+'</div>':'')+(rows?'<div class="nearby-list">'+rows+'</div>':'')+'</section>';
+      const rows=nearbyBusinesses.map((p,i)=>{const opp=nearbyOpportunity(p);return '<article class="nearby-card"><span class="nearby-card-icon" aria-hidden="true">'+(p.category==='Restaurant'?'🍽️':p.category==='Beauté & bien-être'?'✂️':p.category==='Automobile'?'🚗':p.category==='Artisan'?'🛠️':p.category==='Hébergement'?'🏨':'🏪')+'</span><div class="nearby-card-main"><b>'+escHtml(p.name||'Commerce')+'</b><small>'+escHtml([p.category,p.address].filter(Boolean).join(' · '))+(p.rating!=null?' · ★ '+p.rating+' ('+(p.reviews||0)+' avis)':'')+'</small><span class="nearby-priority">'+(opp.closed?'À vérifier · fermé selon Google':opp.score>=45?'Priorité d’audit élevée':opp.score>=25?'Priorité d’audit moyenne':'Priorité d’audit à confirmer')+' · '+opp.score+'/100</span><small class="nearby-evidence">'+escHtml(opp.reasons.join(' · ')||'Peu de signaux publics manquants détectés — audit complet nécessaire.')+'</small></div><button type="button" class="app-btn primary nearby-audit-btn" data-nearby-audit="'+i+'">Analyser ↗</button></article>';}).join('');
+      return '<section class="nearby-banner"><div class="nearby-banner-head"><div><div class="eyebrow">PROSPECTION LOCALE</div><h2>Les commerces à auditer en priorité</h2><p>Classement indicatif à partir des données publiques Google Places : site, horaires, note et volume d’avis. Ce score signale des points à vérifier, pas un chiffre d’affaires ni une preuve de manque de clients. Votre position n’est utilisée qu’après autorisation.</p></div><button type="button" class="app-btn primary nearby-load" data-nearby-load '+(nearbyBusy?'disabled':'')+'>'+(nearbyBusy?'Recherche en cours…':'⌖ Trouver les commerces autour de moi')+'</button></div>'+(nearbyStatus?'<div class="nearby-status" role="status">'+escHtml(nearbyStatus)+'</div>':'')+(rows?'<div class="nearby-list">'+rows+'</div>':'')+'</section>';
     }
     function getBrowserPosition(){
       return new Promise((resolve,reject)=>{
@@ -3206,7 +3219,8 @@ body:has(#authRoot .auth-loading) .login-status:before{content:"";width:7px;heig
         if(!r.ok){const d=await r.json().catch(()=>null);throw new Error(r.status===403?'Google refuse la recherche à proximité : vérifie Places API (New) et les restrictions de la clé.':(d&&d.error&&d.error.message)||('Erreur Google Places HTTP '+r.status));}
         const d=await r.json();
         nearbyBusinesses=(d.places||[]).map(normalizePlace).filter(p=>p.placeId&&p.name);
-        nearbyStatus=nearbyBusinesses.length?nearbyBusinesses.length+' commerce'+(nearbyBusinesses.length>1?'s':'')+' trouvé'+(nearbyBusinesses.length>1?'s':'')+' dans un rayon de 5 km.':'Aucun commerce trouvé dans ce rayon. Réessaie ou utilise « Trouver un commerce ».';
+        nearbyBusinesses.sort((a,b)=>nearbyOpportunity(b).score-nearbyOpportunity(a).score||((a.reviews||0)-(b.reviews||0)));
+        nearbyStatus=nearbyBusinesses.length?nearbyBusinesses.length+' commerce'+(nearbyBusinesses.length>1?'s':'')+' trouvé'+(nearbyBusinesses.length>1?'s':'')+' dans un rayon de 5 km, triés selon les points publics à vérifier.':'Aucun commerce trouvé dans ce rayon. Réessaie ou utilise « Trouver un commerce ».';
         keyStoreSet('places',true,key);recomputeKeyAlerts();
       }catch(e){nearbyStatus=(e&&e.message)||'Impossible de trouver les commerces proches. Réessaie.';}
       finally{nearbyBusy=false;renderApp();}
