@@ -3413,6 +3413,7 @@ body:has(.workspace-app){background:#101018!important}
 .analyse-panel[data-ap-root] .ap-bar::after{display:none!important}
 </style>
 <style id="auditia-icons">.home-stat-icon svg,.home-analytics-icon svg,.score-ic svg,.stat-with-ic svg,.home-audit-mark svg,.app-topbar .topbar-menu-btn svg{width:18px;height:18px;display:block;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.home-stat-icon,.home-analytics-icon{display:inline-grid!important;place-items:center}.stat-with-ic{display:inline-flex!important;align-items:center;gap:6px}.score-ic{display:inline-flex;align-items:center;margin-right:4px;vertical-align:-2px}.score-ic svg{width:15px;height:15px}.pil-score{display:flex;align-items:baseline;gap:4px}.home-audit-mark svg{width:18px;height:18px}.app-topbar .topbar-menu-btn{display:inline-flex!important;align-items:center!important;justify-content:center!important}.app-topbar .topbar-menu-btn svg{width:20px;height:20px}@media(max-width:760px){.mobile-tabbar{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;position:fixed!important;z-index:160!important;left:10px!important;right:10px!important;bottom:calc(8px + env(safe-area-inset-bottom))!important;padding:6px 4px!important;gap:2px!important;border-radius:18px!important;background:#16151e!important;border:1px solid rgba(255,255,255,.1)!important;box-shadow:0 12px 32px rgba(0,0,0,.4)!important}.mobile-tabbar button{display:flex!important;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:50px!important;padding:4px 0!important;margin:0!important;background:transparent!important;border:0!important;border-radius:12px!important;color:#b7b0c8!important;font-size:10px!important;font-weight:650!important;line-height:1.1}.mobile-tabbar button.active{color:#efeaff!important;background:rgba(139,116,230,.18)!important}.mobile-tabbar .tab-icon{display:grid!important;place-items:center;width:24px;height:24px;color:inherit!important;background:transparent!important}.mobile-tabbar .tab-icon svg{width:20px!important;height:20px!important;stroke:currentColor!important;fill:none!important}.workspace-main{padding-bottom:calc(104px + env(safe-area-inset-bottom))!important}}</style>
+<style id="auditia-search">.app-filter{display:block;width:100%;margin:8px 0 12px;min-height:46px;padding:0 14px;border-radius:12px;border:1px solid rgba(255,255,255,.14);background:#12111a;color:#f4f1fb;font:inherit}.app-filter:focus{outline:none;border-color:#a78bfa}</style>
 </head>
 <body>
   <div class="status-safe" aria-hidden="true"></div>
@@ -3461,7 +3462,7 @@ body:has(.workspace-app){background:#101018!important}
       ['Informations locales','Ville, zone desservie et services sont clairs']
     ];
     let appClient = null, appUser = null, appClients = [], appAudits = [], appSettings = null, appView = 'Accueil', activeAudit = null, activeClient = null, appNotice = '', studioClientId = '', studioOutputText = '';
-    let placeResults = [], placeSearching = false, placeMsg = '', pickedDetails = null, clientDraft = null, keyAlerts = [], auditFilter = '', noticeTimer = null, acTimer = null;
+    let placeResults = [], placeSearching = false, placeMsg = '', pickedDetails = null, clientDraft = null, keyAlerts = [], auditFilter = '', clientFilter = '', noticeTimer = null, acTimer = null;
     const KEY_NAMES = { logo_dev:'Logo.dev', places:'Google Places', maps:'Google Maps', pagespeed:'PageSpeed' };
     function recomputeKeyAlerts(){ const a=[]; ['logo_dev','places','maps','pagespeed'].forEach(k=>{ const field=API_FIELD[k]; const val=String((appSettings&&appSettings[field])||'').trim(); if(!val) return; const rec=keyStore()[k]; if(rec&&rec.h===keyHash(val)&&rec.ok===false) a.push(KEY_NAMES[k]); }); keyAlerts=a; }
     async function checkKeysHealth(){
@@ -3732,6 +3733,7 @@ body:has(.workspace-app){background:#101018!important}
       if(studioCopy)studioCopy.addEventListener('click',async()=>{if(!studioOutputText)return;try{await navigator.clipboard.writeText(studioOutputText);studioCopy.textContent='Copié !';}catch(e){const ta=document.createElement('textarea');ta.value=studioOutputText;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();const ok=document.execCommand('copy');ta.remove();studioCopy.textContent=ok?'Copié !':'Copie indisponible';}});
 
       page.querySelectorAll('[data-audit-filter]').forEach(inp=>inp.addEventListener('input',()=>{auditFilter=inp.value;const pos=inp.selectionStart;renderApp();const n=document.querySelector('[data-audit-filter]');if(n){n.focus();try{n.setSelectionRange(pos,pos);}catch(e){}}}));
+      page.querySelectorAll('[data-client-filter]').forEach(inp=>inp.addEventListener('input',()=>{clientFilter=inp.value;const pos=inp.selectionStart;renderApp();const n=document.querySelector('[data-client-filter]');if(n){n.focus();try{n.setSelectionRange(pos,pos);}catch(e){}}}));
     }
     /* ----- Recherche automatique de commerces (Google Places API New) ----- */
     function mapCategory(primary, types){
@@ -3895,7 +3897,7 @@ body:has(.workspace-app){background:#101018!important}
         const r=await withTimeout(fetch('https://places.googleapis.com/v1/places:searchNearby',{
           method:'POST',
           headers:{'Content-Type':'application/json','X-Goog-Api-Key':key,'X-Goog-FieldMask':'places.id,places.displayName,places.formattedAddress,places.addressComponents,places.primaryType,places.types,places.nationalPhoneNumber,places.websiteUri,places.rating,places.userRatingCount,places.businessStatus,places.regularOpeningHours'},
-          body:JSON.stringify({includedTypes:['restaurant','cafe','bakery','store','shopping_mall','beauty_salon','hair_salon','car_repair','plumber','electrician','florist','pharmacy','clothing_store','lodging'],maxResultCount:10,rankPreference:'DISTANCE',languageCode:'fr',regionCode:'FR',locationRestriction:{circle:{center:pos,radius:5000}}})
+          body:JSON.stringify({includedTypes:['restaurant','cafe','bakery','store','shopping_mall','beauty_salon','hair_salon','car_repair','plumber','electrician','florist','pharmacy','clothing_store','lodging'],maxResultCount:20,rankPreference:'DISTANCE',languageCode:'fr',regionCode:'FR',locationRestriction:{circle:{center:pos,radius:5000}}})
         }),15000);
         if(!r.ok){const d=await r.json().catch(()=>null);throw new Error(r.status===403?'Google refuse la recherche à proximité : vérifie Places API (New) et les restrictions de la clé.':(d&&d.error&&d.error.message)||('Erreur Google Places HTTP '+r.status));}
         const d=await r.json();
@@ -3937,7 +3939,14 @@ body:has(.workspace-app){background:#101018!important}
         keyStoreSet('places',true,key); recomputeKeyAlerts();
         const d=await r.json();
         const sugg=(d.suggestions||[]).map(s=>s.placePrediction).filter(Boolean);
-        if(!sugg.length){ box.innerHTML='<div class="ac-msg">Aucun résultat pour l’instant. Continue à taper…</div>'; return; }
+        if(!sugg.length){
+          try{
+            const r2=await withTimeout(fetch('https://places.googleapis.com/v1/places:searchText',{method:'POST',headers:{'Content-Type':'application/json','X-Goog-Api-Key':key,'X-Goog-FieldMask':'places.id,places.displayName,places.formattedAddress'},body:JSON.stringify({textQuery:String(val).trim(),languageCode:'fr',regionCode:'FR',maxResultCount:6})}),9000);
+            if(seq!==acSeq) return;
+            if(r2.ok){ const places=((await r2.json()).places||[]).filter(p=>p.id&&p.displayName&&p.displayName.text); if(places.length){ box.innerHTML=places.map(p=>'<button type="button" class="ac-item" data-ac-pick="'+escHtml(p.id)+'"><b>'+escHtml(p.displayName.text)+'</b>'+(p.formattedAddress?'<small>'+escHtml(p.formattedAddress)+'</small>':'')+'</button>').join(''); return; } }
+          }catch(e){}
+          box.innerHTML='<div class="ac-msg">Aucun commerce trouvé. Essaie le nom et la ville.</div>'; return;
+        }
         box.innerHTML=sugg.slice(0,6).map(s=>{const main=(s.structuredFormat&&s.structuredFormat.mainText&&s.structuredFormat.mainText.text)||(s.text&&s.text.text)||'';const sec=(s.structuredFormat&&s.structuredFormat.secondaryText&&s.structuredFormat.secondaryText.text)||'';return '<button type="button" class="ac-item" data-ac-pick="'+escHtml(s.placeId)+'"><b>'+escHtml(main)+'</b>'+(sec?'<small>'+escHtml(sec)+'</small>':'')+'</button>';}).join('');
       }catch(e){ if(seq!==acSeq) return; box.innerHTML='<div class="ac-msg err">'+escHtml(/timeout/.test(e.message)?'Délai dépassé. Réessaie.':'Auto-complétion bloquée par le navigateur (réseau ou restriction de la clé).')+'</div>'; }
     }
@@ -4098,7 +4107,8 @@ body:has(.workspace-app){background:#101018!important}
       const tries=[
         'https://api.allorigins.win/raw?url='+encodeURIComponent(target),
         'https://corsproxy.io/?url='+encodeURIComponent(target),
-        'https://r.jina.ai/'+target
+        'https://r.jina.ai/'+target,
+        'https://r.jina.ai/https://lite.duckduckgo.com/lite/?q='+encodeURIComponent(query)
       ];
       const dec=h=>{ const m=String(h||'').match(/[?&]uddg=([^&]+)/); if(m){ try{return decodeURIComponent(m[1]);}catch(e){} } return h; };
       const parse=html=>{
@@ -4106,6 +4116,7 @@ body:has(.workspace-app){background:#101018!important}
         let results=[];
         try{ const doc=new DOMParser().parseFromString(html,'text/html'); results=[...doc.querySelectorAll('a.result__a')].map(a=>({title:(a.textContent||'').trim(),url:dec(a.getAttribute('href')||'')})).filter(r=>/^https?:/i.test(r.url)); }catch(e){}
         if(!results.length){ const re=/uddg=([^&"' )]+)/g; let m; const seen=new Set(); while((m=re.exec(html))){ let v; try{v=decodeURIComponent(m[1]);}catch(e){continue;} if(/^https?:/i.test(v)&&!seen.has(v)){seen.add(v);results.push({title:'',url:v});} } }
+        if(results.length<8){ const md=/\[([^\]]{2,140})\]\((https?:\/\/[^)\s]+)\)/g; let mm; const seen=new Set(results.map(r=>r.url)); while((mm=md.exec(html))){ let v=mm[2]; if(/duckduckgo\.com|allorigins|corsproxy|jina\.ai/i.test(v)) continue; if(!seen.has(v)){ seen.add(v); results.push({title:(mm[1]||'').trim(),url:v}); } } }
         return results.slice(0,25);
       };
       // Try providers concurrently so one slow proxy cannot multiply the wait
@@ -4113,7 +4124,7 @@ body:has(.workspace-app){background:#101018!important}
       let timer;
       try{
         const attempts=tries.map(u=>readSiteText(u,{},7000).then(html=>{const results=parse(html); if(!results.length) throw new Error('Aucun résultat exploitable'); return results;}));
-        const timeout=new Promise((_,reject)=>{timer=setTimeout(()=>reject(new Error('Délai de recherche dépassé')),8500);});
+        const timeout=new Promise((_,reject)=>{timer=setTimeout(()=>reject(new Error('Délai de recherche dépassé')),12000);});
         const found = await Promise.race([Promise.any(attempts),timeout]);
         noteLiveSearch();
         return found;
@@ -4123,7 +4134,7 @@ body:has(.workspace-app){background:#101018!important}
     async function findWebPresence(c){
       const name=String((c&&c.name)||'').trim(); if(!name) return {socials:[],directories:[]};
       const city=String((c&&c.city)||'').trim();
-      const results=await fetchSerp(name+' '+city);
+      const results=(await Promise.all([(name+' '+city).trim(),('"'+name+'" '+(city?city+' ':'')+'avis').trim()].filter(Boolean).map(q=>fetchSerp(q).catch(()=>[])))).flat();
       const socials=[]; const seenS=new Set(); const dirs=[]; const seenD=new Set();
       results.forEach(r=>{ let url; try{url=new URL(r.url);}catch(e){return;} if(/sharer|share\?|intent|\/login|\/policies|\/about$|\/help|\/privacy|hashtag|\/explore/i.test(url.href)) return;
         const net=SOCIAL_RX.find(([,rx])=>rx.test(url.hostname)); if(net&&url.pathname.length>1&&!seenS.has(net[0])){ seenS.add(net[0]); socials.push({net:net[0],url:url.href,source:'web'}); }
@@ -4153,6 +4164,12 @@ body:has(.workspace-app){background:#101018!important}
           const website=String(p.websiteUri||'').startsWith('http')?p.websiteUri:'';
           all.push({placeId:id,name:nm,rating:(typeof p.rating==='number')?p.rating:null,reviews:Number(p.userRatingCount)||0,website,primaryType:(p.primaryTypeDisplayName&&p.primaryTypeDisplayName.text)||'',businessStatus:p.businessStatus||'',mapsUrl:p.googleMapsUri||'',isSelf:(!!selfId&&id===selfId)||(!selfId&&!!selfName&&norm(nm)===selfName)});
         });
+        if(selfName&&!all.some(x=>x.isSelf)&&city){
+          try{
+            const r2=await withTimeout(fetch('https://places.googleapis.com/v1/places:searchText',{method:'POST',headers:{'Content-Type':'application/json','X-Goog-Api-Key':key,'X-Goog-FieldMask':'places.id,places.displayName,places.rating,places.userRatingCount,places.websiteUri,places.primaryTypeDisplayName,places.businessStatus,places.googleMapsUri'},body:JSON.stringify({textQuery:String((c&&c.name)||'')+' '+city,languageCode:'fr',regionCode:'FR',maxResultCount:10})}),12000);
+            if(r2.ok){ ((await r2.json()).places||[]).forEach(p=>{ const id=p.id||'', nm=(p.displayName&&p.displayName.text)||''; if(!nm||(id&&seen.has(id))) return; if(id) seen.add(id); const website=String(p.websiteUri||'').startsWith('http')?p.websiteUri:''; all.push({placeId:id,name:nm,rating:(typeof p.rating==='number')?p.rating:null,reviews:Number(p.userRatingCount)||0,website,primaryType:(p.primaryTypeDisplayName&&p.primaryTypeDisplayName.text)||'',businessStatus:p.businessStatus||'',mapsUrl:p.googleMapsUri||'',isSelf:(!!selfId&&id===selfId)||(!selfId&&!!selfName&&norm(nm)===selfName)}); }); }
+          }catch(e){}
+        }
         all.sort((a,b)=>(b.reviews-a.reviews)||((b.rating||0)-(a.rating||0))||a.name.localeCompare(b.name,'fr'));
         all.forEach((x,i)=>x.rank=i+1);
         const self=all.find(x=>x.isSelf)||null, top=all.slice(0,8);
@@ -4166,7 +4183,7 @@ body:has(.workspace-app){background:#101018!important}
     function siteHost(c){ const w=String((c&&c.website)||'').trim(); if(!w) return ''; try{ return new URL(/^https?:\/\//i.test(w)?w:'https://'+w).hostname.replace(/^www\./,''); }catch(e){ return ''; } }
     /* Classement : pour chaque mot-clé client, à quelle position apparaît le commerce (recherche web réelle) */
     async function checkRankings(c){
-      const kws=targetKeywords(c).seo.slice(0,5);
+      const nameRaw=String((c&&c.name)||'').trim(); const cityRaw=String((c&&c.city)||'').trim(); const kws=[...new Set([(nameRaw+' '+cityRaw).trim(),...targetKeywords(c).seo].filter(Boolean))].slice(0,6);
       const name=norm((c&&c.name)||''); const host=siteHost(c);
       const nameTokens=name.split(' ').filter(w=>w.length>3);
       const out=[];
@@ -4178,7 +4195,7 @@ body:has(.workspace-app){background:#101018!important}
           setPhase('Vérification des mots-clés ('+(done+1)+'/'+total+') : '+kw+'…',target);
           tickProgress();
         }
-        const results=await fetchSerp(kw);
+        let results=await fetchSerp(kw); if(!results.length) results=await fetchSerp(kw);
         if(!results.length){ out.push({kw,pos:null,found:false,error:true}); continue; }
         let pos=null, matchType='';
         for(let i=0;i<results.length&&i<20;i++){ const r=results[i]; let h=''; try{ h=new URL(r.url).hostname.replace(/^www\./,''); }catch(e){} const t=norm(r.title)+' '+norm(r.url);
@@ -4839,16 +4856,16 @@ body:has(.workspace-app){background:#101018!important}
         const cd=clientDraft||{}; const catOpts=['Commerce','Restaurant','Artisan','Beauté & bien-être','Automobile','Hébergement','Autre'].map(o=>'<option'+(cd.category===o?' selected':'')+'>'+o+'</option>').join('');
         const addForm='<div class="add-client">'+placeSearchHtml()+'<section class="app-panel"><h3 style="margin:0 0 4px">Ou saisir à la main</h3><form class="app-form" data-create-client style="margin-top:10px"><label>Nom du commerce<input name="name" required maxlength="120" placeholder="Ex. Boulangerie du Centre" value="'+escHtml(cd.name||'')+'"></label><label>Ville<input name="city" required maxlength="100" placeholder="Ex. Azille" value="'+escHtml(cd.city||'')+'"></label><label>Catégorie<select name="category">'+catOpts+'</select></label><label>Site web (facultatif)<input name="website" type="text" placeholder="https://exemple.fr" value="'+escHtml(cd.website||'')+'"></label><button class="app-btn primary" type="submit">Enregistrer le client</button>'+(cd.name?'<button class="app-btn" type="button" data-clear-draft>Vider</button>':'')+'</form></section></div>';
         const openAdd=(!appClients.length||cd.name)?' open':'';
-        const cards=appClients.length?'<div class="client-cards">'+appClients.map(c=>{const d=c.details||{};const n=appAudits.filter(a=>a.client_id===c.id);const last=n[0];const rating=d.rating!=null?' · ★ '+d.rating:'';return '<button class="client-card" data-open-client="'+c.id+'"><span class="cc-avatar">'+escHtml((c.name||'?').charAt(0).toUpperCase())+'</span><span class="cc-txt"><b>'+escHtml(c.name)+'</b><small>'+escHtml(c.city)+' · '+escHtml(c.category||d.category||'Commerce')+rating+'</small><small class="cc-meta">'+n.length+' audit'+(n.length>1?'s':'')+(last?' · dernier '+(last.score||0)+'/100':'')+'</small></span><span class="cc-go" aria-hidden="true">›</span></button>'}).join('')+'</div>':'<div class="app-empty">Aucun client pour le moment. Ajoute ton premier commerce ci-dessus 👆</div>';
-        body='<div class="app-content-title"><div><h2>Mes clients</h2><p>'+appClients.length+' commerce'+(appClients.length>1?'s':'')+' suivi'+(appClients.length>1?'s':'')+'. Touche une fiche pour l’ouvrir.</p></div></div><details class="add-toggle"'+openAdd+'><summary>＋ Ajouter un client</summary>'+addForm+'</details>'+cards;
+        const clientRows=appClients.filter(c=>{const q=norm(clientFilter);if(!q)return true;const d=c.details||{};return norm([c.name,c.city,c.category,d.category,d.address,c.phone].filter(Boolean).join(' ')).includes(q);});const cards=appClients.length?(clientRows.length?'<div class="client-cards">'+clientRows.map(c=>{const d=c.details||{};const n=appAudits.filter(a=>a.client_id===c.id);const last=n[0];const rating=d.rating!=null?' · ★ '+d.rating:'';return '<button class="client-card" data-open-client="'+c.id+'"><span class="cc-avatar">'+escHtml((c.name||'?').charAt(0).toUpperCase())+'</span><span class="cc-txt"><b>'+escHtml(c.name)+'</b><small>'+escHtml(c.city)+' · '+escHtml(c.category||d.category||'Commerce')+rating+'</small><small class="cc-meta">'+n.length+' audit'+(n.length>1?'s':'')+(last?' · dernier '+(last.score||0)+'/100':'')+'</small></span><span class="cc-go" aria-hidden="true">›</span></button>'}).join('')+'</div>':'<div class="app-empty">Aucun commerce pour « '+escHtml(clientFilter)+' ».</div>'):'<div class="app-empty">Aucun client pour le moment. Ajoute ton premier commerce ci-dessus 👆</div>';
+        body='<div class="app-content-title"><div><h2>Mes clients</h2><p>'+appClients.length+' commerce'+(appClients.length>1?'s':'')+' suivi'+(appClients.length>1?'s':'')+'. Touche une fiche pour l’ouvrir.</p></div></div><details class="add-toggle"'+openAdd+'><summary>＋ Ajouter un client</summary>'+addForm+'</details>'+(appClients.length?'<input class="app-filter" data-client-filter placeholder="Rechercher un commerce, une ville, une catégorie…" value="'+escHtml(clientFilter)+'">':'')+cards;
       } else if(appView==='ClientDétail'){
         const c=appClients.find(x=>x.id===activeClient);
         if(!c){ appView='Clients'; renderApp(); return; }
         body=clientDetailHtml(c);
       } else if(appView==='Audits'){
-        body='<div class="app-grid"><section class="app-panel"><h2>Créer un audit</h2>'+(appClients.length?'<form class="app-form" data-create-audit><label>Client<select name="client_id" required>'+appClients.map(c=>'<option value="'+c.id+'">'+escHtml(c.name)+' — '+escHtml(c.city)+'</option>').join('')+'</select></label><label>Nom de l’audit<input name="title" required maxlength="120" value="Audit de visibilité numérique"></label><button class="app-btn primary" type="submit">Créer l’audit</button></form>':'<div class="app-empty">Ajoute d’abord un client dans l’onglet Clients.</div>')+'</section><section class="app-panel"><h2>Historique ('+appAudits.length+')</h2>'+(appAudits.length>3?'<input class="app-filter" data-audit-filter placeholder="🔎 Filtrer par commerce, ville, statut…" value="'+escHtml(auditFilter)+'">':'')+(function(){const q=auditFilter.trim().toLowerCase();const rows=appAudits.filter(a=>{if(!q)return true;const c=appClients.find(x=>x.id===a.client_id);return ((c?.name||'')+' '+(c?.city||'')+' '+(a.title||'')+' '+(a.status||'')).toLowerCase().includes(q);});return rows.length?'<div class="app-list">'+rows.map(a=>{const c=appClients.find(x=>x.id===a.client_id);return '<div class="app-row"><div><b>'+escHtml(c?.name||'Commerce')+'</b><small>'+escHtml(a.title)+' · '+escHtml(a.status||'À démarrer')+' · '+navIcon('score')+' '+(a.score||0)+'/100</small></div><button class="app-btn" data-open-audit="'+a.id+'">Ouvrir</button></div>'}).join('')+'</div>':'<div class="app-empty">'+(appAudits.length?'Aucun audit ne correspond à « '+escHtml(auditFilter)+' ».':'Aucun audit créé.')+'</div>';})()+'</section></div>';
+        body='<div class="app-grid"><section class="app-panel"><h2>Créer un audit</h2>'+(appClients.length?'<form class="app-form" data-create-audit><label>Client<select name="client_id" required>'+appClients.map(c=>'<option value="'+c.id+'">'+escHtml(c.name)+' — '+escHtml(c.city)+'</option>').join('')+'</select></label><label>Nom de l’audit<input name="title" required maxlength="120" value="Audit de visibilité numérique"></label><button class="app-btn primary" type="submit">Créer l’audit</button></form>':'<div class="app-empty">Ajoute d’abord un client dans l’onglet Clients.</div>')+'</section><section class="app-panel"><h2>Historique ('+appAudits.length+')</h2>'+(appAudits.length?'<input class="app-filter" data-audit-filter placeholder="🔎 Filtrer par commerce, ville, statut…" value="'+escHtml(auditFilter)+'">':'')+(function(){const q=auditFilter.trim().toLowerCase();const rows=appAudits.filter(a=>{if(!q)return true;const c=appClients.find(x=>x.id===a.client_id);const d=c&&c.details||{};return norm([(c?.name||''),(c?.city||''),(c?.category||''),(d.category||''),(a.title||''),(a.status||''),String(a.score||'')].join(' ')).includes(norm(q));});return rows.length?'<div class="app-list">'+rows.map(a=>{const c=appClients.find(x=>x.id===a.client_id);return '<div class="app-row"><div><b>'+escHtml(c?.name||'Commerce')+'</b><small>'+escHtml(a.title)+' · '+escHtml(a.status||'À démarrer')+' · '+navIcon('score')+' '+(a.score||0)+'/100</small></div><button class="app-btn" data-open-audit="'+a.id+'">Ouvrir</button></div>'}).join('')+'</div>':'<div class="app-empty">'+(appAudits.length?'Aucun audit ne correspond à « '+escHtml(auditFilter)+' ».':'Aucun audit créé.')+'</div>';})()+'</section></div>';
       } else if(appView==='Rapports'){
-        body='<div class="app-content-title"><div><h2>Rapports & résultats</h2><p>Synthèse de l’activité d’audit.</p></div></div><div class="app-stats"><article class="app-stat"><span>Total des audits</span><strong>'+appAudits.length+'</strong></article><article class="app-stat"><span>Terminés</span><strong>'+completed+'</strong></article><article class="app-stat"><span>Clients</span><strong>'+appClients.length+'</strong></article></div><section class="app-panel"><h2>Historique des audits</h2>'+(appAudits.length?'<div class="app-list">'+appAudits.map(a=>{const client=appClients.find(x=>x.id===a.client_id);return '<div class="app-row"><div><b>'+escHtml(client?.name||'Commerce')+'</b><small>'+escHtml(a.title)+' · '+escHtml(a.status||'À démarrer')+' · '+navIcon('score')+' '+(a.score||0)+'/100</small></div><button class="app-btn" data-open-audit="'+a.id+'">Ouvrir</button></div>'}).join('')+'</div>':'<div class="app-empty">Les rapports apparaîtront ici lorsque tu auras créé des audits.</div>')+'</section>';
+        body='<div class="app-content-title"><div><h2>Rapports & résultats</h2><p>Synthèse de l’activité d’audit.</p></div></div><div class="app-stats"><article class="app-stat"><span>Total des audits</span><strong>'+appAudits.length+'</strong></article><article class="app-stat"><span>Terminés</span><strong>'+completed+'</strong></article><article class="app-stat"><span>Clients</span><strong>'+appClients.length+'</strong></article></div><section class="app-panel"><h2>Historique des audits</h2>'+(appAudits.length?'<input class="app-filter" data-audit-filter placeholder="Rechercher un rapport, un commerce, une ville…" value="'+escHtml(auditFilter)+'">':'')+(function(){const q=norm(auditFilter);const rows=appAudits.filter(a=>{if(!q)return true;const c=appClients.find(x=>x.id===a.client_id);const d=c&&c.details||{};return norm([(c&&c.name)||'',(c&&c.city)||'',(c&&c.category)||'',(d.category||''),(a.title||''),(a.status||''),String(a.score||'')].join(' ')).includes(q);});return rows.length?'<div class="app-list">'+rows.map(a=>{const client=appClients.find(x=>x.id===a.client_id);return '<div class="app-row"><div><b>'+escHtml(client?.name||'Commerce')+'</b><small>'+escHtml(a.title)+' · '+escHtml(a.status||'À démarrer')+' · '+navIcon('score')+' '+(a.score||0)+'/100</small></div><button class="app-btn" data-open-audit="'+a.id+'">Ouvrir</button></div>'}).join('')+'</div>':'<div class="app-empty">'+(appAudits.length?'Aucun rapport pour « '+escHtml(auditFilter)+' ».':'Les rapports apparaîtront ici lorsque tu auras créé des audits.')+'</div>';})()+'</section>';
       } else if(appView==='Profil') {
          const meta=appUser?.user_metadata||{};
          const displayName=String(meta.display_name||meta.full_name||'');
