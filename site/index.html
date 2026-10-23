@@ -2785,6 +2785,74 @@ body:has(#authRoot .auth-loading) .login-status:before{content:"";width:7px;heig
 @media(max-width:760px){.home-next-steps{padding:16px;border-radius:18px;margin-bottom:24px}.home-next-head{gap:8px}.home-next-head h2{font-size:19px}.home-next-head p{font-size:11px}.home-next-count{font-size:9px;padding:6px 8px}.home-step-grid{grid-template-columns:minmax(0,1fr);gap:8px}.home-step{grid-template-columns:32px minmax(0,1fr) auto;align-items:start;padding:13px;gap:10px}.home-step-action{grid-column:3;grid-row:1;align-self:center;margin-top:0;white-space:nowrap}.home-step p{margin:4px 0 6px}.home-step small{font-size:10px}}
 @media(prefers-reduced-motion:reduce){.home-step-action span{transition:none}}
 
+
+/* AuditIA UI polish v1 — cohérence visuelle, mobile-first, sans modifier la logique métier */
+:root{--bg:#100f1c;--panel:#1d1a30;--panel2:#26213e;--text:#f8f6ff;--muted:#b8b1cf;--purple:#a78bfa;--orange:#ffb36b;--line:#403858}
+body{background:radial-gradient(ellipse at 88% -8%,rgba(124,91,235,.16),transparent 34%),#100f1c;color:var(--text)}
+button,input,select,textarea{font:inherit}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid #c4b5fd;outline-offset:3px}
+.workspace-app{padding:12px 0 34px}
+.workspace-head{padding:2px 0 18px;border-bottom:1px solid #ffffff10;margin-bottom:20px}
+.workspace-head h1{letter-spacing:-1.4px}
+.workspace-head p{line-height:1.5}
+.workspace-sidebar,.app-panel,.app-stat,.app-row,.integration-group,.home-next-steps,.home-recent-panel{box-shadow:0 12px 35px #05040c20}
+.workspace-sidebar{background:linear-gradient(160deg,#211d35,#171525);border-color:#ffffff14}
+.sidebar-nav button{transition:background .18s,border-color .18s,transform .18s}
+.sidebar-nav button:hover{background:#ffffff08;border-color:#ffffff12}
+.sidebar-nav button.active{background:linear-gradient(110deg,#49368166,#29213f);border-color:#8b75df66}
+.app-panel,.app-stat{background:linear-gradient(145deg,#211d35,#191627);border-color:#ffffff14;border-radius:20px}
+.app-panel h2{letter-spacing:-.45px}
+.app-row{background:#211d35;border-color:#ffffff12}
+.app-btn,.btn,.login-submit{transition:transform .18s ease,filter .18s ease,box-shadow .18s ease}
+.app-btn{background:#29243f;border-color:#51466f;border-radius:13px}
+.app-btn:hover,.btn:hover{filter:brightness(1.08);transform:translateY(-1px)}
+.app-btn.primary,.login-submit{background:linear-gradient(135deg,#9b80ff,#6d4de8);box-shadow:0 8px 24px #7657df35}
+.app-form input,.app-form select,.app-form textarea,.login-control{background:#151323;border-color:#49405f;border-radius:13px}
+.app-form input:focus,.app-form select:focus,.app-form textarea:focus{border-color:#a78bfa;box-shadow:0 0 0 3px #a78bfa20;outline:none}
+.home-hero{border:1px solid #ffffff16!important;border-radius:25px!important;overflow:hidden!important;background:linear-gradient(145deg,#211b38,#171526)!important;box-shadow:0 20px 54px #05040c35!important}
+.home-hero-copy{background:transparent!important}
+.home-hero-copy h2{letter-spacing:-1.7px!important}
+.home-hero-art{background:linear-gradient(135deg,#292044,#171427)!important}
+.home-visual{border-color:#ffffff14!important;background:linear-gradient(145deg,#201b34,#181526)!important}
+.home-next-steps{background:linear-gradient(145deg,#211d35,#191627)!important;border-color:#ffffff14!important}
+.home-step-card,.home-stat-card{border-color:#ffffff14!important;background:#211d35!important}
+.home-section-heading h2{letter-spacing:-.6px}
+.nearby-banner{background:linear-gradient(135deg,#211d35,#171526);border-color:#51446f;box-shadow:none}
+.nearby-card{background:#ffffff05;border-color:#ffffff14}
+.login-page{background:transparent}
+body:has(#authRoot .auth-loading){background:#100f1c!important}
+body:has(#authRoot .auth-loading) .login-page{background:radial-gradient(ellipse at 50% 28%,rgba(124,91,235,.16),transparent 42%),#100f1c!important;padding:24px 20px!important}
+body:has(#authRoot .auth-loading) .login-page:before{display:none!important}
+body:has(#authRoot .auth-loading) .login-brand{gap:13px;margin-bottom:28px!important}
+body:has(#authRoot .auth-loading) .login-mark{width:58px;height:58px;flex-basis:58px;border-radius:18px;background:linear-gradient(145deg,#8b70f0,#5137b8);box-shadow:0 8px 24px #6748ce35;font-size:33px}
+body:has(#authRoot .auth-loading) .login-wordmark{font-size:clamp(30px,7vw,38px);letter-spacing:-1.5px}
+body:has(#authRoot .auth-loading) .auth-loading{gap:12px;padding:24px 22px;width:min(100%,360px);border:1px solid #ffffff14;border-radius:22px;background:#1a1729;box-shadow:0 18px 48px #05040c40}
+body:has(#authRoot .auth-loading) .auth-spinner{width:27px;height:27px;border-width:2px;border-color:#403858;border-top-color:#a78bfa}
+body:has(#authRoot .auth-loading) .login-foot,body:has(#authRoot .auth-loading) .login-status{color:#8f87a8}
+@media(max-width:760px){
+ .workspace-app{padding:8px 0 28px}
+ .workspace-head{padding-bottom:15px;margin-bottom:16px}
+ .app-panel,.app-stat{padding:15px;border-radius:16px}
+ .app-grid{gap:11px}
+ .home-hero{border-radius:21px!important}
+ .home-hero-copy h2{letter-spacing:-1.2px!important}
+ .home-next-steps{padding:16px!important}
+ .nearby-banner{padding:17px;border-radius:18px}
+ .nearby-list{grid-template-columns:1fr}
+ .workspace-sidebar{background:#171526;border-right:1px solid #ffffff18}
+}
+@media(max-width:420px){
+ .workspace-app{width:100%;padding-left:0;padding-right:0}
+ .workspace-head{margin-left:2px;margin-right:2px}
+ .app-stats{gap:7px}
+ .app-stat{padding:12px 9px}
+ .app-stat strong{font-size:22px}
+ .home-hero-copy h2{font-size:clamp(30px,8.5vw,37px)!important}
+ .home-hero-actions{grid-template-columns:1fr!important}
+ .home-hero-actions .app-btn{width:100%}
+}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important;animation-duration:.01ms!important;animation-iteration-count:1!important}}
+
 </style>
 </head>
 <body>
