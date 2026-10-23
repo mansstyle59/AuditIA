@@ -4110,7 +4110,83 @@ input[type="search"],input[type="tel"],input[type="url"],input[type="number"],
 @keyframes aiPanelIn{from{opacity:0;transform:translateY(8px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
 @media(max-width:760px){.ai-float-launcher{right:14px;bottom:calc(82px + env(safe-area-inset-bottom));width:58px;height:58px}.ai-float-robot{width:43px;height:43px}.ai-float-panel{right:8px;bottom:calc(151px + env(safe-area-inset-bottom));width:calc(100vw - 16px);height:min(64dvh,560px);min-height:320px;border-radius:22px}.ai-float-head{padding:12px}.ai-float-body{padding:13px 11px 8px}.ai-float-compose-wrap{padding:8px}}
 @media(prefers-reduced-motion:reduce){.ai-float-launcher:before,.ai-float-robot,.ai-float-panel{animation:none!important}}
-</style></head>
+</style>
+<style id="auditia-home-layout-repair-v113">
+/* Repair mobile home hero composition: no negative overlap between illustration, kicker and title. */
+@media(max-width:760px){
+  .workspace-main>.home-hero{
+    display:flex!important;flex-direction:column!important;align-items:stretch!important;
+    gap:0!important;padding:16px!important;margin:8px 0 20px!important;
+    border-radius:22px!important;overflow:hidden!important;
+  }
+  .workspace-main>.home-hero .home-hero-copy{
+    display:flex!important;flex-direction:column!important;align-items:flex-start!important;
+    width:100%!important;min-width:0!important;gap:0!important;
+  }
+  .workspace-main>.home-hero .home-hero-art{
+    order:0!important;display:block!important;position:relative!important;
+    width:100%!important;height:clamp(118px,36vw,158px)!important;min-height:0!important;
+    margin:0 0 18px!important;flex:none!important;overflow:hidden!important;
+    border-radius:15px!important;
+  }
+  .workspace-main>.home-hero .home-hero-art svg{
+    display:block!important;width:100%!important;height:100%!important;
+    max-width:100%!important;margin:0 auto!important;transform:none!important;
+  }
+  .workspace-main>.home-hero .home-kicker{
+    order:1!important;position:relative!important;z-index:1!important;
+    display:inline-flex!important;width:auto!important;max-width:100%!important;
+    margin:0 0 12px!important;padding:7px 10px!important;
+    white-space:normal!important;font-size:9px!important;line-height:1.35!important;
+    letter-spacing:1px!important;
+  }
+  .workspace-main>.home-hero .home-hero-copy h2,
+  .workspace-main>.home-hero h2{
+    order:2!important;position:static!important;z-index:auto!important;
+    width:100%!important;max-width:100%!important;margin:0 0 14px!important;
+    font-size:clamp(29px,7.8vw,37px)!important;line-height:1.08!important;
+    letter-spacing:-1.25px!important;overflow-wrap:normal!important;
+  }
+  .workspace-main>.home-hero .home-hero-copy>p{
+    order:3!important;width:100%!important;max-width:100%!important;
+    margin:0!important;font-size:15px!important;line-height:1.62!important;
+  }
+  .workspace-main>.home-hero .home-hero-actions{
+    order:4!important;width:100%!important;display:grid!important;
+    grid-template-columns:minmax(0,1fr)!important;gap:9px!important;margin-top:20px!important;
+  }
+  .workspace-main>.home-hero .home-hero-actions .app-btn{
+    width:100%!important;min-width:0!important;min-height:48px!important;
+    white-space:normal!important;overflow-wrap:anywhere!important;
+  }
+  .home-banner-copy{margin:0!important;padding:0!important;background:none!important}
+  .workspace-main>.home-hero .home-hero-art:after{display:none!important}
+  /* Keep the floating robot compact and out of the bottom navigation/action zone. */
+  .ai-float-launcher{
+    right:12px!important;bottom:calc(16px + env(safe-area-inset-bottom))!important;
+    width:52px!important;height:52px!important;
+    box-shadow:0 6px 20px #603eff55!important;
+  }
+  .ai-float-robot{width:39px!important;height:39px!important}
+  .ai-float-panel{
+    right:8px!important;bottom:calc(78px + env(safe-area-inset-bottom))!important;
+    width:calc(100vw - 16px)!important;max-width:430px!important;
+    height:min(68dvh,560px)!important;min-height:300px!important;
+  }
+  .workspace-main,.workspace-app{min-width:0!important;max-width:100%!important}
+  .home-platform-grid,.home-presence-grid,.home-links-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:10px!important;
+  }
+  .workspace-main .app-btn,.workspace-main button{overflow-wrap:anywhere}
+}
+@media(max-width:380px){
+  .workspace-main>.home-hero{padding:13px!important}
+  .workspace-main>.home-hero .home-hero-copy h2,
+  .workspace-main>.home-hero h2{font-size:clamp(27px,7.5vw,31px)!important}
+}
+</style>
+</head>
 <body>
   <div class="status-safe" aria-hidden="true"></div>
   <header class="wrap top">
