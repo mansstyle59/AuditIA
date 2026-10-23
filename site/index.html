@@ -2917,6 +2917,14 @@ body:has(#authRoot .auth-loading) .login-foot,body:has(#authRoot .auth-loading) 
       *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
     }
 
+  
+    /* Correctif navigation mobile : conserver les onglets visibles sur iPhone */
+    @media(max-width:760px){
+      .mobile-tabbar{display:grid!important}
+      .workspace-head>.burger-btn{display:none!important}
+      .workspace-main{padding-bottom:calc(92px + env(safe-area-inset-bottom))!important}
+    }
+
   </style>
 </head>
 <body>
