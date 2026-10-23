@@ -3706,19 +3706,17 @@ body,.workspace-app{background:#0e0d16!important;color:#f6f3ff!important}
 .home-path li{display:grid;grid-template-columns:32px minmax(0,1fr);gap:10px;align-items:center;padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.03);border:1px solid rgba(186,170,230,.12)}
 .home-path b{display:grid;place-items:center;width:32px;height:32px;border-radius:10px;background:linear-gradient(180deg,#b7a6ff,#7a62e4);color:#fff;font-size:13px}
 .home-path span{font-size:14px}
-@keyframes page-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-.workspace-main>*{animation:page-in .42s cubic-bezier(.2,.7,.2,1) both}
-.workspace-main>*:nth-child(2){animation-delay:.05s}
-.workspace-main>*:nth-child(3){animation-delay:.09s}
-.workspace-main>*:nth-child(4){animation-delay:.13s}
-.workspace-main>*:nth-child(n+5){animation-delay:.16s}
-.app-btn,.audit-card,.report-card,.client-card,.home-path li,.home-channel{transition:transform .22s ease,border-color .22s ease,background .22s ease}
-.home-path li:nth-child(2){animation:page-in .45s ease .08s both}
-.home-path li:nth-child(3){animation:page-in .45s ease .14s both}
+@keyframes page-in{from{opacity:0}to{opacity:1}}
+.workspace-main.is-entering>*{animation:page-in .22s ease both}
+.audit-card,.report-card{content-visibility:auto;contain-intrinsic-size:auto 84px}
+.app-btn{transition:background .18s ease,border-color .18s ease}
+.home-path li:nth-child(2){animation:page-in .28s ease .05s both}
+.home-path li:nth-child(3){animation:page-in .28s ease .09s both}
 .app-btn:active{transform:scale(.98)}
+.mobile-tabbar{display:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
 @media(prefers-reduced-motion:reduce){
-  .workspace-main>*,.home-path li{animation:none}
-  .app-btn,.audit-card,.report-card,.client-card,.home-path li,.home-channel{transition:none}
+  .workspace-main.is-entering>*,.home-path li{animation:none}
+  .app-btn{transition:none}
 }
 .schema-bar b{transform-origin:left center;animation:schema-grow .7s ease}
 .schema-donut .meter{stroke-dasharray:226.2 226.2;stroke-dashoffset:226.2;animation:schema-donut .8s ease forwards}
@@ -3780,7 +3778,7 @@ body,.workspace-app{background:#0e0d16!important;color:#f6f3ff!important}
       ['Informations locales','Ville, zone desservie et services sont clairs']
     ];
     let appClient = null, appUser = null, appClients = [], appAudits = [], appSettings = null, appView = 'Accueil', activeAudit = null, activeClient = null, appNotice = '', studioClientId = '', studioOutputText = '';
-    let placeResults = [], placeSearching = false, placeMsg = '', pickedDetails = null, clientDraft = null, keyAlerts = [], auditFilter = '', clientFilter = '', noticeTimer = null, acTimer = null;
+    let placeResults = [], placeSearching = false, placeMsg = '', pickedDetails = null, clientDraft = null, keyAlerts = [], auditFilter = '', clientFilter = '', noticeTimer = null, acTimer = null, filterTimer = null, lastPaintedView = '';
     const KEY_NAMES = { logo_dev:'Logo.dev', places:'Google Places', maps:'Google Maps', pagespeed:'PageSpeed' };
     function recomputeKeyAlerts(){ const a=[]; ['logo_dev','places','maps','pagespeed'].forEach(k=>{ const field=API_FIELD[k]; const val=String((appSettings&&appSettings[field])||'').trim(); if(!val) return; const rec=keyStore()[k]; if(rec&&rec.h===keyHash(val)&&rec.ok===false) a.push(KEY_NAMES[k]); }); keyAlerts=a; }
     async function checkKeysHealth(){
@@ -3934,6 +3932,7 @@ body,.workspace-app{background:#0e0d16!important;color:#f6f3ff!important}
       const showEyebrow = sectionLabel.trim().toLowerCase()!==headTitle.trim().toLowerCase();
       page.innerHTML = '<div class="workspace-app">'+(pdfBusy?'<div class="pdf-overlay"><div class="pdf-spin"></div><b>Génération du PDF…</b><span>Quelques secondes… l’écran « rapport prêt » s’affichera ensuite.</span><button type="button" class="pdf-cancel" data-pdf-cancel>Annuler</button></div>':'')+'<header class="app-topbar"><button class="burger-btn topbar-menu-btn" type="button" data-toggle-menu aria-label="Ouvrir le menu" aria-controls="workspaceSidebar" aria-expanded="false">'+navIcon('menu')+'</button><div class="tb-actions"><button class="app-btn topbar-profile-btn'+(appView==='Profil'?' is-active':'')+'" type="button" data-app-view="Profil" aria-label="Ouvrir le profil">'+navIcon('profile')+'<span>Profil</span></button><button class="app-btn topbar-logout-btn" type="button" data-app-action="logout" aria-label="Déconnecter" title="Déconnecter">'+navIcon('logout')+'<span>Déconnecter</span></button></div></header><div class="sidebar-backdrop" data-close-menu></div><aside class="workspace-sidebar" id="workspaceSidebar"><div class="sidebar-brand"><img src="'+escHtml(currentLogo())+'" alt="" onerror="this.style.display=&#39;none&#39;"><div><b>'+escHtml(appSettings?.app_name||'AuditIA')+'</b><small>BY AFFIADS</small></div></div><nav class="sidebar-nav" aria-label="Navigation principale">'+navItems.map(([v,ico,target])=>'<button type="button" class="'+(navActive===(target||v)?'active':'')+'" data-app-view="'+(target||v)+'"><span class="nav-icon">'+navIcon(ico)+'</span><span>'+v+'</span>'+(v==='Clients'?'<span class="nav-count">'+appClients.length+'</span>':v==='Audits'?'<span class="nav-count">'+appAudits.length+'</span>':'')+'</button>').join('')+'</nav><div class="sidebar-bottom">Auditer mieux.<br>Décider plus clairement.</div></aside><div class="workspace-layout"><main class="workspace-main"><div class="workspace-head"><div>'+(showEyebrow?'<div class="eyebrow">'+escHtml(sectionLabel)+'</div>':'')+(appView==='Accueil'?'<p class="page-title">'+escHtml(headTitle)+'</p>':'<h1>'+escHtml(headTitle)+'</h1>')+'<p>'+escHtml(headLead)+'</p></div><div class="workspace-actions desktop-account-actions"><button class="app-btn'+(appView==='Profil'?' is-active':'')+'" type="button" data-app-view="Profil">'+navIcon('profile')+'<span>Profil</span></button><button class="app-btn" type="button" data-app-action="logout">'+navIcon('logout')+'<span>Déconnecter</span></button></div></div><nav class="desktop-nav" aria-label="Navigation principale">'+navItems.map(([v,ico,target])=>'<button type="button" class="'+(navActive===(target||v)?'active':'')+'" data-app-view="'+(target||v)+'">'+navIcon(ico)+'<span>'+v+'</span></button>').join('')+'</nav>'+keyAlertHtml()+appNoticeHtml()+body+'<p class="app-muted workspace-footnote">AuditIA · Espace privé</p></main></div><nav class="mobile-tabbar" aria-label="Navigation principale">'+navItems.map(([v,ico,target])=>'<button type="button" class="'+(navActive===(target||v)?'active':'')+'" data-app-view="'+(target||v)+'" aria-label="'+v+'" '+(navActive===(target||v)?'aria-current="page"':'')+'><span class="tab-icon">'+navIcon(ico)+'</span><span>'+v+'</span></button>').join('')+'</nav></div>';
       clearTimeout(noticeTimer);
+      { const main=page.querySelector('.workspace-main'); if(main&&appView!==lastPaintedView){ main.classList.add('is-entering'); lastPaintedView=appView; } }
       if(appNotice && !/^Erreur/.test(appNotice)){ noticeTimer=setTimeout(()=>{ appNotice=''; renderApp(); },4500); }
       { const cb=page.querySelector('[data-pdf-cancel]'); if(cb) cb.addEventListener('click',()=>{ pdfCancelled=true; pdfBusy=false; const h=document.getElementById('printReport'); if(h) h.innerHTML=''; appNotice='Génération annulée.'; renderApp(); }); }
       page.querySelectorAll('[data-app-view]').forEach(b=>b.addEventListener('click',()=>{document.body.classList.remove('menu-open');appView=b.dataset.appView;activeAudit=null;activeClient=null;appNotice='';renderApp();window.scrollTo(0,0)}));
@@ -4053,8 +4052,8 @@ body,.workspace-app{background:#0e0d16!important;color:#f6f3ff!important}
       const studioCopy=page.querySelector('#studioCopy');
       if(studioCopy)studioCopy.addEventListener('click',async()=>{if(!studioOutputText)return;try{await navigator.clipboard.writeText(studioOutputText);studioCopy.textContent='Copié !';}catch(e){const ta=document.createElement('textarea');ta.value=studioOutputText;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();const ok=document.execCommand('copy');ta.remove();studioCopy.textContent=ok?'Copié !':'Copie indisponible';}});
 
-      page.querySelectorAll('[data-audit-filter]').forEach(inp=>inp.addEventListener('input',()=>{auditFilter=inp.value;const pos=inp.selectionStart;renderApp();const n=document.querySelector('[data-audit-filter]');if(n){n.focus();try{n.setSelectionRange(pos,pos);}catch(e){}}}));
-      page.querySelectorAll('[data-client-filter]').forEach(inp=>inp.addEventListener('input',()=>{clientFilter=inp.value;const pos=inp.selectionStart;renderApp();const n=document.querySelector('[data-client-filter]');if(n){n.focus();try{n.setSelectionRange(pos,pos);}catch(e){}}}));
+      page.querySelectorAll('[data-audit-filter]').forEach(inp=>inp.addEventListener('input',()=>{auditFilter=inp.value;const pos=inp.selectionStart;clearTimeout(filterTimer);filterTimer=setTimeout(()=>{renderApp();const n=document.querySelector('[data-audit-filter]');if(n){n.focus();try{n.setSelectionRange(pos,pos);}catch(e){}}},120);}));
+      page.querySelectorAll('[data-client-filter]').forEach(inp=>inp.addEventListener('input',()=>{clientFilter=inp.value;const pos=inp.selectionStart;clearTimeout(filterTimer);filterTimer=setTimeout(()=>{renderApp();const n=document.querySelector('[data-client-filter]');if(n){n.focus();try{n.setSelectionRange(pos,pos);}catch(e){}}},120);}));
     }
     /* ----- Recherche automatique de commerces (Google Places API New) ----- */
     function mapCategory(primary, types){
