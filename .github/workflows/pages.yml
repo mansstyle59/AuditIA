@@ -33,7 +33,10 @@ jobs:
           html_path = root / "index.html"
           html = html_path.read_text(encoding="utf-8")
           scripts = re.findall(r"<script\b([^>]*)>([\s\S]*?)</script>", html, re.I)
-          inline = [(attrs, body) for attrs, body in scripts if not re.search(r"\bsrc\s*=", attrs, re.I)]
+          ld = [(attrs, body) for attrs, body in scripts if re.search(r"application/ld\+json", attrs, re.I)]
+          for _, body in ld:
+              json.loads(body)
+          inline = [(attrs, body) for attrs, body in scripts if not re.search(r"\bsrc\s*=", attrs, re.I) and not re.search(r"application/ld\+json", attrs, re.I)]
           if not inline:
               raise SystemExit("No inline JavaScript found in site/index.html")
           with tempfile.TemporaryDirectory() as tmp:
