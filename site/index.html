@@ -3977,6 +3977,45 @@ pre,code{white-space:pre-wrap;overflow-wrap:anywhere}
   .ai-chat-page{width:100%}
 }
 </style>
+
+<style id="auditia-ios-no-zoom">
+/* iOS: prevent focus zoom on every text-entry control throughout the app. */
+html{
+  -webkit-text-size-adjust:100%;
+  text-size-adjust:100%;
+  touch-action:manipulation;
+}
+body,button,a,label,[role="button"]{
+  touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent;
+}
+input,select,textarea,
+input[type="text"],input[type="email"],input[type="password"],
+input[type="search"],input[type="tel"],input[type="url"],input[type="number"],
+[contenteditable="true"],[role="textbox"],
+.app-form input,.app-form select,.app-form textarea,
+.ai-chat-composer textarea,.ai-chat-composer input,
+.login-control,.input{
+  font-size:16px!important;
+  line-height:1.4;
+  max-font-size:16px;
+  -webkit-text-size-adjust:100%;
+  touch-action:manipulation;
+  scroll-margin-block:100px;
+}
+@media(max-width:760px){
+  input,select,textarea,
+  input[type="text"],input[type="email"],input[type="password"],
+  input[type="search"],input[type="tel"],input[type="url"],input[type="number"],
+  [contenteditable="true"],[role="textbox"],
+  .app-form input,.app-form select,.app-form textarea,
+  .ai-chat-composer textarea,.ai-chat-composer input,
+  .login-control,.input{
+    font-size:16px!important;
+  }
+}
+/* Keep pinch-to-zoom available for accessibility; do not use maximum-scale=1. */
+</style>
 </head>
 <body>
   <div class="status-safe" aria-hidden="true"></div>
