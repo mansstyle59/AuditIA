@@ -3429,6 +3429,35 @@ body:has(.workspace-app){background:#101018!important}
   .workspace-head .desktop-account-actions .app-btn.is-active{border-color:#c4b5fd!important;background:rgba(139,116,230,.22)!important}
 }
 </style>
+<style id="auditia-pages">
+.workspace-head{border:1px solid rgba(255,255,255,.08)!important;border-radius:18px!important;padding:14px 16px!important;background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.015))!important}
+.app-content-title{margin:0 0 14px!important;padding:16px 16px 14px!important;border:1px solid rgba(176,156,255,.22)!important;border-radius:18px!important;background:radial-gradient(ellipse at 100% 0%,rgba(139,116,230,.2),transparent 48%),linear-gradient(160deg,#2a2446,#1b1830)!important}
+.app-content-title h2{font-size:clamp(22px,3vw,28px)!important;letter-spacing:-.04em!important}
+.app-content-title p{max-width:46ch}
+.app-panel{background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.02)),#241f3c!important;border:1px solid rgba(255,255,255,.09)!important;border-radius:18px!important;box-shadow:0 14px 34px rgba(4,3,12,.16)!important}
+.app-panel .eyebrow{display:inline-flex;align-items:center;gap:7px;margin-bottom:8px;padding:4px 8px;border-radius:999px;background:rgba(167,139,250,.12);color:#d5c9ff;letter-spacing:.12em}
+.app-stat{position:relative;overflow:hidden;background:linear-gradient(180deg,#312b52,#241f3d)!important;border:1px solid rgba(176,156,255,.16)!important;border-radius:18px!important}
+.app-stat:before{content:"";position:absolute;right:-20px;top:-24px;width:78px;height:78px;border-radius:50%;background:rgba(167,139,250,.16)}
+.app-stat strong{position:relative;color:#f7f4ff!important}
+.app-row{background:rgba(255,255,255,.035)!important;border:1px solid rgba(255,255,255,.08)!important;border-radius:16px!important}
+.client-card{background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.02))!important;border:1px solid rgba(255,255,255,.1)!important;border-radius:18px!important;box-shadow:0 10px 24px rgba(0,0,0,.12)!important}
+.client-card:hover{border-color:rgba(186,166,255,.45)!important;transform:translateY(-1px)}
+.cc-meta{color:#c4bddc!important}
+.app-empty,.home-empty-state{background:radial-gradient(ellipse at 50% 0%,rgba(139,116,230,.16),transparent 62%),#171526!important;border:1px dashed rgba(186,166,255,.38)!important;border-radius:18px!important}
+.add-toggle{border:1px solid rgba(176,156,255,.24)!important;border-radius:18px!important;background:linear-gradient(180deg,#2a2446,#201c36)!important}
+.add-toggle>summary{color:#e4dcff!important}
+.profile-hero{background:radial-gradient(ellipse at 0% 0%,rgba(139,116,230,.24),transparent 46%),linear-gradient(160deg,#2a2446,#1b1830)!important}
+.integration-group,.settings-preview,.signature-card{border-radius:16px!important}
+.pil,.vis-panel,.scan-panel,.cp-panel,.rk-panel{box-shadow:none}
+.page-dossier{background:radial-gradient(ellipse at 100% 0%,rgba(139,116,230,.16),transparent 42%),linear-gradient(180deg,#2a2446,#211c38)!important}
+@media(max-width:760px){
+  .workspace-head{padding:12px 12px!important;border-radius:16px!important}
+  .app-content-title{padding:14px 14px 12px!important}
+  .app-stats{grid-template-columns:1fr!important}
+  .app-stat{min-height:0!important}
+  .app-stat span{min-height:0!important}
+}
+</style>
 </head>
 <body>
   <div class="status-safe" aria-hidden="true"></div>
@@ -4896,7 +4925,7 @@ body:has(.workspace-app){background:#101018!important}
         const list=Array.isArray(a.checklist)?a.checklist:[];
         const analyzed=!!(a.site||a.scan||a.status==='Analysé');
         const diagBlocks=analyzed?(visibilitySummaryHtml(a,c)+clientInfoHtml(c)+siteShotHtml(a)+scanPanelHtml(a,c)+socialPresenceHtml(a)+rankingsHtml(a)+competitorsHtml(a,c)+targetingPanelHtml(a,c)+improvementHtml(a,c)+'<details class="cd-edit" style="margin-top:14px"><summary>Notes personnelles (facultatif)</summary><form class="app-form" data-save-notes style="padding:0 16px 16px"><label>Notes internes<textarea name="notes" placeholder="Remarques pour toi — n’apparaissent dans le rapport que si tu les remplis.">'+escHtml(a.notes||'')+'</textarea></label><button class="app-btn primary" type="submit">Enregistrer les notes</button></form></details><div class="detail-actions" style="margin-top:16px;flex-wrap:wrap"><button class="app-btn" data-export-report="'+a.id+'" data-mode="simple">📄 Rapport express (1 page · gratuit)</button><button class="app-btn primary" data-export-report="'+a.id+'" data-mode="full">📑 Rapport complet (PDF)</button><button class="app-btn" data-delete-audit="'+a.id+'">Supprimer cet audit</button></div><p class="app-muted" style="margin:8px 0 0;font-size:12px">Le <b>rapport express</b> est l’aperçu gratuit à laisser au prospect ; le <b>rapport complet</b> est le document détaillé que tu peux facturer.</p>'):'<div class="app-panel" style="margin-top:14px"><div class="app-empty">Rien n’est encore analysé. Touche <b>⚡ Analyser le commerce</b> ci-dessus : AuditIA récupère les données Google, lit le site, trouve les réseaux, les informations légales (SIRET) et la performance, puis génère le rapport complet.</div><div class="detail-actions" style="margin-top:14px"><button class="app-btn" data-delete-audit="'+a.id+'">Supprimer cet audit</button></div></div>';
-        body='<button class="app-btn" data-app-view="Audits">← Audits</button><section class="app-panel" style="margin-top:14px"><div class="eyebrow">DOSSIER D’AUDIT</div><h2 style="margin-top:8px">'+escHtml(c?.name||'Commerce')+'</h2><p>'+escHtml(c?.city||'')+' · '+escHtml(a.title)+'</p>'+analysePanelHtml(a,c)+diagBlocks+'</section>';
+        body='<button class="app-btn" data-app-view="Audits">← Audits</button><section class="app-panel page-dossier" style="margin-top:14px"><div class="eyebrow">DOSSIER D’AUDIT</div><h2 style="margin-top:8px">'+escHtml(c?.name||'Commerce')+'</h2><p>'+escHtml(c?.city||'')+' · '+escHtml(a.title)+'</p>'+analysePanelHtml(a,c)+diagBlocks+'</section>';
       }
       appShell(body);
     }
