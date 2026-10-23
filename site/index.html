@@ -4187,28 +4187,29 @@ input[type="search"],input[type="tel"],input[type="url"],input[type="number"],
 }
 </style>
 
-<style id="auditia-header-clear-v115">
-/* iPhone Safari: lower the top bar within the safe area and avoid sticky compositing blur. */
+<style id="auditia-header-position-v116">
+/* Restore the compact, pinned header from reference capture 1. Keep the surface opaque and sharp on iOS Safari. */
 @media(max-width:760px){
   .app-topbar{
-    position:relative!important;
-    top:auto!important;
+    position:sticky!important;
+    top:0!important;
+    z-index:150!important;
     margin-top:0!important;
-    padding-top:calc(env(safe-area-inset-top, 0px) + 24px)!important;
-    padding-bottom:16px!important;
-    background-color:#201c30!important;
+    padding-top:calc(env(safe-area-inset-top, 0px) + 12px)!important;
+    padding-bottom:14px!important;
+    background:#201c30!important;
     -webkit-backdrop-filter:none!important;
     backdrop-filter:none!important;
     filter:none!important;
     transform:none!important;
     -webkit-transform:none!important;
-    box-shadow:0 1px 0 #ffffff12!important;
+    box-shadow:0 1px 0 #ffffff16!important;
     isolation:isolate;
+    contain:paint;
   }
   .app-topbar *{
     -webkit-backdrop-filter:none!important;
     backdrop-filter:none!important;
-    filter:none;
   }
 }
 </style>
