@@ -5,7 +5,9 @@
 - Les politiques SQL limitent l'accès aux données au compte administrateur autorisé et à ses propres lignes.
 - La clé Supabase publiée dans le navigateur est une clé publique ; elle ne remplace jamais RLS.
 - L'index `audits_client_id_idx` accélère la relation entre audits et commerces.
-- Les fichiers d'environnement et secrets locaux sont exclus par `.gitignore`.
+- Les liens affichés et les adresses envoyées aux services d’analyse doivent être `http` ou `https`. Les adresses locales, privées et les schémas `javascript:` sont refusés.
+- Le service worker ne met en cache que les fichiers de l’application, jamais une requête avec paramètres.
+- Les couleurs de marque injectées dans le style doivent être un code hexadécimal. Le logo enregistré est converti en PNG.
 
 ## À ne pas mettre dans le dépôt ni dans le navigateur
 Ne jamais versionner les clés privées/service-role, mots de passe, tokens de webhook ou secrets API. Les clés de navigateur (Google Places, PageSpeed, OpenAI, Bing) ne doivent pas être considérées comme secrètes si le code client les lit : elles peuvent être extraites depuis le navigateur. Les déplacer derrière une fonction serveur/Edge Function, puis les stocker dans les secrets Supabase, avec restrictions de clés côté fournisseur.
