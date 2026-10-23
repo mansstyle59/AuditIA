@@ -2900,7 +2900,80 @@ body:has(#authRoot .auth-loading) .login-foot,body:has(#authRoot .auth-loading) 
     @media(max-width:760px){.home-analytics-grid{grid-template-columns:minmax(0,1fr);gap:10px;margin-bottom:20px}.home-analytics-panel{padding:16px}.home-average-score{font-size:36px;margin:16px 0 10px}.home-status-list{gap:13px;margin-top:17px}}
     @media(prefers-reduced-motion:reduce){.home-score-track span,.home-status-track span{transition:none}}
 
-  </style>
+  
+    /* Correctif définitif navigation iPhone : bouton burger visible en haut à gauche */
+    @media (max-width: 760px) {
+      .workspace-head {
+        display: grid !important;
+        grid-template-columns: 46px minmax(0, 1fr) !important;
+        align-items: center !important;
+        gap: 11px !important;
+      }
+      .workspace-head > .burger-btn {
+        display: inline-flex !important;
+        grid-column: 1 !important;
+        grid-row: 1 !important;
+        position: relative !important;
+        z-index: 130 !important;
+        width: 46px !important;
+        height: 46px !important;
+        min-width: 46px !important;
+        min-height: 46px !important;
+        padding: 0 !important;
+        cursor: pointer !important;
+        color: #fff !important;
+        background: rgba(255,255,255,.12) !important;
+        border: 1px solid rgba(255,255,255,.28) !important;
+        border-radius: 15px !important;
+        box-shadow: 0 8px 24px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.2) !important;
+        backdrop-filter: blur(22px) saturate(160%) !important;
+        -webkit-backdrop-filter: blur(22px) saturate(160%) !important;
+      }
+      .workspace-head > div:nth-child(2) {
+        grid-column: 2 !important;
+        grid-row: 1 !important;
+        min-width: 0 !important;
+      }
+      .workspace-head .workspace-actions {
+        grid-column: 1 / -1 !important;
+        grid-row: 2 !important;
+        width: 100% !important;
+      }
+      .mobile-tabbar { display: none !important; }
+      .workspace-main { padding-bottom: calc(24px + env(safe-area-inset-bottom)) !important; }
+      .workspace-sidebar {
+        position: fixed !important;
+        left: 0 !important;
+        top: 0 !important;
+        bottom: 0 !important;
+        z-index: 120 !important;
+        width: min(320px, 86vw) !important;
+        max-height: 100dvh !important;
+        overflow-y: auto !important;
+        transform: translateX(-110%) !important;
+        visibility: hidden !important;
+        transition: transform .22s ease, visibility .22s ease !important;
+        padding-top: calc(18px + env(safe-area-inset-top)) !important;
+        padding-bottom: calc(20px + env(safe-area-inset-bottom)) !important;
+      }
+      .workspace-sidebar.open {
+        transform: translateX(0) !important;
+        visibility: visible !important;
+      }
+      .sidebar-backdrop { display: none !important; }
+      .sidebar-backdrop.open {
+        display: block !important;
+        position: fixed !important;
+        inset: 0 !important;
+        z-index: 110 !important;
+        background: rgba(5,3,13,.62) !important;
+        backdrop-filter: blur(5px) !important;
+        -webkit-backdrop-filter: blur(5px) !important;
+      }
+      body.menu-open { overflow: hidden !important; }
+    }
+
+    </style>
 </head>
 <body>
   <div class="status-safe" aria-hidden="true"></div>
