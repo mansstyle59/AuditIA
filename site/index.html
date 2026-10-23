@@ -3500,6 +3500,25 @@ body:has(.splash) .splash{position:relative;width:min(100%,380px);margin:0 auto;
 }
 @media(prefers-reduced-motion:reduce){.splash-bar span{animation:none;transform:none;width:100%}}
 </style>
+<style id="auditia-banner">
+.workspace-main>.home-hero{border:1px solid rgba(186,166,255,.22)!important;border-radius:24px!important;overflow:hidden!important;background:radial-gradient(ellipse at 50% 0%,rgba(146,112,255,.28),transparent 46%),linear-gradient(180deg,#261e48 0%,#161326 78%)!important;box-shadow:0 18px 42px rgba(0,0,0,.22)!important}
+.workspace-main>.home-hero .home-hero-art{position:relative!important;display:block!important;height:auto!important;aspect-ratio:2.7/1!important;max-height:176px!important;overflow:hidden!important;background:linear-gradient(180deg,rgba(55,40,104,.28),transparent)!important}
+.workspace-main>.home-hero .home-hero-art:after{content:"";position:absolute;left:0;right:0;bottom:0;height:46px;background:linear-gradient(180deg,transparent,#1a1630);pointer-events:none}
+.workspace-main>.home-hero .home-hero-art svg{display:block!important;width:100%!important;height:100%!important;max-width:none!important;transform:none!important}
+.workspace-main>.home-hero .home-kicker{display:inline-flex!important;width:fit-content!important;align-items:center!important;gap:8px!important;margin:2px 0 0!important;padding:6px 10px!important;border-radius:999px!important;border:1px solid rgba(255,255,255,.12)!important;background:rgba(255,255,255,.06)!important;color:#ddd4ff!important;font-size:10px!important;letter-spacing:.12em!important}
+.workspace-main>.home-hero h2{max-width:14ch!important;margin:12px 0 8px!important;font-size:clamp(28px,7.2vw,42px)!important;line-height:1.04!important;letter-spacing:-.05em!important}
+.workspace-main>.home-hero .home-hero-copy>p{max-width:34em!important;color:#d4cee6!important}
+.workspace-main>.home-hero .home-channel{min-height:58px!important;border-radius:14px!important;background:rgba(255,255,255,.04)!important;border:1px solid rgba(255,255,255,.08)!important;box-shadow:none!important}
+@media(max-width:760px){
+  .workspace-main>.home-hero{padding:0 0 16px!important;margin:0 0 18px!important}
+  .workspace-main>.home-hero .home-hero-copy{padding:0 16px!important}
+  .workspace-main>.home-hero .home-hero-art{margin:0 -16px 8px!important;border-radius:0!important}
+  .workspace-main>.home-hero .home-visual{margin:16px 16px 0!important;border-radius:16px!important}
+}
+@media(min-width:761px){
+  .workspace-main>.home-hero .home-hero-art{max-height:190px!important;margin:0 0 12px!important;border-radius:18px!important}
+}
+</style>
 </head>
 <body>
   <div class="status-safe" aria-hidden="true"></div>
