@@ -3799,6 +3799,99 @@ body,.workspace-app{background:#0e0d16!important;color:#f6f3ff!important}
   .prog-line{stroke-dashoffset:0}
 }
 </style>
+
+<style id="audit-chat-ia-visual-refresh">
+:root{--aci-bg:#050815;--aci-panel:#0d1429;--aci-line:rgba(142,156,255,.24);--aci-muted:#aeb9e7;--aci-purple:#8b5cf6;--aci-blue:#246bff}
+body:has(.ai-chat-page){background:radial-gradient(ellipse at 82% 0%,rgba(39,73,194,.28),transparent 38%),radial-gradient(ellipse at 3% 20%,rgba(101,32,216,.13),transparent 32%),#050815}
+.ai-chat-page{width:100%;max-width:900px;margin:0 auto;color:#f7f8ff}
+.ai-chat-shell{position:relative;min-height:calc(100svh - 188px);border:0;border-radius:24px;overflow:visible;background:transparent;box-shadow:none;gap:15px}
+.ai-chat-header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 2px 14px;background:transparent;border:0}
+.ai-chat-brand{display:flex;align-items:center;gap:12px;min-width:0}
+.ai-chat-orb{display:none}
+.ai-chat-brand b{display:block;font-size:clamp(20px,4vw,31px);font-weight:900;letter-spacing:-1.2px;background:linear-gradient(110deg,#f8f9ff 25%,#72a7ff 65%,#c79cff);color:transparent;background-clip:text;line-height:1.1}
+.ai-chat-brand b:before{content:"✦";font-size:1.1em;margin-right:10px;color:#9e86ff}
+.ai-chat-brand small{display:block;margin:5px 0 0 37px;color:#b2bce7;font-size:11px}
+.ai-chat-status{font-size:10px;letter-spacing:1.2px;text-transform:uppercase;background:rgba(91,74,202,.2);border-color:rgba(151,125,255,.3);color:#d1c4ff}
+.ai-chat-intro{position:relative;min-height:345px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;text-align:left;overflow:hidden;padding:28px 28px 20px;border:1px solid rgba(113,137,255,.45);border-radius:28px;background:radial-gradient(ellipse at 85% 10%,rgba(78,48,201,.66),transparent 45%),radial-gradient(ellipse at 15% 0%,rgba(0,89,255,.20),transparent 55%),linear-gradient(120deg,#0b1228 0%,#13103b 54%,#2b116d 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 18px 45px rgba(0,0,0,.26)}
+.ai-chat-intro:after{content:"";position:absolute;right:-10px;top:5px;width:48%;height:75%;background-image:url('./audit-chat-robot.svg');background-position:center right;background-size:contain;background-repeat:no-repeat;pointer-events:none;opacity:.98}
+.ai-chat-intro:before{content:"ASSISTANT IA  •  EN LIGNE";position:relative;z-index:1;display:inline-flex;align-items:center;gap:10px;border:1px solid rgba(153,125,255,.35);background:rgba(39,29,107,.6);border-radius:999px;padding:8px 13px;color:#c8c4ff;font-size:10px;font-weight:900;letter-spacing:2px;margin-bottom:18px}
+.ai-chat-mascot{display:none}
+.ai-chat-intro h2{position:relative;z-index:1;max-width:65%;margin:0;font-size:clamp(30px,5vw,48px);line-height:1.04;letter-spacing:-1.6px;font-weight:950}
+.ai-chat-intro h2 span{color:#b79aff}
+.ai-chat-intro h2:before{content:"Bonjour !";display:block;margin-bottom:4px;color:#fff}
+.ai-chat-intro p{position:relative;z-index:1;max-width:60%;margin:13px 0 0;color:#ced5ff;font-size:clamp(13px,2vw,17px);line-height:1.55}
+.ai-chat-suggest-label{display:none}
+.ai-chat-suggestions{position:relative;z-index:2;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;width:100%;padding:0;margin-top:-4px}
+.ai-chat-suggestion{min-height:105px;padding:14px 10px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;border-radius:18px;border:1px solid rgba(136,150,255,.29);background:linear-gradient(145deg,rgba(21,31,65,.94),rgba(14,14,39,.94));box-shadow:inset 0 1px 0 rgba(255,255,255,.04);color:#f6f7ff;font-size:12px;line-height:1.35;font-weight:800}
+.ai-chat-suggestion:before{content:"⌕";display:grid;place-items:center;width:41px;height:41px;border-radius:13px;background:linear-gradient(145deg,#1681ff,#2541ef);box-shadow:0 8px 22px rgba(34,93,255,.28);font-size:27px;color:white}
+.ai-chat-suggestion:nth-child(2):before{content:"▤";background:linear-gradient(145deg,#a855f7,#5021ef)}
+.ai-chat-suggestion:nth-child(3):before{content:"◎";background:linear-gradient(145deg,#fb7185,#e11d48)}
+.ai-chat-suggestion:nth-child(4):before{content:"◉";background:linear-gradient(145deg,#fb923c,#ea580c)}
+.ai-chat-suggestion:hover{transform:translateY(-2px);border-color:#9a81ff;background:linear-gradient(145deg,#20194f,#14182e)}
+.ai-chat-result{margin:0;padding:19px 18px;border-radius:22px;border:1px solid var(--aci-line);background:linear-gradient(120deg,rgba(14,22,44,.96),rgba(13,18,37,.94))}
+.ai-chat-result>b{font-size:18px;font-weight:850}
+.ai-chat-bullets{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;margin-top:14px}
+.ai-chat-bullets li{position:relative;display:flex;flex-direction:column;gap:5px;padding:14px 8px 6px;text-align:center;color:#c5cefa;font-size:11px;line-height:1.35}
+.ai-chat-bullets li:before{content:"";width:43px;height:43px;margin:0 auto 7px;border-radius:14px;background:linear-gradient(145deg,#1478ff,#273be9);box-shadow:0 7px 21px rgba(28,84,255,.28)}
+.ai-chat-bullets li:nth-child(2):before{background:linear-gradient(145deg,#ad5cff,#5426dd)}
+.ai-chat-bullets li:nth-child(3):before{background:linear-gradient(145deg,#ff9a48,#d74f1c)}
+.ai-chat-bullets li:nth-child(4):before{background:linear-gradient(145deg,#10cc8a,#07895a)}
+.ai-chat-bullets li strong{font-size:25px;line-height:1;color:white}
+.ai-chat-result p{font-size:11px;color:#7f8ab8;margin-top:9px}
+.ai-chat-disclaimer{margin:0;padding:18px;border:1px solid rgba(150,112,255,.28);border-radius:21px;background:linear-gradient(110deg,rgba(49,31,110,.42),rgba(12,19,41,.92));text-align:left;color:#c0c9f2;font-size:12px;line-height:1.65}
+.ai-chat-disclaimer:before{content:"✦";display:inline-grid;place-items:center;float:left;width:44px;height:44px;margin:0 13px 5px 0;border-radius:50%;background:linear-gradient(145deg,#783bff,#3935db);font-size:24px;color:white;box-shadow:0 0 25px rgba(115,70,255,.3)}
+.ai-chat-composer-wrap{position:relative;bottom:auto;margin:0;padding:12px;border:1px solid rgba(130,143,255,.35);border-radius:24px;background:linear-gradient(140deg,rgba(16,22,45,.98),rgba(9,12,29,.98));box-shadow:0 18px 38px rgba(0,0,0,.22)}
+.ai-chat-composer{min-height:62px;align-items:center;padding:7px 9px 7px 14px;border-radius:19px;border-color:rgba(139,154,255,.3);background:#10142b}
+.ai-chat-composer textarea{min-height:42px;color:#f7f8ff!important;font-size:14px!important}
+.ai-chat-composer textarea::placeholder{color:#98a4de}
+.ai-chat-send{width:54px;height:48px;min-height:48px;padding:0;border-radius:15px;background:linear-gradient(145deg,#a275ff,#642cff);color:white;font-size:0;box-shadow:0 8px 20px rgba(116,64,255,.34)}
+.ai-chat-send:after{content:"➤";font-size:23px}
+.ai-chat-suggestions~.ai-chat-history{padding:10px 2px}
+.ai-chat-msg{border-radius:17px;background:#11182e;border-color:rgba(135,151,255,.2);font-size:13px}
+.ai-chat-msg.user{background:linear-gradient(130deg,#34226e,#122862);border-color:#6e59df}
+.ai-chat-actions button{border-radius:999px;background:#151a35;border-color:#4f4d80}
+.desktop-nav{gap:8px;background:rgba(9,13,29,.88);border-color:rgba(139,154,255,.22)}
+.desktop-nav button{font-size:12px}
+.mobile-tabbar{z-index:80!important;background:rgba(8,12,27,.94)!important;border:1px solid rgba(130,143,255,.25)!important;backdrop-filter:blur(18px)}
+.mobile-tabbar button{color:#9ba8d5!important}
+.mobile-tabbar button.active{color:#eadfff!important;background:linear-gradient(145deg,rgba(95,49,219,.55),rgba(24,56,157,.45))!important;border-color:rgba(155,121,255,.5)!important}
+@media(max-width:760px){
+ .workspace-app{padding:8px 0 calc(104px + env(safe-area-inset-bottom))!important}
+ .workspace-head{display:none!important}
+ .desktop-nav{display:none!important}
+ .ai-chat-page{padding:0 0 14px}
+ .ai-chat-shell{min-height:0;gap:12px}
+ .ai-chat-header{padding:7px 13px 12px}
+ .ai-chat-brand b{font-size:22px;letter-spacing:-.8px}
+ .ai-chat-brand small{font-size:10px;margin-left:34px}
+ .ai-chat-status{max-width:124px;white-space:normal;font-size:8px;letter-spacing:.7px;text-align:center;padding:6px 8px}
+ .ai-chat-intro{min-height:352px;padding:23px 17px 17px;border-radius:24px}
+ .ai-chat-intro:after{right:-22px;top:48px;width:58%;height:62%;background-size:contain;background-position:center right}
+ .ai-chat-intro:before{font-size:9px;letter-spacing:1.4px;margin-bottom:19px;padding:7px 10px}
+ .ai-chat-intro h2{max-width:72%;font-size:clamp(30px,9vw,42px);letter-spacing:-1.2px}
+ .ai-chat-intro p{max-width:68%;font-size:13px;line-height:1.52;margin-top:13px}
+ .ai-chat-suggestions{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:-5px}
+ .ai-chat-suggestion{min-height:120px;padding:12px 8px;border-radius:17px;font-size:12px}
+ .ai-chat-suggestion:before{width:42px;height:42px}
+ .ai-chat-result{padding:12px 8px;border-radius:20px}
+ .ai-chat-result>b{font-size:15px;margin-left:8px}
+ .ai-chat-bullets{grid-template-columns:repeat(4,minmax(0,1fr));margin-top:9px}
+ .ai-chat-bullets li{font-size:10px;padding:10px 3px 4px}
+ .ai-chat-bullets li:before{width:35px;height:35px;border-radius:12px;margin-bottom:5px}
+ .ai-chat-result p{padding:0 10px}
+ .ai-chat-disclaimer{padding:14px;border-radius:19px;font-size:11px}
+ .ai-chat-composer-wrap{padding:8px;border-radius:22px}
+ .ai-chat-composer{gap:6px;padding:5px 6px 5px 10px;min-height:56px}
+ .ai-chat-composer textarea{font-size:13px!important;padding:8px!important}
+ .ai-chat-send{height:44px;width:45px;min-height:44px}
+ .mobile-tabbar{position:fixed!important;left:10px!important;right:10px!important;bottom:calc(8px + env(safe-area-inset-bottom))!important;width:auto!important;border-radius:19px!important;padding:5px!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;box-shadow:0 14px 35px #0008!important}
+ .mobile-tabbar button{min-height:57px!important;border-radius:14px!important}
+ .mobile-tabbar button span:last-child{font-size:10px!important}
+ .mobile-tabbar button[data-app-view="Accueil"],.mobile-tabbar button[data-app-view="Clients"],.mobile-tabbar button[data-app-view="Studio"],.mobile-tabbar button[data-app-view="Paramètres"]{display:none!important}
+ .mobile-tabbar button[data-app-view="Assistant"],.mobile-tabbar button[data-app-view="Audits"],.mobile-tabbar button[data-app-view="Rapports"]{display:flex!important}
+}
+@media(max-width:390px){.ai-chat-intro{min-height:330px;padding:20px 14px}.ai-chat-intro h2{font-size:29px}.ai-chat-intro p{font-size:12px;max-width:70%}.ai-chat-suggestion{min-height:113px;font-size:11px}.ai-chat-bullets li{font-size:9px}}
+</style>
 </head>
 <body>
   <div class="status-safe" aria-hidden="true"></div>
@@ -4032,7 +4125,7 @@ body,.workspace-app{background:#0e0d16!important;color:#f6f3ff!important}
       const navItems=[['Assistant','assistant'],['Accueil','home'],['Clients','clients'],['Audits','audits'],['Rapports','reports'],['Studio','sparkles'],['Réglages','settings','Paramètres']];
       const sectionLabel = appView==='ClientDétail'?'Clients':appView==='Détail'?'Audits':appView==='Paramètres'?'Réglages':appView==='Profil'?'Profil':appView==='Assistant'?'Assistant':appView;
       const navActive = appView==='ClientDétail'?'Clients':appView==='Détail'?'Audits':appView;
-      const headTitle = appView==='Accueil'?'Accueil':appView==='Assistant'?'Assistant AuditIA':appView==='Paramètres'?'Réglages':appView==='Profil'?'Mon profil':appView==='ClientDétail'?'Fiche client':appView==='Détail'?'Dossier d’audit':appView;
+      const headTitle = appView==='Accueil'?'Accueil':appView==='Assistant'?'Audit Chat IA':appView==='Paramètres'?'Réglages':appView==='Profil'?'Mon profil':appView==='ClientDétail'?'Fiche client':appView==='Détail'?'Dossier d’audit':appView;
       const headLead = appView==='Assistant'?'Conseils et actions à partir des données réellement disponibles.':appView==='Clients'?(appClients.length?appClients.length+' commerce'+(appClients.length>1?'s':'')+' suivi'+(appClients.length>1?'s':'')+'.':'Ajoute un commerce pour commencer.'):appView==='Audits'?'Un dossier par commerce. Le score n’apparaît qu’après une analyse.':appView==='Rapports'?'Schémas et PDF, uniquement à partir des audits analysés.':appView==='Studio'?'Contenus et argumentaire à partir des dossiers.':appView==='Paramètres'?'Identité, signature et connexions des rapports.':appView==='Profil'?'Ton nom et ton accès. L’e-mail ne se change pas ici.':appView==='ClientDétail'?(function(){const c=appClients.find(x=>x.id===activeClient);return c?[c.name,c.city].filter(Boolean).join(' · '):'Fiche d’un commerce.';})():appView==='Détail'?(function(){const a=appAudits.find(x=>x.id===activeAudit);const c=a&&appClients.find(x=>x.id===a.client_id);return c?[c.name,c.city].filter(Boolean).join(' · '):'Le score n’apparaît qu’après l’analyse.';})():'';
       const showEyebrow = sectionLabel.trim().toLowerCase()!==headTitle.trim().toLowerCase();
       page.innerHTML = '<div class="workspace-app">'+(pdfBusy?'<div class="pdf-overlay"><div class="pdf-spin"></div><b>Génération du PDF…</b><span>Quelques secondes… l’écran « rapport prêt » s’affichera ensuite.</span><button type="button" class="pdf-cancel" data-pdf-cancel>Annuler</button></div>':'')+'<header class="app-topbar"><button class="burger-btn topbar-menu-btn" type="button" data-toggle-menu aria-label="Ouvrir le menu" aria-controls="workspaceSidebar" aria-expanded="false">'+navIcon('menu')+'</button><div class="tb-actions"><button class="app-btn topbar-profile-btn'+(appView==='Profil'?' is-active':'')+'" type="button" data-app-view="Profil" aria-label="Ouvrir le profil">'+navIcon('profile')+'<span>Profil</span></button><button class="app-btn topbar-logout-btn" type="button" data-app-action="logout" aria-label="Déconnecter" title="Déconnecter">'+navIcon('logout')+'<span>Déconnecter</span></button></div></header><div class="sidebar-backdrop" data-close-menu></div><aside class="workspace-sidebar" id="workspaceSidebar"><div class="sidebar-brand"><img src="'+escHtml(currentLogo())+'" alt="" onerror="this.style.display=&#39;none&#39;"><div><b>'+escHtml(appSettings?.app_name||'AuditIA')+'</b><small>BY AFFIADS</small></div></div><nav class="sidebar-nav" aria-label="Navigation principale">'+navItems.map(([v,ico,target])=>'<button type="button" class="'+(navActive===(target||v)?'active':'')+'" data-app-view="'+(target||v)+'"><span class="nav-icon">'+navIcon(ico)+'</span><span>'+v+'</span>'+(v==='Clients'?'<span class="nav-count">'+appClients.length+'</span>':v==='Audits'?'<span class="nav-count">'+appAudits.length+'</span>':'')+'</button>').join('')+'</nav><div class="sidebar-bottom">Auditer mieux.<br>Décider plus clairement.</div></aside><div class="workspace-layout"><main class="workspace-main"><div class="workspace-head"><div>'+(showEyebrow?'<div class="eyebrow">'+escHtml(sectionLabel)+'</div>':'')+(appView==='Accueil'?'<p class="page-title">'+escHtml(headTitle)+'</p>':'<h1>'+escHtml(headTitle)+'</h1>')+'<p>'+escHtml(headLead)+'</p></div><div class="workspace-actions desktop-account-actions"><button class="app-btn'+(appView==='Profil'?' is-active':'')+'" type="button" data-app-view="Profil">'+navIcon('profile')+'<span>Profil</span></button><button class="app-btn" type="button" data-app-action="logout">'+navIcon('logout')+'<span>Déconnecter</span></button></div></div><nav class="desktop-nav" aria-label="Navigation principale">'+navItems.map(([v,ico,target])=>'<button type="button" class="'+(navActive===(target||v)?'active':'')+'" data-app-view="'+(target||v)+'">'+navIcon(ico)+'<span>'+v+'</span></button>').join('')+'</nav>'+keyAlertHtml()+appNoticeHtml()+body+'<p class="app-muted workspace-footnote">AuditIA · Espace privé</p></main></div><nav class="mobile-tabbar" aria-label="Navigation principale">'+navItems.map(([v,ico,target])=>'<button type="button" class="'+(navActive===(target||v)?'active':'')+'" data-app-view="'+(target||v)+'" aria-label="'+v+'" '+(navActive===(target||v)?'aria-current="page"':'')+'><span class="tab-icon">'+navIcon(ico)+'</span><span>'+v+'</span></button>').join('')+'</nav></div>';
@@ -5358,12 +5451,12 @@ body,.workspace-app{background:#0e0d16!important;color:#f6f3ff!important}
         const analysed=appAudits.filter(a=>a.site||a.scan||a.status==='Analysé'||a.status==='Terminé');
         const pending=appAudits.filter(a=>!analysed.includes(a));
         const suggestions=[
-          'Quels sont les audits à traiter en priorité ?',
-          'Comment démarrer un audit pour un commerce ?',
-          'Résume mes derniers résultats.',
-          'Comment préparer un rapport client ?'
+          'Analyser un commerce',
+          'Préparer un rapport',
+          'Optimiser un commerce',
+          'Mes derniers résultats'
         ];
-        body='<section class="ai-chat-page"><div class="ai-chat-shell" data-ai-chat><header class="ai-chat-header"><div class="ai-chat-brand"><span class="ai-chat-orb" aria-hidden="true">✳</span><div><b>Assistant AuditIA</b><small>Votre copilote de visibilité locale</small></div></div><span class="ai-chat-status">Données locales disponibles</span></header><div class="ai-chat-intro"><div class="ai-chat-mascot" aria-hidden="true">✦</div><h2>Bonjour, je suis <span>AuditIA.</span></h2><p>Je vous aide à comprendre vos audits, choisir la prochaine action et préparer vos livrables. Je distingue toujours les données vérifiées des pistes à confirmer.</p></div><div class="ai-chat-suggest-label">POUR COMMENCER</div><div class="ai-chat-suggestions">'+suggestions.map((x,i)=>'<button class="ai-chat-suggestion" type="button" data-ai-prompt="'+escHtml(x)+'">'+['↗','＋','▤','↗'][i]+' &nbsp; '+escHtml(x)+'</button>').join('')+'</div><div class="ai-chat-history" id="aiChatHistory" aria-live="polite"><div class="ai-chat-msg assistant"><small>Assistant</small>Je peux déjà analyser la liste de vos dossiers enregistrés, expliquer le fonctionnement d’AuditIA et vous guider vers les bonnes actions. Pour des métriques SEO ou des performances, je m’appuie sur les résultats présents dans les dossiers — je n’invente pas de mesures.</div></div><div class="ai-chat-result"><b>Votre espace en un coup d’œil</b><ul class="ai-chat-bullets"><li>'+known+' commerce'+(known===1?'':'s')+' dans la base</li><li>'+appAudits.length+' dossier'+(appAudits.length===1?'':'s')+' d’audit, dont '+analysed.length+' avec des résultats enregistrés</li><li>'+pending.length+' dossier'+(pending.length===1?'':'s')+' à démarrer ou à compléter</li></ul><p>Ces nombres proviennent des données déjà chargées dans cette session.</p></div><div class="ai-chat-disclaimer">Les réponses sont générées localement à partir de l’espace AuditIA. Aucune API d’IA externe n’est appelée par cette première version.</div><form class="ai-chat-composer-wrap" id="aiChatForm"><div class="ai-chat-composer"><textarea id="aiChatInput" rows="1" maxlength="1200" aria-label="Écrire à l’assistant" placeholder="Posez une question sur vos audits…"></textarea><button class="ai-chat-send" type="submit">Envoyer ↑</button></div></form></div></section>';
+        body='<section class="ai-chat-page"><div class="ai-chat-shell" data-ai-chat><header class="ai-chat-header"><div class="ai-chat-brand"><span class="ai-chat-orb" aria-hidden="true">✳</span><div><b>Audit Chat IA</b><small>Votre assistant audit & visibilité locale</small></div></div><span class="ai-chat-status">Données locales disponibles</span></header><div class="ai-chat-intro"><div class="ai-chat-mascot" aria-hidden="true">✦</div><h2>Je suis <span>Audit Chat IA</span> 👋</h2><p>Je vous aide à comprendre vos audits, choisir la prochaine action et préparer vos livrables. Je distingue toujours les données vérifiées des pistes à confirmer.</p></div><div class="ai-chat-suggest-label">POUR COMMENCER</div><div class="ai-chat-suggestions">'+suggestions.map((x,i)=>'<button class="ai-chat-suggestion" type="button" data-ai-prompt="'+escHtml(x)+'">'+['↗','＋','▤','↗'][i]+' &nbsp; '+escHtml(x)+'</button>').join('')+'</div><div class="ai-chat-history" id="aiChatHistory" aria-live="polite"><div class="ai-chat-msg assistant"><small>Assistant</small>Je peux déjà analyser la liste de vos dossiers enregistrés, expliquer le fonctionnement d’AuditIA et vous guider vers les bonnes actions. Pour des métriques SEO ou des performances, je m’appuie sur les résultats présents dans les dossiers — je n’invente pas de mesures.</div></div><div class="ai-chat-result"><b>Votre espace en un coup d’œil</b><ul class="ai-chat-bullets"><li><strong>'+known+'</strong>Commerces<br>dans la base</li><li><strong>'+appAudits.length+'</strong>Audits<br>enregistrés</li><li><strong>'+pending.length+'</strong>En cours<br>ou à compléter</li><li><strong>'+analysed.length+'</strong>Rapports<br>avec résultats</li></ul><p>Ces nombres proviennent des données déjà chargées dans cette session.</p></div><div class="ai-chat-disclaimer"><strong>Bon à savoir</strong><br>Je m’appuie uniquement sur les données présentes dans vos dossiers. Je n’invente pas d’informations et je vous indique ce qui doit être confirmé.</div><form class="ai-chat-composer-wrap" id="aiChatForm"><div class="ai-chat-composer"><textarea id="aiChatInput" rows="1" maxlength="1200" aria-label="Écrire à l’assistant" placeholder="Posez votre question à Audit Chat IA…"></textarea><button class="ai-chat-send" type="submit">Envoyer ↑</button></div></form></div></section>';
       } else if(appView==='Accueil'){
         const latest=appAudits.slice(0,4);
         const completedPct=appAudits.length?Math.round(completed/appAudits.length*100):0;
@@ -5423,7 +5516,7 @@ body,.workspace-app{background:#0e0d16!important;color:#f6f3ff!important}
     async function openWorkspace(client,user){
       appClient=client;appUser=user;
       if(!user||String(user.email||'').toLowerCase()!==ADMIN_EMAIL){await client.auth.signOut();throw new Error('Ce compte n’est pas autorisé à accéder à AuditIA.')}
-      await refreshData();appView='Accueil';activeAudit=null;appNotice='';renderApp();
+      await refreshData();appView='Assistant';activeAudit=null;appNotice='';renderApp();
       void checkKeysHealth();
     }
     /* ----- écrans de connexion (rendus dans #authRoot) ----- */
