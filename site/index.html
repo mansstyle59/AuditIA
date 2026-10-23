@@ -2786,6 +2786,7 @@ body:has(#authRoot .auth-loading) .login-status:before{content:"";width:7px;heig
 @media(prefers-reduced-motion:reduce){.home-step-action span{transition:none}}
 
 
+.studio-output{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.65;padding:16px;border:1px solid #ffffff18;border-radius:14px;background:#151323;color:var(--text);font-size:14px;margin-top:12px}.studio-output::selection{background:#6d4de8;color:#fff}.sidebar-nav button[data-app-view="Studio"] .nav-icon{color:#c4b5fd}
 /* AuditIA UI polish v1 — cohérence visuelle, mobile-first, sans modifier la logique métier */
 :root{--bg:#100f1c;--panel:#1d1a30;--panel2:#26213e;--text:#f8f6ff;--muted:#b8b1cf;--purple:#a78bfa;--orange:#ffb36b;--line:#403858}
 body{background:radial-gradient(ellipse at 88% -8%,rgba(124,91,235,.16),transparent 34%),#100f1c;color:var(--text)}
@@ -2901,7 +2902,7 @@ body:has(#authRoot .auth-loading) .login-foot,body:has(#authRoot .auth-loading) 
       ['Identité visuelle','Logo, photos et informations sont cohérents'],
       ['Informations locales','Ville, zone desservie et services sont clairs']
     ];
-    let appClient = null, appUser = null, appClients = [], appAudits = [], appSettings = null, appView = 'Accueil', activeAudit = null, activeClient = null, appNotice = '';
+    let appClient = null, appUser = null, appClients = [], appAudits = [], appSettings = null, appView = 'Accueil', activeAudit = null, activeClient = null, appNotice = '', studioClientId = '', studioOutputText = '';
     let placeResults = [], placeSearching = false, placeMsg = '', pickedDetails = null, clientDraft = null, keyAlerts = [], auditFilter = '', noticeTimer = null, acTimer = null;
     const KEY_NAMES = { logo_dev:'Logo.dev', places:'Google Places', maps:'Google Maps', pagespeed:'PageSpeed' };
     function recomputeKeyAlerts(){ const a=[]; ['logo_dev','places','maps','pagespeed'].forEach(k=>{ const field=API_FIELD[k]; const val=String((appSettings&&appSettings[field])||'').trim(); if(!val) return; const rec=keyStore()[k]; if(rec&&rec.h===keyHash(val)&&rec.ok===false) a.push(KEY_NAMES[k]); }); keyAlerts=a; }
