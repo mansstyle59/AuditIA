@@ -3608,7 +3608,14 @@ body:has(.splash) .splash{position:relative;width:min(100%,380px);margin:0 auto;
 .report-card{padding:12px;border:1px solid rgba(255,255,255,.1);border-radius:16px;background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.02))}
 .report-top{display:grid;grid-template-columns:42px minmax(0,1fr) auto;gap:10px;align-items:center}
 .report-actions{display:grid;grid-template-columns:1fr 1.2fr auto;gap:8px;margin-top:12px}
-.report-actions .app-btn{min-height:40px;padding:0 10px}
+.prog-card{margin:0 0 14px}
+.prog-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.prog-head h3{margin:4px 0 0}
+.prog-head b{font-size:22px;letter-spacing:-.04em}
+.prog-head b.up{color:#8de3bb}
+.prog-head b.down{color:#f0a0a0}
+.prog-svg{width:100%;height:auto;display:block;margin-top:8px}
+.page-dossier .prog-card{margin-top:14px;background:rgba(255,255,255,.03)}
 </style>
 </head>
 <body>
@@ -4939,11 +4946,27 @@ body:has(.splash) .splash{position:relative;width:min(100%,380px);margin:0 auto;
       K.para(visibilityVerdict(idx),{size:9.5}); K.para('Le score résume les signaux disponibles. SEO = visibilité dans les moteurs de recherche ; GEO = chances d’être cité par les assistants IA.',{size:8,color:K.MUT}); K.gap(1);
       const bar=(label,score,x,w)=>{ const col=pdfScoreCol(score); K.setF('bold',9); K.setT(K.DARK); pdf.text(label,x,K.y+3.2); K.setT(col); pdf.text(score+'/100',x+w,K.y+3.2,{align:'right'}); pdf.setFillColor(230,226,240); pdf.roundedRect(x,K.y+4.6,w,2.1,1,1,'F'); pdf.setFillColor(col[0],col[1],col[2]); pdf.roundedRect(x,K.y+4.6,Math.max(1.4,w*Math.max(0,Math.min(100,Number(score)||0))/100),2.1,1,1,'F'); };
       K.ensure(12); const gap=6, bw=(K.CW-gap)/2; bar('SEO — Google',diag.seo.score,K.M,bw); bar('GEO — IA',diag.geo.score,K.M+bw+gap,bw); K.y+=12; }
+    function pdfProgress(pdf,K,a){
+      const mine=(appAudits||[]).filter(x=>String(x.client_id)===String(a.client_id)&&(x.site||x.scan||x.status==='Analysé'||x.status==='Terminé')).map(x=>({t:new Date(x.updated_at||x.created_at||0).getTime(),s:Math.max(0,Math.min(100,Number(x.score)||0))})).filter(x=>x.t&&!isNaN(x.t)).sort((p,q)=>p.t-q.t).slice(-8);
+      if(mine.length<2) return;
+      K.heading('Progression des scores');
+      K.para('Chaque point est un audit déjà enregistré pour ce commerce. Aucune valeur n’est estimée.',{size:8,color:K.MUT});
+      K.ensure(32);
+      const x0=K.M,y0=K.y+22,w=K.CW,h=18;
+      pdf.setDrawColor(225,221,237); pdf.setLineWidth(0.3); pdf.line(x0,y0,x0+w,y0);
+      mine.forEach((p,i)=>{
+        const x=x0+i/(mine.length-1)*w, y=y0-(p.s/100)*h;
+        if(i){ const prev=mine[i-1]; pdf.setDrawColor(118,87,237); pdf.setLineWidth(0.5); pdf.line(x0+(i-1)/(mine.length-1)*w,y0-(prev.s/100)*h,x,y); }
+        pdf.setFillColor(118,87,237); pdf.circle(x,y,1.15,'F');
+      });
+      const delta=mine[mine.length-1].s-mine[0].s;
+      K.y=y0+5; K.para((delta>0?'+':'')+delta+' point'+(Math.abs(delta)>1?'s':'')+' entre la première et la dernière mesure.',{size:8,color:K.MUT});
+    }
     function buildPdfFull(pdf,a,c){
       const st={...defaultSettings(),...(appSettings||{})}; const d=(c&&c.details)||{}; const diag=visibilityAudit(a,c); const col=hexToRgb(st.primary_color);
       const K=pdfKit(pdf); const {W,M,CW}=K;
       pdfHeadBand(pdf,K,st,a,'Rapport de visibilité numérique');
-      pdfClientVerdict(pdf,K,a,c,d,diag); K.hr();
+      pdfClientVerdict(pdf,K,a,c,d,diag); pdfProgress(pdf,K,a); K.hr();
       const pillar=(title,sub,p)=>{ K.heading(title,col); K.para(sub,{color:K.MUT,size:8.5}); K.gap(1);
         K.ensure(6); K.setF('bold',10); K.setT(K.DARK); pdf.text('Ce que vous avez',M,K.y+3.4); K.y+=5.6; if(p.have.length) p.have.forEach(x=>K.bullet(x.label,x.advice,[31,157,87])); else K.para('À construire entièrement sur cet axe.',{color:K.MUT,size:9});
         K.gap(1); K.ensure(6); K.setF('bold',10); K.setT(K.DARK); pdf.text('Ce qu’il vous manque',M,K.y+3.4); K.y+=5.6; if(p.miss.length) p.miss.forEach(x=>K.bullet(x.label,x.gap,[192,57,43])); else K.para('Rien de bloquant sur cet axe.',{color:K.MUT,size:9}); K.gap(2); };
@@ -5032,6 +5055,19 @@ body:has(.splash) .splash{position:relative;width:min(100%,380px);margin:0 auto;
       const shareBtn=ov.querySelector('[data-share]');
       if(shareBtn) shareBtn.addEventListener('click',async()=>{ try{ const file=new File([blob],fname,{type:'application/pdf'}); await navigator.share({files:[file],title:fname}); }catch(err){ if(err&&err.name!=='AbortError'){ try{ window.open(url,'_blank'); }catch(_){} } } });
     }
+    function progressChartHtml(rows, opts){
+      opts=opts||{};
+      const pts=(rows||[]).filter(a=>a&&(a.site||a.scan||a.status==='Analysé'||a.status==='Terminé')).map(a=>({t:new Date(a.updated_at||a.created_at||0).getTime(),score:Math.max(0,Math.min(100,Number(a.score)||0)),name:((appClients.find(c=>c.id===a.client_id)||{}).name)||'Commerce'})).filter(p=>p.t&&!isNaN(p.t)).sort((a,b)=>a.t-b.t).slice(-8);
+      if(!pts.length) return opts.quiet?'':'<section class="app-panel prog-card"><div class="eyebrow">PROGRESSION</div><h3>Scores dans le temps</h3><p class="app-muted">Aucun score réel pour le moment. Le graphique apparaîtra après la première analyse.</p></section>';
+      const w=320,h=128,pad=18;
+      const x=i=>pts.length===1?w/2:pad+(i/(pts.length-1))*(w-pad*2);
+      const y=s=>h-22-(s/100)*(h-40);
+      const d=pts.map((p,i)=>(i?'L':'M')+x(i).toFixed(1)+','+y(p.score).toFixed(1)).join(' ');
+      const dots=pts.map((p,i)=>'<g><circle cx="'+x(i).toFixed(1)+'" cy="'+y(p.score).toFixed(1)+'" r="4" fill="#c4b5fd"/><text x="'+x(i).toFixed(1)+'" y="'+(y(p.score)-8).toFixed(1)+'" text-anchor="middle" fill="#f4f1ff" font-size="10" font-weight="700">'+p.score+'</text><text x="'+x(i).toFixed(1)+'" y="'+(h-6)+'" text-anchor="middle" fill="#b7b0c8" font-size="9">'+escHtml(new Date(p.t).toLocaleDateString('fr-FR',{day:'2-digit',month:'short'}))+'</text><title>'+escHtml(p.name+' · '+p.score+'/100')+'</title></g>').join('');
+      const delta=pts.length>1?pts[pts.length-1].score-pts[0].score:null;
+      const note=pts.length<2?'Une seule mesure enregistrée. Relance l’analyse plus tard pour comparer les scores réels.':((delta>0?'+':'')+delta+' point'+(Math.abs(delta)>1?'s':'')+' entre la première et la dernière mesure affichée.');
+      return '<section class="app-panel prog-card"><div class="prog-head"><div><div class="eyebrow">PROGRESSION</div><h3>Scores enregistrés</h3></div>'+(delta==null?'':'<b class="'+(delta>=0?'up':'down')+'">'+(delta>0?'+':'')+delta+'</b>')+'</div><svg class="prog-svg" viewBox="0 0 '+w+' '+h+'" role="img" aria-label="Évolution des scores d’audit"><line x1="'+pad+'" y1="'+(h-22)+'" x2="'+(w-pad)+'" y2="'+(h-22)+'" stroke="#ffffff22"/><path d="'+d+'" fill="none" stroke="#c4b5fd" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>'+dots+'</svg><p class="app-muted">'+escHtml(note)+'</p></section>';
+    }
     function auditRowHtml(a){
       const c=appClients.find(x=>x.id===a.client_id);
       const done=!!(a.site||a.scan||a.status==='Analysé'||a.status==='Terminé');
@@ -5082,7 +5118,7 @@ body:has(.splash) .splash{position:relative;width:min(100%,380px);margin:0 auto;
       } else if(appView==='Rapports'){
         const readyReports=appAudits.filter(a=>a.site||a.scan||a.status==='Analysé'||a.status==='Terminé').length;
         const reportList=(function(){const q=norm(auditFilter);const rows=appAudits.filter(a=>{if(!q)return true;const c=appClients.find(x=>x.id===a.client_id);const d=c&&c.details||{};return norm([(c&&c.name)||'',(c&&c.city)||'',(c&&c.category)||'',(d.category||''),(a.title||''),(a.status||''),String(a.score||'')].join(' ')).includes(q);});return rows.length?'<div class="report-list">'+rows.map(reportCardHtml).join('')+'</div>':'<div class="app-empty">'+(appAudits.length?'Aucun rapport pour « '+escHtml(auditFilter)+' ».':'Les rapports apparaissent ici après un audit.')+'</div>';})();
-        body='<div class="reports-page"><div class="app-content-title"><div><h2>Rapports</h2><p>L’express tient sur une page. Le PDF complet reprend le même moteur, avec le détail.</p></div></div><div class="audit-kpis"><article><b>'+appAudits.length+'</b><span>Dossiers</span></article><article><b>'+readyReports+'</b><span>Prêts à exporter</span></article><article><b>'+Math.max(0,appAudits.length-readyReports)+'</b><span>Sans analyse</span></article></div><section class="app-panel"><h2>Exporter</h2>'+(appAudits.length?'<input class="app-filter" data-audit-filter placeholder="Rechercher un commerce, une ville…" value="'+escHtml(auditFilter)+'">':'')+reportList+'</section></div>';
+        body='<div class="reports-page"><div class="app-content-title"><div><h2>Rapports</h2><p>L’express tient sur une page. Le PDF complet reprend le même moteur, avec le détail.</p></div></div><div class="audit-kpis"><article><b>'+appAudits.length+'</b><span>Dossiers</span></article><article><b>'+readyReports+'</b><span>Prêts à exporter</span></article><article><b>'+Math.max(0,appAudits.length-readyReports)+'</b><span>Sans analyse</span></article></div>'+progressChartHtml(appAudits)+'<section class="app-panel"><h2>Exporter</h2>'+(appAudits.length?'<input class="app-filter" data-audit-filter placeholder="Rechercher un commerce, une ville…" value="'+escHtml(auditFilter)+'">':'')+reportList+'</section></div>';
       } else if(appView==='Profil') {
          const meta=appUser?.user_metadata||{};
          const displayName=String(meta.display_name||meta.full_name||'');
@@ -5097,7 +5133,7 @@ body:has(.splash) .splash{position:relative;width:min(100%,380px);margin:0 auto;
         const list=Array.isArray(a.checklist)?a.checklist:[];
         const analyzed=!!(a.site||a.scan||a.status==='Analysé');
         const diagBlocks=analyzed?(visibilitySummaryHtml(a,c)+clientInfoHtml(c)+siteShotHtml(a)+scanPanelHtml(a,c)+socialPresenceHtml(a)+rankingsHtml(a)+competitorsHtml(a,c)+targetingPanelHtml(a,c)+improvementHtml(a,c)+'<details class="cd-edit" style="margin-top:14px"><summary>Notes personnelles (facultatif)</summary><form class="app-form" data-save-notes style="padding:0 16px 16px"><label>Notes internes<textarea name="notes" placeholder="Remarques pour toi — n’apparaissent dans le rapport que si tu les remplis.">'+escHtml(a.notes||'')+'</textarea></label><button class="app-btn primary" type="submit">Enregistrer les notes</button></form></details><div class="detail-actions" style="margin-top:16px;flex-wrap:wrap"><button class="app-btn" data-export-report="'+a.id+'" data-mode="simple">📄 Rapport express (1 page · gratuit)</button><button class="app-btn primary" data-export-report="'+a.id+'" data-mode="full">📑 Rapport complet (PDF)</button><button class="app-btn" data-delete-audit="'+a.id+'">Supprimer cet audit</button></div><p class="app-muted" style="margin:8px 0 0;font-size:12px">Le <b>rapport express</b> est l’aperçu gratuit à laisser au prospect ; le <b>rapport complet</b> est le document détaillé que tu peux facturer.</p>'):'<div class="app-panel" style="margin-top:14px"><div class="app-empty">Rien n’est encore analysé. Touche <b>Lancer l’analyse</b> ci-dessus : AuditIA récupère les données Google, lit le site, trouve les réseaux, les informations légales (SIRET) et la performance, puis génère le rapport complet.</div><div class="detail-actions" style="margin-top:14px"><button class="app-btn" data-delete-audit="'+a.id+'">Supprimer cet audit</button></div></div>';
-        body='<button class="app-btn" data-app-view="Audits">← Audits</button><section class="app-panel page-dossier" style="margin-top:14px"><div class="dossier-head"><div><div class="eyebrow">DOSSIER D’AUDIT</div><h2 style="margin-top:8px">'+escHtml(c?.name||'Commerce')+'</h2><p>'+escHtml(c?.city||'')+' · '+escHtml(a.title)+'</p></div>'+(analyzed?'<div class="audit-score-chip"><b>'+(Number(a.score)||0)+'</b><span>/100</span></div>':'<div class="audit-score-chip is-wait"><span>Pas encore analysé</span></div>')+'</div>'+analysePanelHtml(a,c)+diagBlocks+'</section>';
+        body='<button class="app-btn" data-app-view="Audits">← Audits</button><section class="app-panel page-dossier" style="margin-top:14px"><div class="dossier-head"><div><div class="eyebrow">DOSSIER D’AUDIT</div><h2 style="margin-top:8px">'+escHtml(c?.name||'Commerce')+'</h2><p>'+escHtml(c?.city||'')+' · '+escHtml(a.title)+'</p></div>'+(analyzed?'<div class="audit-score-chip"><b>'+(Number(a.score)||0)+'</b><span>/100</span></div>':'<div class="audit-score-chip is-wait"><span>Pas encore analysé</span></div>')+'</div>'+progressChartHtml(appAudits.filter(x=>String(x.client_id)===String(a.client_id)),{quiet:true})+analysePanelHtml(a,c)+diagBlocks+'</section>';
       }
       appShell(body);
     }
