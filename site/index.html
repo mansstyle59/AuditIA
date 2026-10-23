@@ -3230,6 +3230,49 @@ button { touch-action: manipulation; }
 .ap-live-steps{display:grid;gap:7px}.ap-live-step{display:grid;grid-template-columns:30px minmax(0,1fr) auto;align-items:center;gap:10px;padding:11px 12px;border:1px solid #ffffff0d;border-radius:12px;background:#ffffff04;color:#c8c1dc;font-size:12px;line-height:1.4}.ap-step-icon{width:27px;height:27px;display:grid;place-items:center;border-radius:9px;background:#ffffff0b;color:#aaa0c8;font-weight:850}.ap-step-status{font-size:10px;color:#938aa9;text-align:right;white-space:nowrap}.ap-live-step.is-active{border-color:#8c75ee70;background:linear-gradient(90deg,#6049b328,#ffffff04);color:#fff}.ap-live-step.is-active .ap-step-icon{background:#5c46b8;color:#fff;animation:ap-pulse 1.7s ease-in-out infinite}.ap-live-step.is-active .ap-step-status{color:#c6b8ff}.ap-live-step.is-done .ap-step-icon{background:#164e3b;color:#92e9c2}.ap-live-step.is-done .ap-step-status{color:#8de0b9}.ap-live-step.is-limited{border-color:#a8783b55;background:#9a65200b}.ap-live-step.is-limited .ap-step-icon{background:#553b21;color:#ffd39b}.ap-live-step.is-limited .ap-step-status{color:#f4c681}.ap-live-summary{border-top:1px solid #ffffff12;margin:17px 0 0!important;padding-top:14px;color:#a8a0bf!important;font-size:11px!important;line-height:1.6}.ap-live-summary b{color:#dcd5f2}
 @keyframes ap-pulse{0%,100%{box-shadow:0 0 0 0 #a18aff00}50%{box-shadow:0 0 0 4px #a18aff20}}
 @media(max-width:540px){.ap-topline{display:block}.ap-live-badge{margin-top:12px}.ap-meta{align-items:flex-start;flex-direction:column;gap:5px}.ap-meta [data-ap-eta]{text-align:left}.ap-counts{gap:6px}.ap-counts span{display:block;padding:9px 8px;font-size:10px}.ap-counts b{display:block;margin-bottom:2px}.ap-live-step{grid-template-columns:28px minmax(0,1fr);gap:8px;padding:10px}.ap-step-status{grid-column:2;text-align:left;white-space:normal;margin-top:-4px}}
+
+/* Live audit — quatre temps, chiffres uniquement réels. */
+.ap-live-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
+.ap-clock{font-variant-numeric:tabular-nums;color:#d9d2ef;font-size:13px;font-weight:750}
+.ap-biz{margin:0 0 12px!important;font-size:clamp(28px,6vw,40px)!important;letter-spacing:-1.1px!important;line-height:1.05!important}
+.ap-stepkicker{margin:14px 0 4px!important;color:#b7a6ff!important;font-size:11px!important;font-weight:850;letter-spacing:1.4px}
+.ap-chapter{margin:0 0 6px!important;font-size:clamp(20px,4.5vw,26px)!important;letter-spacing:-.5px!important}
+.ap-chapter-sub{margin:0 0 14px!important;color:#b7b0cb!important;font-size:13px!important;line-height:1.45!important;max-width:46ch}
+.ap-stage{min-height:168px;margin:0 0 14px;padding:14px;border:1px solid rgba(167,149,255,.28);border-radius:18px;background:radial-gradient(circle at 50% 55%,rgba(124,98,214,.16),transparent 58%),rgba(10,8,20,.35)}
+.ap-stage-note{margin:10px 0 0!important;color:#9d96b4!important;font-size:11px!important}
+.ap-browser{border:1px solid rgba(255,255,255,.12);border-radius:16px;background:#f4f1fb;color:#241f38;padding:12px;box-shadow:0 16px 40px rgba(0,0,0,.18)}
+.ap-browser-bar{display:flex;align-items:center;gap:6px;margin-bottom:12px}
+.ap-browser-bar i{width:7px;height:7px;border-radius:50%;background:#d5d0e4}
+.ap-browser-bar b{margin-left:6px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;font-weight:750;background:#fff;border-radius:999px;padding:5px 10px}
+.ap-skel,.ap-skel-btn{height:8px;border-radius:999px;margin:8px 0;background:linear-gradient(90deg,#e4dff3,#f7f5fc 50%,#e4dff3);background-size:200% 100%;animation:ap-shimmer 1.4s linear infinite}
+.ap-skel.w60{width:60%}.ap-skel.w80{width:80%}
+.ap-skel-btn{width:46%;height:28px;border-radius:10px;margin-top:14px;background:linear-gradient(90deg,#6d4de8,#8d74f5)}
+.ap-radar{position:relative;height:168px;border-radius:14px;overflow:hidden;background:radial-gradient(circle,#2a2450 0 18%,transparent 19%),repeating-radial-gradient(circle at 50% 58%,rgba(176,160,255,.0) 0 28px,rgba(176,160,255,.28) 29px 30px);display:flex;align-items:center;justify-content:center}
+.ap-radar-sweep{position:absolute;left:50%;top:58%;width:46%;height:2px;transform-origin:left center;background:linear-gradient(90deg,rgba(155,255,214,.15),#b7a4ff);animation:ap-sweep 3.2s linear infinite}
+.ap-radar-dot{width:12px;height:12px;border-radius:50%;background:#c4b5fd;box-shadow:0 0 0 8px rgba(196,181,253,.18)}
+.ap-radar-names{display:block}
+.ap-chip{position:absolute;max-width:46%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border:1px solid rgba(196,181,253,.55);background:rgba(28,24,48,.92);color:#f4f0ff;border-radius:999px;padding:7px 10px;font-size:12px;font-weight:750}
+.ap-radar-names .ap-chip:nth-child(2){top:16px;left:12px}
+.ap-radar-names .ap-chip:nth-child(3){top:22px;right:10px}
+.ap-radar-names .ap-chip:nth-child(4){bottom:18px;left:14px}
+.ap-radar-names .ap-chip:nth-child(5){bottom:16px;right:12px}
+.ap-radar-names .ap-chip:nth-child(6){top:46%;left:8px}
+.ap-radar-names .ap-chip:nth-child(7){top:42%;right:8px}
+.ap-chip.is-wait{position:static;max-width:none}
+.ap-modules{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ap-module{min-width:0;padding:12px;border:1px solid rgba(255,255,255,.1);border-radius:14px;background:rgba(255,255,255,.04)}
+.ap-module b{display:block;font-size:13px;margin-bottom:4px}
+.ap-module span{display:block;color:#b7b0cb;font-size:12px;line-height:1.35}
+.ap-module.is-ready{border-color:rgba(155,135,255,.55);background:rgba(109,77,232,.16)}
+.ap-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:14px}
+.ap-metrics div{padding:12px 8px;border:1px solid rgba(255,255,255,.1);border-radius:14px;background:rgba(255,255,255,.04);text-align:center}
+.ap-metrics b{display:block;font-size:26px;letter-spacing:-.6px;font-variant-numeric:tabular-nums}
+.ap-metrics span{display:block;margin-top:2px;color:#aaa3c0;font-size:11px}
+@keyframes ap-shimmer{0%{background-position:100% 0}100%{background-position:-100% 0}}
+@keyframes ap-sweep{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@media(max-width:540px){.ap-stage{padding:12px}.ap-metrics b{font-size:22px}.ap-chip{font-size:11px;padding:6px 8px}}
+@media(prefers-reduced-motion:reduce){.ap-skel,.ap-skel-btn,.ap-radar-sweep{animation:none}}
+
 /* Live Scan : résultats progressifs réels */
 .ap-live-results{margin:18px 0;padding:16px;border:1px solid rgba(154,135,255,.24);border-radius:18px;background:linear-gradient(145deg,rgba(117,88,220,.12),rgba(15,13,28,.28))}.ap-results-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}.ap-results-heading>span:last-child{font-size:11px;color:var(--muted)}.ap-live-facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.ap-fact{min-width:0;padding:12px;border:1px solid rgba(255,255,255,.09);border-radius:13px;background:rgba(255,255,255,.035)}.ap-fact span,.ap-fact small{display:block;color:var(--muted);font-size:11px}.ap-fact b{display:block;margin:5px 0;font-size:16px;overflow-wrap:anywhere}.ap-fact small{line-height:1.4}.ap-facts-empty{grid-column:1/-1;padding:14px;border:1px dashed rgba(255,255,255,.14);border-radius:12px;color:var(--muted);font-size:12px}.ap-live-step{transition:background .2s ease,border-color .2s ease}.ap-live-step.is-active .ap-step-icon{animation:apPulse 1.4s ease-in-out infinite}@keyframes apPulse{0%,100%{box-shadow:0 0 0 3px rgba(139,112,245,.1)}50%{box-shadow:0 0 0 6px rgba(139,112,245,.2)}}@media(max-width:480px){.ap-live-facts{grid-template-columns:1fr}.ap-results-heading{align-items:flex-start;flex-direction:column}.ap-fact{padding:11px}}
 </style>
@@ -3926,8 +3969,10 @@ button { touch-action: manipulation; }
       try{
         const attempts=tries.map(u=>readSiteText(u,{},7000).then(html=>{const results=parse(html); if(!results.length) throw new Error('Aucun résultat exploitable'); return results;}));
         const timeout=new Promise((_,reject)=>{timer=setTimeout(()=>reject(new Error('Délai de recherche dépassé')),8500);});
-        return await Promise.race([Promise.any(attempts),timeout]);
-      }catch(e){ return []; }
+        const found = await Promise.race([Promise.any(attempts),timeout]);
+        noteLiveSearch();
+        return found;
+      }catch(e){ noteLiveSearch(); return []; }
       finally{ if(timer) clearTimeout(timer); }
     }
     async function findWebPresence(c){
@@ -4117,22 +4162,105 @@ button { touch-action: manipulation; }
     }
     let fullAuditState=null, fullAuditTimer=null;
     function stopFullTicker(){ if(fullAuditTimer){ clearInterval(fullAuditTimer); fullAuditTimer=null; } }
+    function liveChapter(phase){
+      const p=String(phase||'').toLowerCase();
+      if(/rapport|génération|generation/.test(p)) return 4;
+      if(/concurrent|mot-clé|mot-cle|classement/.test(p)) return 3;
+      if(/présence|presence|annuaire|réseau|reseau/.test(p)) return 2;
+      return 1;
+    }
+    function liveChapterMeta(st){
+      const instant=liveChapter(st&&st.phase);
+      const n=Math.max(1,Math.min(4,Math.max((st&&st.chapterSeen)||1,instant)));
+      const all=[
+        ['AuditIA découvre l’activité','La fiche et le site sont lus. Un chiffre n’apparaît que lorsqu’une source a répondu.'],
+        ['AuditIA cherche la présence publique','Réseaux et annuaires, seulement s’ils ressortent d’une recherche réelle.'],
+        ['AuditIA compare les commerces proches','Noms renvoyés par Google Places. Ce n’est pas le classement de Google Maps.'],
+        ['AuditIA prépare le dossier','Synthèse à partir des mesures déjà reçues. Aucun chiffre n’est ajouté à la main.']
+      ];
+      return {n,title:all[n-1][0],sub:all[n-1][1]};
+    }
+    function ensureLiveStats(){
+      if(!fullAuditState.stats) fullAuditState.stats={competitors:0,searches:0,sites:0};
+      if(!Array.isArray(fullAuditState.rivalNames)) fullAuditState.rivalNames=[];
+    }
+    function noteLiveSearch(){
+      if(!fullAuditState) return;
+      ensureLiveStats();
+      fullAuditState.stats.searches+=1;
+      tickProgress();
+    }
+    function noteLiveSite(url){
+      if(!fullAuditState) return;
+      ensureLiveStats();
+      fullAuditState.stats.sites=1;
+      try{ fullAuditState.host=new URL(url).hostname.replace(/^www\./,''); }catch(e){}
+      tickProgress();
+    }
+    function noteLiveRivals(list){
+      if(!fullAuditState) return;
+      ensureLiveStats();
+      const names=(list||[]).filter(x=>x&&!x.isSelf&&x.name).map(x=>String(x.name).trim()).filter(Boolean).slice(0,6);
+      fullAuditState.rivalNames=names;
+      fullAuditState.stats.competitors=names.length;
+      tickProgress();
+    }
+    function liveStageHtml(st){
+      const n=(st.chapterSeen||liveChapter(st.phase));
+      if(n===1){
+        const host=st.host||'Préparation…';
+        return '<div class="ap-browser" aria-hidden="true"><div class="ap-browser-bar"><i></i><i></i><i></i><b>'+escHtml(host)+'</b></div><div class="ap-skel"></div><div class="ap-skel w60"></div><div class="ap-skel w80"></div><div class="ap-skel-btn"></div></div><p class="ap-stage-note">Squelette de lecture. Ce n’est pas une capture du site.</p>';
+      }
+      if(n===2){
+        return '<div class="ap-radar" aria-hidden="true"><span class="ap-radar-sweep"></span><span class="ap-radar-dot"></span></div><p class="ap-stage-note">Recherche en cours. Aucun nom tant qu’une source n’a pas répondu.</p>';
+      }
+      if(n===3){
+        const names=st.rivalNames||[];
+        const chips=names.length?names.map(nm=>'<span class="ap-chip">'+escHtml(nm)+'</span>').join(''):'<span class="ap-chip is-wait">En attente des noms</span>';
+        return '<div class="ap-radar ap-radar-names">'+(names.length?'<span class="ap-radar-sweep" aria-hidden="true"></span>':'')+chips+'</div><p class="ap-stage-note">Chaque nom est un commerce renvoyé par Google Places.</p>';
+      }
+      const perf=(st.facts||[]).find(x=>x.label==='Performance mobile');
+      const rivals=st.stats?st.stats.competitors:0;
+      const sites=st.stats?st.stats.sites:0;
+      const mods=[
+        ['Veille locale', rivals?rivals+' commerce'+(rivals>1?'s':'')+' proche'+(rivals>1?'s':''):'Pas encore de liste', !!rivals],
+        ['Site', sites?'Page d’accueil lue':(st.host?'Lecture non aboutie':'Pas de site enregistré'), !!sites],
+        ['Performance', perf?perf.value:'Pas encore mesurée', !!(perf&&perf.value&&perf.value!=='Indisponible')],
+        ['Dossier', /rapport|genération|génération/i.test(st.phase||'')?'Synthèse en cours':'En attente des mesures', /rapport|genération|génération/i.test(st.phase||'')]
+      ];
+      return '<div class="ap-modules">'+mods.map(m=>'<article class="ap-module'+(m[2]?' is-ready':'')+'"><b>'+escHtml(m[0])+'</b><span>'+escHtml(m[1])+'</span></article>').join('')+'</div>';
+    }
     function tickProgress(){
       if(!fullAuditState) return;
       fullAuditState.pct += (fullAuditState.target-fullAuditState.pct)*0.09;
       if(fullAuditState.pct>99.4) fullAuditState.pct=99.4;
       const el=document.querySelector('[data-ap-root]'); if(!el) return;
+      ensureLiveStats();
       const shown=Math.min(100,Math.round(fullAuditState.pct));
       const bar=el.querySelector('[data-ap-bar]'); if(bar) bar.style.width=shown+'%';
       const pc=el.querySelector('[data-ap-pct]'); if(pc) pc.textContent=shown+'%';
-      const ph=el.querySelector('[data-ap-phase]'); if(ph) ph.textContent=fullAuditState.phase;
+      const meta=liveChapterMeta(fullAuditState);
+      const kicker=el.querySelector('[data-ap-kicker]'); if(kicker) kicker.textContent='ÉTAPE '+meta.n+' SUR 4';
+      const chapter=el.querySelector('[data-ap-chapter]'); if(chapter) chapter.textContent=meta.title;
+      const sub=el.querySelector('[data-ap-chapter-sub]'); if(sub) sub.textContent=meta.sub;
+      const elapsed=Math.max(0,Math.floor((Date.now()-fullAuditState.startedAt)/1000));
+      const clock=el.querySelector('[data-ap-clock]');
+      if(clock){
+        const estMin=Math.max(1,Math.ceil((fullAuditState.estTotal||60)/60));
+        const mm=Math.floor(elapsed/60), ss=String(elapsed%60).padStart(2,'0');
+        clock.textContent=mm+':'+ss+(fullAuditState.pct>=99?' · finalisation':' · ≈ '+estMin+' min');
+      }
+      const stage=el.querySelector('[data-ap-stage]');
+      if(stage){
+        const perf=(fullAuditState.facts||[]).find(x=>x.label==='Performance mobile');
+        const sig=[meta.n,fullAuditState.host||'',(fullAuditState.rivalNames||[]).join('|'),fullAuditState.stats.competitors,fullAuditState.stats.sites,perf?perf.value:''].join('§');
+        if(stage.dataset.sig!==sig){ stage.dataset.sig=sig; stage.innerHTML=liveStageHtml(fullAuditState); }
+      }
       const steps=el.querySelector('[data-ap-steps]');
       if(steps) steps.innerHTML=fullAuditState.steps.map((st,i)=>'<div class="ap-live-step '+(st.status==='active'?'is-active':st.status==='done'?'is-done':st.status==='limited'?'is-limited':'')+'"><span class="ap-step-icon">'+(st.status==='done'?'✓':st.status==='active'?'↻':st.status==='limited'?'!':String(i+1))+'</span><span>'+escHtml(st.label)+'</span><span class="ap-step-status">'+(st.status==='done'?'Terminé':st.status==='active'?'En cours':st.status==='limited'?'Partiel / indisponible':'À venir')+'</span></div>').join('');
-      const eta=el.querySelector('[data-ap-eta]'); if(eta){ const elapsed=(Date.now()-fullAuditState.startedAt)/1000; const rem=Math.max(0,Math.round(fullAuditState.estTotal-elapsed)); eta.textContent=(fullAuditState.pct>=99?'finalisation…':(rem>0?'≈ '+rem+' s estimées':'finalisation des résultats…')); }
-      const done=fullAuditState.steps.filter(st=>st.status==='done').length;
-      const limited=fullAuditState.steps.filter(st=>st.status==='limited').length;
-      const active=fullAuditState.steps.filter(st=>st.status==='active').length;
-      const count=el.querySelector('[data-ap-counts]'); if(count) count.innerHTML='<span><b>'+done+'</b> terminée'+(done>1?'s':'')+'</span><span><b>'+active+'</b> en cours</span><span><b>'+limited+'</b> partielle'+(limited>1?'s':'')+'</span>';
+      const rv=el.querySelector('[data-ap-m-rivals]'); if(rv) rv.textContent=String(fullAuditState.stats.competitors||0);
+      const sq=el.querySelector('[data-ap-m-searches]'); if(sq) sq.textContent=String(fullAuditState.stats.searches||0);
+      const stc=el.querySelector('[data-ap-m-sites]'); if(stc) stc.textContent=String(fullAuditState.stats.sites||0);
       const facts=el.querySelector('[data-ap-facts]');
       if(facts){ const items=fullAuditState.facts||[]; facts.innerHTML=items.length?items.map(x=>'<div class="ap-fact"><span>'+escHtml(x.label)+'</span><b>'+escHtml(x.value)+'</b><small>'+escHtml(x.detail||'Résultat reçu')+'</small></div>').join(''):'<div class="ap-facts-empty">Les premiers résultats apparaîtront ici dès que les sources répondront.</div>'; }
     }
@@ -4145,6 +4273,8 @@ button { touch-action: manipulation; }
       if(!step){ step={label,status:'active'}; fullAuditState.steps.push(step); }
       else step.status='active';
       fullAuditState.phase=label; fullAuditState.target=target;
+      const seen=liveChapter(label);
+      if(!fullAuditState.chapterSeen||seen>fullAuditState.chapterSeen) fullAuditState.chapterSeen=seen;
       tickProgress();
     }
     function setAuditFact(label,value,detail){
@@ -4166,13 +4296,13 @@ button { touch-action: manipulation; }
       const c=appClients.find(x=>x.id===a.client_id);
       let site=String((c&&c.website)||'').trim(); const hasWeb=!!site; if(hasWeb&&!/^https?:\/\//i.test(site)) site='https://'+site;
       const wait=ms=>new Promise(r=>setTimeout(r,ms));
-      fullAuditState={id:auditId,pct:2,target:hasWeb?12:26,phase:'Préparation de l’audit…',startedAt:Date.now(),estTotal:hasWeb?78:42,steps:[{label:'Préparation et données du commerce',status:'active'}],facts:[]};
-      appNotice=''; renderApp(); stopFullTicker(); fullAuditTimer=setInterval(tickProgress,170);
+      fullAuditState={id:auditId,pct:2,target:hasWeb?12:26,phase:'Préparation de l’audit…',startedAt:Date.now(),estTotal:hasWeb?120:70,chapterSeen:1,steps:[{label:'Préparation et données du commerce',status:'active'}],facts:[],stats:{competitors:0,searches:0,sites:0},rivalNames:[],host:hasWeb?siteHost({website:site}):''};
+      appNotice=''; renderApp(); stopFullTicker(); fullAuditTimer=setInterval(tickProgress,170); tickProgress();
       let siteRes=a.site||null, scan=a.scan||null, newDetails=null, issues=[];
       try{
         if(hasWeb){
           setPhase('Lecture du site et détection des réseaux…',20);
-          try{ const html=await readSiteHtml(site); siteRes=analyzeSite(html,site); siteRes.hasWebsite=true; setAuditFact('Site web','Analysé',((siteRes.title||siteRes.finalUrl||site)+' · '+((siteRes.socials||[]).length)+' réseaux détectés')); }
+          try{ const html=await readSiteHtml(site); siteRes=analyzeSite(html,site); siteRes.hasWebsite=true; noteLiveSite(siteRes.finalUrl||site); setAuditFact('Site web','Analysé',((siteRes.title||siteRes.finalUrl||site)+' · '+((siteRes.socials||[]).length)+' réseaux détectés')); }
           catch(e){ markPhaseLimited('Lecture du site et détection des réseaux…'); issues.push('lecture du site impossible'); }
           setPhase('Recherche de la présence sur le web (réseaux, annuaires)…',32);
           try{ const web=await findWebPresence(c); const base=siteRes||{socials:[],hasWebsite:true,analyzedAt:new Date().toISOString(),finalUrl:site}; base.socials=base.socials||[]; const have=new Set(base.socials.map(s=>s.net)); (web.socials||[]).forEach(w=>{ if(!have.has(w.net)){ have.add(w.net); base.socials.push(w); } }); base.directories=web.directories||[]; siteRes=base; }
@@ -4195,7 +4325,7 @@ button { touch-action: manipulation; }
           try{ const shot=await fetchScreenshot(site); if(shot&&siteRes){ siteRes.screenshot=shot; await appClient.from('audits').update({site:siteRes}).eq('id',auditId); } else if(!shot){ issues.push('capture du site indisponible'); } }
           catch(e){}
           setPhase('Analyse des concurrents locaux…',84);
-          try{ const cp=await fetchCompetitors(c); if(cp){ setAuditFact('Concurrents locaux',cp.total!=null?cp.total+' trouvés':'Résultats reçus',cp.selfRank?'Commerce classé '+cp.selfRank:'Comparaison locale reçue'); if(siteRes){ siteRes.competitors=cp; await appClient.from('audits').update({site:siteRes}).eq('id',auditId); } } else setAuditFact('Concurrents locaux','Indisponible','La source de recherche n’a pas fourni de résultat exploitable'); }
+          try{ const cp=await fetchCompetitors(c); if(cp){ noteLiveRivals(cp.list); setAuditFact('Concurrents locaux',cp.total!=null?cp.total+' trouvés':'Résultats reçus',cp.selfRank?'Commerce classé '+cp.selfRank:'Comparaison locale reçue'); if(siteRes){ siteRes.competitors=cp; await appClient.from('audits').update({site:siteRes}).eq('id',auditId); } } else setAuditFact('Concurrents locaux','Indisponible','La source de recherche n’a pas fourni de résultat exploitable'); }
           catch(e){}
           setPhase('Vérification du classement sur les mots-clés…',90);
           try{ const rk=await checkRankings(c); if(siteRes){ siteRes.rankings=rk; await appClient.from('audits').update({site:siteRes}).eq('id',auditId); } }
@@ -4214,7 +4344,7 @@ button { touch-action: manipulation; }
           try{ const web=await findWebPresence(c); siteRes={hasWebsite:false,socials:web.socials||[],directories:web.directories||[],analyzedAt:new Date().toISOString(),finalUrl:null}; await appClient.from('audits').update({site:siteRes}).eq('id',auditId); }
           catch(e){ siteRes={hasWebsite:false,socials:[],directories:[],analyzedAt:new Date().toISOString(),finalUrl:null}; }
           setPhase('Analyse des concurrents locaux…',72);
-          try{ const cp=await fetchCompetitors(c); if(cp){ siteRes.competitors=cp; await appClient.from('audits').update({site:siteRes}).eq('id',auditId); } }
+          try{ const cp=await fetchCompetitors(c); if(cp){ noteLiveRivals(cp.list); setAuditFact('Concurrents locaux',(cp.list||[]).filter(x=>x&&!x.isSelf).length+' commerces proches',cp.query||'Google Places'); siteRes.competitors=cp; await appClient.from('audits').update({site:siteRes}).eq('id',auditId); } }
           catch(e){}
           setPhase('Vérification du classement sur les mots-clés…',85);
           try{ const rk=await checkRankings(c); siteRes.rankings=rk; await appClient.from('audits').update({site:siteRes}).eq('id',auditId); }
@@ -4242,7 +4372,8 @@ button { touch-action: manipulation; }
     }
     function analysePanelHtml(a,c){
       if(fullAuditState&&fullAuditState.id===a.id){
-        return '<section class="app-panel analyse-panel ap-premium" data-ap-root><div class="ap-topline"><div><div class="eyebrow">AUDITIA · LIVE SCAN</div><h3 style="margin:5px 0 5px">Analyse du commerce en direct</h3><p class="ap-subtitle">Chaque étape correspond à un contrôle lancé par AuditIA. Les résultats partiels restent visibles si une source échoue.</p></div><span class="ap-live-badge"><i></i> ANALYSE ACTIVE</span></div><div class="ap-progress-row"><div class="ap-progress-track"><div class="ap-bar" data-ap-bar style="width:3%"></div></div><b data-ap-pct>3%</b></div><div class="ap-meta"><span data-ap-phase>Préparation de l’audit…</span><span data-ap-eta>Initialisation…</span></div><div class="ap-counts" data-ap-counts><span><b>0</b> terminée</span><span><b>1</b> en cours</span><span><b>0</b> partielle</span></div><div class="ap-live-results"><div class="ap-results-heading"><span class="eyebrow">RÉSULTATS EN DIRECT</span><span>Mis à jour à chaque réponse</span></div><div class="ap-live-facts" data-ap-facts aria-live="polite"><div class="ap-facts-empty">Les premiers résultats apparaîtront ici dès que les sources répondront.</div></div></div><div class="ap-live-steps" data-ap-steps aria-live="polite"><div class="ap-live-step is-active"><span class="ap-step-icon">↻</span><span>Préparation et données du commerce</span><span class="ap-step-status">En cours</span></div></div><p class="ap-live-summary"><b>Transparence des résultats.</b> Les statuts reflètent les contrôles exécutés ; les pourcentages sont une progression estimée et ne constituent pas une note d’audit.</p></section>';
+        const hasWebLive=!!String((c&&c.website)||'').trim();
+        return '<section class="app-panel analyse-panel ap-premium" data-ap-root><div class="ap-live-top"><span class="ap-live-badge"><i></i> Analyse en cours</span><span class="ap-clock" data-ap-clock>0:00 · ≈ '+(hasWebLive?'2':'1')+' min</span></div><h3 class="ap-biz">'+escHtml((c&&c.name)||'Commerce')+'</h3><div class="ap-progress-row"><div class="ap-progress-track"><div class="ap-bar" data-ap-bar style="width:3%"></div></div><b data-ap-pct>3%</b></div><p class="ap-stepkicker" data-ap-kicker>ÉTAPE 1 SUR 4</p><h4 class="ap-chapter" data-ap-chapter>AuditIA découvre l’activité</h4><p class="ap-chapter-sub" data-ap-chapter-sub>La fiche et le site sont lus. Un chiffre n’apparaît que lorsqu’une source a répondu.</p><div class="ap-stage" data-ap-stage></div><div class="ap-live-results"><div class="ap-results-heading"><span class="eyebrow">RÉSULTATS REÇUS</span><span>Uniquement des réponses réelles</span></div><div class="ap-live-facts" data-ap-facts aria-live="polite"><div class="ap-facts-empty">Les premiers résultats apparaîtront ici dès que les sources répondront.</div></div></div><div class="ap-live-steps" data-ap-steps aria-live="polite"><div class="ap-live-step is-active"><span class="ap-step-icon">↻</span><span>Préparation et données du commerce</span><span class="ap-step-status">En cours</span></div></div><div class="ap-metrics" aria-live="polite"><div><b data-ap-m-rivals>0</b><span>concurrents</span></div><div><b data-ap-m-searches>0</b><span>recherches</span></div><div><b data-ap-m-sites>0</b><span>sites lus</span></div></div><p class="ap-live-summary"><b>Pas de chiffre inventé.</b> La barre est une progression estimée, pas une note. Les compteurs restent à zéro tant qu’une source n’a pas répondu.</p></section>';
       }
       const site=String((c&&c.website)||'').trim(); const analyzed=!!(a.scan||a.site);
       const sub=site?'Lecture du site, détection des réseaux, performance Google et diagnostic SEO &amp; GEO — en une seule fois.':'Ce commerce n’a pas de site : l’analyse se base sur les données Google. Ajoute un site pour l’analyse complète (performance, réseaux, GEO).';
