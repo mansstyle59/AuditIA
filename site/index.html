@@ -2926,6 +2926,35 @@ body:has(#authRoot .auth-loading) .login-foot,body:has(#authRoot .auth-loading) 
     }
 
   </style>
+<style>
+
+    /* AuditIA mobile menu hotfix: keep the drawer visible and the page crisp */
+    @media (max-width: 760px) {
+      .workspace-sidebar {
+        display: block !important;
+        background: #211c35 !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+        box-shadow: 0 18px 48px rgba(0,0,0,.42) !important;
+      }
+      .workspace-sidebar.open {
+        display: block !important;
+        visibility: visible !important;
+        transform: translateX(0) !important;
+      }
+      .workspace-head > .burger-btn {
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+        background: #33284f !important;
+      }
+      .sidebar-backdrop.open {
+        background: rgba(5,3,13,.58) !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+      }
+    }
+
+</style>
 </head>
 <body>
   <div class="status-safe" aria-hidden="true"></div>
