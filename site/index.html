@@ -3327,6 +3327,61 @@ button { touch-action: manipulation; }
 /* Live Scan : résultats progressifs réels */
 .ap-live-results{margin:18px 0;padding:16px;border:1px solid rgba(154,135,255,.24);border-radius:18px;background:linear-gradient(145deg,rgba(117,88,220,.12),rgba(15,13,28,.28))}.ap-results-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}.ap-results-heading>span:last-child{font-size:11px;color:var(--muted)}.ap-live-facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.ap-fact{min-width:0;padding:12px;border:1px solid rgba(255,255,255,.09);border-radius:13px;background:rgba(255,255,255,.035)}.ap-fact span,.ap-fact small{display:block;color:var(--muted);font-size:11px}.ap-fact b{display:block;margin:5px 0;font-size:16px;overflow-wrap:anywhere}.ap-fact small{line-height:1.4}.ap-facts-empty{grid-column:1/-1;padding:14px;border:1px dashed rgba(255,255,255,.14);border-radius:12px;color:var(--muted);font-size:12px}.ap-live-step{transition:background .2s ease,border-color .2s ease}.ap-live-step.is-active .ap-step-icon{animation:apPulse 1.4s ease-in-out infinite}@keyframes apPulse{0%,100%{box-shadow:0 0 0 3px rgba(139,112,245,.1)}50%{box-shadow:0 0 0 6px rgba(139,112,245,.2)}}@media(max-width:480px){.ap-live-facts{grid-template-columns:1fr}.ap-results-heading{align-items:flex-start;flex-direction:column}.ap-fact{padding:11px}}
 </style>
+<style id="auditia-assistant-chat">
+/* Assistant conversationnel AuditIA — inspiration Solina, branché sur les données locales déjà chargées */
+.ai-chat-page{max-width:900px;margin:0 auto}
+.ai-chat-shell{min-height:min(760px,calc(100svh - 205px));display:flex;flex-direction:column;border:1px solid rgba(186,170,230,.2);border-radius:28px;overflow:hidden;background:radial-gradient(ellipse at 50% 0%,rgba(125,98,230,.18),transparent 38%),linear-gradient(180deg,#171426,#100e1b);box-shadow:0 18px 50px rgba(0,0,0,.18)}
+.ai-chat-header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 20px;border-bottom:1px solid rgba(255,255,255,.08)}
+.ai-chat-brand{display:flex;align-items:center;gap:10px;min-width:0}
+.ai-chat-orb{width:40px;height:40px;flex:0 0 40px;display:grid;place-items:center;border-radius:14px;background:linear-gradient(145deg,#c5b6ff,#7051d7);color:#fff;font-size:21px;box-shadow:0 8px 22px rgba(112,81,215,.28)}
+.ai-chat-brand b{display:block;font-size:15px;line-height:1.2}.ai-chat-brand small{display:block;margin-top:3px;color:#aba4c2;font-size:11px}
+.ai-chat-status{display:inline-flex;align-items:center;gap:7px;padding:7px 10px;border:1px solid rgba(111,224,180,.18);border-radius:999px;color:#a8e8cd;background:rgba(45,130,98,.1);font-size:10px;font-weight:800;white-space:nowrap}
+.ai-chat-status:before{content:"";width:6px;height:6px;border-radius:50%;background:#6fe0b4}
+.ai-chat-intro{padding:clamp(26px,5vw,45px) 22px 18px;text-align:center}
+.ai-chat-mascot{margin:0 auto 15px;width:62px;height:62px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.16);border-radius:22px;background:linear-gradient(145deg,#2a2545,#19162c);font-size:30px;box-shadow:0 0 0 7px rgba(166,138,255,.04)}
+.ai-chat-intro h2{margin:0;font-size:clamp(25px,4vw,34px);line-height:1.12;letter-spacing:-1.1px}.ai-chat-intro h2 span{color:#b8a6ff}
+.ai-chat-intro p{max-width:550px;margin:10px auto 0;color:#b7b0c8;font-size:13px;line-height:1.6}
+.ai-chat-suggest-label{margin:4px 20px 10px;color:#8e87a6;font-size:10px;font-weight:850;letter-spacing:1.5px;text-align:center}
+.ai-chat-suggestions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;padding:0 20px 18px}
+.ai-chat-suggestion{min-height:47px;text-align:left;border:1px solid rgba(186,170,230,.2);border-radius:15px;background:rgba(255,255,255,.025);color:#e6e1f5;padding:11px 13px;font-size:12px;font-weight:700;cursor:pointer;transition:background .15s,border-color .15s,transform .15s}
+.ai-chat-suggestion:hover{background:rgba(166,138,255,.09);border-color:#8e79db;transform:translateY(-1px)}
+.ai-chat-history{display:grid;gap:15px;align-content:start;padding:6px 20px 22px;flex:1;min-height:100px}
+.ai-chat-msg{max-width:min(84%,640px);padding:13px 15px;border:1px solid rgba(255,255,255,.08);border-radius:18px;background:#201c33;color:#ede9f7;font-size:13px;line-height:1.65;white-space:pre-wrap;overflow-wrap:anywhere}
+.ai-chat-msg.user{justify-self:end;border-color:rgba(166,138,255,.22);background:linear-gradient(140deg,#3b2e69,#28213f)}
+.ai-chat-msg.assistant{justify-self:start}
+.ai-chat-msg small{display:block;margin-bottom:4px;color:#bcb0ee;font-size:10px;font-weight:850;letter-spacing:.7px;text-transform:uppercase}
+.ai-chat-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.ai-chat-actions button{min-height:37px;border:1px solid rgba(186,170,230,.22);border-radius:11px;background:#29233f;color:#d9ccff;padding:8px 11px;font-size:11px;font-weight:800;cursor:pointer}
+.ai-chat-actions button.primary{background:#8c73ea;color:white;border-color:transparent}
+.ai-chat-disclaimer{padding:0 20px 13px;text-align:center;color:#817a99;font-size:10px;line-height:1.5}
+.ai-chat-composer-wrap{position:sticky;bottom:0;padding:12px 14px calc(12px + env(safe-area-inset-bottom));border-top:1px solid rgba(255,255,255,.08);background:rgba(19,16,31,.95);backdrop-filter:blur(18px)}
+.ai-chat-composer{display:flex;align-items:flex-end;gap:9px;padding:7px;border:1px solid rgba(186,170,230,.25);border-radius:19px;background:#171426}
+.ai-chat-composer textarea{display:block;min-width:0;min-height:43px;max-height:130px;flex:1;resize:vertical;border:0!important;outline:0!important;background:transparent!important;color:#f6f3ff!important;padding:11px 10px!important;font:inherit;font-size:14px!important;line-height:1.45}
+.ai-chat-send{min-height:42px;flex:0 0 auto;border:0;border-radius:13px;padding:0 17px;background:#9a86f6;color:#201833;font-weight:850;font-size:12px;cursor:pointer}
+.ai-chat-send:disabled{opacity:.45;cursor:not-allowed}
+.ai-chat-empty{display:none}
+.ai-chat-result{margin:0 20px 16px;border:1px solid rgba(186,170,230,.15);border-radius:16px;background:rgba(255,255,255,.025);padding:12px 14px}
+.ai-chat-result b{display:block;font-size:12px}.ai-chat-result p{margin:5px 0 0;color:#aaa3bf;font-size:11px;line-height:1.5}
+.ai-chat-bullets{display:grid;gap:7px;margin:10px 0 0;padding:0;list-style:none}
+.ai-chat-bullets li{display:flex;gap:8px;color:#d4cfe4;font-size:12px;line-height:1.45}
+.ai-chat-bullets li:before{content:"•";color:#b8a6ff;font-size:18px;line-height:1}
+@media(max-width:760px){
+ .ai-chat-page{width:100%;max-width:none}
+ .ai-chat-shell{min-height:calc(100svh - 190px);border-left:0;border-right:0;border-radius:24px 24px 22px 22px}
+ .ai-chat-header{padding:15px 16px}
+ .ai-chat-intro{padding:27px 18px 17px}
+ .ai-chat-suggestions{grid-template-columns:minmax(0,1fr);gap:8px;padding:0 15px 15px}
+ .ai-chat-suggestion{min-height:44px;border-radius:14px;font-size:12px}
+ .ai-chat-history{padding:6px 14px 17px}
+ .ai-chat-msg{max-width:94%;font-size:13px}
+ .ai-chat-disclaimer{padding:0 14px 11px}
+ .ai-chat-composer-wrap{padding:10px 10px calc(10px + env(safe-area-inset-bottom))}
+ .ai-chat-composer{border-radius:17px}
+ .ai-chat-send{min-height:42px;padding:0 13px}
+}
+@media(prefers-reduced-motion:reduce){.ai-chat-suggestion{transition:none!important}}
+</style>
+
   <style id="auditia-live-scan-polish">
     /* AuditIA live scan: visual layer only; the existing audit engine remains untouched. */
     .analyse-panel[data-ap-root]{
@@ -3925,9 +3980,33 @@ body,.workspace-app{background:#0e0d16!important;color:#f6f3ff!important}
       else if(!appSettings){ appSettings=defaultSettings(); }
       updateBrandColors();
     }
+    function buildAuditIAAssistantReply(question){
+      const q=String(question||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+      const analysed=appAudits.filter(a=>a.site||a.scan||a.status==='Analysé'||a.status==='Terminé');
+      const pending=appAudits.filter(a=>!analysed.includes(a));
+      const high=appAudits.filter(a=>{const score=Number(a.score);return (a.site||a.scan||a.status==='Analysé'||a.status==='Terminé')&&score>0&&score<50;});
+      const next=appAudits.find(a=>!analysed.includes(a))||appAudits[0];
+      const clientForAudit=a=>a&&appClients.find(c=>String(c.id)===String(a.client_id));
+      if(/priorit|urgent|commencer|prochain|a traiter/.test(q)){
+        if(high.length){const lines=high.slice(0,3).map(a=>{const c=clientForAudit(a);return (c?.name||a.title||'Commerce')+' ('+(Number(a.score)||0)+'/100)';}).join(', ');return {text:'Je commencerais par les dossiers analysés dont le score enregistré est inférieur à 50/100 : '+lines+'. Ce seuil est un repère de tri, pas une prédiction de gain. Ouvrez le dossier pour examiner les constats et les actions vérifiables.',actions:[{label:'Voir les audits',view:'Audits'}]};}
+        if(pending.length){const c=clientForAudit(pending[0]);return {text:'La priorité la plus défendable est de compléter un dossier qui n’a pas encore de résultat. Le premier dossier en attente est '+(c?.name||pending[0].title||'un commerce')+'. Lancez son analyse avant de formuler des recommandations fondées sur les résultats.',actions:[{label:'Ouvrir les audits',view:'Audits'}]};}
+        return {text:'Je ne vois pas de dossier en attente ni de score faible dans les données chargées. Consultez les derniers résultats, puis choisissez une action spécifique à partir des constats vérifiés.',actions:[{label:'Consulter les rapports',view:'Rapports'}]};
+      }
+      if(/resume|resultat|dernier|score|audit/.test(q)){
+        if(!analysed.length)return {text:'Aucun dossier analysé n’est identifiable dans les données actuellement chargées. Il y a '+appAudits.length+' dossier(s), dont '+pending.length+' sans résultat reconnu. Ouvrez Audits, choisissez un commerce puis lancez l’analyse. Je n’affiche pas de score estimé quand il n’existe pas de résultat.',actions:[{label:'Aller aux audits',view:'Audits'}]};
+        const rows=analysed.slice(0,4).map(a=>{const c=clientForAudit(a);return (c?.name||a.title||'Commerce')+' : '+(Number(a.score)||0)+'/100 — '+String(a.status||'Résultat enregistré');}).join('\n');
+        return {text:'Voici les dossiers avec des résultats enregistrés les plus récents :\n'+rows+'\n\nLes informations détaillées (performance, visibilité, constats et recommandations) sont dans chaque dossier et rapport. Le score seul ne suffit pas à expliquer une cause.',actions:[{label:'Voir les audits',view:'Audits'},{label:'Voir les rapports',view:'Rapports'}]};
+      }
+      if(/rapport|pdf|client|factur|export/.test(q))return {text:'Pour préparer un livrable client : ouvrez Audits, entrez dans un dossier analysé, vérifiez les constats et les notes, puis choisissez « Rapport express » ou « Rapport complet (PDF) ». N’exportez pas un audit non analysé : le document doit refléter les données réellement disponibles.',actions:[{label:'Ouvrir les audits',view:'Audits'},{label:'Consulter les rapports',view:'Rapports'}]};
+      if(/demarrer|nouveau|creer|commerce|ajouter/.test(q))return {text:'Pour lancer un audit : ajoutez ou recherchez d’abord le commerce dans Clients, vérifiez son nom, sa ville et son site web, créez le dossier d’audit puis lancez l’analyse complète. Gardez à l’esprit que certaines données externes peuvent être absentes si un service ou son quota est indisponible.',actions:[{label:'Gérer les clients',view:'Clients'},{label:'Ouvrir les audits',view:'Audits'}]};
+      if(/studio|reseau|publication|prospection|argumentaire|site vitrine/.test(q))return {text:'Le Studio peut préparer des brouillons de publications, un brief de site vitrine ou un argumentaire commercial à partir du commerce sélectionné. Relisez et personnalisez toujours ces brouillons avant de les envoyer ou de les publier.',actions:[{label:'Ouvrir le Studio',view:'Studio'}]};
+      if(/parametre|api|cle|connexion/.test(q))return {text:'Les connexions et paramètres se trouvent dans Réglages. Les clés secrètes d’IA ne doivent pas être utilisées directement dans le navigateur : une intégration IA distante devra passer par une fonction serveur sécurisée, avec contrôle d’accès, quotas et gestion des erreurs.',actions:[{label:'Ouvrir les réglages',view:'Paramètres'}]};
+      return {text:'Je peux vous aider à prioriser les dossiers, résumer les résultats enregistrés, guider la création d’un audit, préparer un rapport PDF ou utiliser le Studio. Pour le moment, cette version n’appelle pas de grand modèle externe : elle répond à partir des données disponibles dans AuditIA et de règles explicites. Pour obtenir une conversation IA libre, il faudra ensuite ajouter un endpoint serveur sécurisé, sans exposer de clé dans le navigateur.',actions:[{label:'Audits',view:'Audits'},{label:'Clients',view:'Clients'},{label:'Studio',view:'Studio'}]};
+    }
     function appNoticeHtml(){return appNotice?'<div class="app-notice '+(appNotice.startsWith('Erreur')?'error':'')+'">'+escHtml(appNotice)+'</div>':''}
     function navIcon(name){
       const paths={
+        assistant:'<path d="M12 3a7 7 0 0 0-7 7v3a3 3 0 0 0 3 3h2v-5H7a5 5 0 0 1 10 0h-3v5h2a3 3 0 0 0 3-3v-3a7 7 0 0 0-7-7Z"/><path d="M9 20h6M12 16v4"/>',
         home:'<path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1Z"/>',
         clients:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20v-1.5a6.5 6.5 0 0 1 13 0V20Z"/><path d="M16 5.2a3.5 3.5 0 0 1 0 6.6M18 14a5 5 0 0 1 3.5 4.8V20"/>',
         audits:'<path d="M7 3h10l4 4v14H3V3Z"/><path d="M7 11h10M7 15h10M7 7h4"/>',
@@ -3950,11 +4029,11 @@ body,.workspace-app{background:#0e0d16!important;color:#f6f3ff!important}
     }
     function appShell(body) {
       const page = document.querySelector('.login-page');
-      const navItems=[['Accueil','home'],['Clients','clients'],['Audits','audits'],['Rapports','reports'],['Studio','sparkles'],['Réglages','settings','Paramètres']];
-      const sectionLabel = appView==='ClientDétail'?'Clients':appView==='Détail'?'Audits':appView==='Paramètres'?'Réglages':appView==='Profil'?'Profil':appView;
+      const navItems=[['Assistant','assistant'],['Accueil','home'],['Clients','clients'],['Audits','audits'],['Rapports','reports'],['Studio','sparkles'],['Réglages','settings','Paramètres']];
+      const sectionLabel = appView==='ClientDétail'?'Clients':appView==='Détail'?'Audits':appView==='Paramètres'?'Réglages':appView==='Profil'?'Profil':appView==='Assistant'?'Assistant':appView;
       const navActive = appView==='ClientDétail'?'Clients':appView==='Détail'?'Audits':appView;
-      const headTitle = appView==='Accueil'?'Accueil':appView==='Paramètres'?'Réglages':appView==='Profil'?'Mon profil':appView==='ClientDétail'?'Fiche client':appView==='Détail'?'Dossier d’audit':appView;
-      const headLead = appView==='Clients'?(appClients.length?appClients.length+' commerce'+(appClients.length>1?'s':'')+' suivi'+(appClients.length>1?'s':'')+'.':'Ajoute un commerce pour commencer.'):appView==='Audits'?'Un dossier par commerce. Le score n’apparaît qu’après une analyse.':appView==='Rapports'?'Schémas et PDF, uniquement à partir des audits analysés.':appView==='Studio'?'Contenus et argumentaire à partir des dossiers.':appView==='Paramètres'?'Identité, signature et connexions des rapports.':appView==='Profil'?'Ton nom et ton accès. L’e-mail ne se change pas ici.':appView==='ClientDétail'?(function(){const c=appClients.find(x=>x.id===activeClient);return c?[c.name,c.city].filter(Boolean).join(' · '):'Fiche d’un commerce.';})():appView==='Détail'?(function(){const a=appAudits.find(x=>x.id===activeAudit);const c=a&&appClients.find(x=>x.id===a.client_id);return c?[c.name,c.city].filter(Boolean).join(' · '):'Le score n’apparaît qu’après l’analyse.';})():'';
+      const headTitle = appView==='Accueil'?'Accueil':appView==='Assistant'?'Assistant AuditIA':appView==='Paramètres'?'Réglages':appView==='Profil'?'Mon profil':appView==='ClientDétail'?'Fiche client':appView==='Détail'?'Dossier d’audit':appView;
+      const headLead = appView==='Assistant'?'Conseils et actions à partir des données réellement disponibles.':appView==='Clients'?(appClients.length?appClients.length+' commerce'+(appClients.length>1?'s':'')+' suivi'+(appClients.length>1?'s':'')+'.':'Ajoute un commerce pour commencer.'):appView==='Audits'?'Un dossier par commerce. Le score n’apparaît qu’après une analyse.':appView==='Rapports'?'Schémas et PDF, uniquement à partir des audits analysés.':appView==='Studio'?'Contenus et argumentaire à partir des dossiers.':appView==='Paramètres'?'Identité, signature et connexions des rapports.':appView==='Profil'?'Ton nom et ton accès. L’e-mail ne se change pas ici.':appView==='ClientDétail'?(function(){const c=appClients.find(x=>x.id===activeClient);return c?[c.name,c.city].filter(Boolean).join(' · '):'Fiche d’un commerce.';})():appView==='Détail'?(function(){const a=appAudits.find(x=>x.id===activeAudit);const c=a&&appClients.find(x=>x.id===a.client_id);return c?[c.name,c.city].filter(Boolean).join(' · '):'Le score n’apparaît qu’après l’analyse.';})():'';
       const showEyebrow = sectionLabel.trim().toLowerCase()!==headTitle.trim().toLowerCase();
       page.innerHTML = '<div class="workspace-app">'+(pdfBusy?'<div class="pdf-overlay"><div class="pdf-spin"></div><b>Génération du PDF…</b><span>Quelques secondes… l’écran « rapport prêt » s’affichera ensuite.</span><button type="button" class="pdf-cancel" data-pdf-cancel>Annuler</button></div>':'')+'<header class="app-topbar"><button class="burger-btn topbar-menu-btn" type="button" data-toggle-menu aria-label="Ouvrir le menu" aria-controls="workspaceSidebar" aria-expanded="false">'+navIcon('menu')+'</button><div class="tb-actions"><button class="app-btn topbar-profile-btn'+(appView==='Profil'?' is-active':'')+'" type="button" data-app-view="Profil" aria-label="Ouvrir le profil">'+navIcon('profile')+'<span>Profil</span></button><button class="app-btn topbar-logout-btn" type="button" data-app-action="logout" aria-label="Déconnecter" title="Déconnecter">'+navIcon('logout')+'<span>Déconnecter</span></button></div></header><div class="sidebar-backdrop" data-close-menu></div><aside class="workspace-sidebar" id="workspaceSidebar"><div class="sidebar-brand"><img src="'+escHtml(currentLogo())+'" alt="" onerror="this.style.display=&#39;none&#39;"><div><b>'+escHtml(appSettings?.app_name||'AuditIA')+'</b><small>BY AFFIADS</small></div></div><nav class="sidebar-nav" aria-label="Navigation principale">'+navItems.map(([v,ico,target])=>'<button type="button" class="'+(navActive===(target||v)?'active':'')+'" data-app-view="'+(target||v)+'"><span class="nav-icon">'+navIcon(ico)+'</span><span>'+v+'</span>'+(v==='Clients'?'<span class="nav-count">'+appClients.length+'</span>':v==='Audits'?'<span class="nav-count">'+appAudits.length+'</span>':'')+'</button>').join('')+'</nav><div class="sidebar-bottom">Auditer mieux.<br>Décider plus clairement.</div></aside><div class="workspace-layout"><main class="workspace-main"><div class="workspace-head"><div>'+(showEyebrow?'<div class="eyebrow">'+escHtml(sectionLabel)+'</div>':'')+(appView==='Accueil'?'<p class="page-title">'+escHtml(headTitle)+'</p>':'<h1>'+escHtml(headTitle)+'</h1>')+'<p>'+escHtml(headLead)+'</p></div><div class="workspace-actions desktop-account-actions"><button class="app-btn'+(appView==='Profil'?' is-active':'')+'" type="button" data-app-view="Profil">'+navIcon('profile')+'<span>Profil</span></button><button class="app-btn" type="button" data-app-action="logout">'+navIcon('logout')+'<span>Déconnecter</span></button></div></div><nav class="desktop-nav" aria-label="Navigation principale">'+navItems.map(([v,ico,target])=>'<button type="button" class="'+(navActive===(target||v)?'active':'')+'" data-app-view="'+(target||v)+'">'+navIcon(ico)+'<span>'+v+'</span></button>').join('')+'</nav>'+keyAlertHtml()+appNoticeHtml()+body+'<p class="app-muted workspace-footnote">AuditIA · Espace privé</p></main></div><nav class="mobile-tabbar" aria-label="Navigation principale">'+navItems.map(([v,ico,target])=>'<button type="button" class="'+(navActive===(target||v)?'active':'')+'" data-app-view="'+(target||v)+'" aria-label="'+v+'" '+(navActive===(target||v)?'aria-current="page"':'')+'><span class="tab-icon">'+navIcon(ico)+'</span><span>'+v+'</span></button>').join('')+'</nav></div>';
       clearTimeout(noticeTimer);
@@ -3962,6 +4041,9 @@ body,.workspace-app{background:#0e0d16!important;color:#f6f3ff!important}
       if(appNotice && !/^Erreur/.test(appNotice)){ noticeTimer=setTimeout(()=>{ appNotice=''; renderApp(); },4500); }
       { const cb=page.querySelector('[data-pdf-cancel]'); if(cb) cb.addEventListener('click',()=>{ pdfCancelled=true; pdfBusy=false; const h=document.getElementById('printReport'); if(h) h.innerHTML=''; appNotice='Génération annulée.'; renderApp(); }); }
       page.querySelectorAll('[data-app-view]').forEach(b=>b.addEventListener('click',()=>{document.body.classList.remove('menu-open');appView=b.dataset.appView;activeAudit=null;activeClient=null;appNotice='';renderApp();window.scrollTo(0,0)}));
+      page.querySelectorAll('[data-ai-prompt]').forEach(b=>b.addEventListener('click',()=>{const input=page.querySelector('#aiChatInput');if(input){input.value=b.dataset.aiPrompt;input.focus();input.dispatchEvent(new Event('input',{bubbles:true}));}}));
+      { const f=page.querySelector('#aiChatForm'); if(f) f.addEventListener('submit',e=>{e.preventDefault();const input=f.querySelector('#aiChatInput');const history=page.querySelector('#aiChatHistory');const raw=(input?.value||'').trim();if(!raw||!history)return;const q=raw.slice(0,1200);const user=document.createElement('div');user.className='ai-chat-msg user';user.textContent=q;history.appendChild(user);if(input)input.value='';const reply=buildAuditIAAssistantReply(q);const bot=document.createElement('div');bot.className='ai-chat-msg assistant';const label=document.createElement('small');label.textContent='Assistant';bot.appendChild(label);bot.appendChild(document.createTextNode(reply.text));history.appendChild(bot);if(reply.actions&&reply.actions.length){const actions=document.createElement('div');actions.className='ai-chat-actions';reply.actions.forEach(a=>{const btn=document.createElement('button');btn.type='button';btn.textContent=a.label;btn.dataset.appView=a.view;actions.appendChild(btn)});bot.appendChild(actions);actions.querySelectorAll('[data-app-view]').forEach(btn=>btn.addEventListener('click',()=>{appView=btn.dataset.appView;activeAudit=null;activeClient=null;appNotice='';renderApp();window.scrollTo(0,0)}));}history.scrollTop=history.scrollHeight;bot.scrollIntoView({block:'nearest',behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});}); }
+
       page.querySelectorAll('[data-open-client]').forEach(b=>b.addEventListener('click',()=>{activeClient=b.dataset.openClient;appView='ClientDétail';appNotice='';renderApp();window.scrollTo(0,0);}));
       page.querySelectorAll('[data-new-audit-for]').forEach(b=>b.addEventListener('click',async()=>{const cid=b.dataset.newAuditFor;const row={user_id:appUser.id,client_id:cid,title:'Audit de visibilité numérique',status:'À démarrer',score:0,checklist:checklistTemplate.map(([label,detail])=>({label,detail,done:false}))};const {error}=await appClient.from('audits').insert(row);if(error){appNotice='Erreur : '+error.message;renderApp();return;}appNotice='Audit créé.';await refreshData();const mine=appAudits.filter(a=>a.client_id===cid);if(mine.length){activeAudit=mine[0].id;appView='Détail';}renderApp();window.scrollTo(0,0);}));
       page.querySelectorAll('[data-edit-client-form]').forEach(f=>f.addEventListener('submit',async e=>{e.preventDefault();const fd=new FormData(f);const id=f.dataset.id;let website=String(fd.get('website')||'').trim();if(website&&!/^https?:\/\//i.test(website))website='https://'+website;const upd={name:String(fd.get('name')||'').trim(),city:String(fd.get('city')||'').trim(),category:String(fd.get('category')||'Autre'),website:website||null};const {error}=await appClient.from('clients').update(upd).eq('id',id);appNotice=error?'Erreur : '+error.message:'Fiche client mise à jour.';await refreshData();renderApp();}));
@@ -5271,7 +5353,18 @@ body,.workspace-app{background:#0e0d16!important;color:#f6f3ff!important}
     function renderApp(){
       const completed=appAudits.filter(a=>a.status==='Terminé'||a.status==='Analysé').length;
       let body='';
-      if(appView==='Accueil'){
+      if(appView==='Assistant'){
+        const known=appClients.length;
+        const analysed=appAudits.filter(a=>a.site||a.scan||a.status==='Analysé'||a.status==='Terminé');
+        const pending=appAudits.filter(a=>!analysed.includes(a));
+        const suggestions=[
+          'Quels sont les audits à traiter en priorité ?',
+          'Comment démarrer un audit pour un commerce ?',
+          'Résume mes derniers résultats.',
+          'Comment préparer un rapport client ?'
+        ];
+        body='<section class="ai-chat-page"><div class="ai-chat-shell" data-ai-chat><header class="ai-chat-header"><div class="ai-chat-brand"><span class="ai-chat-orb" aria-hidden="true">✳</span><div><b>Assistant AuditIA</b><small>Votre copilote de visibilité locale</small></div></div><span class="ai-chat-status">Données locales disponibles</span></header><div class="ai-chat-intro"><div class="ai-chat-mascot" aria-hidden="true">✦</div><h2>Bonjour, je suis <span>AuditIA.</span></h2><p>Je vous aide à comprendre vos audits, choisir la prochaine action et préparer vos livrables. Je distingue toujours les données vérifiées des pistes à confirmer.</p></div><div class="ai-chat-suggest-label">POUR COMMENCER</div><div class="ai-chat-suggestions">'+suggestions.map((x,i)=>'<button class="ai-chat-suggestion" type="button" data-ai-prompt="'+escHtml(x)+'">'+['↗','＋','▤','↗'][i]+' &nbsp; '+escHtml(x)+'</button>').join('')+'</div><div class="ai-chat-history" id="aiChatHistory" aria-live="polite"><div class="ai-chat-msg assistant"><small>Assistant</small>Je peux déjà analyser la liste de vos dossiers enregistrés, expliquer le fonctionnement d’AuditIA et vous guider vers les bonnes actions. Pour des métriques SEO ou des performances, je m’appuie sur les résultats présents dans les dossiers — je n’invente pas de mesures.</div></div><div class="ai-chat-result"><b>Votre espace en un coup d’œil</b><ul class="ai-chat-bullets"><li>'+known+' commerce'+(known===1?'':'s')+' dans la base</li><li>'+appAudits.length+' dossier'+(appAudits.length===1?'':'s')+' d’audit, dont '+analysed.length+' avec des résultats enregistrés</li><li>'+pending.length+' dossier'+(pending.length===1?'':'s')+' à démarrer ou à compléter</li></ul><p>Ces nombres proviennent des données déjà chargées dans cette session.</p></div><div class="ai-chat-disclaimer">Les réponses sont générées localement à partir de l’espace AuditIA. Aucune API d’IA externe n’est appelée par cette première version.</div><form class="ai-chat-composer-wrap" id="aiChatForm"><div class="ai-chat-composer"><textarea id="aiChatInput" rows="1" maxlength="1200" aria-label="Écrire à l’assistant" placeholder="Posez une question sur vos audits…"></textarea><button class="ai-chat-send" type="submit">Envoyer ↑</button></div></form></div></section>';
+      } else if(appView==='Accueil'){
         const latest=appAudits.slice(0,4);
         const completedPct=appAudits.length?Math.round(completed/appAudits.length*100):0;
         const scoredAudits=appAudits.filter(a=>a.site||a.scan||a.status==='Analysé'||a.status==='Terminé');
