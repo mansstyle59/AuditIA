@@ -3459,16 +3459,26 @@ body:has(.workspace-app){background:#101018!important}
 }
 </style>
 <style id="auditia-splash">
-body:has(.splash){background:#100e1c!important}
-body:has(.splash)>.top,body:has(.splash)>footer{display:none!important}
-body:has(.splash) .login-page{min-height:100svh!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:24px 20px calc(24px + env(safe-area-inset-bottom))!important;background:radial-gradient(ellipse at 50% 18%,rgba(139,92,255,.32),transparent 46%),radial-gradient(ellipse at 80% 80%,rgba(242,139,70,.08),transparent 32%),#100e1c!important}
-body:has(.splash) .splash{width:min(100%,420px);margin:0 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;background:transparent!important;border:0!important;box-shadow:none!important;min-height:0!important;padding:0!important}
-.splash-mark{width:74px;height:74px;display:grid;place-items:center;border-radius:24px;background:linear-gradient(145deg,#a78bfa,#5b3fd4);color:#fff;font-size:40px;font-weight:800;box-shadow:0 16px 40px rgba(91,63,212,.35),inset 0 1px rgba(255,255,255,.28)}
-.splash-mark span{color:#ffb07a;font-size:.62em;margin-left:-2px}
-.splash-word{margin:4px 0 0;font-size:clamp(40px,10vw,52px);letter-spacing:-.05em;line-height:1;font-weight:820}
+body:has(.splash){background:#0e0c18!important}
+body:has(.splash)>.top,body:has(.splash)>footer,body:has(.splash) .status-safe{display:none!important}
+body:has(.splash) .wrap{width:100%!important;max-width:none!important}
+body:has(.splash) .login-page{min-height:100svh!important;width:100%!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:calc(28px + env(safe-area-inset-top)) 28px calc(28px + env(safe-area-inset-bottom))!important;background:radial-gradient(ellipse at 50% 12%,rgba(124,86,230,.42),transparent 34%),radial-gradient(ellipse at 50% 78%,rgba(242,139,70,.08),transparent 28%),#0e0c18!important}
+body:has(.splash) .login-page:before{display:none!important}
+body:has(.splash) .splash{position:relative;width:min(100%,380px);margin:0 auto;display:flex!important;flex-direction:column;align-items:center;justify-content:center;gap:0;text-align:center;background:transparent!important;border:0!important;box-shadow:none!important;min-height:0!important;padding:0!important}
+.splash-scene{position:relative;width:min(100%,300px);height:148px;margin:0 0 22px}
+.splash-scene:before{content:"";position:absolute;left:18%;right:18%;bottom:8px;height:70px;background:radial-gradient(ellipse,rgba(167,139,250,.55),transparent 70%);filter:blur(10px)}
+.splash-art{position:relative;display:block;width:100%;height:100%;filter:drop-shadow(0 16px 18px rgba(0,0,0,.28))}
+.splash-brand{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+.splash-mark{width:58px;height:58px;display:grid;place-items:center;border-radius:18px;background:linear-gradient(145deg,#b7a2ff,#6246d8);color:#fff;font-size:32px;font-weight:800;letter-spacing:-1px;box-shadow:0 12px 28px rgba(91,63,212,.38),inset 0 1px rgba(255,255,255,.3)}
+.splash-mark span{color:#ffc39a;font-size:.58em;margin-left:-1px}
+.splash-name{text-align:left}
+.splash-word{margin:0;font-size:clamp(34px,8vw,44px);letter-spacing:-.055em;line-height:.95;font-weight:820}
 .splash-word span{color:#f28b46}
-.splash p{margin:0;max-width:16em;color:#d5d0e6;font-size:16px;line-height:1.45}
-body:has(.splash) .auth-spinner{width:28px;height:28px;margin-top:10px;border:2px solid rgba(167,139,250,.25);border-top-color:#c4b5fd;border-radius:50%;animation:auditia-spin .9s linear infinite}
+.splash-name small{display:block;margin-top:6px;color:#b7b0c8;font-size:11px;font-weight:750;letter-spacing:.16em;text-transform:uppercase}
+.splash p{margin:0;max-width:18em;color:#ddd7ee;font-size:15px;line-height:1.5}
+.splash-bar{width:120px;height:3px;margin-top:26px;border-radius:99px;overflow:hidden;background:rgba(255,255,255,.12)}
+.splash-bar span{display:block;height:100%;width:42%;border-radius:99px;background:linear-gradient(90deg,#c4b5fd,#f28b46);animation:splash-slide 1.15s ease-in-out infinite}
+@keyframes splash-slide{0%{transform:translateX(-130%)}100%{transform:translateX(280%)}}
 .workspace-main:has(>.home-hero) .home-hero-art{display:block!important;overflow:hidden!important}
 @media(max-width:760px){
   .workspace-main:has(>.home-hero)>.workspace-head{display:none!important}
@@ -3488,7 +3498,7 @@ body:has(.splash) .auth-spinner{width:28px;height:28px;margin-top:10px;border:2p
   .workspace-main:has(>.home-hero) .home-hero-art{height:168px!important;margin:0 0 10px!important;border-radius:16px!important}
   .workspace-main:has(>.home-hero) .home-hero-art svg{width:100%!important;height:100%!important;max-width:560px!important;transform:none!important}
 }
-@media(prefers-reduced-motion:reduce){body:has(.splash) .auth-spinner{animation:none}}
+@media(prefers-reduced-motion:reduce){.splash-bar span{animation:none;transform:none;width:100%}}
 </style>
 </head>
 <body>
@@ -5071,7 +5081,7 @@ body:has(.splash) .auth-spinner{width:28px;height:28px;margin-top:10px;border:2p
     });
 
     let recoveryShown=false;
-    function showAuthLoading(){ authRoot.innerHTML = '<section class="splash auth-loading" role="status" aria-live="polite"><div class="splash-mark" aria-hidden="true">A<span>✓</span></div><h1 class="splash-word">Audit<span>IA</span></h1><p>La visibilité de vos commerces, sous contrôle.</p><div class="auth-spinner" aria-hidden="true"></div></section>'; }
+    function showAuthLoading(){ authRoot.innerHTML = '<section class="splash auth-loading" role="status" aria-live="polite"><div class="splash-scene" aria-hidden="true"><svg class="splash-art" viewBox="0 0 280 150"><ellipse cx="140" cy="142" rx="78" ry="7" fill="#000" opacity=".28"/><path d="M62 86 140 34l78 52" fill="#efe8ff"/><path d="M74 84h132v52H74z" fill="#3c345f"/><rect x="70" y="80" width="140" height="8" fill="#51447a"/><rect x="96" y="98" width="30" height="24" rx="2" fill="#ffe7c2"/><rect x="154" y="98" width="30" height="24" rx="2" fill="#ffe7c2"/><path d="M111 98v24M96 110h30M169 98v24M154 110h30" stroke="#b8884a" stroke-width="1.2" opacity=".7"/><rect x="126" y="108" width="28" height="28" rx="2" fill="#1b162c"/><rect x="132" y="114" width="16" height="10" rx="1.5" fill="#ffe7c2"/></svg></div><div class="splash-brand"><div class="splash-mark" aria-hidden="true">A<span>✓</span></div><div class="splash-name"><h1 class="splash-word">Audit<span>IA</span></h1><small>by AffiAds</small></div></div><p>La visibilité de vos commerces, sous contrôle.</p><div class="splash-bar" aria-hidden="true"><span></span></div></section>'; }
     async function boot(){
       showAuthLoading();
       await getClient();
