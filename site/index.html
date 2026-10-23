@@ -4328,14 +4328,15 @@ body,.workspace-app{background:#0e0d16!important;color:#f6f3ff!important}
     function clientDetailHtml(c){
       const d=c.details||{};
       const audits=appAudits.filter(a=>a.client_id===c.id);
-      const avg=audits.length?Math.round(audits.reduce((s,a)=>s+(Number(a.score)||0),0)/audits.length):0;
-      const last=audits[0];
+      const scoredAudits=audits.filter(x=>x.site||x.scan||x.status==='Analysé'||x.status==='Terminé');
+      const avg=scoredAudits.length?Math.round(scoredAudits.reduce((s,a)=>s+(Number(a.score)||0),0)/scoredAudits.length):null;
+      const last=scoredAudits[0];
       const scoredOldToNew=[...audits].reverse().map(a=>Number(a.score)||0);
       const initial=(c.name||'?').charAt(0).toUpperCase();
       const tel=String(c.phone||d.phone||'').replace(/[^\d+]/g,'');
       const mapsQ=encodeURIComponent([c.name,d.address||c.city].filter(Boolean).join(' '));
       const header='<section class="app-panel cd-head"><div class="cd-id"><span class="cd-avatar">'+escHtml(initial)+'</span><div class="cd-id-txt"><h2>'+escHtml(c.name)+'</h2><p>'+escHtml([c.city,c.category||d.category].filter(Boolean).join(' · '))+'</p>'+(d.rating!=null?'<span class="cd-rating">★ '+d.rating+' · '+(d.reviews||0)+' avis Google</span>':'')+'</div></div><div class="cd-actions"><button class="app-btn primary" data-new-audit-for="'+c.id+'">＋ Nouvel audit</button>'+(tel?'<a class="app-btn" href="tel:'+escHtml(tel)+'">📞 Appeler</a>':'')+(c.website?'<a class="app-btn" href="'+escHtml(c.website)+'" target="_blank" rel="noopener noreferrer">🌐 Site</a>':'')+'<a class="app-btn" href="https://www.google.com/maps/search/?api=1&query='+mapsQ+'" target="_blank" rel="noopener noreferrer">📍 Localiser</a></div></section>';
-      const stats='<div class="app-stats"><article class="app-stat"><span class="stat-with-ic">'+navIcon('chart')+' Audits</span><strong>'+audits.length+'</strong></article><article class="app-stat"><span class="stat-with-ic">'+navIcon('score')+' Score moyen</span><strong>'+avg+'<small>/100</small></strong></article><article class="app-stat"><span class="stat-with-ic">'+navIcon('trend')+' Dernier score</span><strong>'+(last?(last.score||0):'—')+(last?'<small>/100</small>':'')+'</strong></article></div>';
+      const stats='<div class="app-stats"><article class="app-stat"><span class="stat-with-ic">'+navIcon('chart')+' Audits</span><strong>'+audits.length+'</strong></article><article class="app-stat"><span class="stat-with-ic">'+navIcon('score')+' Score moyen</span><strong>'+(avg==null?'—':avg+'<small>/100</small>')+'</strong></article><article class="app-stat"><span class="stat-with-ic">'+navIcon('trend')+' Dernier score</span><strong>'+(last?(last.score||0)+'<small>/100</small>':'—')+'</strong></article></div>';
       const evo=(scoredOldToNew.filter(v=>v>0).length>=2)?'<section class="app-panel"><div class="eyebrow">ÉVOLUTION DU SCORE</div><div class="cd-spark">'+sparkline(scoredOldToNew)+'</div><p class="scan-note">Du plus ancien au plus récent audit.</p></section>':'';
       const auditList='<section class="app-panel"><div class="scan-head"><div><h3 style="margin:0">Audits de ce client</h3></div><button class="app-btn primary" data-new-audit-for="'+c.id+'">Nouvel audit</button></div>'+(audits.length?'<div class="app-list" style="margin-top:10px">'+audits.map(a=>'<div class="app-row"><div><b>'+escHtml(a.title||'Audit')+'</b><small>'+escHtml(a.status||'À démarrer')+' · '+navIcon('score')+' '+(a.score||0)+'/100</small></div><button class="app-btn" data-open-audit="'+a.id+'">Ouvrir</button></div>').join('')+'</div>':'<div class="app-empty" style="margin-top:10px">Aucun audit pour ce client. Lance son premier audit.</div>')+'</section>';
       const catOpts=['Commerce','Restaurant','Artisan','Beauté & bien-être','Automobile','Hébergement','Autre'].map(o=>'<option'+(c.category===o?' selected':'')+'>'+o+'</option>').join('');
@@ -4423,6 +4424,14 @@ body,.workspace-app{background:#0e0d16!important;color:#f6f3ff!important}
     /* Recherche web (SERP) fiable côté navigateur : DuckDuckGo HTML via proxy, résultats ordonnés */
     const DIRECTORY_RX=[['Pages Jaunes',/pagesjaunes\.fr/],['Google Maps',/(maps\.google\.|goo\.gl\/maps|g\.page)/],['TripAdvisor',/tripadvisor\./],['TheFork',/(thefork\.|lafourchette\.)/],['Yelp',/yelp\./],['Mappy',/mappy\./],['Petit Futé',/petitfute\./],['Justacôté',/justacote\./],['Cylex',/cylex/],['Foursquare',/foursquare\./],['Booking',/booking\.com/],['Uber Eats',/ubereats\./],['Deliveroo',/deliveroo\./],['Planity',/planity\./],['Doctolib',/doctolib\./],['Treatwell',/treatwell\./],['Resy',/resy\./]];
     async function fetchSerp(query){
+      const cacheKey=String(query||'').trim().toLowerCase();
+      if(!fetchSerp.memo) fetchSerp.memo=new Map();
+      if(cacheKey&&fetchSerp.memo.has(cacheKey)) return fetchSerp.memo.get(cacheKey);
+      const job=fetchSerpUncached(query);
+      if(cacheKey) fetchSerp.memo.set(cacheKey, job);
+      return job;
+    }
+    async function fetchSerpUncached(query){
       const target='https://html.duckduckgo.com/html/?q='+encodeURIComponent(query);
       const tries=[
         'https://api.allorigins.win/raw?url='+encodeURIComponent(target),
@@ -4506,17 +4515,12 @@ body,.workspace-app{background:#0e0d16!important;color:#f6f3ff!important}
       const nameRaw=String((c&&c.name)||'').trim(); const cityRaw=String((c&&c.city)||'').trim(); const kws=[...new Set([(nameRaw+' '+cityRaw).trim(),...targetKeywords(c).seo].filter(Boolean))].slice(0,6);
       const name=norm((c&&c.name)||''); const host=siteHost(c);
       const nameTokens=name.split(' ').filter(w=>w.length>3);
-      const out=[];
-      for(const kw of kws){
-        if(fullAuditState){
-          const done=out.length, total=kws.length||1;
-          const base=String((c&&c.website)||'').trim()?90:85;
-          const target=Math.min(94,base+Math.floor((done/total)*5));
-          setPhase('Vérification des mots-clés ('+(done+1)+'/'+total+') : '+kw+'…',target);
-          tickProgress();
-        }
-        let results=await fetchSerp(kw); if(!results.length) results=await fetchSerp(kw);
-        if(!results.length){ out.push({kw,pos:null,found:false,error:true}); continue; }
+      const out=new Array(kws.length);
+      let cursor=0;
+      const one=async(kw,idx)=>{
+        if(fullAuditState) setAuditFact('Mot-clé en cours', kw, (idx+1)+' / '+kws.length);
+        const results=await fetchSerp(kw);
+        if(!results.length){ out[idx]={kw,pos:null,found:false,error:true}; return; }
         let pos=null, matchType='';
         for(let i=0;i<results.length&&i<20;i++){ const r=results[i]; let h=''; try{ h=new URL(r.url).hostname.replace(/^www\./,''); }catch(e){} const t=norm(r.title)+' '+norm(r.url);
           const hostMatch=!!(host&&h&&(h===host||h.endsWith('.'+host)));
@@ -4524,8 +4528,9 @@ body,.workspace-app{background:#0e0d16!important;color:#f6f3ff!important}
           const dirMatch=DIRECTORY_RX.some(([,rx])=>rx.test(r.url))&&nameMatch;
           if(hostMatch||nameMatch||dirMatch){ pos=i+1; matchType=hostMatch?'site':dirMatch?'annuaire':'nom'; break; }
         }
-        out.push({kw,pos,found:pos!=null,matchType});
-      }
+        out[idx]={kw,pos,found:pos!=null,matchType};
+      };
+      await Promise.all(Array.from({length:Math.min(3,kws.length)},async()=>{ while(cursor<kws.length){ const i=cursor++; await one(kws[i], i); } }));
       return out;
     }
     function rankBadge(r){ if(r.error) return {t:'indisponible',c:'no'}; if(r.pos==null) return {t:'non trouvé',c:'bad'}; if(r.pos<=3) return {t:'n°'+r.pos+' · très bien placé',c:'ok'}; if(r.pos<=10) return {t:'n°'+r.pos+' · page 1',c:'mid'}; return {t:'page 2 (n°'+r.pos+')',c:'bad'}; }
@@ -4778,61 +4783,37 @@ body,.workspace-app{background:#0e0d16!important;color:#f6f3ff!important}
       const c=appClients.find(x=>x.id===a.client_id);
       let site=String((c&&c.website)||'').trim(); const hasWeb=!!site; if(hasWeb&&!/^https?:\/\//i.test(site)) site='https://'+site;
       const wait=ms=>new Promise(r=>setTimeout(r,ms));
-      fullAuditState={id:auditId,pct:2,target:hasWeb?12:26,phase:'Préparation de l’audit…',startedAt:Date.now(),estTotal:hasWeb?120:70,chapterSeen:1,steps:[{label:'Préparation et données du commerce',status:'active'}],facts:[],stats:{competitors:0,searches:0,sites:0},rivalNames:[],host:hasWeb?siteHost({website:site}):''};
+      fullAuditState={id:auditId,pct:2,target:hasWeb?18:26,phase:'Préparation de l’audit…',startedAt:Date.now(),estTotal:hasWeb?55:35,chapterSeen:1,steps:[{label:'Préparation et données du commerce',status:'active'}],facts:[],stats:{competitors:0,searches:0,sites:0},rivalNames:[],host:hasWeb?siteHost({website:site}):''};
       appNotice=''; renderApp(); stopFullTicker(); fullAuditTimer=setInterval(tickProgress,170); tickProgress();
       let siteRes=a.site||null, scan=a.scan||null, newDetails=null, issues=[];
       try{
-        if(hasWeb){
-          setPhase('Lecture du site et détection des réseaux…',20);
-          try{ const html=await readSiteHtml(site); siteRes=analyzeSite(html,site); siteRes.hasWebsite=true; noteLiveSite(siteRes.finalUrl||site); setAuditFact('Site web','Analysé',((siteRes.title||siteRes.finalUrl||site)+' · '+((siteRes.socials||[]).length)+' réseaux détectés')); }
-          catch(e){ markPhaseLimited('Lecture du site et détection des réseaux…'); issues.push('lecture du site impossible'); }
-          setPhase('Recherche de la présence sur le web (réseaux, annuaires)…',32);
-          try{ const web=await findWebPresence(c); const base=siteRes||{socials:[],hasWebsite:true,analyzedAt:new Date().toISOString(),finalUrl:site}; base.socials=base.socials||[]; const have=new Set(base.socials.map(s=>s.net)); (web.socials||[]).forEach(w=>{ if(!have.has(w.net)){ have.add(w.net); base.socials.push(w); } }); base.directories=web.directories||[]; siteRes=base; }
-          catch(e){}
-          if(siteRes){ try{ await appClient.from('audits').update({site:siteRes}).eq('id',auditId); }catch(e){} }
-          setPhase('Recherche de l’ancienneté (nom de domaine)…',42);
-          try{ const dc=await fetchDomainDate(site); if(dc){ newDetails={...(c&&c.details||{}),domainCreated:dc}; } }
-          catch(e){}
-          setPhase('Recherche des informations légales (SIRET / SIRENE)…',50);
-          try{ const sir=await fetchSirene(c); if(sir&&sir.matched){ newDetails={...(newDetails||(c&&c.details)||{}),sirene:sir}; } }
-          catch(e){}
-          setPhase('Comptage des photos de la fiche Google…',58);
-          try{ const pc=await fetchPlacePhotos((c&&c.details&&c.details.place_id)||''); if(pc!=null){ newDetails={...(newDetails||(c&&c.details)||{}),photoCount:pc}; } }
-          catch(e){}
-          if(newDetails){ try{ await appClient.from('clients').update({details:newDetails}).eq('id',c.id); }catch(e){} }
-          setPhase('Mesure de la performance (Google PageSpeed)…',66);
-          try{ scan=await fetchPagespeed(site); setAuditFact('Performance mobile',scan.scores&&scan.scores.performance!=null?scan.scores.performance+'/100':'Mesurée','Google PageSpeed Insights · Lighthouse'); }
-          catch(e){ setAuditFact('Performance mobile','Indisponible',((e&&e.message)||'Source non disponible').slice(0,110)); markPhaseLimited('Mesure de la performance (Google PageSpeed)…'); issues.push('performance indisponible ('+((e&&e.message)||'').slice(0,40)+')'); }
-          setPhase('Capture d’écran du site…',76);
-          try{ const shot=await fetchScreenshot(site); if(shot&&siteRes){ siteRes.screenshot=shot; await appClient.from('audits').update({site:siteRes}).eq('id',auditId); } else if(!shot){ issues.push('capture du site indisponible'); } }
-          catch(e){}
-          setPhase('Analyse des concurrents locaux…',84);
-          try{ const cp=await fetchCompetitors(c); if(cp){ noteLiveRivals(cp.list); setAuditFact('Concurrents locaux',cp.total!=null?cp.total+' trouvés':'Résultats reçus',cp.selfRank?'Commerce classé '+cp.selfRank:'Comparaison locale reçue'); if(siteRes){ siteRes.competitors=cp; await appClient.from('audits').update({site:siteRes}).eq('id',auditId); } } else setAuditFact('Concurrents locaux','Indisponible','La source de recherche n’a pas fourni de résultat exploitable'); }
-          catch(e){}
-          setPhase('Vérification du classement sur les mots-clés…',90);
-          try{ const rk=await checkRankings(c); if(siteRes){ siteRes.rankings=rk; await appClient.from('audits').update({site:siteRes}).eq('id',auditId); } }
-          catch(e){}
-          setPhase('Génération du rapport SEO &amp; GEO…',96);
-          await wait(500);
-        } else {
-          setPhase('Recherche des informations légales (SIRET / SIRENE)…',22);
-          try{ const sir=await fetchSirene(c); if(sir&&sir.matched){ newDetails={...(newDetails||(c&&c.details)||{}),sirene:sir}; } }
-          catch(e){}
-          setPhase('Comptage des photos de la fiche Google…',34);
-          try{ const pc=await fetchPlacePhotos((c&&c.details&&c.details.place_id)||''); if(pc!=null){ newDetails={...(newDetails||(c&&c.details)||{}),photoCount:pc}; } }
-          catch(e){}
-          if(newDetails){ try{ await appClient.from('clients').update({details:newDetails}).eq('id',c.id); }catch(e){} }
-          setPhase('Recherche de la présence sur le web (réseaux, annuaires)…',52);
-          try{ const web=await findWebPresence(c); siteRes={hasWebsite:false,socials:web.socials||[],directories:web.directories||[],analyzedAt:new Date().toISOString(),finalUrl:null}; await appClient.from('audits').update({site:siteRes}).eq('id',auditId); }
-          catch(e){ siteRes={hasWebsite:false,socials:[],directories:[],analyzedAt:new Date().toISOString(),finalUrl:null}; }
-          setPhase('Analyse des concurrents locaux…',72);
-          try{ const cp=await fetchCompetitors(c); if(cp){ noteLiveRivals(cp.list); setAuditFact('Concurrents locaux',(cp.list||[]).filter(x=>x&&!x.isSelf).length+' commerces proches',cp.query||'Google Places'); siteRes.competitors=cp; await appClient.from('audits').update({site:siteRes}).eq('id',auditId); } }
-          catch(e){}
-          setPhase('Vérification du classement sur les mots-clés…',85);
-          try{ const rk=await checkRankings(c); siteRes.rankings=rk; await appClient.from('audits').update({site:siteRes}).eq('id',auditId); }
-          catch(e){}
-          setPhase('Génération du rapport…',95); await wait(500);
-        }
+        const settle=async(label,promise,onOk)=>{ try{ const value=await promise; if(onOk&&value!=null) onOk(value); return value; }catch(e){ if(label) issues.push(label); return null; } };
+        setPhase('Sources en parallèle : site, web, concurrents, performance…',62);
+        const [html,web,sir,photos,domain,shot,cp,speed,rk]=await Promise.all([
+          hasWeb?settle('lecture du site impossible', readSiteHtml(site)):Promise.resolve(null),
+          settle('', findWebPresence(c)),
+          settle('', fetchSirene(c)),
+          settle('', fetchPlacePhotos((c&&c.details&&c.details.place_id)||'')),
+          hasWeb?settle('', fetchDomainDate(site)):Promise.resolve(null),
+          hasWeb?settle('', fetchScreenshot(site)):Promise.resolve(null),
+          settle('', fetchCompetitors(c), value=>{ noteLiveRivals(value.list); setAuditFact('Concurrents locaux', value.total!=null?value.total+' trouvés':'Résultats reçus', value.selfRank?'Commerce classé '+value.selfRank:'Comparaison locale reçue'); }),
+          hasWeb?settle('performance indisponible', fetchPagespeed(site), value=>{ scan=value; setAuditFact('Performance mobile', value.scores&&value.scores.performance!=null?value.scores.performance+'/100':'Mesurée','Google PageSpeed Insights · Lighthouse'); }):Promise.resolve(null),
+          settle('', checkRankings(c))
+        ]);
+        if(html){ siteRes=analyzeSite(html,site); siteRes.hasWebsite=true; noteLiveSite(siteRes.finalUrl||site); setAuditFact('Site web','Analysé',(siteRes.finalUrl||site)+' · '+((siteRes.socials||[]).length)+' réseaux sur la page'); }
+        else if(hasWeb){ siteRes=siteRes||{socials:[],hasWebsite:true,analyzedAt:new Date().toISOString(),finalUrl:site}; }
+        else siteRes={hasWebsite:false,socials:[],directories:[],analyzedAt:new Date().toISOString(),finalUrl:null};
+        if(web){ siteRes.socials=siteRes.socials||[]; const have=new Set(siteRes.socials.map(s=>s.net)); (web.socials||[]).forEach(w=>{ if(!have.has(w.net)){ have.add(w.net); siteRes.socials.push(w); } }); siteRes.directories=web.directories||[]; setAuditFact('Présence web', siteRes.socials.length+' réseaux · '+siteRes.directories.length+' annuaires','Recherche réelle'); }
+        if(shot) siteRes.screenshot=shot;
+        if(cp) siteRes.competitors=cp;
+        if(Array.isArray(rk)){ siteRes.rankings=rk; const found=rk.filter(r=>r.found).length; setAuditFact('Mots-clés', found+' trouvé'+(found>1?'s':'')+' sur '+rk.length, 'Recherche web réelle'); }
+        if(speed) scan=speed;
+        if(domain) newDetails={...(newDetails||(c&&c.details)||{}),domainCreated:domain};
+        if(sir&&sir.matched) newDetails={...(newDetails||(c&&c.details)||{}),sirene:sir};
+        if(photos!=null) newDetails={...(newDetails||(c&&c.details)||{}),photoCount:photos};
+        if(newDetails){ try{ await appClient.from('clients').update({details:newDetails}).eq('id',c.id); }catch(e){} }
+        setPhase('Génération du rapport…',96);
+        await wait(280);
         const merged={...a,site:siteRes,scan:scan};
         const diag=visibilityAudit(merged, newDetails?{...c,details:newDetails}:c);
         const payload={score:diag.index,status:'Analysé',updated_at:new Date().toISOString()};
