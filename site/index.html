@@ -4511,6 +4511,42 @@ body:has(.workspace-app) .login-page:has(.workspace-app){min-height:0!important;
   .mobile-tabbar,.mobile-tabbar button,.app-topbar .tb-actions button{transition:none!important}
 }
 </style>
+
+<style id="auditia-header-edge-fix-v121">
+/* Fix the header's constrained parent width: the header itself spans the viewport, not the content column. */
+@media(max-width:760px){
+  body:has(.workspace-app){overflow-x:hidden!important}
+  .workspace-app{
+    width:100%!important;max-width:100%!important;min-width:0!important;
+    margin:0!important;overflow-x:clip!important;
+  }
+  .app-topbar{
+    position:sticky!important;top:0!important;z-index:250!important;
+    box-sizing:border-box!important;
+    width:100vw!important;max-width:100vw!important;min-width:0!important;
+    margin-top:0!important;margin-bottom:18px!important;
+    margin-left:calc(50% - 50vw)!important;
+    margin-right:calc(50% - 50vw)!important;
+    padding-left:max(14px,env(safe-area-inset-left,0px))!important;
+    padding-right:max(14px,env(safe-area-inset-right,0px))!important;
+    background:#151321!important;opacity:1!important;
+    -webkit-backdrop-filter:none!important;backdrop-filter:none!important;
+    transform:none!important;filter:none!important;
+    border:0!important;border-bottom:1px solid rgba(191,177,255,.16)!important;
+    border-radius:0!important;box-shadow:0 8px 22px rgba(0,0,0,.18)!important;
+    overflow:visible!important;
+  }
+  .app-topbar::before,.app-topbar::after{content:none!important;display:none!important}
+  .app-topbar .tb-brand{flex:1 1 0!important;max-width:100%!important}
+  .app-topbar .tb-actions{flex:0 0 auto!important}
+}
+@media(max-width:420px){
+  .app-topbar{
+    padding-left:max(10px,env(safe-area-inset-left,0px))!important;
+    padding-right:max(10px,env(safe-area-inset-right,0px))!important;
+  }
+}
+</style>
 </head>
 <body>
   <div class="status-safe" aria-hidden="true"></div>
