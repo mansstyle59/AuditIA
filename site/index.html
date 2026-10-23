@@ -2900,6 +2900,23 @@ body:has(#authRoot .auth-loading) .login-foot,body:has(#authRoot .auth-loading) 
     @media(max-width:760px){.home-analytics-grid{grid-template-columns:minmax(0,1fr);gap:10px;margin-bottom:20px}.home-analytics-panel{padding:16px}.home-average-score{font-size:36px;margin:16px 0 10px}.home-status-list{gap:13px;margin-top:17px}}
     @media(prefers-reduced-motion:reduce){.home-score-track span,.home-status-track span{transition:none}}
 
+  
+    /* Finition accessibilité & mobile : sans modifier les parcours ni les données */
+    :where(a,button,input,select,textarea,[tabindex]):focus-visible{
+      outline:3px solid #c4b5fd;
+      outline-offset:3px;
+    }
+    @media(max-width:760px){
+      input,select,textarea{font-size:16px}
+      button,.app-btn,.home-text-link{touch-action:manipulation}
+      .app-btn{min-height:42px}
+      body{padding-bottom:env(safe-area-inset-bottom,0px)}
+    }
+    @media(prefers-reduced-motion:reduce){
+      html{scroll-behavior:auto}
+      *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+    }
+
   </style>
 </head>
 <body>
