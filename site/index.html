@@ -4547,6 +4547,25 @@ body:has(.workspace-app) .login-page:has(.workspace-app){min-height:0!important;
   }
 }
 </style>
+
+<style id="auditia-mobile-burger-only-v122">
+/* On mobile, the bottom tab bar is the primary navigation; keep only the burger in the top bar. */
+@media(max-width:760px){
+  .app-topbar{
+    display:flex!important;justify-content:flex-start!important;align-items:center!important;
+    min-height:62px!important;height:62px!important;
+    padding:8px max(14px,env(safe-area-inset-left,0px))!important;
+    margin-bottom:14px!important;gap:0!important;
+  }
+  .app-topbar .tb-brand,
+  .app-topbar .tb-actions{display:none!important}
+  .app-topbar .topbar-menu-btn{
+    display:grid!important;flex:0 0 44px!important;
+    width:44px!important;height:44px!important;
+    margin:0!important;
+  }
+}
+</style>
 </head>
 <body>
   <div class="status-safe" aria-hidden="true"></div>
