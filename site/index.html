@@ -4815,7 +4815,31 @@ body:has(.workspace-app) .login-page:has(.workspace-app){min-height:0!important;
     @media (prefers-reduced-motion: reduce) {
       .workspace-sidebar, .app-topbar * { transition: none !important; }
     }
-  </style>
+  
+
+  /* Correctif iPhone : la zone de sécurité était comptée deux fois.
+     Le parent .login-page ajoute déjà le safe-area, puis la barre le rajoutait.
+     On supprime l'espace du parent uniquement lorsque l'espace connecté est affiché. */
+  @media (max-width: 760px) {
+    .login-page:has(.workspace-app) {
+      padding-top: 0 !important;
+      margin-top: 0 !important;
+    }
+    .workspace-app {
+      padding-top: 0 !important;
+      margin-top: 0 !important;
+    }
+    .app-topbar {
+      top: 0 !important;
+      margin-top: 0 !important;
+      padding-top: calc(env(safe-area-inset-top, 0px) + 8px) !important;
+      min-height: calc(60px + env(safe-area-inset-top, 0px)) !important;
+    }
+    .workspace-main {
+      padding-top: 0 !important;
+    }
+  }
+</style>
 
 </head>
 <body>
