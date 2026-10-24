@@ -5105,6 +5105,171 @@ body:has(.workspace-app) .login-page:has(.workspace-app){min-height:0!important;
       .home-v118-action-card { padding: 12px !important; }
     }
   </style>
+
+  <style id="auditia-gadget-dashboard-v132">
+    /* Gadget-inspired dashboard: compact data widgets, crisp outlines and restrained violet glow. */
+    .home-v118 { gap: 18px !important; }
+    .home-v118-hero {
+      border-color: rgba(170,148,255,.34) !important;
+      background:
+        radial-gradient(ellipse at 86% 8%, rgba(125,87,255,.24), transparent 36%),
+        radial-gradient(ellipse at 5% 100%, rgba(57,106,220,.12), transparent 42%),
+        linear-gradient(135deg,#12172f 0%,#21183e 56%,#141324 100%) !important;
+      box-shadow: 0 18px 52px rgba(4,3,18,.30), inset 0 1px 0 rgba(255,255,255,.055) !important;
+    }
+    .home-v118-preview,
+    .home-v118-panel,
+    .home-v118-recent {
+      position: relative;
+      border: 1px solid rgba(174,157,255,.24) !important;
+      background:
+        linear-gradient(145deg,rgba(33,29,61,.96),rgba(16,17,34,.98)) !important;
+      box-shadow: 0 12px 30px rgba(4,3,17,.20), inset 0 1px 0 rgba(255,255,255,.045) !important;
+    }
+    .home-v118-preview:before,
+    .home-v118-panel:before {
+      content: "";
+      position: absolute;
+      top: 12px; left: 16px; right: 16px;
+      height: 1px;
+      background: linear-gradient(90deg,rgba(176,150,255,.42),rgba(176,150,255,0));
+      pointer-events: none;
+    }
+    .home-v118-preview-stats > div {
+      position: relative;
+      padding: 10px 9px !important;
+      border: 1px solid rgba(169,151,255,.16);
+      border-radius: 12px;
+      background: rgba(121,96,210,.075);
+      gap: 8px !important;
+    }
+    .home-v118-preview-stats > div + div {
+      padding-left: 9px !important;
+      border-left: 1px solid rgba(169,151,255,.16) !important;
+    }
+    .home-v118-preview-stats span {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 9px !important;
+      letter-spacing: .2px;
+    }
+    .home-v118-preview-stats span:before {
+      content: "";
+      display: inline-block;
+      width: 5px; height: 5px; flex: 0 0 5px;
+      border-radius: 50%;
+      background: #a993ff;
+      box-shadow: 0 0 8px rgba(169,147,255,.6);
+    }
+    .home-v118-preview-stats strong {
+      font-size: clamp(22px,3vw,29px) !important;
+      letter-spacing: -1px !important;
+      color: #f7f3ff;
+    }
+    .home-v118-progress {
+      padding: 12px;
+      border: 1px solid rgba(169,151,255,.15);
+      border-radius: 13px;
+      background: rgba(7,9,24,.28);
+    }
+    .home-v118-progress-track,
+    .home-v118-score-track {
+      height: 7px !important;
+      background: rgba(255,255,255,.075) !important;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,.28);
+    }
+    .home-v118-progress-track span,
+    .home-v118-score-track span {
+      box-shadow: 0 0 12px rgba(151,112,255,.35);
+    }
+    .home-v118-action-card {
+      position: relative;
+      overflow: hidden;
+      border-color: rgba(174,157,255,.20) !important;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.04), 0 8px 20px rgba(3,3,15,.12);
+    }
+    .home-v118-action-card:after {
+      content: "";
+      position: absolute;
+      top: 0; left: 15px; right: 15px;
+      height: 1px;
+      background: linear-gradient(90deg,transparent,rgba(192,172,255,.42),transparent);
+      pointer-events: none;
+    }
+    .home-v118-action-icon {
+      position: relative;
+      border: 1px solid rgba(141,160,255,.18);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.07);
+    }
+    .home-v118-action-purple .home-v118-action-icon {
+      border-color: rgba(176,146,255,.23);
+      box-shadow: 0 0 18px rgba(124,83,255,.10), inset 0 1px 0 rgba(255,255,255,.08);
+    }
+    .home-v118-action-orange .home-v118-action-icon {
+      border-color: rgba(255,180,124,.18);
+    }
+    .home-v118-action-text strong { letter-spacing: -.2px; }
+    .home-v118-arrow {
+      display: grid;
+      place-items: center;
+      flex: 0 0 28px;
+      width: 28px; height: 28px;
+      border: 1px solid rgba(180,160,255,.17);
+      border-radius: 9px;
+      background: rgba(129,96,255,.08);
+      font-size: 17px !important;
+    }
+    .home-v118-panel-heading h2 { letter-spacing: -.55px !important; }
+    .home-v118-panel-symbol {
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 0 18px rgba(120,86,255,.08);
+    }
+    .home-v118-steps li {
+      border-top-color: rgba(174,157,255,.11) !important;
+    }
+    .home-v118-step-number {
+      background: linear-gradient(145deg,rgba(138,105,255,.14),rgba(88,68,165,.06)) !important;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+    }
+    .home-v118-steps li.is-done .home-v118-step-number {
+      box-shadow: 0 0 16px rgba(88,211,159,.08);
+    }
+    .home-v118-score strong { color: #d5c7ff; }
+    .home-v118-score-badge {
+      background: rgba(138,112,255,.07);
+      border-color: rgba(174,157,255,.16) !important;
+    }
+    .home-v118-status-list > div {
+      padding: 9px 10px;
+      border: 1px solid rgba(174,157,255,.11);
+      border-radius: 11px;
+      background: rgba(7,9,24,.20);
+    }
+    .home-v118-audit-row {
+      transition: background .16s ease;
+    }
+    .home-v118-audit-row:hover { background: rgba(142,113,255,.055); }
+    .home-v118-audit-icon,
+    .home-v118-open-audit {
+      border: 1px solid rgba(174,157,255,.17);
+    }
+    @media (max-width: 760px) {
+      .home-v118 { gap: 16px !important; }
+      .home-v118-hero { gap: 15px !important; }
+      .home-v118-preview { padding: 14px !important; border-radius: 19px !important; }
+      .home-v118-preview-stats { gap: 6px !important; }
+      .home-v118-preview-stats > div { padding: 9px 7px !important; border-radius: 10px !important; }
+      .home-v118-preview-stats > div + div { padding-left: 7px !important; }
+      .home-v118-preview-stats span { font-size: 8px !important; }
+      .home-v118-preview-stats strong { font-size: 23px !important; }
+      .home-v118-progress { margin-top: 14px !important; padding: 10px !important; }
+      .home-v118-action-card { min-height: 0 !important; }
+      .home-v118-panel { padding: 15px !important; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .home-v118-action-card, .home-v118-audit-row { transition: none !important; }
+    }
+  </style>
 </head>
 <body>
   <div class="status-safe" aria-hidden="true"></div>
