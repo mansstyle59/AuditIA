@@ -4853,6 +4853,58 @@ body:has(.workspace-app) .login-page:has(.workspace-app){min-height:0!important;
   .term-help-pop strong{font-weight:750;color:#fff}
   @media(max-width:760px){.term-help-pop{position:fixed;left:16px;right:16px;top:auto;bottom:calc(18px + env(safe-area-inset-bottom));width:auto;max-width:none}}
   @media(prefers-reduced-motion:reduce){.term-help-pop{scroll-behavior:auto}}
+
+  /* AuditIA finishing pass: solid iPhone chrome, denser tool spacing, refined Studio. */
+  @media (max-width: 760px) {
+    .status-safe { background:#171522 !important; opacity:1 !important; -webkit-backdrop-filter:none !important; backdrop-filter:none !important; }
+    .app-topbar { background:#201d31 !important; -webkit-backdrop-filter:none !important; backdrop-filter:none !important; box-shadow:none !important; }
+    .workspace-app { padding-top:0 !important; margin-top:0 !important; }
+    .login-page:has(.workspace-app) { padding-top:0 !important; margin-top:0 !important; }
+    .workspace-main { padding-top:0 !important; }
+    .tgt-sub { margin:9px 0 5px !important; }
+    .kw-wrap { gap:5px !important; }
+    .kw-chip { padding:5px 8px !important; line-height:1.25 !important; }
+    .geo-q { gap:5px !important; }
+    .geo-q li { padding:8px 10px !important; }
+    .app-grid { gap:10px !important; }
+    .app-form { gap:9px !important; }
+    .app-form label { gap:4px !important; }
+  }
+  .studio-intro { display:flex;align-items:center;gap:16px;padding:20px !important;background:radial-gradient(ellipse at 100% 0%,rgba(129,99,255,.22),transparent 52%),linear-gradient(135deg,#30294f,#24213b) !important;border-color:rgba(164,145,255,.35) !important; }
+  .studio-intro-mark { flex:0 0 62px;width:62px;height:62px;padding:7px;border-radius:18px;background:rgba(126,99,245,.17);border:1px solid rgba(177,157,255,.35); }
+  .studio-intro-mark img { width:100%;height:100%;object-fit:contain; }
+  .studio-intro-copy { min-width:0; }
+  .studio-intro-copy h2 { margin:4px 0 6px !important;font-size:clamp(19px,3vw,25px) !important;line-height:1.2; }
+  .studio-intro-copy p { margin:0 !important;line-height:1.55; }
+  .studio-select-panel { margin-top:10px; }
+  .studio-select-label { display:grid;gap:6px;margin-top:8px;font-size:13px;font-weight:750; }
+  .studio-select-label select { width:100%;min-width:0;padding:12px;border:1px solid #6c6192;border-radius:12px;background:#262343;color:#fff;font:inherit; }
+  .studio-tools { margin-top:18px; }
+  .studio-section-head { margin-bottom:10px; }
+  .studio-section-head p { margin:4px 0 0; }
+  .studio-grid { grid-template-columns:repeat(3,minmax(0,1fr)) !important;gap:10px !important; }
+  .studio-tool-card { position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:16px !important;margin:0 !important;min-width:0;background:linear-gradient(160deg,rgba(125,99,237,.11),rgba(255,255,255,.02)) !important; }
+  .studio-tool-icon { display:grid;place-items:center;width:38px;height:38px;margin-bottom:4px;border-radius:12px;background:#453878;border:1px solid #6959a3;color:#d8ccff;font-size:22px;font-weight:800; }
+  .studio-tool-card h3 { margin:0 !important;font-size:17px; }
+  .studio-tool-card p { margin:0 0 8px;flex:1;line-height:1.5; }
+  .studio-tool-card .app-btn { width:100%;justify-content:center;white-space:normal;line-height:1.35;min-height:42px;padding:10px !important; }
+  .studio-output-panel { margin-top:14px; }
+  .studio-output-head { display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px; }
+  .studio-output-head h2 { margin:3px 0 0 !important;font-size:18px; }
+  .studio-draft-badge { padding:5px 9px;border-radius:999px;background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.25);color:#8fe4c0;font-size:11px;font-weight:800;white-space:nowrap; }
+  .studio-output { white-space:pre-wrap;text-align:left;padding:16px !important;line-height:1.65;background:#211e32;border:1px solid #51476f;border-radius:14px;color:#f2efff;font-size:13px;overflow-wrap:anywhere; }
+  .studio-output-note { margin:10px 0 0 !important;font-size:11px !important;line-height:1.5; }
+  @media(max-width:760px) {
+    .studio-intro { align-items:flex-start;gap:12px;padding:16px !important; }
+    .studio-intro-mark { flex-basis:48px;width:48px;height:48px;border-radius:14px;padding:5px; }
+    .studio-grid { grid-template-columns:1fr !important; }
+    .studio-tool-card { display:grid;grid-template-columns:42px minmax(0,1fr);column-gap:10px;padding:14px !important; }
+    .studio-tool-icon { grid-row:1 / span 2;width:38px;height:38px;margin:0; }
+    .studio-tool-card .eyebrow,.studio-tool-card h3,.studio-tool-card p,.studio-tool-card .app-btn { grid-column:2; }
+    .studio-tool-card p { margin-bottom:4px; }
+    .studio-tool-card .app-btn { margin-top:4px; }
+  }
+  @media(prefers-reduced-motion:reduce) { .app-topbar,.studio-tool-card { transition:none !important; } }
 </style>
 
 </head>
@@ -6259,7 +6311,7 @@ body:has(.workspace-app) .login-page:has(.workspace-app){min-height:0!important;
     function pdfScoreCol(v){ return v>=75?[31,157,87]:v>=50?[201,138,0]:[192,57,43]; }
     function pdfKit(pdf,st){
       const W=210,H=297,M=18,CW=W-2*M,PT=0.3528; let y=M;
-      const pageTop=()=>{ const col=hexToRgb((st&&st.primary_color)||'#7657ed'); pdf.setFillColor(250,249,253); pdf.rect(0,0,W,H,'F'); pdf.setFillColor(col[0],col[1],col[2]); pdf.rect(0,0,W,22,'F'); pdf.setFillColor(255,255,255); pdf.roundedRect(M,5,2,12,1,1,'F'); pdf.setFont('helvetica','bold'); pdf.setFontSize(11); pdf.setTextColor(255,255,255); pdf.text(String((st&&st.app_name)||'AuditIA'),M+6,10.5); pdf.setFont('helvetica','normal'); pdf.setFontSize(7.5); pdf.text('RAPPORT DE VISIBILITÉ NUMÉRIQUE',M+6,16); pdf.setFontSize(7.5); pdf.text(String((st&&st.company_name)||'AffiAds'),W-M,10.5,{align:'right'}); pdf.setTextColor(130,125,148); pdf.text('Suite du rapport · '+new Date().toLocaleDateString('fr-FR'),W-M,16,{align:'right'}); };
+      const pageTop=()=>{ const col=hexToRgb((st&&st.primary_color)||'#7657ed'); pdf.setFillColor(250,249,253); pdf.rect(0,0,W,H,'F'); pdf.setFillColor(col[0],col[1],col[2]); pdf.rect(0,0,W,22,'F'); pdfAuditiaMark(pdf,M,4,14,col); pdf.setFont('helvetica','bold'); pdf.setFontSize(11); pdf.setTextColor(255,255,255); pdf.text(String((st&&st.app_name)||'AuditIA'),M+18,10.5); pdf.setFont('helvetica','normal'); pdf.setFontSize(7.5); pdf.text('RAPPORT DE VISIBILITÉ NUMÉRIQUE',M+18,16); pdf.setFontSize(7.5); pdf.text(String((st&&st.company_name)||'AffiAds'),W-M,10.5,{align:'right'}); pdf.setTextColor(130,125,148); pdf.text('Suite du rapport · '+new Date().toLocaleDateString('fr-FR'),W-M,16,{align:'right'}); };
       const DARK=[32,28,46], MUT=[112,108,132], LINE=[225,221,237];
       const setF=(s,sz)=>{pdf.setFont('helvetica',s||'normal');pdf.setFontSize(sz);};
       const setT=c=>pdf.setTextColor(c[0],c[1],c[2]);
@@ -6278,7 +6330,14 @@ body:has(.workspace-app) .login-page:has(.workspace-app){min-height:0!important;
       return K;
     }
     function pdfFooter(pdf,st){ const n=pdf.internal.getNumberOfPages(); for(let i=1;i<=n;i++){ pdf.setPage(i); pdf.setDrawColor(229,225,239); pdf.setLineWidth(0.25); pdf.line(18,286,192,286); pdf.setFont('helvetica','normal'); pdf.setFontSize(7.5); pdf.setTextColor(130,125,148); pdf.text('Rapport généré par '+(st.app_name||'AuditIA')+' · '+(st.company_name||'AffiAds'),18,291); pdf.text('Page '+i+' / '+n,192,291,{align:'right'}); } }
-    function pdfHeadBand(pdf,K,st,a,title){ const col=hexToRgb(st.primary_color); pdf.setFillColor(250,249,253); pdf.rect(0,0,K.W,K.H,'F'); pdf.setFillColor(col[0],col[1],col[2]); pdf.rect(0,0,K.W,28,'F'); pdf.setFillColor(255,255,255); pdf.roundedRect(K.M,6,2.2,16,1,1,'F'); K.setF('bold',15); pdf.setTextColor(255,255,255); pdf.text(String(st.app_name||'AuditIA'),K.M+6,13); K.setF('normal',8.5); pdf.text(title,K.M+6,20); K.setF('normal',8); pdf.text(new Date(a.updated_at||Date.now()).toLocaleDateString('fr-FR'),K.W-K.M,12,{align:'right'}); pdf.text(String(st.company_name||'AffiAds'),K.W-K.M,20,{align:'right'}); K.y=36; }
+    function pdfAuditiaMark(pdf,x,y,size,col){
+      const c=col||[118,87,237]; pdf.setFillColor(c[0],c[1],c[2]); pdf.roundedRect(x,y,size,size,2,2,'F');
+      pdf.setDrawColor(255,255,255); pdf.setLineWidth(Math.max(.45,size*.055));
+      pdf.line(x+size*.22,y+size*.76,x+size*.46,y+size*.25); pdf.line(x+size*.46,y+size*.25,x+size*.72,y+size*.76);
+      pdf.line(x+size*.33,y+size*.56,x+size*.61,y+size*.56);
+      pdf.setDrawColor(255,173,114); pdf.setLineWidth(Math.max(.55,size*.065)); pdf.line(x+size*.58,y+size*.78,x+size*.69,y+size*.88); pdf.line(x+size*.69,y+size*.88,x+size*.88,y+size*.65);
+    }
+    function pdfHeadBand(pdf,K,st,a,title){ const col=hexToRgb(st.primary_color); pdf.setFillColor(250,249,253); pdf.rect(0,0,K.W,K.H,'F'); pdf.setFillColor(col[0],col[1],col[2]); pdf.rect(0,0,K.W,28,'F'); pdfAuditiaMark(pdf,K.M,5.5,17,col); K.setF('bold',15); pdf.setTextColor(255,255,255); pdf.text(String(st.app_name||'AuditIA'),K.M+22,13); K.setF('normal',8.5); pdf.text(title,K.M+22,20); K.setF('normal',8); pdf.text(new Date(a.updated_at||Date.now()).toLocaleDateString('fr-FR'),K.W-K.M,12,{align:'right'}); pdf.text(String(st.company_name||'AffiAds'),K.W-K.M,20,{align:'right'}); K.y=36; }
     function pdfClientVerdict(pdf,K,a,c,d,diag){ const idx=diag.index; const lab=visibilityLabel(idx); const ic=pdfScoreCol(idx);
       K.para((c&&c.name)||'Commerce',{style:'bold',size:21}); K.para([c&&c.city,c&&(c.category||d.category)].filter(Boolean).join('   ·   '),{color:K.MUT,size:9.5}); K.para('BILAN DE VISIBILITÉ NUMÉRIQUE  ·  '+new Date(a.updated_at||Date.now()).toLocaleDateString('fr-FR'),{color:K.MUT,size:7.5}); K.gap(2);
       K.ensure(27); pdf.setFillColor(244,241,252); pdf.roundedRect(K.M,K.y,K.CW,23,3,3,'F'); pdf.setFillColor(ic[0],ic[1],ic[2]); pdf.rect(K.M,K.y,2,23,'F'); K.setF('bold',34); K.setT(ic); pdf.text(String(idx),K.M+5,K.y+13); K.setF('normal',10); K.setT(K.MUT); pdf.text('/100',K.M+5+String(idx).length*8.5,K.y+13); K.setF('bold',11); K.setT(ic); pdf.text(lab.t,K.M+43,K.y+13); K.y+=27;
@@ -6375,7 +6434,7 @@ body:has(.workspace-app) .login-page:has(.workspace-app){min-height:0!important;
     }
     function buildPdfSimple(pdf,a,c){
       const st={...defaultSettings(),...(appSettings||{})}; const d=(c&&c.details)||{}; const diag=visibilityAudit(a,c); const col=hexToRgb(st.primary_color);
-      const K=pdfKit(pdf); const {W,M,CW}=K;
+      const K=pdfKit(pdf,st); const {W,M,CW}=K;
       pdfHeadBand(pdf,K,st,a,'Aperçu de visibilité');
       pdfClientVerdict(pdf,K,a,c,d,diag); K.hr();
       K.heading('Vos points forts · à conserver',col); if(diag.strengths.length) diag.strengths.slice(0,3).forEach(x=>K.bullet(x.label,'',[31,157,87])); else K.para('Aucun point fort confirmé dans les données disponibles.',{color:K.MUT,size:8.5});
@@ -6556,11 +6615,13 @@ body:has(.workspace-app) .login-page:has(.workspace-app){min-height:0!important;
       } else if(appView==='Studio'){
         const selected=appClients.find(c=>c.id===studioClientId)||appClients[0];
         const opts=appClients.map(c=>'<option value="'+escHtml(c.id)+'"'+(selected&&selected.id===c.id?' selected':'')+'>'+escHtml(c.name)+' — '+escHtml(c.city)+'</option>').join('');
-        body='<section class="app-panel"><div class="eyebrow">CHOISIR UN COMMERCE</div>'+(appClients.length?'<label>Commerce suivi<select id="studioClientSelect">'+opts+'</select></label>':'<div class="app-empty">Ajoute d’abord un commerce dans Clients.</div>')+
-          '<div class="app-grid" style="margin-top:14px"><article class="app-panel"><div class="eyebrow">CONTENUS</div><h3>Réseaux sociaux</h3><p>Trois brouillons à personnaliser avant publication.</p><button class="app-btn primary" type="button" data-studio-generate="social" '+(selected?'':'disabled')+'>Préparer les publications</button></article>'+
-          '<article class="app-panel"><div class="eyebrow">PRÉSENCE WEB</div><h3>Brief de site vitrine</h3><p>Structure de site et informations à confirmer avant création.</p><button class="app-btn primary" type="button" data-studio-generate="site" '+(selected?'':'disabled')+'>Préparer le brief de site</button></article>'+
-          '<article class="app-panel"><div class="eyebrow">PROSPECTION</div><h3>Argumentaire commercial</h3><p>Un message de prise de contact sans promesses non vérifiées.</p><button class="app-btn primary" type="button" data-studio-generate="pitch" '+(selected?'':'disabled')+'>Préparer mon argumentaire</button></article></div></section>'+
-          '<section class="app-panel" style="margin-top:14px"><div class="eyebrow">BROUILLON MODIFIABLE</div><div id="studioOutput" class="app-empty">Choisis une action ci-dessus. Les informations manquantes seront signalées plutôt qu’inventées.</div><button type="button" class="app-btn" id="studioCopy" style="margin-top:12px" disabled>Copier le texte</button></section>';
+        body='<section class="app-panel studio-intro"><div class="studio-intro-mark"><img src="./auditia-icon.svg" alt="AuditIA"></div><div class="studio-intro-copy"><div class="eyebrow">STUDIO DE CONTENU</div><h2>Des idées aux contenus prêts à adapter</h2><p>Prépare des publications, un brief de site ou un argumentaire à partir des informations du commerce sélectionné. Relis et vérifie avant utilisation.</p></div></section>'+
+          '<section class="app-panel studio-select-panel"><div class="eyebrow">1 · COMMERCE CONCERNÉ</div>'+(appClients.length?'<label class="studio-select-label">Sélectionner un commerce<select id="studioClientSelect">'+opts+'</select></label>':'<div class="app-empty">Ajoute d’abord un commerce dans Clients pour personnaliser les contenus.</div>')+'</section>'+
+          '<section class="studio-tools"><div class="studio-section-head"><div class="eyebrow">2 · CHOISIR UN OUTIL</div><p>Chaque outil prépare un brouillon modifiable, sans publier automatiquement.</p></div><div class="app-grid studio-grid">'+
+          '<article class="app-panel studio-tool-card"><span class="studio-tool-icon" aria-hidden="true">✦</span><div class="eyebrow">RÉSEAUX SOCIAUX</div><h3>Publications</h3><p>Trois idées de posts pour présenter l’activité et engager les clients.</p><button class="app-btn primary" type="button" data-studio-generate="social" '+(selected?'':'disabled')+'>Créer mes brouillons <span aria-hidden="true">→</span></button></article>'+
+          '<article class="app-panel studio-tool-card"><span class="studio-tool-icon" aria-hidden="true">⌂</span><div class="eyebrow">PRÉSENCE WEB</div><h3>Brief de site</h3><p>Une structure claire pour une vitrine web et ses informations essentielles.</p><button class="app-btn primary" type="button" data-studio-generate="site" '+(selected?'':'disabled')+'>Préparer le brief <span aria-hidden="true">→</span></button></article>'+
+          '<article class="app-panel studio-tool-card"><span class="studio-tool-icon" aria-hidden="true">↗</span><div class="eyebrow">PROSPECTION</div><h3>Argumentaire</h3><p>Un message professionnel de prise de contact, sans promesse inventée.</p><button class="app-btn primary" type="button" data-studio-generate="pitch" '+(selected?'':'disabled')+'>Préparer le message <span aria-hidden="true">→</span></button></article></div></section>'+
+          '<section class="app-panel studio-output-panel"><div class="studio-output-head"><div><div class="eyebrow">3 · VOTRE BROUILLON</div><h2>Contenu à relire et personnaliser</h2></div><span class="studio-draft-badge">Modifiable</span></div><div id="studioOutput" class="app-empty">Choisis un outil ci-dessus. Les informations manquantes seront signalées plutôt qu’inventées.</div><button type="button" class="app-btn primary" id="studioCopy" style="margin-top:12px" disabled>Copier le texte</button><p class="studio-output-note">Avant publication : vérifie les faits, les prix, les coordonnées et les droits sur les visuels.</p></section>';
       } else if(appView==='Clients'){
         const cd=clientDraft||{}; const catOpts=['Commerce','Restaurant','Artisan','Beauté & bien-être','Automobile','Hébergement','Autre'].map(o=>'<option'+(cd.category===o?' selected':'')+'>'+o+'</option>').join('');
         const addForm='<div class="add-client">'+placeSearchHtml()+'<section class="app-panel"><h3 style="margin:0 0 4px">Ou saisir à la main</h3><form class="app-form" data-create-client style="margin-top:10px"><label>Nom du commerce<input name="name" required maxlength="120" placeholder="Ex. Boulangerie du Centre" value="'+escHtml(cd.name||'')+'"></label><label>Ville<input name="city" required maxlength="100" placeholder="Ex. Azille" value="'+escHtml(cd.city||'')+'"></label><label>Catégorie<select name="category">'+catOpts+'</select></label><label>Site web (facultatif)<input name="website" type="text" placeholder="https://exemple.fr" value="'+escHtml(cd.website||'')+'"></label><button class="app-btn primary" type="submit">Enregistrer le client</button>'+(cd.name?'<button class="app-btn" type="button" data-clear-draft>Vider</button>':'')+'</form></section></div>';
