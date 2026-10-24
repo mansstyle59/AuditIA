@@ -5060,6 +5060,51 @@ body:has(.workspace-app) .login-page:has(.workspace-app){min-height:0!important;
       .ai-float-suggestion { font-size: 10px !important; padding: 8px 9px !important; }
     }
   </style>
+
+  <style id="auditia-home-dashboard-rhythm-v131">
+    /* Fix oversized vertical gaps in the mobile dashboard without changing its content or actions. */
+    .home-v118 {
+      display: grid !important;
+      align-content: start !important;
+      align-items: start !important;
+      grid-auto-rows: max-content !important;
+      min-height: 0 !important;
+      height: auto !important;
+    }
+    .home-v118 > .home-v118-hero,
+    .home-v118 > .home-v118-section,
+    .home-v118 > .home-v118-lower-grid,
+    .home-v118 > .home-v118-recent-section {
+      position: relative;
+      align-self: start !important;
+      min-height: 0 !important;
+      height: auto !important;
+      margin-top: 0 !important;
+      margin-bottom: 0 !important;
+    }
+    .home-v118 > .home-v118-section,
+    .home-v118 > .home-v118-lower-grid {
+      align-content: start !important;
+      grid-auto-rows: max-content !important;
+    }
+    .home-v118-section-heading,
+    .home-v118-action-grid,
+    .home-v118-panel,
+    .home-v118-steps { min-height: 0 !important; }
+    @media (max-width: 760px) {
+      .home-v118 { gap: 18px !important; padding-bottom: 12px !important; }
+      .home-v118-hero { gap: 16px !important; }
+      .home-v118 > .home-v118-section { gap: 10px !important; }
+      .home-v118-section-heading { margin: 0 !important; padding: 0 !important; }
+      .home-v118-action-grid { margin: 0 !important; gap: 9px !important; }
+      .home-v118-action-card { min-height: 0 !important; padding: 14px !important; align-items: center !important; }
+      .home-v118 > .home-v118-lower-grid { gap: 12px !important; }
+    }
+    @media (max-width: 390px) {
+      .home-v118 { gap: 15px !important; }
+      .home-v118-action-card { padding: 12px !important; }
+    }
+  </style>
 </head>
 <body>
   <div class="status-safe" aria-hidden="true"></div>
