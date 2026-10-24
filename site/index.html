@@ -4976,6 +4976,26 @@ body:has(.workspace-app) .login-page:has(.workspace-app){min-height:0!important;
   @media(prefers-reduced-motion:reduce) { .app-topbar,.studio-tool-card { transition:none !important; } }
 </style>
 
+
+  <style id="auditia-header-safe-area-alignment-v129">
+    /* Align the control row with the approved reference: more breathing room below the iOS status bar. */
+    @media (max-width: 760px) {
+      .app-topbar {
+        box-sizing: border-box !important;
+        height: auto !important;
+        min-height: 0 !important;
+        padding-top: calc(env(safe-area-inset-top, 0px) + 26px) !important;
+        padding-bottom: 10px !important;
+        align-items: center !important;
+        margin-bottom: 16px !important;
+      }
+      .app-topbar .topbar-menu-btn,
+      .app-topbar .tb-actions .topbar-profile-btn,
+      .app-topbar .tb-actions .topbar-logout-btn {
+        flex-shrink: 0 !important;
+      }
+    }
+  </style>
 </head>
 <body>
   <div class="status-safe" aria-hidden="true"></div>
