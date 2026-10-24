@@ -4758,6 +4758,65 @@ body:has(.workspace-app) .login-page:has(.workspace-app){min-height:0!important;
   .app-topbar .tb-actions .topbar-profile-btn,.app-topbar .tb-actions .topbar-logout-btn{padding:0 7px!important;font-size:11px!important;gap:4px!important}
 }
 </style>
+
+  <!-- AuditIA quality pass: mobile navigation and report trust signals -->
+  <style id="auditia-quality-pass">
+    @media (max-width: 760px) {
+      .workspace-app { padding: 0 0 calc(20px + env(safe-area-inset-bottom)) !important; }
+      .app-topbar {
+        position: sticky !important; top: 0 !important; z-index: 150 !important;
+        padding: max(8px, env(safe-area-inset-top)) 14px 10px !important;
+        min-height: calc(58px + env(safe-area-inset-top));
+        background: rgba(30, 29, 48, .97) !important;
+        -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
+        border-bottom: 1px solid rgba(255,255,255,.10) !important;
+        gap: 10px !important;
+      }
+      .app-topbar .topbar-menu-btn {
+        display: inline-flex !important; flex: 0 0 42px !important;
+        width: 42px !important; height: 42px !important; align-items: center;
+        justify-content: center; border-radius: 13px !important;
+      }
+      .app-topbar .tb-brand { min-width: 0 !important; flex: 1 1 auto !important; }
+      .app-topbar .tb-brand img { width: 34px !important; height: 34px !important; }
+      .app-topbar .tb-brand b { font-size: 15px !important; }
+      .app-topbar .tb-brand small { font-size: 9px !important; letter-spacing: .7px !important; }
+      .app-topbar .tb-actions { gap: 6px !important; flex: 0 0 auto; }
+      .app-topbar .tb-actions .app-btn { min-height: 38px !important; padding: 7px 9px !important; }
+      .app-topbar .topbar-profile-btn span, .app-topbar .topbar-logout-btn span { display: none !important; }
+      .mobile-tabbar { display: none !important; visibility: hidden !important; }
+      .workspace-sidebar {
+        display: block !important; position: fixed !important;
+        top: env(safe-area-inset-top) !important; bottom: 0 !important; left: 0 !important;
+        z-index: 220 !important; width: min(300px, 86vw) !important;
+        border-radius: 0 22px 0 0 !important; padding: 18px 14px !important;
+        background: #292640 !important; overflow-y: auto !important;
+        transform: translateX(-105%) !important; visibility: hidden !important;
+        transition: transform .2s ease, visibility .2s ease !important;
+      }
+      .workspace-sidebar.open {
+        transform: translateX(0) !important; visibility: visible !important;
+        box-shadow: 0 0 0 100vmax rgba(5,3,13,.62) !important;
+      }
+      .sidebar-backdrop { display: none !important; }
+      .sidebar-backdrop.open {
+        display: block !important; position: fixed !important; inset: 0 !important;
+        z-index: 210 !important; background: rgba(5,3,13,.62) !important;
+        -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+      }
+      .workspace-head { margin-top: 0 !important; }
+      .workspace-main { padding-top: 10px !important; }
+    }
+    @media (min-width: 761px) {
+      .mobile-tabbar { display: none !important; }
+      .workspace-app { padding-bottom: 28px !important; }
+    }
+    .report-quality-note { color: #696579; font-size: 8px; line-height: 1.45; }
+    @media (prefers-reduced-motion: reduce) {
+      .workspace-sidebar, .app-topbar * { transition: none !important; }
+    }
+  </style>
+
 </head>
 <body>
   <div class="status-safe" aria-hidden="true"></div>
@@ -6194,6 +6253,23 @@ body:has(.workspace-app) .login-page:has(.workspace-app){min-height:0!important;
       const delta=mine[mine.length-1].s-mine[0].s;
       K.y=y0+5; K.para((delta>0?'+':'')+delta+' point'+(Math.abs(delta)>1?'s':'')+' entre la première et la dernière mesure.',{size:8,color:K.MUT});
     }
+    function pdfEvidenceQuality(pdf,K,a,c,col){
+      const d=(c&&c.details)||{}, scan=a&&a.scan, site=a&&a.site;
+      const signals=[
+        ['Fiche commerce',!!(d.place_id||d.address||d.rating!=null||d.reviews!=null)],
+        ['Site web',!!(site&&site.pageRead)],
+        ['Performance Lighthouse',!!(scan&&scan.scores)],
+        ['Concurrents locaux',!!(site&&site.competitors&&site.competitors.list&&site.competitors.list.length)],
+        ['Recherches de présence web',!!(site&&site.rankings&&site.rankings.length)]
+      ];
+      const available=signals.filter(x=>x[1]).map(x=>x[0]);
+      const missing=signals.filter(x=>!x[1]).map(x=>x[0]);
+      K.heading('Périmètre et fiabilité des données',col);
+      K.para('Rapport généré le '+new Date().toLocaleString('fr-FR')+'. État du dossier : '+String((a&&a.status)||'non précisé')+'.',{size:8.5});
+      K.para('Éléments présents : '+(available.length?available.join(' · '):'aucune source détaillée reconnue dans ce dossier')+'.',{size:8,color:K.MUT});
+      if(missing.length) K.para('Éléments non disponibles ou non confirmés : '+missing.join(' · ')+'. Leur absence ne prouve pas un défaut du commerce.',{size:8,color:K.MUT});
+      K.para('Les constats reflètent les données accessibles au moment de l’audit. Un classement de popularité ou une recherche indicative ne constitue pas le classement exact de Google. Les scores ne garantissent ni position, ni appels, ni ventes.',{size:8,color:K.MUT});
+    }
     function buildPdfFull(pdf,a,c){
       const st={...defaultSettings(),...(appSettings||{})}; const d=(c&&c.details)||{}; const diag=visibilityAudit(a,c); const col=hexToRgb(st.primary_color);
       const K=pdfKit(pdf); const {W,M,CW}=K;
@@ -6217,6 +6293,7 @@ body:has(.workspace-app) .login-page:has(.workspace-app){min-height:0!important;
       const rk=a&&a.site&&a.site.rankings; if(rk&&rk.length&&!rk.every(r=>r.error)){ K.heading('Classement sur les mots-clés',col); const found=rk.filter(r=>r.found).length; K.para('Trouvé sur '+found+' / '+rk.length+' recherches.',{size:9.5}); K.gap(1); rk.forEach(r=>{ const b=(typeof rankBadge==='function')?rankBadge(r):{t:(r.found?('n°'+r.pos):'non trouvé')}; K.rowLR(r.kw,b.t); }); K.para('Classement indicatif (recherche web), différent du classement Google exact.',{size:7.5,color:K.MUT}); }
       const plan=(typeof improvementPlan==='function')?improvementPlan(a,c):[]; if(plan.length){ K.heading('Plan d’amélioration détaillé',col); plan.forEach((it,i)=>{ K.setF('bold',10); const hl=pdf.splitTextToSize((i+1)+'. '+it.title+'   ['+it.axis+' · '+it.priority+']',CW); K.ensure(K.lh(10)*hl.length+2); K.setT(K.DARK); hl.forEach(ln=>{ pdf.text(ln,M,K.y+3.4); K.y+=K.lh(10); }); if(it.why) K.para('Pourquoi : '+it.why,{size:8.5,color:K.MUT}); (it.how||[]).forEach(h=>K.bullet(h,'',col)); K.gap(1.5); }); }
       if(a.notes){ K.heading('Notes',col); K.para(a.notes,{size:9.5}); }
+      pdfEvidenceQuality(pdf,K,a,c,col);
       K.gap(3); K.hr(); K.ensure(6); K.setF('bold',10); K.setT(col); pdf.text(String(st.signature_name||st.company_name||'AffiAds'),M,K.y+3.4); K.y+=5; if(st.signature_role) K.para(st.signature_role,{size:9,color:K.MUT}); const contact=[st.contact_email,st.phone,st.website].filter(Boolean).join('   ·   '); if(contact) K.para(contact,{size:9}); if(st.signature_text) K.para(st.signature_text,{size:8.5,color:K.MUT});
       pdfFooter(pdf,st);
     }
@@ -6227,6 +6304,7 @@ body:has(.workspace-app) .login-page:has(.workspace-app){min-height:0!important;
       pdfClientVerdict(pdf,K,a,c,d,diag); K.hr();
       K.heading('Vos points forts · à conserver',col); if(diag.strengths.length) diag.strengths.slice(0,3).forEach(x=>K.bullet(x.label,'',[31,157,87])); else K.para('Aucun point fort confirmé dans les données disponibles.',{color:K.MUT,size:8.5});
       K.heading('Priorités · à améliorer',col); if(diag.weaknesses.length) diag.weaknesses.slice(0,4).forEach(x=>K.bullet(x.label,'',[192,57,43])); else K.para('Aucun manque majeur identifié dans les données disponibles.',{color:K.MUT,size:8.5});
+      K.para('Périmètre : résultats limités aux données disponibles à la date de génération. Les éléments non vérifiés ne sont pas des preuves d’absence. Aucun résultat commercial ou classement Google n’est garanti.',{size:7.5,color:K.MUT});
       K.gap(2); K.ensure(22); pdf.setFillColor(246,243,255); pdf.setDrawColor(col[0],col[1],col[2]); pdf.setLineWidth(0.3); pdf.roundedRect(M,K.y,CW,20,3,3,'FD'); K.setF('bold',10); K.setT(col); pdf.text('La prochaine étape',M+4,K.y+7); K.setF('normal',8.5); K.setT([70,70,70]); pdf.splitTextToSize('Commencez par corriger une priorité à la fois, puis mesurez à nouveau les résultats. Le rapport complet apporte les détails, les concurrents et un plan d’action.',CW-8).slice(0,3).forEach((ln,i)=>pdf.text(ln,M+4,K.y+12+i*4)); K.y+=24;
       K.setF('bold',10); K.setT(col); pdf.text(String(st.signature_name||st.company_name||'AffiAds'),M,K.y+4); K.y+=5; const contact=[st.contact_email,st.phone,st.website].filter(Boolean).join('   ·   '); if(contact){ K.setF('normal',9); K.setT(K.DARK); pdf.text(contact,M,K.y+3); }
       pdfFooter(pdf,st);
@@ -6235,7 +6313,9 @@ body:has(.workspace-app) .login-page:has(.workspace-app){min-height:0!important;
       if(pdfBusy) return;
       const a=appAudits.find(x=>x.id===auditId);
       if(!a){appNotice='Audit introuvable. Réessaie.';renderApp();return;}
-      const c=appClients.find(x=>x.id===a.client_id);
+      const c=appClients.find(x=>String(x.id)===String(a.client_id));
+      const hasAuditEvidence=!!(a.site||a.scan||a.status==='Analysé'||a.status==='Terminé');
+      if(!hasAuditEvidence){appNotice='Rapport non exporté : ce dossier ne contient pas encore de résultat d’analyse. Lancez d’abord l’analyse du commerce pour éviter un rapport trompeur.';renderApp();return;}
       mode=(mode==='simple')?'simple':'full';
       pdfBusy=true;pdfCancelled=false;appNotice='';renderApp();
       try{
