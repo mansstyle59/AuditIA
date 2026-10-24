@@ -4839,6 +4839,20 @@ body:has(.workspace-app) .login-page:has(.workspace-app){min-height:0!important;
       padding-top: 0 !important;
     }
   }
+
+  /* Aide contextuelle pour les termes techniques : ouvrable au toucher et au clavier. */
+  .term-title{display:inline-flex;align-items:center;gap:7px;flex-wrap:wrap}
+  .term-help{position:relative;display:inline-flex;vertical-align:middle;z-index:8;font-size:13px;line-height:1.3}
+  .term-help>summary{list-style:none;display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;border:1px solid rgba(180,160,255,.7);background:rgba(139,110,245,.18);color:#d8ccff;font-size:12px;font-weight:850;cursor:pointer;user-select:none}
+  .term-help>summary::-webkit-details-marker{display:none}
+  .term-help>summary:focus-visible{outline:2px solid #b7a4ff;outline-offset:3px}
+  .term-help[open]>summary{background:#8b6ef5;color:#fff}
+  .term-help-pop{position:absolute;left:0;top:calc(100% + 8px);width:min(300px,calc(100vw - 56px));padding:14px;border:1px solid rgba(180,160,255,.45);border-radius:14px;background:#201c32;color:#f6f3ff;box-shadow:0 16px 38px rgba(0,0,0,.42);font-size:12px;line-height:1.5;z-index:300}
+  .term-help-pop b{display:block;font-size:12px;line-height:1.45;color:#d8ccff;margin-bottom:7px}
+  .term-help-pop p{margin:7px 0 0;color:#e0dced;white-space:normal}
+  .term-help-pop strong{font-weight:750;color:#fff}
+  @media(max-width:760px){.term-help-pop{position:fixed;left:16px;right:16px;top:auto;bottom:calc(18px + env(safe-area-inset-bottom));width:auto;max-width:none}}
+  @media(prefers-reduced-motion:reduce){.term-help-pop{scroll-behavior:auto}}
 </style>
 
 </head>
@@ -6131,11 +6145,20 @@ body:has(.workspace-app) .login-page:has(.workspace-app){min-height:0!important;
       if(s&&s.recommendations) s.recommendations.slice(0,4).forEach(r=>plan.push({t:r.title,d:r.detail||'',p:r.severity==='haute'?'Haute':'Moyenne',axis:'SEO'}));
       return plan.sort((x,y)=>rank[x.p]-rank[y.p]).slice(0,10);
     }
+    function termHelpHtml(term){
+      const definitions={
+        SEO:{label:'SEO',full:'Search Engine Optimization',meaning:'Référencement naturel : améliorer un site et ses pages pour qu’ils apparaissent plus facilement dans les résultats de recherche, notamment sur Google.',example:'Exemple : une boulangerie de Narbonne travaille sa page « boulangerie artisanale Narbonne » pour être plus facile à trouver.'},
+        GEO:{label:'GEO',full:'Generative Engine Optimization',meaning:'Optimisation pour les moteurs et assistants d’IA : rendre les informations du commerce claires, cohérentes et fiables afin qu’elles puissent être comprises et éventuellement citées par des outils comme ChatGPT ou Gemini.',example:'Exemple : des informations cohérentes, des pages utiles et des données structurées aident les IA à comprendre l’activité. Une citation n’est jamais garantie.'}
+      };
+      const d=definitions[String(term||'').toUpperCase()];
+      if(!d)return '';
+      return '<details class="term-help"><summary aria-label="Que signifie '+d.label+' ?" title="Que signifie '+d.label+' ?">?</summary><div class="term-help-pop"><b>'+d.label+' — '+d.full+'</b><p>'+d.meaning+'</p><p><strong>'+d.example+'</strong></p></div></details>';
+    }
     function pillarCardHtml(title,sub,p){
       const col=p.score>=75?'#34d399':p.score>=50?'#fbbf24':'#f87171';
       const have=p.have.slice(0,3).map(x=>'<li class="ok">'+escHtml(x.label)+'</li>').join('');
       const miss=p.miss.slice(0,4).map(x=>'<li class="no">'+escHtml(x.label)+'</li>').join('');
-      return '<div class="pil"><div class="pil-top"><div class="pil-ttl"><b>'+escHtml(title)+'</b><small>'+escHtml(sub)+'</small></div><div class="pil-score" style="color:'+col+'"><span class="score-ic">'+navIcon('score')+'</span>'+p.score+'<small>/100</small></div></div><ul class="pil-list">'+(have||'')+(miss||'')+((!have&&!miss)?'<li class="vis-none">En attente d’analyse</li>':'')+'</ul></div>';
+      return '<div class="pil"><div class="pil-top"><div class="pil-ttl"><span class="term-title"><b>'+escHtml(title)+'</b>'+termHelpHtml(title)+'</span><small>'+escHtml(sub)+'</small></div><div class="pil-score" style="color:'+col+'"><span class="score-ic">'+navIcon('score')+'</span>'+p.score+'<small>/100</small></div></div><ul class="pil-list">'+(have||'')+(miss||'')+((!have&&!miss)?'<li class="vis-none">En attente d’analyse</li>':'')+'</ul></div>';
     }
     function visibilityLabel(i){ return i>=70?{t:'Bonne visibilité',c:'ok'}:i>=45?{t:'Visibilité moyenne',c:'mid'}:{t:'Mauvaise visibilité',c:'bad'}; }
     function visibilitySummaryHtml(a,c){
