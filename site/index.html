@@ -3990,7 +3990,6 @@ header.app-topbar .tb-actions{display:flex!important;gap:8px;flex:0 0 auto}
 /* ===== Accueil « Assistant AuditIA » ===== */
 .hx{display:grid;gap:16px}
 .hx>section{margin:0!important}
-.hx>.hx-section{padding:4px 0 0!important}
 body:has(.hx) .ai-float-launcher{display:none!important}
 .hx-ico{display:grid;place-items:center;width:40px;height:40px;flex:0 0 40px;border-radius:12px;color:#fff}
 .hx-ico svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
@@ -4005,29 +4004,9 @@ body:has(.hx) .ai-float-launcher{display:none!important}
 .hx-hero h1{margin:12px 0 8px;font-size:clamp(28px,7.6vw,42px);line-height:1.05;font-weight:800;letter-spacing:-1.2px;color:#fff}
 .hx-hero-copy p{margin:0;font-size:15px;line-height:1.5;color:#C9CCE6}
 .hx-robot{position:absolute;z-index:0;right:-10px;top:10px;width:46%;max-width:240px;pointer-events:none;filter:drop-shadow(0 12px 30px rgba(91,95,239,.35))}
-.hx-act:active,.hx-chips button:active{transform:scale(.97)}
-.hx-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));padding:16px 6px;border:1px solid rgba(123,108,255,.22);border-radius:20px;background:linear-gradient(160deg,#151838,#101230)}
-.hx-stat{display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-width:0;padding:0 10px;border-left:1px solid rgba(255,255,255,.07)}
-.hx-stat:first-child{border-left:0}
-.hx-stat .hx-ico{width:36px;height:36px;flex-basis:36px;margin-bottom:8px}
-.hx-stat strong{font-size:26px;line-height:1;font-weight:800;color:#fff;font-variant-numeric:tabular-nums}
-.hx-stat b{margin-top:4px;font-size:14px;font-weight:700;color:#fff}
-.hx-stat small{font-size:12px;line-height:1.3;color:#ABB0CC}
 .hx-note{display:flex;align-items:center;gap:14px;padding:16px;border:1px solid rgba(123,108,255,.22);border-radius:20px;background:linear-gradient(160deg,#17163a,#111331)}
 .hx-note strong{display:block;font-size:16px;color:#fff}
 .hx-note p{margin:4px 0 0;font-size:14px;line-height:1.5;color:#ABB0CC}
-.hx-section h2{margin:6px 2px 4px;font-size:22px;font-weight:800;letter-spacing:-.5px;color:#fff}
-.hx-section>p{margin:0 2px 12px;font-size:14px;color:#ABB0CC}
-.hx-acts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.hx-act{display:flex;align-items:center;gap:12px;min-width:0;padding:14px;border-radius:18px;border:1px solid;color:#fff;text-align:left;cursor:pointer;transition:transform .12s}
-.hx-act-txt{display:flex;flex-direction:column;gap:4px;flex:1;min-width:0}
-.hx-act-txt strong{font-size:15px;font-weight:700}
-.hx-act-txt small{font-size:12.5px;line-height:1.4;color:#C4C8E2}
-.hx-chev svg{width:18px;height:18px;fill:none;stroke:#fff;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;opacity:.8}
-.hx-act-blue{background:linear-gradient(150deg,rgba(46,91,234,.30),rgba(18,22,60,.9));border-color:rgba(79,139,255,.45)}
-.hx-act-violet{background:linear-gradient(150deg,rgba(106,76,240,.32),rgba(22,18,58,.9));border-color:rgba(155,123,255,.45)}
-.hx-act-orange{background:linear-gradient(150deg,rgba(240,106,34,.30),rgba(40,20,22,.9));border-color:rgba(255,154,77,.45)}
-.hx-act-green{background:linear-gradient(150deg,rgba(22,167,101,.30),rgba(12,36,36,.9));border-color:rgba(63,212,140,.45)}
 .hx-ask-wrap{padding:12px;border:1px solid rgba(123,108,255,.25);border-radius:24px;background:linear-gradient(160deg,#151838,#0F1230)}
 .hx-ask{display:flex;align-items:center;gap:8px;padding:6px 6px 6px 16px;border:1px solid rgba(255,255,255,.1);border-radius:18px;background:#0E1028}
 .hx-ask input{flex:1;min-width:0;height:44px;border:0;background:transparent;color:#fff;font-size:16px!important;outline:none}
@@ -4036,12 +4015,8 @@ body:has(.hx) .ai-float-launcher{display:none!important}
 .hx-ask button svg,.hx-chips svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .hx-chips{display:flex;gap:8px;margin-top:10px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .hx-chips::-webkit-scrollbar{display:none}
-.hx-chips button{display:inline-flex;align-items:center;gap:6px;flex:0 0 auto;min-height:40px;padding:0 14px;border:1px solid rgba(255,255,255,.12);border-radius:999px;background:rgba(255,255,255,.04);color:#E6E7F5;font:600 13px/1 inherit;cursor:pointer}
+.hx-chips button{display:inline-flex;align-items:center;gap:6px;flex:0 0 auto;min-height:40px;padding:0 14px;border:1px solid rgba(255,255,255,.12);border-radius:999px;background:rgba(255,255,255,.04);color:#E6E7F5;font-weight:600;font-size:13px;line-height:1;font-family:inherit;cursor:pointer}
 .hx-chips button svg{width:15px;height:15px}
-@media(min-width:900px){.hx-hero{padding:30px 28px 24px}.hx-robot{width:34%;top:0}.hx-acts{gap:14px}}
-@media(max-width:480px){.hx-acts{grid-template-columns:minmax(0,1fr)}}
-@media(max-width:400px){.hx-stats{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:16px}.hx-stat:nth-child(3){border-left:0}}
-@media(max-width:360px){.hx-acts{grid-template-columns:minmax(0,1fr)}.hx-hero-copy{max-width:100%}.hx-robot{opacity:.35}}
 
 /* ===== iPhone : en-tête plus près de la barre d'état ===== */
 @media(max-width:760px){header.app-topbar{padding-top:calc(env(safe-area-inset-top,0px) + 8px)!important;padding-bottom:10px!important}}
@@ -4069,7 +4044,7 @@ section.splash.auth-loading{position:fixed!important;inset:0!important;z-index:9
 /* ===== Réglages : raccourcis + enregistrement toujours accessible ===== */
 .set-jump{display:flex;gap:8px;margin:0 0 14px;overflow-x:auto;scrollbar-width:none}
 .set-jump::-webkit-scrollbar{display:none}
-.set-jump button{flex:0 0 auto;min-height:40px;padding:0 16px;border:1px solid rgba(123,108,255,.3);border-radius:999px;background:rgba(123,108,255,.12);color:#E6E7F5;font:600 14px/1 inherit;cursor:pointer}
+.set-jump button{flex:0 0 auto;min-height:40px;padding:0 16px;border:1px solid rgba(123,108,255,.3);border-radius:999px;background:rgba(123,108,255,.12);color:#E6E7F5;font-weight:600;font-size:14px;line-height:1;font-family:inherit;cursor:pointer}
 .set-jump button:active{transform:scale(.97)}
 .set-anchor{scroll-margin-top:96px}
 .set-savebar{position:sticky!important;bottom:calc(10px + env(safe-area-inset-bottom,0px))!important;z-index:40!important;display:flex!important;gap:8px!important;padding:10px!important;border:1px solid rgba(123,108,255,.28)!important;border-radius:18px!important;background:rgba(14,16,40,.9)!important;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 10px 30px rgba(0,0,0,.35)}
@@ -4091,6 +4066,36 @@ header.app-topbar .tb-actions .app-btn,header.app-topbar .topbar-menu-btn{box-sh
 .workspace-main .app-btn.primary{border-radius:14px!important}
 .workspace-main .app-panel h2,.workspace-main .app-panel h3{color:#fff!important;letter-spacing:-.3px!important}
 .workspace-main .app-empty{background:rgba(255,255,255,.02)!important;border:1px dashed rgba(123,108,255,.3)!important;border-radius:16px!important;color:#ABB0CC!important}
+
+/* ===== Accueil (référence capture) : hero lumineux, tuiles colorées, bouton d'audit ===== */
+.hx-hero{display:grid!important;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);align-items:center;gap:4px;min-height:230px;padding:22px 0 18px 20px!important;border:1px solid rgba(139,108,255,.6)!important;border-radius:26px!important;background:radial-gradient(70% 90% at 92% 30%,rgba(139,108,255,.55),transparent 65%),radial-gradient(60% 70% at 0% 100%,rgba(61,123,255,.25),transparent 60%),linear-gradient(135deg,#221a6b,#2d2296 55%,#4a34c9)!important;box-shadow:0 0 0 1px rgba(139,108,255,.15),0 18px 50px rgba(64,40,190,.35),inset 0 1px rgba(255,255,255,.12)!important}
+.hx-hero-copy{max-width:none!important;min-width:0}
+.hx-kicker{display:inline-flex!important;padding:6px 14px 6px 10px;border:1px solid rgba(139,108,255,.6);border-radius:999px;background:rgba(10,11,26,.35);font-size:11px;letter-spacing:3px!important;color:#E6E1FF!important}
+.hx-hero h1{font-size:clamp(30px,8.6vw,46px)!important}
+.hx-robot{position:static!important;width:100%!important;max-width:220px!important;justify-self:end;filter:none!important;margin-right:-4px;-webkit-mask-image:radial-gradient(closest-side,#000 62%,transparent 100%);mask-image:radial-gradient(closest-side,#000 62%,transparent 100%)}
+.hx-tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:10px;border:1px solid rgba(123,108,255,.25);border-radius:24px;background:linear-gradient(160deg,#141738,#0f1230)}
+.hx-tile{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-width:0;min-height:150px;padding:14px;border:1px solid;border-radius:18px;color:#fff;text-align:left;cursor:pointer;overflow:hidden;transition:transform .12s}
+.hx-tile::after{content:"";position:absolute;inset:auto -30% -45% 20%;height:90%;border-radius:50%;background:radial-gradient(closest-side,rgba(255,255,255,.10),transparent);pointer-events:none}
+.hx-tile .hx-ico{width:46px;height:46px;flex-basis:46px;border-radius:14px;margin-bottom:10px;box-shadow:0 6px 16px rgba(0,0,0,.25)}
+.hx-tile .hx-ico svg{width:24px;height:24px}
+.hx-tile strong{font-size:30px;line-height:1;font-weight:800;font-variant-numeric:tabular-nums}
+.hx-tile b{margin-top:4px;font-size:16px;font-weight:700}
+.hx-tile small{font-size:13px;line-height:1.3;color:rgba(255,255,255,.75)}
+.hx-go{display:grid;place-items:center;width:34px;height:34px;flex:0 0 34px;border-radius:50%;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08)}
+.hx-go svg{width:16px;height:16px;fill:none;stroke:#fff;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.hx-tile .hx-go{position:absolute;right:12px;top:50%;transform:translateY(-10%)}
+.hx-tile-blue{background:linear-gradient(150deg,#1f56d6,#152a78 60%,#121c4e);border-color:rgba(79,139,255,.55)}
+.hx-tile-violet{background:linear-gradient(150deg,#5a3fd0,#33228a 60%,#1f1758);border-color:rgba(155,123,255,.55)}
+.hx-tile-orange{background:linear-gradient(150deg,#f07a2c,#a3441a 60%,#5a2412);border-color:rgba(255,154,77,.6)}
+.hx-tile-green{background:linear-gradient(150deg,#1aa86a,#0f6b47 60%,#0b3a2c);border-color:rgba(63,212,140,.55)}
+.hx-cta{display:flex;align-items:center;gap:14px;width:100%;min-height:64px;padding:0 14px 0 18px;border:1px solid rgba(190,170,255,.45);border-radius:20px;background:linear-gradient(100deg,#6a46ee,#7d5cff 55%,#6b4cf0);box-shadow:0 12px 30px rgba(106,70,238,.35),inset 0 1px rgba(255,255,255,.2);color:#fff;font-weight:700;font-size:18px;line-height:1.2;font-family:inherit;text-align:left;cursor:pointer;transition:transform .12s}
+.hx-cta>span:nth-child(2){flex:1}
+.hx-cta-ico svg{width:26px;height:26px;fill:none;stroke:#fff;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;display:block}
+.hx-cta .hx-go{width:38px;height:38px;flex-basis:38px;background:rgba(255,255,255,.16)}
+.hx-note .hx-ico-lg{width:64px!important;height:64px!important;flex-basis:64px!important;box-shadow:0 8px 24px rgba(106,76,240,.45)}
+.hx-note .hx-ico-lg svg{width:28px;height:28px}
+@media(max-width:360px){.hx-hero{grid-template-columns:1fr}.hx-robot{max-width:150px;justify-self:center}.hx-tile strong{font-size:26px}}
+@media(min-width:900px){.hx-tiles{grid-template-columns:repeat(4,minmax(0,1fr))}.hx-hero{padding:30px 10px 26px 32px!important}.hx-robot{max-width:300px!important}}
 </style>
 </head>
 <body>
@@ -5787,25 +5792,20 @@ header.app-topbar .tb-actions .app-btn,header.app-topbar .topbar-menu-btn{box-sh
         const runningAudits=appAudits.filter(a=>!scoredAudits.includes(a)&&/cours|progress/i.test(String(a.status||''))).length;
         const freshAudits=Math.max(0,appAudits.length-scoredAudits.length-runningAudits);
         const firstStep=appClients.length?'Voir mes commerces':'Ajouter un commerce';
-        const HXI={search:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg>',bars:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20V12M12 20V5M19 20v-9"/></svg>',doc:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M9.5 13h5M9.5 17h5"/></svg>',target:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><path d="m12 12 7-7M16 4h3v3"/></svg>',store:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5 5.5 4h13L20 9.5M4 9.5h16M4 9.5a2.7 2.7 0 0 0 5.3 0 2.7 2.7 0 0 0 5.4 0 2.7 2.7 0 0 0 5.3 0M5.5 12v8h13v-8M10 20v-5h4v5"/></svg>',clock:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 7.5V12l3 2"/></svg>',check:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>',bulb:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 17h6M10 20.5h4M12 3a6 6 0 0 0-3.5 10.9c.7.5 1 1.2 1 2.1h5c0-.9.3-1.6 1-2.1A6 6 0 0 0 12 3Z"/></svg>',send:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 3 10 14M21 3l-7 18-4-7-7-4z"/></svg>',arrow:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>',chev:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>'};
+        const HXI={search:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg>',doc:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M9.5 13h5M9.5 17h5"/></svg>',store:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5 5.5 4h13L20 9.5M4 9.5h16M4 9.5a2.7 2.7 0 0 0 5.3 0 2.7 2.7 0 0 0 5.4 0 2.7 2.7 0 0 0 5.3 0M5.5 12v8h13v-8M10 20v-5h4v5"/></svg>',clock:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 7.5V12l3 2"/></svg>',check:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>',bulb:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 17h6M10 20.5h4M12 3a6 6 0 0 0-3.5 10.9c.7.5 1 1.2 1 2.1h5c0-.9.3-1.6 1-2.1A6 6 0 0 0 12 3Z"/></svg>',send:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 3 10 14M21 3l-7 18-4-7-7-4z"/></svg>',arrow:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>',chev:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>'};
         const hxReady=scoredAudits.length, hxTodo=Math.max(0,appAudits.length-scoredAudits.length);
-        const hxStat=(ic,tone,n,l1,l2)=>'<div class="hx-stat"><span class="hx-ico hx-'+tone+'">'+HXI[ic]+'</span><strong>'+n+'</strong><b>'+l1+'</b><small>'+l2+'</small></div>';
-        const hxAct=(ic,tone,t,d,attr)=>'<button type="button" class="hx-act hx-act-'+tone+'" '+attr+'><span class="hx-ico hx-'+tone+'">'+HXI[ic]+'</span><span class="hx-act-txt"><strong>'+t+'</strong><small>'+d+'</small></span><span class="hx-chev">'+HXI.chev+'</span></button>';
-        const hxLast=latest[0];
+        const hxTile=(ic,tone,n,l1,l2,view)=>'<button type="button" class="hx-tile hx-tile-'+tone+'" data-app-view="'+view+'" aria-label="'+l1+' : '+n+'"><span class="hx-ico hx-'+tone+'">'+HXI[ic]+'</span><strong>'+n+'</strong><b>'+l1+'</b><small>'+l2+'</small><span class="hx-go">'+HXI.chev+'</span></button>';
         const hxPrompts=['Quels audits traiter en priorité ?','Comment démarrer un audit ?','Aide sur les rapports'];
         body='<div class="hx">'+
           '<section class="hx-hero" aria-labelledby="hx-title">'+
             '<div class="hx-hero-copy"><div class="hx-kicker"><i></i>ASSISTANT IA</div>'+
             '<h1 id="hx-title">Assistant <span class="hx-grad">AuditIA</span></h1>'+
             '<p>Votre copilote pour analyser, optimiser et vendre vos audits de commerces locaux.</p></div>'+
-            '<img class="hx-robot" src="./audit-chat-robot.svg" alt="" aria-hidden="true">'+
-            
+            '<img class="hx-robot" src="./home-robot.png" alt="" aria-hidden="true">'+
           '</section>'+
-          '<section class="hx-stats" aria-label="Indicateurs">'+hxStat('store','blue',appClients.length,'Commerces','dans la base')+hxStat('doc','violet',appAudits.length,'Audits','enregistrés')+hxStat('clock','orange',hxTodo,'À analyser','à compléter')+hxStat('check','green',hxReady,'Analysés','prêts pour un rapport')+'</section>'+
+          '<section class="hx-tiles" aria-label="Indicateurs">'+hxTile('store','blue',appClients.length,'Commerces','dans la base','Clients')+hxTile('doc','violet',appAudits.length,'Audits','enregistrés','Audits')+hxTile('clock','orange',hxTodo,'À analyser','à compléter','Audits')+hxTile('check','green',hxReady,'Analysés','prêts pour un rapport','Rapports')+'</section>'+
+          '<button type="button" class="hx-cta" data-app-view="Audits"><span class="hx-cta-ico">'+HXI.search+'</span><span>Lancer un nouvel audit</span><span class="hx-go">'+HXI.chev+'</span></button>'+
           '<section class="hx-note"><span class="hx-ico hx-violet hx-ico-lg">'+HXI.bulb+'</span><div><strong>Bon à savoir</strong><p>Je m’appuie uniquement sur les données présentes dans vos dossiers. Je n’invente pas d’informations et je vous indique toujours ce qui doit être confirmé.</p></div></section>'+
-          '<section class="hx-section" aria-labelledby="hx-do"><h2 id="hx-do">Que souhaitez-vous faire ?</h2><p>Choisissez une action ou posez directement votre question.</p>'+
-            '<div class="hx-acts">'+hxAct('search','blue','Analyser un commerce','Comprendre sa visibilité, sa concurrence et ses opportunités.','data-app-view="Clients"')+hxAct('doc','violet','Préparer un rapport','Générer un rapport PDF professionnel pour votre client.','data-app-view="Rapports"')+hxAct('bars','orange','Optimiser un commerce','Obtenir des actions concrètes et prioritaires.','data-app-view="Studio"')+hxAct('target','green','Mes derniers résultats',hxLast?'Reprendre le dernier audit enregistré.':'Retrouver vos audits enregistrés.',hxLast?'data-open-audit="'+hxLast.id+'"':'data-app-view="Audits"')+'</div>'+
-          '</section>'+
           '<section class="hx-ask-wrap" aria-label="Poser une question à Audit Chat IA"><form class="hx-ask" data-home-ask><input name="q" type="text" maxlength="1200" autocomplete="off" enterkeyhint="send" placeholder="Posez une question sur vos audits…" aria-label="Votre question pour Audit Chat IA"><button type="submit" aria-label="Envoyer la question">'+HXI.send+'</button></form>'+
             '<div class="hx-chips">'+hxPrompts.map(q=>'<button type="button" data-home-prompt="'+q+'">'+HXI.arrow+'<span>'+q+'</span></button>').join('')+'</div></section>'+
         '</div>';
