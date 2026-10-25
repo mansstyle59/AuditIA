@@ -4076,6 +4076,21 @@ section.splash.auth-loading{position:fixed!important;inset:0!important;z-index:9
 .set-savebar .app-btn{flex:1 1 0;min-height:46px}
 body:has(.set-savebar) .ai-float-launcher{bottom:calc(92px + env(safe-area-inset-bottom,0px))!important}
 @media(max-width:760px){.set-savebar{position:fixed!important;left:12px!important;right:12px!important;bottom:calc(10px + env(safe-area-inset-bottom,0px))!important;margin:0!important}form[data-settings-form]{padding-bottom:92px!important}}
+
+/* ===== En-tête net sur iPhone : aucun filtre, aucun texte en dégradé, aucun halo (rendu WebKit) ===== */
+header.app-topbar>a.tb-brand .tb-spark{filter:none!important}
+header.app-topbar>a.tb-brand b em{background:none!important;-webkit-background-clip:border-box!important;background-clip:border-box!important;color:#A08CFF!important;-webkit-text-fill-color:#A08CFF!important}
+header.app-topbar,header.app-topbar *{text-shadow:none!important;-webkit-font-smoothing:antialiased}
+header.app-topbar .tb-actions .app-btn,header.app-topbar .topbar-menu-btn{box-shadow:none!important;filter:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;border:1px solid rgba(255,255,255,.14)!important;background:#15173A!important}
+/* ===== Harmonisation des pages (même langage que l'accueil) ===== */
+.workspace-main .app-panel,.workspace-main .add-toggle,.workspace-main .client-card,.workspace-main .audit-card,.workspace-main .report-card,.workspace-main .integration-group,.workspace-main .cd-edit,.workspace-main .settings-preview{background:linear-gradient(160deg,#151838,#101230)!important;border:1px solid rgba(123,108,255,.22)!important;border-radius:20px!important;box-shadow:0 10px 30px rgba(5,6,20,.35)!important}
+.workspace-main .info-row,.workspace-main .scan-metric,.workspace-main .rec-item,.workspace-main .audit-profile-data,.workspace-main .info-hours,.workspace-main .audit-reputation,.workspace-main .ba-col,.workspace-main .report-meter,.workspace-main .api-security-note{background:rgba(255,255,255,.035)!important;border:1px solid rgba(255,255,255,.08)!important;border-radius:14px!important;box-shadow:none!important}
+.workspace-main .app-filter,.workspace-main .ac-input,.workspace-main .app-form input:not([type=color]):not([type=checkbox]):not([type=file]),.workspace-main .app-form select,.workspace-main .app-form textarea{background:#0E1028!important;border:1px solid rgba(255,255,255,.1)!important;border-radius:14px!important;color:#fff!important}
+.workspace-main .app-filter:focus,.workspace-main .ac-input:focus,.workspace-main .app-form input:focus,.workspace-main .app-form select:focus,.workspace-main .app-form textarea:focus{border-color:#8B6CFF!important;box-shadow:0 0 0 3px rgba(139,108,255,.22)!important;outline:none!important}
+.workspace-main .app-btn:not(.primary){background:rgba(255,255,255,.04)!important;border:1px solid rgba(255,255,255,.12)!important;border-radius:14px!important;color:#E6E7F5!important;box-shadow:none!important}
+.workspace-main .app-btn.primary{border-radius:14px!important}
+.workspace-main .app-panel h2,.workspace-main .app-panel h3{color:#fff!important;letter-spacing:-.3px!important}
+.workspace-main .app-empty{background:rgba(255,255,255,.02)!important;border:1px dashed rgba(123,108,255,.3)!important;border-radius:16px!important;color:#ABB0CC!important}
 </style>
 </head>
 <body>
@@ -5248,18 +5263,44 @@ body:has(.set-savebar) .ai-float-launcher{bottom:calc(92px + env(safe-area-inset
       appNotice=''; renderApp(); stopFullTicker(); fullAuditTimer=setInterval(tickProgress,170); tickProgress();
       let siteRes=null, scan=null, newDetails=null, issues=[];
       try{
-        const settle=async(label,promise,onOk)=>{ try{ const value=await promise; if(onOk&&value!=null) onOk(value); return value; }catch(e){ if(label) issues.push(label); return null; } };
-        setPhase('Sources en parallèle : site, web, concurrents, performance…',62);
+        /* Suivi en direct par source : chaque source a sa ligne, un délai maximum, et fait avancer la barre
+           seulement quand elle a réellement répondu (ou échoué). Une source muette ne bloque plus l'analyse. */
+        const toScale=Number(window.__liveTimeoutScale)||1;
+        const withTimeout=(promise,ms)=>Promise.race([Promise.resolve(promise),new Promise((_,rej)=>setTimeout(()=>rej(new Error('délai dépassé')),Math.max(50,ms*toScale)))]);
+        const srcSteps=[];
+        const prep=fullAuditState.steps[0]; if(prep) prep.status='done';
+        fullAuditState.phase='Lecture des sources en parallèle';
+        const advance=()=>{
+          if(!fullAuditState) return;
+          const finished=srcSteps.filter(st=>st.status!=='active').length;
+          fullAuditState.target=Math.max(fullAuditState.target,12+Math.round(80*finished/Math.max(1,srcSteps.length)));
+          const isDone=key=>srcSteps.some(st=>st.key===key&&st.status!=='active');
+          let ch=1;
+          if(isDone('site')||(!hasWeb&&isDone('fiche'))) ch=2;
+          if(isDone('presence')) ch=Math.max(ch,3);
+          fullAuditState.chapterSeen=Math.max(fullAuditState.chapterSeen||1,ch);
+          tickProgress();
+        };
+        const track=(key,label,issue,promise,ms,onOk)=>{
+          const st={key,label,status:'active'}; srcSteps.push(st); fullAuditState.steps.push(st);
+          return (async()=>{
+            let v=null;
+            try{ v=await withTimeout(promise,ms); if(onOk&&v!=null) onOk(v); st.status='done'; }
+            catch(e){ st.status='limited'; if(issue) issues.push(issue); v=null; }
+            advance(); return v;
+          })();
+        };
+        tickProgress();
         const [html,web,sir,photos,domain,shot,cp,speed,rk]=await Promise.all([
-          hasWeb?settle('lecture du site impossible', readSiteHtml(site)):Promise.resolve(null),
-          settle('', findWebPresence(c)),
-          settle('', fetchSirene(c)),
-          settle('', fetchPlacePhotos((c&&c.details&&c.details.place_id)||'')),
-          hasWeb?settle('', fetchDomainDate(site)):Promise.resolve(null),
-          hasWeb?settle('', fetchScreenshot(site)):Promise.resolve(null),
-          settle('', fetchCompetitors(c), value=>{ noteLiveRivals(value.list); setAuditFact('Concurrents locaux', value.total!=null?value.total+' commerces':'Résultats reçus', value.selfRank?'N°'+value.selfRank+' par nombre d’avis, pas le rang Google':'Comparaison du volume d’avis'); }),
-          hasWeb?settle('performance indisponible', fetchPagespeed(site), value=>{ scan=value; setAuditFact('Performance mobile', value.scores&&value.scores.performance!=null?value.scores.performance+'/100':'Mesurée','Google PageSpeed Insights · Lighthouse'); }):Promise.resolve(null),
-          settle('', checkRankings(c))
+          hasWeb?track('site','Lecture du site','lecture du site impossible', readSiteHtml(site), 20000):Promise.resolve(null),
+          track('presence','Réseaux et annuaires','', findWebPresence(c), 35000),
+          track('fiche','Informations légales (SIRENE)','', fetchSirene(c), 15000),
+          track('fiche','Photos de la fiche Google','', fetchPlacePhotos((c&&c.details&&c.details.place_id)||''), 15000),
+          hasWeb?track('fiche','Ancienneté du domaine','', fetchDomainDate(site), 12000):Promise.resolve(null),
+          hasWeb?track('site','Capture du site','', fetchScreenshot(site), 20000):Promise.resolve(null),
+          track('rivals','Concurrents proches','', fetchCompetitors(c), 25000, value=>{ noteLiveRivals(value.list); setAuditFact('Concurrents locaux', value.total!=null?value.total+' commerces':'Résultats reçus', value.selfRank?'N°'+value.selfRank+' par nombre d’avis, pas le rang Google':'Comparaison du volume d’avis'); }),
+          hasWeb?track('perf','Performance mobile (PageSpeed)','performance indisponible', fetchPagespeed(site), 60000, value=>{ scan=value; setAuditFact('Performance mobile', value.scores&&value.scores.performance!=null?value.scores.performance+'/100':'Mesurée','Google PageSpeed Insights · Lighthouse'); }):Promise.resolve(null),
+          track('keywords','Mots-clés recherchés','', checkRankings(c), 45000)
         ]);
         if(html){ siteRes=analyzeSite(html,site); siteRes.hasWebsite=true; siteRes.pageRead=true; noteLiveSite(siteRes.finalUrl||site); setAuditFact('Site web','Page lue',(siteRes.finalUrl||site)+' · '+((siteRes.socials||[]).length)+' réseaux sur la page'); }
         else if(hasWeb){ siteRes={socials:[],directories:[],hasWebsite:true,pageRead:false,analyzedAt:new Date().toISOString(),finalUrl:site}; setAuditFact('Site web','Page non lue','Les critères de la page ne sont pas notés'); }
