@@ -106,8 +106,8 @@
     .integration-group{border:1px solid #ffffff14;background:#1D212B;border-radius:14px;padding:14px;margin:12px 0}
     .integration-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px}
     .integration-head b{display:block;font-size:14px}.integration-head small{display:block;color:var(--muted);font-size:11px;margin-top:3px}
-    .integration-status{font-size:10px;font-weight:850;border-radius:999px;padding:5px 8px;background:#3a2e22;color:#ffd3a6;white-space:nowrap}
-    .integration-status.ready{background:#1f4a3c;color:#9ae8c4}
+    
+    
     .integration-key{position:relative}.integration-key input{padding-right:48px!important}
     .reveal-key{position:absolute;right:7px;top:6px;height:34px;padding:0 9px;border:0;border-radius:8px;background:#343A48;color:#A3C2FF;font-size:11px;font-weight:800}
     .settings-warning{border:1px solid #77572f66;background:#33271966;color:#f7d9ad;border-radius:13px;padding:12px 14px;font-size:12px;line-height:1.5}
@@ -200,7 +200,7 @@
  .integration-head{gap:8px}
  .integration-head b{font-size:13px}
  .integration-head small{font-size:11px;line-height:1.4}
- .integration-status{white-space:normal;text-align:center;max-width:112px}
+ 
  .settings-actions{display:grid;grid-template-columns:1fr}
  .mobile-tabbar{position:fixed;z-index:100;left:12px;right:12px;bottom:calc(8px + env(safe-area-inset-bottom));display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:3px;padding:6px;border:1px solid #ffffff12;border-radius:21px;background:#1D212B;box-shadow:0 12px 38px #0E101570}
  .mobile-tabbar button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-width:0;min-height:55px;border:0;border-radius:15px;background:transparent;color:#A4ACBC;font-size:10px;font-weight:700;padding:5px 2px}
@@ -255,7 +255,7 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
  .app-content-title h2{font-size:22px}
  .app-content-title p{font-size:12px}
  .app-panel{overflow:visible}
- .app-stats .app-stat{display:flex;flex-direction:column;justify-content:space-between}
+ .app-stats .app-stat{display:flex;flex-direction:column;justify-content:flex-start}
  .app-row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center}
  .app-row>div{min-width:0}
  .app-row .app-btn{max-width:108px;white-space:normal;line-height:1.2}
@@ -366,9 +366,9 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
 .integration-head>div{min-width:0}
 .integration-head b{display:block;font-size:14px;line-height:1.35;color:#f5f3fb}
 .integration-head small{display:block;margin-top:5px;font-size:12px;line-height:1.5;color:#A4ACBC}
-.integration-status{display:inline-flex;align-items:center;gap:6px;flex:0 0 auto;max-width:132px;border:1px solid #262B37;background:#161920;color:#A4ACBC;border-radius:999px;padding:6px 9px;font-size:10px;font-weight:800;line-height:1.25}
-.integration-status.is-configured{background:#173b32;border-color:#286450;color:#91e3c3}
-.integration-status.is-pending{background:#161920;border-color:#262B37;color:#A3C2FF}
+
+
+
 .integration-group label{display:grid;gap:7px;font-size:12px;font-weight:750;color:#DDE2EA}
 .integration-group input{width:100%;min-width:0;min-height:46px;border:1px solid #343A48;background:#0E1015;color:#f5f3fb;border-radius:12px;padding:11px 12px;font-size:15px}
 .integration-key{display:flex;gap:8px;min-width:0}
@@ -383,7 +383,7 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
 .api-overview-item strong{display:block;font-size:19px;line-height:1.3}
 .api-overview-item span{display:block;margin-top:4px;color:#A4ACBC;font-size:11px;line-height:1.4}
 .api-security-note{padding:13px 14px;border:1px solid #554c31;background:#302b20;border-radius:14px;color:#d7c9a6;font-size:12px;line-height:1.6;margin:12px 0}
-@media(max-width:760px){.integration-group{padding:13px;border-radius:16px}.integration-head{display:grid;grid-template-columns:minmax(0,1fr);gap:8px}.integration-status{max-width:max-content}.api-actions{display:grid;grid-template-columns:1fr}.api-link{width:100%;min-height:44px}.api-overview{gap:7px}.api-overview-item{padding:10px}.api-overview-item strong{font-size:17px}}
+@media(max-width:760px){.integration-group{padding:13px;border-radius:16px}.integration-head{display:grid;grid-template-columns:minmax(0,1fr);gap:8px}.api-actions{display:grid;grid-template-columns:1fr}.api-link{width:100%;min-height:44px}.api-overview{gap:7px}.api-overview-item{padding:10px}.api-overview-item strong{font-size:17px}}
 
 
 /* Accueil AuditIA — dashboard premium, hiérarchie claire et mobile-first */
@@ -444,7 +444,7 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
     .integration-head{margin-bottom:0;gap:8px}
     .integration-head b{font-size:12px;line-height:1.4}
     .integration-head small{font-size:10px;line-height:1.4;margin-top:2px}
-    .integration-status{font-size:9px;padding:4px 7px;max-width:120px}
+    
     .integration-group label{gap:5px;font-size:11px}
     .integration-group input{min-height:39px;padding:8px 10px;font-size:13px;border-radius:9px}
     .integration-key{gap:6px}
@@ -463,14 +463,14 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       .api-overview-item span{font-size:9px}
       .integration-group{padding:11px}
       .integration-head{align-items:flex-start}
-      .integration-status{white-space:normal;text-align:center}
+      
       .api-actions .api-link{flex:1 1 auto}
     }
     @media(max-width:420px){
       .api-overview-item strong{font-size:13px}
       .api-overview-item span{font-size:8px}
       .integration-head{flex-direction:column}
-      .integration-status{max-width:none}
+      
       .settings-actions{display:grid;grid-template-columns:1fr}
     }
 
@@ -498,7 +498,7 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
     .cd-actions .app-btn{flex:1;min-width:120px;text-align:center;justify-content:center;display:inline-flex;align-items:center;gap:6px}
     .cd-spark{padding:6px 0}.spark{width:100%;height:48px;display:block}
     .cd-edit{margin-top:4px;border:1px solid #343A48;border-radius:16px;background:#1D212B;overflow:hidden}
-    .cd-edit>summary{list-style:none;cursor:pointer;padding:14px 16px;font-weight:800;color:#A3C2FF}
+    .cd-edit>summary{list-style:none;cursor:pointer;padding:14px 16px;font-size:14px;font-weight:600;color:var(--ds-text)}
     .cd-edit>summary::-webkit-details-marker{display:none}
     .cd-edit[open]>summary{border-bottom:1px solid #343A48}
     .cd-edit .app-form{padding:0 16px 16px}
@@ -770,7 +770,7 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
     .api-test-msg{font-size:12.5px;line-height:1.45;color:var(--muted);flex:1;min-width:140px}
     .api-test-msg.ok{color:#9ae8c4}
     .api-test-msg.err{color:#ffb4bd}
-    .integration-status.ready{background:#1f4a3c;color:#9ae8c4}
+    
 
     /* ============================================================
        SYSTÈME DE DESIGN AuditIA v2 — « atelier sobre »
@@ -883,6 +883,11 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
     .cc-txt small{font-size:12px;color:var(--ds-text-3)}
     .cc-go{color:var(--ds-text-3);font-size:20px}
     .add-toggle{margin-bottom:20px;overflow:hidden}
+    .cd-head{margin:14px 0 12px}
+    /* Pastille d'état d'une intégration (une seule définition) */
+    .integration-status{display:inline-flex;align-items:center;gap:6px;flex:0 0 auto;align-self:flex-start;width:auto;max-width:max-content;padding:5px 10px;border:1px solid var(--ds-line);border-radius:999px;background:var(--ds-surface-2);color:var(--ds-text-2);font-size:11px;font-weight:600;line-height:1.2;white-space:nowrap;text-align:left}
+    .integration-status.ready,.integration-status.is-configured{background:#3DCB8F14;border-color:#3DCB8F33;color:#A6EBCB}
+    .integration-status.is-pending{color:var(--ds-accent-text)}
     .add-toggle>summary{padding:14px 16px;cursor:pointer;font-size:14px;font-weight:600;color:var(--ds-text);list-style:none}
     .add-toggle>summary::-webkit-details-marker{display:none}
     .add-toggle[open]>summary{border-bottom:1px solid var(--ds-line)}
