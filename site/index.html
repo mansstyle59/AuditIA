@@ -4305,6 +4305,32 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
 .rp-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}.rp-head h2{margin:0!important}
 .rp-head .app-btn{min-height:40px;padding:0 14px!important;font-size:13.5px!important}
 .workspace-main .report-top .audit-state .sc-delta{margin-top:6px}
+
+/* ===== Compact & compréhensible : progression par commerce, dossier resserré ===== */
+.pg-help{margin:4px 0 10px!important;font-size:13px!important}
+.pg-list{display:grid;gap:8px}
+.pg-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border:1px solid rgba(255,255,255,.08);border-radius:14px;background:rgba(255,255,255,.035)}
+.pg-name{min-width:0}.pg-name b{display:block;font-size:15px;color:#fff}.pg-name small{display:block;margin-top:2px;font-size:12px;line-height:1.35;color:#ABB0CC}
+.pg-val{display:flex;flex-direction:column;align-items:flex-end;flex:0 0 auto}.pg-val b{font-size:22px;font-weight:800;color:#fff}.pg-val small{font-size:12px;color:#ABB0CC}.pg-val span{font-size:15px;color:#C9CCE6}
+.workspace-main>.workspace-head h1{text-shadow:none!important;filter:none!important}
+.page-dossier:has(.dx-summary) .audit-score-chip{display:none!important}
+.workspace-main .dx-summary{padding:16px!important}
+.dx-top{gap:14px}.dx-ring{width:92px;height:92px;flex-basis:92px}.dx-ring::before{inset:9px}.dx-ring b{font-size:32px}.dx-ring small{bottom:18px;font-size:11px}
+.dx-verdict p{margin:4px 0!important;font-size:13.5px!important}
+.dx-summary .vis-kf{margin:12px 0 0!important}
+.dx-bars{gap:8px;margin:12px 0 4px}
+.dx-pil{border-radius:16px}
+.dx-pil>summary{list-style:none}.dx-pil>summary::-webkit-details-marker{display:none}
+.dx-pil[open]>summary{border-bottom-left-radius:0;border-bottom-right-radius:0}
+.dx-pil-list{margin:0;padding:8px 14px 12px;list-style:none;display:grid;gap:6px;border:1px solid rgba(255,255,255,.08);border-top:0;border-radius:0 0 16px 16px;background:rgba(255,255,255,.02)}
+.dx-pil-list li{display:flex;gap:8px;font-size:13.5px;color:#DADCF0}.dx-pil-list li span{width:16px;flex:0 0 16px;text-align:center;font-weight:800}
+.dx-pil-list li.ok span{color:#3FD48C}.dx-pil-list li.part span{color:#FFB15A}.dx-pil-list li.no span{color:#FF7A7A}
+.dx-hint{margin:0 2px 12px;font-size:12px;color:#8489AB}
+.dx-bench{margin-bottom:12px}
+.dx-act{padding:12px!important}.dx-act h4{margin:8px 0 2px!important;font-size:15px!important}
+.reports-page .audit-kpis article{padding:12px!important;gap:2px!important;align-items:flex-start!important;text-align:left!important}
+.reports-page .audit-kpis b{font-size:24px!important}
+.reports-page .audit-kpis span{font-size:12.5px!important;line-height:1.25;text-align:left!important}
 </style>
 </head>
 <body>
@@ -5685,7 +5711,7 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
       return '<div class="dx-bench"><div class="dx-bench-row dx-bench-h"><span>Face aux '+others.length+' concurrents proches</span><b>Vous</b><em>Médiane</em><em>Meilleur</em></div>'+row('Avis Google',self?Number(self.reviews)||0:null,med(rv),Math.max(...rv),f0)+row('Note',self&&self.rating!=null?Number(self.rating):null,med(rt),Math.max(...rt.filter(x=>x!=null),0)||null,f1)+(self?'':'<p class="dx-note">Le commerce n’apparaît pas dans la liste Google des concurrents proches.</p>')+'</div>';
     }
     function visibilitySummaryHtml(a,c){
-      const diag=visibilityAudit(a,c); const i=diag.index; const d=(c&&c.details)||{};
+      const diag=visibilityAudit(a,c); const i=(a&&a.score!=null&&!isNaN(Number(a.score)))?Math.round(Number(a.score)):diag.index; const d=(c&&c.details)||{};
       const col=i>=75?'#3FD48C':i>=50?'#FFB15A':'#FF7A7A'; const lab=visibilityLabel(i);
       const um=auditUnmeasured(a,c); const measured=diag.items.length; const total=measured+um.reduce((n,x)=>n+x.n,0);
       const kf=[];
@@ -5695,13 +5721,12 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
       const rk=a&&a.site&&a.site.rankings;
       if(rk&&rk.length&&!rk.every(r=>r.error)){ const f=rk.filter(r=>r.found).length; kf.push(['mots-clés trouvés',f+' / '+rk.length]); }
       const kfHtml='<div class="vis-kf">'+kf.map(([k,v])=>'<span class="vis-kf-item"><b>'+escHtml(v)+'</b><small>'+escHtml(k)+'</small></span>').join('')+'</div>';
-      const bar=(id,name,sub,p)=>{const cc=p.score>=75?'good':p.score>=50?'mid':'low';return '<button type="button" class="dx-bar" data-jump="'+id+'"><span class="dx-bar-l"><b>'+name+'</b><small>'+sub+'</small></span><span class="dx-bar-t"><i class="'+cc+'" style="width:'+p.score+'%"></i></span><em class="'+cc+'">'+p.score+'</em></button>';};
+      const bar=(pk,name,sub,p)=>{const cc=p.score>=75?'good':p.score>=50?'mid':'low';const its=diag.items.filter(x=>x.pillar===pk).sort((x,y)=>x.val-y.val);return '<details class="dx-pil"><summary class="dx-bar"><span class="dx-bar-l"><b>'+name+'</b><small>'+sub+'</small></span><span class="dx-bar-t"><i class="'+cc+'" style="width:'+p.score+'%"></i></span><em class="'+cc+'">'+p.score+'</em></summary><ul class="dx-pil-list">'+its.map(x=>'<li class="'+(x.val>=1?'ok':x.val>0?'part':'no')+'"><span>'+(x.val>=1?'✓':x.val>0?'◐':'✕')+'</span>'+escHtml(x.label)+'</li>').join('')+'</ul></details>';};
       const toc=[['d-actions','Actions'],['d-fiche','Fiche'],a&&a.scan?['d-perf','Performance']:null,a&&a.site?['d-social','Présence']:null,rk&&rk.length?['d-rank','Mots-clés']:null,cp&&cp.list&&cp.list.length?['d-comp','Concurrents']:null,a&&a.site?['d-imp','Recommandations']:null].filter(Boolean);
       return '<section class="app-panel dx-summary">'+
         '<div class="dx-top"><div class="dx-ring" style="--p:'+i+';--c:'+col+'"><b>'+i+'</b><small>/100</small></div><div class="dx-verdict"><span class="eyebrow">VERDICT</span><div class="sv-verdict sv-'+lab.c+'">'+lab.t+'</div><p>'+escHtml(visibilityVerdict(i))+'</p><small class="dx-rel" title="Les éléments non mesurables ne sont jamais comptés comme des défauts.">Fiabilité : '+measured+' / '+total+' vérifications mesurées</small></div></div>'+
-        kfHtml+'<div class="dx-bars">'+bar('dx-seo','SEO','Être trouvé sur Google',diag.seo)+bar('dx-geo','GEO','Être cité par les IA',diag.geo)+'</div>'+benchmarkHtml(a)+
+        kfHtml+'<div class="dx-bars">'+bar('seo','SEO','Être trouvé sur Google',diag.seo)+bar('geo','GEO','Être cité par les IA',diag.geo)+'</div><p class="dx-hint">Touchez SEO ou GEO pour voir le détail des vérifications.</p>'+benchmarkHtml(a)+
         '<nav class="dx-toc" aria-label="Sommaire du dossier">'+toc.map(([id,t])=>'<button type="button" data-jump="'+id+'">'+t+'</button>').join('')+'</nav>'+
-        '<div class="pil-grid"><div id="dx-seo" class="set-anchor">'+pillarCardHtml('SEO','Être trouvé sur Google',diag.seo)+'</div><div id="dx-geo" class="set-anchor">'+pillarCardHtml('GEO','Être cité par les IA (ChatGPT, Gemini…)',diag.geo)+'</div></div>'+
         '<details class="dx-unmeasured"><summary>Non vérifiable ('+um.length+') — exclu du score</summary><ul>'+um.map(x=>'<li><b>'+escHtml(x.label)+'</b><span>'+escHtml(x.why)+'</span></li>').join('')+'</ul></details>'+
       '</section>';
     }
@@ -5992,16 +6017,14 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
     }
     function progressChartHtml(rows, opts){
       opts=opts||{};
-      const pts=(rows||[]).filter(a=>a&&(a.site||a.scan||a.status==='Analysé'||a.status==='Terminé')).map(a=>({t:new Date(a.updated_at||a.created_at||0).getTime(),score:Math.max(0,Math.min(100,Number(a.score)||0)),name:((appClients.find(c=>c.id===a.client_id)||{}).name)||'Commerce'})).filter(p=>p.t&&!isNaN(p.t)).sort((a,b)=>a.t-b.t).slice(-8);
-      if(!pts.length) return opts.quiet?'':'<section class="app-panel prog-card"><div class="eyebrow">PROGRESSION</div><h3>Scores dans le temps</h3><p class="app-muted">Aucun score réel pour le moment. Le graphique apparaîtra après la première analyse.</p></section>';
-      const w=320,h=128,pad=18;
-      const x=i=>pts.length===1?w/2:pad+(i/(pts.length-1))*(w-pad*2);
-      const y=s=>h-22-(s/100)*(h-40);
-      const d=pts.map((p,i)=>(i?'L':'M')+x(i).toFixed(1)+','+y(p.score).toFixed(1)).join(' ');
-      const dots=pts.map((p,i)=>'<g><circle cx="'+x(i).toFixed(1)+'" cy="'+y(p.score).toFixed(1)+'" r="4" fill="#BDB4FF"/><text x="'+x(i).toFixed(1)+'" y="'+(y(p.score)-8).toFixed(1)+'" text-anchor="middle" fill="#f4f1ff" font-size="10" font-weight="700">'+p.score+'</text><text x="'+x(i).toFixed(1)+'" y="'+(h-6)+'" text-anchor="middle" fill="#b7b0c8" font-size="9">'+escHtml(new Date(p.t).toLocaleDateString('fr-FR',{day:'2-digit',month:'short'}))+'</text><title>'+escHtml(p.name+' · '+p.score+'/100')+'</title></g>').join('');
-      const delta=pts.length>1?pts[pts.length-1].score-pts[0].score:null;
-      const note=pts.length<2?'Une seule mesure enregistrée. Relance l’analyse plus tard pour comparer les scores réels.':((delta>0?'+':'')+delta+' point'+(Math.abs(delta)>1?'s':'')+' entre la première et la dernière mesure affichée.');
-      return '<section class="app-panel prog-card"><div class="prog-head"><div><div class="eyebrow">PROGRESSION</div><h3>Scores enregistrés</h3></div>'+(delta==null?'':'<b class="'+(delta>=0?'up':'down')+'">'+(delta>0?'+':'')+delta+'</b>')+'</div><svg class="prog-svg" viewBox="0 0 '+w+' '+h+'" role="img" aria-label="Évolution des scores d’audit"><line x1="'+pad+'" y1="'+(h-22)+'" x2="'+(w-pad)+'" y2="'+(h-22)+'" stroke="#ffffff22"/><path class="prog-line" pathLength="100" d="'+d+'" fill="none" stroke="#BDB4FF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>'+dots+'</svg><p class="app-muted">'+escHtml(note)+'</p></section>';
+      const done=(rows||[]).filter(a=>a&&(a.site||a.scan||a.status==='Analysé'||a.status==='Terminé'));
+      if(!done.length) return opts.quiet?'':'<section class="app-panel prog-card"><div class="eyebrow">PROGRESSION</div><h3>Évolution par commerce</h3><p class="app-muted">Aucune analyse pour le moment. L’évolution apparaîtra après la première analyse d’un commerce.</p></section>';
+      const fmt=t=>new Date(t).toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
+      const byClient={};
+      done.forEach(a=>{const t=new Date(a.updated_at||a.created_at||0).getTime()||0;(byClient[a.client_id]=byClient[a.client_id]||[]).push({t,score:Math.max(0,Math.min(100,Number(a.score)||0))});});
+      const lines=Object.entries(byClient).map(([id,list])=>{list.sort((x,y)=>x.t-y.t);const c=appClients.find(x=>String(x.id)===String(id))||{};const first=list[0],last=list[list.length-1];return {name:c.name||'Commerce',n:list.length,first,last,delta:list.length>1?last.score-first.score:null};}).sort((x,y)=>(y.delta==null?-999:y.delta)-(x.delta==null?-999:x.delta));
+      const row=l=>'<div class="pg-row"><div class="pg-name"><b>'+escHtml(l.name)+'</b><small>'+(l.n>1?l.n+' analyses · du '+fmt(l.first.t)+' au '+fmt(l.last.t):'1 analyse'+(l.last.t?' · le '+fmt(l.last.t):'')+' — relance plus tard pour voir l’évolution')+'</small></div><div class="pg-val">'+(l.delta==null?'<b>'+l.last.score+'</b><small>/100</small>':'<span>'+l.first.score+' → <b>'+l.last.score+'</b></span><em class="sc-delta '+(l.delta>=0?'up':'down')+'">'+(l.delta>0?'▲ +':l.delta<0?'▼ ':'= ')+l.delta+'</em>')+'</div></div>';
+      return '<section class="app-panel prog-card"><div class="eyebrow">PROGRESSION</div><h3>Évolution par commerce</h3><p class="app-muted pg-help">Score de la première analyse → score de la dernière, pour chaque commerce.</p><div class="pg-list">'+lines.map(row).join('')+'</div></section>';
     }
     function reportBoardHtml(source){
       const rows=source||appAudits;
