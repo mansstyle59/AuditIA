@@ -4019,7 +4019,8 @@ body:has(.hx) .ai-float-launcher{display:none!important}
 .hx-chips button svg{width:15px;height:15px}
 
 /* ===== iPhone : en-tête plus près de la barre d'état ===== */
-@media(max-width:760px){header.app-topbar{padding-top:calc(env(safe-area-inset-top,0px) + 8px)!important;padding-bottom:10px!important}}
+/* iPhone : le contenu de l'en-tête reste sous la zone floutée par iOS (barre d'état) ; fond uni opaque derrière l'heure */
+@media(max-width:760px){header.app-topbar{padding-top:calc(env(safe-area-inset-top,0px) + 22px)!important;padding-bottom:12px!important;background:#07081A!important}}
 /* ===== Titre de chaque page (sauf accueil, qui a son propre en-tête) ===== */
 @media(max-width:760px){
   .workspace-main>.workspace-head{display:block!important;margin:6px 2px 16px!important;padding:0!important;border:0!important;background:none!important;min-height:0!important}
