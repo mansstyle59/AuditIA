@@ -3,12 +3,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#f6f5fb" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#2a2838" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#0E1015" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0E1015" media="(prefers-color-scheme: dark)">
   <meta name="description" content="AuditIA by AffiAds — auditez la visibilité numérique de vos commerces et transformez vos constats en actions.">
-  <link rel="icon" href="./favicon-32.png?v=5" sizes="32x32" type="image/png">
-  <link rel="icon" type="image/svg+xml" href="./auditia-icon.svg?v=5">
-  <link rel="apple-touch-icon" href="./apple-touch-icon.png?v=5">
+  <link rel="icon" href="./favicon-32.png?v=6" sizes="32x32" type="image/png">
+  <link rel="icon" type="image/svg+xml" href="./auditia-icon.svg?v=6">
+  <link rel="apple-touch-icon" href="./apple-touch-icon.png?v=6">
   <link rel="manifest" href="./manifest.webmanifest">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
@@ -26,13 +26,13 @@
 
     .login-page{min-height:calc(100svh - 148px);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:30px 0 26px}
     .login-brand{display:flex;align-items:center;justify-content:center;gap:14px;margin:4px auto 26px;text-decoration:none;color:var(--text)}
-    .login-mark{width:58px;height:58px;flex:0 0 58px;display:grid;place-items:center;border-radius:17px;background:linear-gradient(145deg,#5B8CFF,#343A48);box-shadow:0 8px 24px #262B3755;color:#fff;font-size:34px;font-weight:850;letter-spacing:-3px}
-    .login-mark span{color:#f2a05f}.login-wordmark{font-size:clamp(31px,6vw,43px);font-weight:850;letter-spacing:-2px;line-height:1}
+    .login-mark{position:relative;width:58px;height:58px;flex:0 0 58px;display:grid;place-items:center;border-radius:17px;background:linear-gradient(145deg,#1E2638,#0B0E14);border:1px solid #ffffff1a;box-shadow:0 10px 28px #00000055;color:#fff;font-size:34px;font-weight:800;letter-spacing:-1px}
+    .login-mark span{position:absolute;right:-5px;bottom:-5px;width:22px;height:22px;display:grid;place-items:center;border-radius:50%;background:var(--ds-accent);border:2px solid var(--ds-bg);color:#fff;font-size:11px;font-weight:800;letter-spacing:0}.login-wordmark{font-size:clamp(31px,6vw,43px);font-weight:850;letter-spacing:-2px;line-height:1}
     .login-card{width:min(100%,600px);background:linear-gradient(155deg,#262B37f5,#1D212Bf8);color:var(--text);border:1px solid #ffffff20;border-radius:26px;padding:clamp(24px,4.5vw,36px);box-shadow:0 24px 70px #0E101555}
     .login-card h1{font-size:clamp(32px,5vw,42px);letter-spacing:-1.7px;line-height:1.15;margin:0 0 20px;color:var(--text)}
     .login-subtitle{font-size:clamp(16px,2.5vw,19px);color:var(--muted);margin:0 0 28px;line-height:1.5;max-width:46ch}
     .login-field{display:block;font-size:16px;font-weight:700;color:#f2efff;margin:0 0 22px}.login-field>span{display:block;margin-bottom:15px}
-    .login-control{display:block;width:100%;height:58px;border:1px solid #7D8698;border-radius:15px;padding:0 16px;font-size:16px;color:#f8f6ff;background:#161920;outline:none;box-shadow:inset 0 1px 2px #0002}
+    .login-control{display:block;width:100%;height:58px;border:1px solid #343A48;border-radius:15px;padding:0 16px;font-size:16px;color:#f8f6ff;background:#161920;outline:none;box-shadow:inset 0 1px 2px #0002}
     .login-control:focus{border-color:#5B8CFF;box-shadow:0 0 0 4px #5B8CFF25}
     .password-wrap{position:relative}.password-wrap .login-control{padding-right:60px}
     .toggle-password{position:absolute;right:6px;top:6px;width:46px;height:46px;display:grid;place-items:center;border:0;border-radius:12px;background:transparent;color:#A3C2FF;cursor:pointer}
@@ -59,18 +59,18 @@
     .app-btn:disabled{opacity:.55}
     .app-nav{display:flex;gap:8px;overflow:auto;padding:4px 0 14px;margin-bottom:10px}
     .app-nav button{flex:0 0 auto;border:1px solid var(--line);border-radius:999px;padding:10px 15px;background:#1D212B;color:var(--muted);font-weight:750}
-    .app-nav button.active{background:#343A48;color:#e6dfff;border-color:#7D8698}
+    .app-nav button.active{background:#343A48;color:#e6dfff;border-color:#343A48}
     .app-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:16px 0 22px}
     .app-stat,.app-panel{background:linear-gradient(145deg,#262B37,#1D212B);border:1px solid #ffffff20;border-radius:18px;padding:18px;min-width:0}
     .app-stat span{display:block;color:var(--muted);font-size:13px}.app-stat strong{display:block;font-size:30px;margin-top:6px}
     .app-panel h2{font-size:19px;margin:0 0 14px}.app-panel p{color:var(--muted);font-size:13px}
     .app-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
     .app-form{display:grid;gap:12px}.app-form label{display:grid;gap:6px;font-size:13px;font-weight:750;color:#e8e3fa}
-    .app-form input,.app-form select,.app-form textarea{width:100%;min-width:0;border:1px solid #7D8698;border-radius:11px;background:#161920;color:#fff;padding:12px;font:inherit}
+    .app-form input,.app-form select,.app-form textarea{width:100%;min-width:0;border:1px solid #343A48;border-radius:11px;background:#161920;color:#fff;padding:12px;font:inherit}
     .app-form textarea{min-height:95px;resize:vertical}
     .app-list{display:grid;gap:10px}.app-row{display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid #ffffff14;background:#1D212B;border-radius:13px;padding:13px}
     .app-row b{display:block;font-size:14px}.app-row small{display:block;color:var(--muted);font-size:12px;margin-top:4px}
-    .app-empty{padding:24px;text-align:center;border:1px dashed #7D8698;border-radius:15px;color:var(--muted);font-size:13px}
+    .app-empty{padding:24px;text-align:center;border:1px dashed #343A48;border-radius:15px;color:var(--muted);font-size:13px}
     .app-check{display:flex;align-items:flex-start;gap:10px;padding:13px 0;border-bottom:1px solid #ffffff12;font-size:14px}
     .app-check input{margin-top:4px;accent-color:#5B8CFF}.app-check small{display:block;color:var(--muted);margin-top:3px}
     .app-notice{border-radius:12px;padding:12px 14px;margin:12px 0;background:#1d4b3e;color:#a7f0cf;font-size:13px}.app-notice.error{background:#5a2c38;color:#ffc4cc}
@@ -483,7 +483,7 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
     .add-toggle .place-search,.add-toggle .app-panel{margin:0 0 12px}
     .client-cards{display:grid;gap:10px}
     .client-card{display:flex;align-items:center;gap:13px;width:100%;text-align:left;background:#1D212B;border:1px solid #343A48;border-radius:16px;padding:14px;cursor:pointer;color:var(--text);transition:border-color .15s,background .15s}
-    .client-card:hover{border-color:#7D8698;background:#161920}
+    .client-card:hover{border-color:#343A48;background:#161920}
     .cc-avatar{flex:0 0 46px;width:46px;height:46px;border-radius:14px;display:grid;place-items:center;font-weight:800;font-size:19px;background:linear-gradient(145deg,#5B8CFF,#5B8CFF);color:#fff}
     .cc-txt{min-width:0;flex:1}.cc-txt b{display:block;font-size:15px;line-height:1.3;overflow-wrap:anywhere}
     .cc-txt small{display:block;color:#A4ACBC;font-size:12px;line-height:1.45;overflow-wrap:anywhere}
@@ -610,7 +610,7 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
     .ac-input:focus{outline:2px solid #5B8CFF80;border-color:#5B8CFF}
     .ac-list{display:grid;gap:6px;margin-top:8px}
     .ac-item{display:block;width:100%;text-align:left;background:#262B37;border:1px solid #343A48;border-radius:12px;padding:12px 13px;cursor:pointer;color:#f3f2f8}
-    .ac-item:hover{background:#262B37;border-color:#7D8698}
+    .ac-item:hover{background:#262B37;border-color:#343A48}
     .ac-item b{display:block;font-size:14px;line-height:1.3}
     .ac-item small{display:block;color:#A4ACBC;font-size:12px;margin-top:2px;overflow-wrap:anywhere}
     .ac-msg{font-size:12.5px;color:#A4ACBC;padding:8px 2px;line-height:1.5}
@@ -618,7 +618,7 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
     .place-form{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
     .place-form input{flex:1;min-width:160px;border:1px solid #343A48;background:#1D212B;color:#f5f3fb;border-radius:13px;padding:13px 14px;min-height:48px}
     .place-form .app-btn{min-height:48px;white-space:nowrap}
-    .place-msg{font-size:12.5px;color:#A3C2FF;background:#262B37;border:1px solid #7D8698;border-radius:12px;padding:10px 12px;margin:10px 0 0;line-height:1.5}
+    .place-msg{font-size:12.5px;color:#A3C2FF;background:#262B37;border:1px solid #343A48;border-radius:12px;padding:10px 12px;margin:10px 0 0;line-height:1.5}
     .place-results{display:grid;gap:8px;margin-top:10px}
     .place-card{display:flex;align-items:center;justify-content:space-between;gap:10px;background:#262B37;border:1px solid #ffffff10;border-radius:14px;padding:12px}
     .place-info{min-width:0}.place-info b{font-size:14px;line-height:1.3}.place-info small{display:block;color:#A4ACBC;font-size:11.5px;line-height:1.4;overflow-wrap:anywhere}
@@ -677,7 +677,7 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
     .sp-badge{flex:0 0 auto;font-size:10px;font-weight:800;padding:2px 7px;border-radius:20px}
     .sp-badge.ok{background:#1f4a3c;color:#9ae8c4}.sp-badge.no{background:#1D212B;color:#A4ACBC}
     .sp-signals{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
-    .sp-chip{font-size:11px;font-weight:700;color:#A3C2FF;background:#262B37;border:1px solid #7D8698;border-radius:20px;padding:4px 10px}
+    .sp-chip{font-size:11px;font-weight:700;color:#A3C2FF;background:#262B37;border:1px solid #343A48;border-radius:20px;padding:4px 10px}
     @media(max-width:600px){.sp-grid{grid-template-columns:minmax(0,1fr)}}
     /* ===== Diagnostic SEO & GEO (synthèse à l'écran) ===== */
     .pil-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
@@ -692,7 +692,7 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
     .pil-list li.no::before{content:"✗";position:absolute;left:0;color:#fb7185;font-weight:800}
     @media(max-width:600px){.pil-grid{grid-template-columns:minmax(0,1fr)}}
     /* ===== Analyse complète : bouton + barre de progression ===== */
-    .analyse-panel{margin-top:14px;border:1px solid #7D8698!important;background:linear-gradient(180deg,#262B37,#1D212B)!important}
+    .analyse-panel{margin-top:14px;border:1px solid var(--ds-line)!important;background:linear-gradient(180deg,#1A2233,var(--ds-surface) 70%)!important}
     .ap-cta{width:100%;min-height:52px;font-size:16px;font-weight:800}
     .ap-last{font-size:11.5px;color:#A4ACBC;margin:10px 0 0;text-align:center}
     .ap-bar-wrap{height:14px;border-radius:10px;background:#161920;overflow:hidden;border:1px solid #ffffff12}
@@ -707,7 +707,7 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
     .tgt-panel{margin-top:14px}
     .tgt-sub{font-size:12px;font-weight:800;color:#A3C2FF;margin:14px 0 8px}
     .kw-wrap{display:flex;flex-wrap:wrap;gap:7px}
-    .kw-chip{font-size:12px;font-weight:700;color:#e7defb;background:#262B37;border:1px solid #7D8698;border-radius:9px;padding:6px 11px}
+    .kw-chip{font-size:12px;font-weight:700;color:#e7defb;background:#262B37;border:1px solid #343A48;border-radius:9px;padding:6px 11px}
     .geo-q{list-style:none;margin:0;padding:0;display:grid;gap:6px}
     .geo-q li{font-size:12.5px;color:#DDE2EA;background:#262B37;border:1px solid #ffffff0d;border-radius:10px;padding:9px 11px;line-height:1.4}
     .geo-q li::before{content:"“";color:#5B8CFF;font-weight:800;margin-right:2px}
@@ -764,7 +764,7 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
 
     /* ===== Test & validation des clés API ===== */
     .api-test{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:10px 0 2px}
-    .api-test-btn{min-height:40px;border:1px solid #7D8698;background:#262B37;color:#e7defb;border-radius:12px;padding:9px 14px;font-weight:800;font-size:13px;cursor:pointer}
+    .api-test-btn{min-height:40px;border:1px solid #343A48;background:#262B37;color:#e7defb;border-radius:12px;padding:9px 14px;font-weight:800;font-size:13px;cursor:pointer}
     .api-test-btn:hover{background:#1D212B}
     .api-test-btn:disabled{opacity:.6;cursor:wait}
     .api-test-msg{font-size:12.5px;line-height:1.45;color:var(--muted);flex:1;min-width:140px}
@@ -784,6 +784,8 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
     input,select,textarea,.login-control,.input{font-size:16px!important}
     .status-safe{position:fixed;top:0;left:0;right:0;height:var(--safe-top);background:var(--ds-bg);z-index:95;pointer-events:none}
     .login-page{padding-top:calc(var(--safe-top) + 12px)}
+    .login-wordmark{font-weight:750;letter-spacing:-.8px;color:var(--ds-text)}
+    .login-wordmark .login-ia{color:var(--ds-accent)}
     @media(max-width:760px){.login-page{padding-top:calc(var(--safe-top) + 8px)}}
 
     /* ---- Structure : zone de travail, colonnes, navigation bureau ---- */
@@ -865,7 +867,7 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
     .app-form textarea{min-height:96px;resize:vertical}
     .app-form input,.app-form select,.app-form textarea,.app-filter,.login-control{font-family:var(--ds-font);font-weight:500}
     /* Dossier d'audit : le conteneur global n'est plus une carte (évite 3 niveaux de cartes imbriquées) */
-    .workspace-main>section.app-panel:has(.analyse-panel){padding:0;border:0;background:transparent}
+    .workspace-main>section.app-panel:has(.analyse-panel){padding:0;border:0;background:transparent;overflow:visible;border-radius:0}
     .workspace-main>section.app-panel:has(.analyse-panel)>h2{font-size:24px;font-weight:700;letter-spacing:-.5px;margin:6px 0 4px}
     .app-form input[type=color]{width:56px;height:40px;min-height:40px;padding:3px;border-radius:var(--ds-r-sm);cursor:pointer}
     .app-form input:focus,.app-form select:focus,.app-form textarea:focus,.app-filter:focus,.login-control:focus{border-color:var(--ds-accent);box-shadow:0 0 0 3px var(--ds-accent-soft)}
@@ -965,7 +967,10 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
       .app-topbar .tb-actions button:active{background:var(--ds-surface-3)}
       .workspace-head{display:block;margin:0 0 20px;padding:0 0 4px;border-bottom:0}
       .workspace-head .workspace-actions{display:none!important}
-      .workspace-head h1{font-size:32px;letter-spacing:-1px;margin:4px 0 4px}
+      .workspace-head h1{font-size:32px;letter-spacing:-1px;margin:2px 0 0}
+      .workspace-head .eyebrow,.workspace-head p{display:none}
+      .login-page{padding-left:16px;padding-right:16px}
+      .app-topbar .tb-brand img{box-shadow:0 0 0 1px var(--ds-line)}
       .workspace-head p{font-size:12px}
       .status-safe{display:none}
       .app-content-title h2{font-size:24px}
@@ -2233,7 +2238,7 @@ main.wrap:has(.workspace-app){width:100%;max-width:none;margin:0;padding:0}
     /* ----- écrans de connexion (rendus dans #authRoot) ----- */
     const authRoot = document.getElementById('authRoot');
     const EYE = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
-    const BRAND = '<a class="login-brand" href="./" aria-label="AuditIA accueil"><span class="login-mark" aria-hidden="true">A<span>✓</span></span><span class="login-wordmark">Audit<span style="color:#f28b46">IA</span></span></a>';
+    const BRAND = '<a class="login-brand" href="./" aria-label="AuditIA accueil"><span class="login-mark" aria-hidden="true">A<span>✓</span></span><span class="login-wordmark">Audit<span class="login-ia">IA</span></span></a>';
     const FOOT = '<p class="login-foot">AuditIA · Auditer mieux, décider plus clairement</p><p class="login-status">Connexion sécurisée via Supabase</p>';
     const pwdField = (id,label,ac) => '<label class="login-field" for="'+id+'"><span>'+label+'</span><span class="password-wrap"><input class="login-control" id="'+id+'" type="password" autocomplete="'+ac+'" required minlength="8"><button class="toggle-password" type="button" data-showpwd="'+id+'" aria-label="Afficher le mot de passe" title="Afficher le mot de passe">'+EYE+'</button></span></label>';
     const validEmail = e => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e);
