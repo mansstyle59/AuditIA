@@ -4331,6 +4331,20 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
 .reports-page .audit-kpis article{padding:12px!important;gap:2px!important;align-items:flex-start!important;text-align:left!important}
 .reports-page .audit-kpis b{font-size:24px!important}
 .reports-page .audit-kpis span{font-size:12.5px!important;line-height:1.25;text-align:left!important}
+
+/* ===== Premium : identité cohérente, note A–F, compteurs de travail ===== */
+.dx-grade{margin-left:4px;padding:1px 6px;border-radius:6px;background:rgba(255,255,255,.1);font-size:11px;font-weight:800;vertical-align:middle;color:#fff}
+.dx-identity h3{margin:6px 0 2px!important;font-size:18px!important}
+.dx-id-list{display:grid;gap:8px;margin-top:10px}
+.dx-id-row{display:grid;grid-template-columns:28px minmax(0,1fr) auto;align-items:center;gap:10px;padding:10px 12px;border:1px solid rgba(255,255,255,.08);border-radius:14px;background:rgba(255,255,255,.035)}
+.dx-id-ic{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;font-weight:800}
+.dx-id-row.ok .dx-id-ic{background:rgba(63,212,140,.16);color:#3FD48C}.dx-id-row.no .dx-id-ic{background:rgba(255,122,122,.16);color:#FF7A7A}.dx-id-row.na .dx-id-ic{background:rgba(255,255,255,.06);color:#8489AB}
+.dx-id-row b{display:block;font-size:14.5px;color:#fff}.dx-id-row small{font-size:12px;color:#ABB0CC}.dx-id-row em{font-style:normal;font-size:13px;color:#DADCF0;text-align:right;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dx-id-row.no em{color:#FFB0B0}
+.hx-work{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;padding:12px;border:1px solid rgba(123,108,255,.25);border-radius:20px;background:linear-gradient(160deg,#151838,#101230)}
+.hx-work>div{display:grid;justify-items:center;gap:2px;text-align:center}
+.hx-work b{font-size:22px;font-weight:800;color:#fff;font-variant-numeric:tabular-nums}.hx-work b.up{color:#3FD48C}
+.hx-work span{font-size:11px;line-height:1.2;color:#ABB0CC}
 </style>
 </head>
 <body>
@@ -4606,6 +4620,7 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
         const askChat=(q)=>{q=String(q||'').trim();if(!q||!input||!form)return;setOpen(true);input.value=q.slice(0,1200);form.requestSubmit?form.requestSubmit():form.dispatchEvent(new Event('submit',{cancelable:true}));};
         page.querySelectorAll('[data-home-ask]').forEach(f=>f.addEventListener('submit',e=>{e.preventDefault();const fld=f.querySelector('input');askChat(fld?.value);if(fld){fld.value='';fld.blur();}}));
         page.querySelectorAll('[data-home-prompt]').forEach(btn=>btn.addEventListener('click',()=>askChat(btn.dataset.homePrompt)));
+        if(typeof requestAnimationFrame==='function'&&typeof performance!=='undefined'&&!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches)){page.querySelectorAll('.dx-ring').forEach(r=>{const target=parseFloat(r.style.getPropertyValue('--p'))||0;const lab=r.querySelector('b');if(!lab||r.dataset.anim)return;r.dataset.anim='1';const t0=performance.now(),dur=900;const step=now=>{const k=Math.min(1,(now-t0)/dur),e=1-Math.pow(1-k,3),v=Math.round(target*e);r.style.setProperty('--p',v);lab.textContent=v;if(k<1)requestAnimationFrame(step);};r.style.setProperty('--p',0);lab.textContent='0';requestAnimationFrame(step);});}
         if(!window.__jumpBound){window.__jumpBound=true;document.addEventListener('change',e=>{const so=e.target.closest&&e.target.closest('[data-client-sort]');if(so){clientSort=so.value||'urgence';renderApp();}});document.addEventListener('click',e=>{const chip=e.target.closest&&e.target.closest('[data-client-chip]');if(chip){e.preventDefault();clientFilter=chip.dataset.clientChip||'';renderApp();return;}
           const tr=e.target.closest&&e.target.closest('[data-client-tier]');if(tr){e.preventDefault();clientTier=clientTier===tr.dataset.clientTier?'':tr.dataset.clientTier;renderApp();return;}
           const af=e.target.closest&&e.target.closest('[data-act-filter]');if(af){const box=af.closest('.dx-actions');if(box){box.dataset.filter=af.dataset.actFilter;box.querySelectorAll('[data-act-filter]').forEach(x=>x.classList.toggle('is-on',x===af));}return;}
@@ -5094,6 +5109,35 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
     const TRACK_RX=[['Pixel Meta',/connect\.facebook\.net|fbq\(/],['Google Tag Manager',/googletagmanager\.com\/gtm|GTM-[A-Z0-9]{4,}/],['Google Analytics',/google-analytics\.com|gtag\(/],['Pixel TikTok',/analytics\.tiktok\.com|ttq\.load/]];
     const CMS_RX=[['Wix',/wix\.com|wixstatic/i],['WordPress',/wp-content|wp-includes/i],['Shopify',/cdn\.shopify|Shopify\.theme/i],['Squarespace',/squarespace/i],['Webflow',/webflow/i],['Jimdo',/jimdo/i],['PrestaShop',/prestashop/i],['Google Sites',/sites\.google/i]];
     async function readSiteText(url,opts,timeout){const ctl=new AbortController();const t=setTimeout(()=>ctl.abort(),timeout||40000);try{const r=await fetch(url,{...(opts||{}),signal:ctl.signal});if(!r.ok){const e=new Error('HTTP '+r.status);e.status=r.status;throw e;}return await r.text();}finally{clearTimeout(t);}}
+    /* Barème GEO local (inspiré des audits GEO publiés) : fichiers lus pour les IA + signaux de la page */
+    const AI_BOTS=['GPTBot','OAI-SearchBot','ChatGPT-User','PerplexityBot','ClaudeBot','Google-Extended','Applebot-Extended','CCBot'];
+    function parseRobotsForAI(txt){
+      const groups=[];let cur=null;
+      String(txt||'').split(/\r?\n/).forEach(line=>{const l=line.replace(/#.*/,'').trim();if(!l)return;const m=l.match(/^([A-Za-z-]+)\s*:\s*(.*)$/);if(!m)return;const k=m[1].toLowerCase(),v=m[2].trim();
+        if(k==='user-agent'){if(!cur||cur.rules.length){cur={agents:[],rules:[]};groups.push(cur);}cur.agents.push(v.toLowerCase());}
+        else if(cur&&(k==='disallow'||k==='allow'))cur.rules.push({k,v});});
+      const rootBlocked=g=>!!g&&g.rules.some(r=>r.k==='disallow'&&r.v==='/')&&!g.rules.some(r=>r.k==='allow'&&r.v==='/');
+      const star=groups.find(g=>g.agents.includes('*'));
+      const blocked=AI_BOTS.filter(b=>{const g=groups.find(gr=>gr.agents.includes(b.toLowerCase()));return g?rootBlocked(g):rootBlocked(star);});
+      return {read:true,blocked,total:AI_BOTS.length};
+    }
+    async function fetchGeoFiles(site){
+      let origin;try{origin=new URL(site).origin;}catch(e){return null;}
+      const get=async path=>{try{const t=await readSiteText('https://api.allorigins.win/raw?url='+encodeURIComponent(origin+path),{},12000);return typeof t==='string'?t:null;}catch(e){return null;}};
+      const [rb,ll]=await Promise.all([get('/robots.txt'),get('/llms.txt')]);
+      const looksHtml=t=>/^\s*</.test(t||'')||/<html|<body/i.test(t||'');
+      const robots=rb==null?null:(looksHtml(rb)||!/user-agent/i.test(rb)?{read:true,blocked:[],total:AI_BOTS.length,missing:true}:parseRobotsForAI(rb));
+      const llms=ll==null?null:(!looksHtml(ll)&&ll.trim().length>40);
+      return {robots,llms};
+    }
+    function geoFromHtml(html){
+      try{const doc=new DOMParser().parseFromString(html,'text/html');const text=(doc.body&&doc.body.textContent||'').replace(/\s+/g,' ');
+        const faq=/FAQPage/i.test(html)||[...doc.querySelectorAll('h1,h2,h3,h4,summary,dt')].some(h=>/faq|questions? fr[ée]quentes|vos questions/i.test(h.textContent||''));
+        const lists=doc.querySelectorAll('ul li,ol li').length>=4||!!doc.querySelector('table');
+        const digits=(text.match(/\b\d+(?:[.,]\d+)?\s?(?:€|%|ans|km|min|h\b)?/g)||[]).length;
+        const dated=/dateModified|datePublished|article:modified_time|og:updated_time/i.test(html)||!!doc.querySelector('time[datetime]');
+        return {faq,lists,digits,dated};}catch(e){return {};}
+    }
     async function readSiteHtml(url){
       url=safeHttpUrl(url); if(!url) throw new Error('adresse non autorisée');
       const tries=[()=>readSiteText('https://r.jina.ai/'+url,{headers:{'X-Return-Format':'html','X-Timeout':'25'}},45000),()=>readSiteText('https://api.allorigins.win/raw?url='+encodeURIComponent(url),{},30000)];
@@ -5534,7 +5578,7 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
           })();
         };
         tickProgress();
-        const [html,web,sir,photos,domain,shot,cp,speed,rk]=await Promise.all([
+        const [html,web,sir,photos,domain,shot,cp,speed,rk,gf]=await Promise.all([
           hasWeb?track('site','Lecture du site','lecture du site impossible', readSiteHtml(site), 20000):Promise.resolve(null),
           track('presence','Réseaux et annuaires','', findWebPresence(c), 35000),
           track('fiche','Informations légales (SIRENE)','', fetchSirene(c), 15000),
@@ -5543,9 +5587,10 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
           hasWeb?track('site','Capture du site','', fetchScreenshot(site), 20000):Promise.resolve(null),
           track('rivals','Concurrents proches','', fetchCompetitors(c), 25000, value=>{ noteLiveRivals(value.list); setAuditFact('Concurrents locaux', value.total!=null?value.total+' commerces':'Résultats reçus', value.selfRank?'N°'+value.selfRank+' par nombre d’avis, pas le rang Google':'Comparaison du volume d’avis'); }),
           hasWeb?track('perf','Performance mobile (PageSpeed)','performance indisponible', fetchPagespeed(site), 60000, value=>{ scan=value; setAuditFact('Performance mobile', value.scores&&value.scores.performance!=null?value.scores.performance+'/100':'Mesurée','Google PageSpeed Insights · Lighthouse'); }):Promise.resolve(null),
-          track('keywords','Mots-clés recherchés','', checkRankings(c), 45000)
+          track('keywords','Mots-clés recherchés','', checkRankings(c), 45000),
+          hasWeb?track('site','Fichiers lus par les IA (robots.txt, llms.txt)','', fetchGeoFiles(site), 20000):Promise.resolve(null)
         ]);
-        if(html){ siteRes=analyzeSite(html,site); siteRes.hasWebsite=true; siteRes.pageRead=true; noteLiveSite(siteRes.finalUrl||site); setAuditFact('Site web','Page lue',(siteRes.finalUrl||site)+' · '+((siteRes.socials||[]).length)+' réseaux sur la page'); }
+        if(html){ siteRes=analyzeSite(html,site); siteRes.hasWebsite=true; siteRes.pageRead=true; siteRes.geo=Object.assign({},geoFromHtml(html),gf||{}); noteLiveSite(siteRes.finalUrl||site); setAuditFact('Site web','Page lue',(siteRes.finalUrl||site)+' · '+((siteRes.socials||[]).length)+' réseaux sur la page'); }
         else if(hasWeb){ siteRes={socials:[],directories:[],hasWebsite:true,pageRead:false,analyzedAt:new Date().toISOString(),finalUrl:site}; setAuditFact('Site web','Page non lue','Les critères de la page ne sont pas notés'); }
         else siteRes={hasWebsite:false,pageRead:false,socials:[],directories:[],analyzedAt:new Date().toISOString(),finalUrl:null};
         if(web){ siteRes.socials=siteRes.socials||[]; const have=new Set(siteRes.socials.map(s=>s.net)); (web.socials||[]).forEach(w=>{ if(!have.has(w.net)){ have.add(w.net); siteRes.socials.push(w); } }); siteRes.directories=web.directories||[]; setAuditFact('Présence web', (web.socials||[]).length+' réseaux · '+(web.directories||[]).length+' annuaires','Uniquement si le nom est dans l’adresse'); }
@@ -5646,6 +5691,13 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
       if(si){ const nd=((si.directories)||[]).length; const dv=tier(nd,[[3,1],[2,0.7],[1,0.4],[0,0]]); add('geo','Présence sur le web (annuaires)',nd>=2,10,'Peu présent sur les annuaires/plateformes : être référencé (Pages Jaunes, TripAdvisor, Maps…) renforce la fiabilité pour les IA.',nd+' plateforme'+(nd>1?'s':'')+' où le commerce est référencé.',dv); }
       if(si){ const mv=major>=2?1:major===1?0.5:0; add('geo','Présence multi-réseaux',major>=2,6,'Peu de réseaux majeurs actifs : une présence sur Instagram/Facebook renforce les signaux d’activité pour les IA.',major+' réseau'+(major>1?'x':'')+' majeur'+(major>1?'s':'')+' détecté'+(major>1?'s':'')+'.',mv); }
       if(d.sirene&&d.sirene.matched) add('geo','Entreprise officiellement enregistrée',true,6,'','Entreprise enregistrée au registre officiel (SIRENE) : identité légale vérifiable, rassurante pour les IA et les clients.');
+      const gx=page&&si.geo;
+      if(gx&&gx.robots){ const bl=gx.robots.blocked||[]; add('geo','Robots d’IA autorisés',!bl.length,8,'Le fichier robots.txt bloque '+bl.length+' robot'+(bl.length>1?'s':'')+' d’IA ('+bl.slice(0,3).join(', ')+') : ces assistants ne peuvent pas lire le site pour le recommander.',gx.robots.missing?'Aucun robots.txt restrictif : les IA peuvent lire le site.':'Les robots des IA (ChatGPT, Perplexity, Gemini…) peuvent lire le site.',1-bl.length/Math.max(1,gx.robots.total)); }
+      if(gx&&gx.llms!=null) add('geo','Fichier llms.txt',!!gx.llms,3,'Pas de fichier llms.txt : ce petit fichier résume le commerce pour les assistants IA (qui, quoi, où, horaires).','Fichier llms.txt présent pour guider les IA.');
+      if(gx&&gx.faq!=null) add('geo','Questions fréquentes (FAQ)',!!gx.faq,5,'Pas de section FAQ : les IA reprennent volontiers des réponses courtes aux questions des clients (prix, horaires, livraison…).','Section FAQ présente : réponses faciles à citer pour les IA.');
+      if(gx&&gx.lists!=null) add('geo','Contenu structuré (listes, tableaux)',!!gx.lists,3,'Peu de listes ou tableaux : un contenu structuré (services, tarifs) est plus facile à reprendre pour les IA.','Contenu structuré en listes ou tableaux.');
+      if(gx&&gx.digits!=null){ const dv=gx.digits>=5?1:gx.digits>=2?0.5:0; add('geo','Chiffres concrets (prix, années, délais)',gx.digits>=5,3,'Peu de chiffres concrets : prix, années d’expérience ou délais rendent le commerce plus crédible et citable.','Chiffres concrets présents sur la page.',dv); }
+      if(gx&&gx.dated!=null) add('geo','Date de mise à jour lisible',!!gx.dated,2,'Aucune date de mise à jour lisible par les machines : les IA privilégient les informations récentes.','Date de publication ou de mise à jour lisible.');
       const pill=p=>{const it=items.filter(x=>x.pillar===p);const t=it.reduce((n,x)=>n+x.weight,0);const g=it.reduce((n,x)=>n+x.weight*(x.val!=null?x.val:(x.ok?1:0)),0);return {score:t?Math.round(g/t*100):0,have:it.filter(x=>x.ok),miss:it.filter(x=>!x.ok&&x.gap)};};
       const seoP=pill('seo'),geoP=pill('geo');
       const index=Math.round((seoP.score+geoP.score)/2);
@@ -5683,6 +5735,7 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
       const d=(c&&c.details)||{}; const si=a&&a.site; const s=a&&a.scan;
       const site=String((c&&c.website)||d.website||'').trim(); const um=[];
       if(site&&si&&!si.pageRead) um.push({label:'Contenu du site (8 vérifications)',why:'la page n’a pas pu être lue (site inaccessible ou lecture refusée)',n:8});
+      if(site&&si&&si.pageRead&&!(si.geo&&si.geo.robots)) um.push({label:'Fichiers lus par les IA (robots.txt, llms.txt)',why:si.geo?'les fichiers n’ont pas pu être lus':'mesure ajoutée récemment : relancer l’analyse',n:2});
       if(site&&!(s&&s.scores&&s.scores.performance!=null)) um.push({label:'Performance mobile et SEO technique',why:'Google PageSpeed n’a pas répondu',n:2});
       if(!(si&&si.rankings&&si.rankings.some(r=>!r.error))) um.push({label:'Classement sur les mots-clés',why:si?'la recherche web n’a pas répondu':'analyse complète non lancée',n:1});
       if(d.photoCount==null) um.push({label:'Photos de la fiche Google',why:'nombre non fourni par Google pour ce commerce',n:1});
@@ -5721,7 +5774,7 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
       const rk=a&&a.site&&a.site.rankings;
       if(rk&&rk.length&&!rk.every(r=>r.error)){ const f=rk.filter(r=>r.found).length; kf.push(['mots-clés trouvés',f+' / '+rk.length]); }
       const kfHtml='<div class="vis-kf">'+kf.map(([k,v])=>'<span class="vis-kf-item"><b>'+escHtml(v)+'</b><small>'+escHtml(k)+'</small></span>').join('')+'</div>';
-      const bar=(pk,name,sub,p)=>{const cc=p.score>=75?'good':p.score>=50?'mid':'low';const its=diag.items.filter(x=>x.pillar===pk).sort((x,y)=>x.val-y.val);return '<details class="dx-pil"><summary class="dx-bar"><span class="dx-bar-l"><b>'+name+'</b><small>'+sub+'</small></span><span class="dx-bar-t"><i class="'+cc+'" style="width:'+p.score+'%"></i></span><em class="'+cc+'">'+p.score+'</em></summary><ul class="dx-pil-list">'+its.map(x=>'<li class="'+(x.val>=1?'ok':x.val>0?'part':'no')+'"><span>'+(x.val>=1?'✓':x.val>0?'◐':'✕')+'</span>'+escHtml(x.label)+'</li>').join('')+'</ul></details>';};
+      const bar=(pk,name,sub,p)=>{const cc=p.score>=75?'good':p.score>=50?'mid':'low';const its=diag.items.filter(x=>x.pillar===pk).sort((x,y)=>x.val-y.val);return '<details class="dx-pil"><summary class="dx-bar"><span class="dx-bar-l"><b>'+name+'</b><small>'+sub+'</small></span><span class="dx-bar-t"><i class="'+cc+'" style="width:'+p.score+'%"></i></span><em class="'+cc+'">'+p.score+'<sup class="dx-grade">'+(p.score>=90?'A':p.score>=75?'B':p.score>=60?'C':p.score>=40?'D':'F')+'</sup></em></summary><ul class="dx-pil-list">'+its.map(x=>'<li class="'+(x.val>=1?'ok':x.val>0?'part':'no')+'"><span>'+(x.val>=1?'✓':x.val>0?'◐':'✕')+'</span>'+escHtml(x.label)+'</li>').join('')+'</ul></details>';};
       const toc=[['d-actions','Actions'],['d-fiche','Fiche'],a&&a.scan?['d-perf','Performance']:null,a&&a.site?['d-social','Présence']:null,rk&&rk.length?['d-rank','Mots-clés']:null,cp&&cp.list&&cp.list.length?['d-comp','Concurrents']:null,a&&a.site?['d-imp','Recommandations']:null].filter(Boolean);
       return '<section class="app-panel dx-summary">'+
         '<div class="dx-top"><div class="dx-ring" style="--p:'+i+';--c:'+col+'"><b>'+i+'</b><small>/100</small></div><div class="dx-verdict"><span class="eyebrow">VERDICT</span><div class="sv-verdict sv-'+lab.c+'">'+lab.t+'</div><p>'+escHtml(visibilityVerdict(i))+'</p><small class="dx-rel" title="Les éléments non mesurables ne sont jamais comptés comme des défauts.">Fiabilité : '+measured+' / '+total+' vérifications mesurées</small></div></div>'+
@@ -5729,6 +5782,20 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
         '<nav class="dx-toc" aria-label="Sommaire du dossier">'+toc.map(([id,t])=>'<button type="button" data-jump="'+id+'">'+t+'</button>').join('')+'</nav>'+
         '<details class="dx-unmeasured"><summary>Non vérifiable ('+um.length+') — exclu du score</summary><ul>'+um.map(x=>'<li><b>'+escHtml(x.label)+'</b><span>'+escHtml(x.why)+'</span></li>').join('')+'</ul></details>'+
       '</section>';
+    }
+    function identityHtml(a,c){
+      const d=(c&&c.details)||{}; const si=a&&a.site; const sr=d.sirene&&d.sirene.matched?d.sirene:null;
+      const nz=v=>String(v||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
+      const dg=v=>String(v||'').replace(/\D/g,'').replace(/^33/,'0').slice(-9);
+      const rows=[];
+      const gPhone=dg((c&&c.phone)||d.phone);
+      if(si&&si.pageRead){ const tels=(Array.isArray(si.tel)?si.tel:[si.tel]).filter(Boolean).map(dg); rows.push(['Téléphone','Google ↔ site',!gPhone||!tels.length?null:tels.includes(gPhone),!tels.length?'non affiché sur le site':!gPhone?'absent de Google':tels.includes(gPhone)?'identique':'différent']); }
+      if(sr){ const gCity=nz(c&&c.city); rows.push(['Ville','Google ↔ registre SIRENE',(gCity&&sr.ville)?nz(sr.ville).includes(gCity)||gCity.includes(nz(sr.ville)):null,sr.ville||'—']);
+        const addr=nz(d.address); rows.push(['Code postal','Google ↔ registre SIRENE',(addr&&sr.codePostal)?addr.includes(sr.codePostal):null,sr.codePostal||'—']);
+        const gName=nz(c&&c.name), sName=nz(sr.denomination); rows.push(['Nom','Google ↔ registre SIRENE',(gName&&sName)?(sName.includes(gName)||gName.includes(sName)||gName.split(' ').some(w=>w.length>3&&sName.includes(w))):null,sr.denomination||'—']); }
+      if(!rows.length) return '';
+      const ok=rows.filter(r=>r[2]===true).length, ko=rows.filter(r=>r[2]===false).length;
+      return '<section class="app-panel dx-identity"><div class="eyebrow">IDENTITÉ COHÉRENTE</div><h3>'+(ko?ko+' écart'+(ko>1?'s':'')+' à corriger':'Informations cohérentes')+'</h3><p class="app-muted">Des coordonnées identiques partout rassurent Google, les IA et les clients.</p><div class="dx-id-list">'+rows.map(r=>'<div class="dx-id-row '+(r[2]===true?'ok':r[2]===false?'no':'na')+'"><span class="dx-id-ic">'+(r[2]===true?'✓':r[2]===false?'✕':'–')+'</span><div><b>'+escHtml(r[0])+'</b><small>'+escHtml(r[1])+'</small></div><em>'+escHtml(r[3])+'</em></div>').join('')+'</div>'+(ok+ko<rows.length?'<p class="dx-note">« – » : comparaison impossible, une des sources ne fournit pas l’information.</p>':'')+'</section>';
     }
     function auditActionsHtml(a,c){
       const diag=visibilityAudit(a,c); const acts=auditActions(a,c,diag); if(!acts.length) return '';
@@ -5940,7 +6007,7 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
       const cp=a&&a.site&&a.site.competitors; if(cp&&cp.list&&cp.list.length){ K.heading('Concurrents locaux',col); const self=cp.list.find(x=>x.isSelf); let ins; if(self&&cp.selfRank){ if(cp.selfRank===1) ins='Votre commerce a le volume d’avis le plus élevé parmi les résultats analysés.'; else { const t=cp.nextAhead; const need=t?Math.max(1,(Number(t.reviews)||0)-(Number(self.reviews)||0)+1):null; ins='Rang de volume d’avis : '+cp.selfRank+' sur '+cp.total+(need!=null?' — environ '+need+' avis supplémentaires pour dépasser '+t.name+'.':'.'); } } else ins='Le commerce n’a pas été identifié avec certitude dans l’échantillon comparé.'; K.para(ins,{size:9.5}); K.gap(1); cp.list.slice(0,6).forEach((x,i)=>{ K.rowLR((x.rank||i+1)+'. '+x.name+(x.isSelf?' (vous)':''),(x.rating!=null?String(x.rating).replace('.',',')+'/5':'—')+'  ·  '+(Number(x.reviews)||0)+' avis'); if(x.website) K.para('Site web : '+x.website,{size:7.5,color:K.MUT}); if(x.mapsUrl) K.para('Google Maps : '+x.mapsUrl,{size:7.5,color:K.MUT}); }); K.para('Échantillon Google Places trié par volume d’avis puis note. Ce classement de popularité ne représente pas l’ordre exact de Google Maps.',{size:7.5,color:K.MUT}); }
       const rk=a&&a.site&&a.site.rankings; if(rk&&rk.length&&!rk.every(r=>r.error)){ K.heading('Classement sur les mots-clés',col); const found=rk.filter(r=>r.found).length; K.para('Trouvé sur '+found+' / '+rk.length+' recherches.',{size:9.5}); K.gap(1); rk.forEach(r=>{ const b=(typeof rankBadge==='function')?rankBadge(r):{t:(r.found?('n°'+r.pos):'non trouvé')}; K.rowLR(r.kw,b.t); }); K.para('Classement indicatif (recherche web), différent du classement Google exact.',{size:7.5,color:K.MUT}); }
       const plan=(typeof improvementPlan==='function')?improvementPlan(a,c):[]; if(plan.length){ K.ensure(42); K.heading('Feuille de route recommandée',col); K.para('Traitez les actions dans l’ordre ci-dessous. Après les corrections, relancez un audit comparable pour mesurer l’évolution plutôt que de supposer un résultat.',{size:8.5,color:K.MUT}); plan.forEach((it,i)=>{ K.setF('bold',10); const hl=pdf.splitTextToSize((i+1)+'. '+it.title+'   ['+it.axis+' · '+it.priority+']',CW); K.ensure(K.lh(10)*hl.length+2); K.setT(K.DARK); hl.forEach(ln=>{ pdf.text(ln,M,K.y+3.4); K.y+=K.lh(10); }); if(it.why) K.para('Pourquoi : '+it.why,{size:8.5,color:K.MUT}); (it.how||[]).forEach(h=>K.bullet(h,'',col)); K.gap(1.5); }); }
-      if(a.notes){ K.heading('Notes',col); K.para(a.notes,{size:9.5}); }
+      { const acts=auditActions(a,c,diag).slice(0,5); if(acts.length){ K.heading('Plan des 30 prochains jours',col); K.para('Actions classées par gain de score estimé (mêmes pondérations que le score). À vérifier avant mise en œuvre.',{size:8.5,color:K.MUT}); acts.forEach((x,i)=>K.bullet((i+1)+'. '+x.label+' — +'+String(x.gain).replace('.',',')+' pts · impact '+x.impact.toLowerCase()+' · '+x.effort,'',col)); K.gap(2); } } if(a.notes){ K.heading('Notes',col); K.para(a.notes,{size:9.5}); }
       pdfEvidenceQuality(pdf,K,a,c,col);
       K.gap(3); K.hr(); K.ensure(6); K.setF('bold',10); K.setT(col); pdf.text(String(st.signature_name||st.company_name||'AffiAds'),M,K.y+3.4); K.y+=5; if(st.signature_role) K.para(st.signature_role,{size:9,color:K.MUT}); const contact=[st.contact_email,st.phone,st.website].filter(Boolean).join('   ·   '); if(contact) K.para(contact,{size:9}); if(st.signature_text) K.para(st.signature_text,{size:8.5,color:K.MUT});
       pdfFooter(pdf,st);
@@ -6092,6 +6159,7 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
             '<img class="hx-robot" src="./home-robot.png" alt="" aria-hidden="true">'+
           '</section>'+
           '<section class="hx-tiles" aria-label="Indicateurs">'+hxTile('store','blue',appClients.length,'Commerces','dans la base','Clients')+hxTile('doc','violet',appAudits.length,'Audits','enregistrés','Audits')+hxTile('clock','orange',hxTodo,'À analyser','à compléter','Audits')+hxTile('check','green',hxReady,'Analysés','prêts pour un rapport','Rapports')+'</section>'+
+          (function(){if(!scoredAudits.length)return '';const per={};let verifs=0;scoredAudits.forEach(a=>{const c=appClients.find(x=>x.id===a.client_id);try{verifs+=visibilityAudit(a,c).items.length;}catch(e){}const t=new Date(a.updated_at||a.created_at||0).getTime()||0;(per[a.client_id]=per[a.client_id]||[]).push({t,s:Number(a.score)||0,a,c});});let acts=0,gained=0;Object.values(per).forEach(l=>{l.sort((x,y)=>x.t-y.t);const last=l[l.length-1];try{acts+=auditActions(last.a,last.c,visibilityAudit(last.a,last.c)).length;}catch(e){}if(l.length>1)gained+=Math.max(0,last.s-l[0].s);});return '<section class="hx-work" aria-label="Votre travail"><div><b>'+scoredAudits.length+'</b><span>audits réalisés</span></div><div><b>'+verifs+'</b><span>vérifications mesurées</span></div><div><b>'+acts+'</b><span>actions proposées</span></div><div><b class="up">+'+gained+'</b><span>points gagnés</span></div></section>';})()+
           '<button type="button" class="hx-cta" data-app-view="Audits"><span class="hx-cta-ico">'+HXI.search+'</span><span>Lancer un nouvel audit</span><span class="hx-go">'+HXI.chev+'</span></button>'+
           '<section class="hx-note"><span class="hx-ico hx-violet hx-ico-lg">'+HXI.bulb+'</span><div><strong>Bon à savoir</strong><p>Je m’appuie uniquement sur les données présentes dans vos dossiers. Je n’invente pas d’informations et je vous indique toujours ce qui doit être confirmé.</p></div></section>'+
           '<section class="hx-ask-wrap" aria-label="Poser une question à Audit Chat IA"><form class="hx-ask" data-home-ask><input name="q" type="text" maxlength="1200" autocomplete="off" enterkeyhint="send" placeholder="Posez une question sur vos audits…" aria-label="Votre question pour Audit Chat IA"><button type="submit" aria-label="Envoyer la question">'+HXI.send+'</button></form>'+
@@ -6148,8 +6216,8 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
         const c=appClients.find(x=>x.id===a.client_id);
         const list=Array.isArray(a.checklist)?a.checklist:[];
         const analyzed=!!(a.site||a.scan||a.status==='Analysé');
-        const diagBlocks=analyzed?(visibilitySummaryHtml(a,c)+dxWrap('d-actions',auditActionsHtml(a,c))+'<!--AP-->'+ficheCompareHtml(c)+dxWrap('d-fiche',clientInfoHtml(c))+siteShotHtml(a)+dxWrap('d-perf',scanPanelHtml(a,c))+dxWrap('d-social',socialPresenceHtml(a))+dxWrap('d-rank',rankingsHtml(a))+dxWrap('d-comp',competitorsHtml(a,c))+targetingPanelHtml(a,c)+(improvementHtml(a,c)?'<details class="dx-more set-anchor" id="d-imp"><summary>Recommandations détaillées (pourquoi, comment)</summary>'+improvementHtml(a,c)+'</details>':'')+'<details class="cd-edit" style="margin-top:14px"><summary>Notes personnelles (facultatif)</summary><form class="app-form" data-save-notes style="padding:0 16px 16px"><label>Notes internes<textarea name="notes" placeholder="Remarques pour toi — n’apparaissent dans le rapport que si tu les remplis.">'+escHtml(a.notes||'')+'</textarea></label><button class="app-btn primary" type="submit">Enregistrer les notes</button></form></details><div class="detail-actions" style="margin-top:16px;flex-wrap:wrap"><button class="app-btn" data-export-report="'+a.id+'" data-mode="simple">📄 Rapport express (1 page · gratuit)</button><button class="app-btn primary" data-export-report="'+a.id+'" data-mode="full">📑 Rapport complet (PDF)</button><button class="app-btn" data-delete-audit="'+a.id+'">Supprimer cet audit</button></div><p class="app-muted" style="margin:8px 0 0;font-size:12px">Le <b>rapport express</b> est l’aperçu gratuit à laisser au prospect ; le <b>rapport complet</b> est le document détaillé que tu peux facturer.</p>'):ficheCompareHtml(c)+'<div class="app-panel" style="margin-top:14px"><div class="app-empty">Rien n’est encore analysé. Touche <b>Lancer l’analyse</b> ci-dessus : AuditIA récupère les données Google, lit le site, trouve les réseaux, les informations légales (SIRET) et la performance, puis génère le rapport complet.</div><div class="detail-actions" style="margin-top:14px"><button class="app-btn" data-delete-audit="'+a.id+'">Supprimer cet audit</button></div></div>';
-        body='<button class="app-btn" data-app-view="Audits">← Audits</button><section class="app-panel page-dossier" style="margin-top:14px"><div class="dossier-head"><div><div class="eyebrow">DOSSIER D’AUDIT</div><h2 style="margin-top:8px">'+escHtml(c?.name||'Commerce')+'</h2><p>'+escHtml(c?.city||'')+' · '+escHtml(a.title)+'</p></div>'+(analyzed?'<div class="audit-score-chip"><b>'+(Number(a.score)||0)+'</b><span>/100</span></div>':'<div class="audit-score-chip is-wait"><span>Pas encore analysé</span></div>')+'</div>'+progressChartHtml(appAudits.filter(x=>String(x.client_id)===String(a.client_id)),{quiet:true})+((analyzed&&!(fullAuditState&&fullAuditState.id===a.id))?diagBlocks.replace('<!--AP-->',analysePanelHtml(a,c)):analysePanelHtml(a,c)+diagBlocks.replace('<!--AP-->',''))+'</section>';
+        const diagBlocks=analyzed?(visibilitySummaryHtml(a,c)+dxWrap('d-actions',auditActionsHtml(a,c))+identityHtml(a,c)+progressChartHtml(appAudits.filter(x=>String(x.client_id)===String(a.client_id)),{quiet:true})+'<!--AP-->'+ficheCompareHtml(c)+dxWrap('d-fiche',clientInfoHtml(c))+siteShotHtml(a)+dxWrap('d-perf',scanPanelHtml(a,c))+dxWrap('d-social',socialPresenceHtml(a))+dxWrap('d-rank',rankingsHtml(a))+dxWrap('d-comp',competitorsHtml(a,c))+targetingPanelHtml(a,c)+(improvementHtml(a,c)?'<details class="dx-more set-anchor" id="d-imp"><summary>Recommandations détaillées (pourquoi, comment)</summary>'+improvementHtml(a,c)+'</details>':'')+'<details class="cd-edit" style="margin-top:14px"><summary>Notes personnelles (facultatif)</summary><form class="app-form" data-save-notes style="padding:0 16px 16px"><label>Notes internes<textarea name="notes" placeholder="Remarques pour toi — n’apparaissent dans le rapport que si tu les remplis.">'+escHtml(a.notes||'')+'</textarea></label><button class="app-btn primary" type="submit">Enregistrer les notes</button></form></details><div class="detail-actions" style="margin-top:16px;flex-wrap:wrap"><button class="app-btn" data-export-report="'+a.id+'" data-mode="simple">📄 Rapport express (1 page · gratuit)</button><button class="app-btn primary" data-export-report="'+a.id+'" data-mode="full">📑 Rapport complet (PDF)</button><button class="app-btn" data-delete-audit="'+a.id+'">Supprimer cet audit</button></div><p class="app-muted" style="margin:8px 0 0;font-size:12px">Le <b>rapport express</b> est l’aperçu gratuit à laisser au prospect ; le <b>rapport complet</b> est le document détaillé que tu peux facturer.</p>'):ficheCompareHtml(c)+'<div class="app-panel" style="margin-top:14px"><div class="app-empty">Rien n’est encore analysé. Touche <b>Lancer l’analyse</b> ci-dessus : AuditIA récupère les données Google, lit le site, trouve les réseaux, les informations légales (SIRET) et la performance, puis génère le rapport complet.</div><div class="detail-actions" style="margin-top:14px"><button class="app-btn" data-delete-audit="'+a.id+'">Supprimer cet audit</button></div></div>';
+        body='<button class="app-btn" data-app-view="Audits">← Audits</button><section class="app-panel page-dossier" style="margin-top:14px"><div class="dossier-head"><div><div class="eyebrow">DOSSIER D’AUDIT</div><h2 style="margin-top:8px">'+escHtml(c?.name||'Commerce')+'</h2><p>'+escHtml(c?.city||'')+' · '+escHtml(a.title)+'</p></div>'+(analyzed?'<div class="audit-score-chip"><b>'+(Number(a.score)||0)+'</b><span>/100</span></div>':'<div class="audit-score-chip is-wait"><span>Pas encore analysé</span></div>')+'</div>'+((analyzed&&!(fullAuditState&&fullAuditState.id===a.id))?diagBlocks.replace('<!--AP-->',analysePanelHtml(a,c)):analysePanelHtml(a,c)+diagBlocks.replace('<!--AP-->',''))+'</section>';
       }
       appShell(body);
     }
