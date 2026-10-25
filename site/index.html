@@ -4215,6 +4215,31 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
 @media(max-width:360px){.ai-float-welcome{padding-right:0!important}.ai-welcome-robot{display:none}}
 .ai-float-head-copy small::before,.ai-float-head-copy small::after{display:none!important;content:none!important}
 @media(max-width:760px){.ai-float-panel{height:auto!important;max-height:calc(100dvh - 190px - env(safe-area-inset-top,0px))!important;display:flex!important;flex-direction:column!important}.ai-float-panel[hidden]{display:none!important}.ai-float-body{flex:1 1 auto!important;min-height:0!important;max-height:none!important;overflow-y:auto!important}}
+
+/* ===== Rapports (maquette) : cartes graphiques, barres en dégradé, export ===== */
+.workspace-main .schema-card,.workspace-main .prog-card{position:relative;padding:20px!important;border-color:rgba(139,108,255,.4)!important}
+.workspace-main .schema-card::after,.workspace-main .prog-card::after{content:"";position:absolute;top:16px;right:16px;width:50px;height:50px;border-radius:14px;border:1.5px solid rgba(150,130,255,.5);background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23B79CFF' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 19v-6M12 19V6M18 19v-9'/%3E%3C/svg%3E") center/24px no-repeat,linear-gradient(150deg,#2a2670,#14143a);display:block!important}
+.workspace-main .schema-card:has(b.geo)::after{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23B79CFF' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='8'/%3E%3Ccircle cx='12' cy='12' r='4'/%3E%3Cpath d='m12 12 7-7M16 4h3v3'/%3E%3C/svg%3E") center/24px no-repeat,linear-gradient(150deg,#2a2670,#14143a)}
+.workspace-main .schema-card .eyebrow,.workspace-main .prog-card .eyebrow{display:inline-flex;padding:6px 14px;border-radius:999px;background:rgba(123,108,255,.2);color:#C9B6FF;font-size:11px;font-weight:700;letter-spacing:2.4px}
+.workspace-main .schema-card h3,.workspace-main .prog-card h3{margin:12px 60px 14px 0!important;font-size:19px!important;font-weight:700!important;color:#fff!important}
+.workspace-main .schema-bar{display:grid!important;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"l v" "b b";align-items:center;row-gap:8px;margin:0 0 14px}
+.workspace-main .schema-bar>span{grid-area:l;font-size:15px;color:#DADCF0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.workspace-main .schema-bar>em{grid-area:v;font-style:normal;font-size:18px;font-weight:800;color:#fff}
+.workspace-main .schema-bar>i{grid-area:b;display:block;height:10px;border-radius:99px;background:rgba(255,255,255,.08)!important;overflow:hidden}
+.workspace-main .schema-bar>i>b{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#6a46ee,#B79CFF)!important}
+.workspace-main .schema-bar>i>b.geo{background:linear-gradient(90deg,#4F7BFF,#5ee6b8)!important}
+.workspace-main .report-card{padding:16px!important}
+.workspace-main .report-top{display:grid!important;grid-template-columns:64px minmax(0,1fr);grid-template-areas:"m c" "m s";column-gap:14px;align-items:start}
+.workspace-main .report-top .audit-mark{grid-area:m;width:64px;height:64px;flex-basis:64px;font-size:28px!important}
+.workspace-main .report-top .audit-copy{grid-area:c;min-width:0}
+.workspace-main .report-top .audit-state{grid-area:s;display:flex;flex-direction:column;margin-top:8px}
+.workspace-main .report-top .audit-state b{font-size:30px;font-weight:800;color:#fff;line-height:1}
+.workspace-main .report-top .audit-state small{font-size:14px;color:#ABB0CC}
+.workspace-main .report-meter{display:block!important;height:8px!important;margin-top:12px;padding:0!important;border:0!important;border-radius:99px!important;background:rgba(255,255,255,.08)!important;overflow:hidden}
+.workspace-main .report-meter>i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#6a46ee,#B79CFF)}
+.workspace-main .report-actions{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:16px}
+.workspace-main .report-actions .app-btn{min-height:52px;justify-content:center;font-size:16px!important;font-weight:700!important;border-radius:16px!important}
+.workspace-main .report-actions .app-btn.primary{box-shadow:0 8px 22px rgba(106,70,238,.4)!important}
 </style>
 </head>
 <body>
