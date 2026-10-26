@@ -6085,6 +6085,29 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
       const shareBtn=ov.querySelector('[data-share]');
       if(shareBtn) shareBtn.addEventListener('click',async()=>{ try{ const file=new File([blob],fname,{type:'application/pdf'}); await navigator.share({files:[file],title:fname}); }catch(err){ if(err&&err.name!=='AbortError'){ try{ window.open(url,'_blank'); }catch(_){} } } });
     }
+    function homeResultsHtml(){
+      const isDone=x=>!!(x&&(x.site||x.scan||x.status==='Analysé'||x.status==='Terminé'));
+      const tm=x=>new Date(x.updated_at||x.created_at||0).getTime()||0;
+      const head='<span class="hx-kicker"><i></i>DERNIER AUDIT</span>';
+      const list=appAudits.filter(isDone).sort((x,y)=>tm(y)-tm(x));
+      if(!list.length) return '<section class="hx-demo" aria-label="Dernier audit"><div class="hx-demo-head">'+head+'</div><div class="hx-mock"><h4>Aucun audit analysé pour le moment</h4><p>Lancez un audit sur un commerce : son score, ses actions prioritaires et sa place face aux concurrents apparaîtront ici.</p></div></section>';
+      const a=list[0]; const c=appClients.find(x=>String(x.id)===String(a.client_id))||{};
+      const score=Math.max(0,Math.min(100,Math.round(Number(a.score)||0)));
+      const verdict=score>=75?'Bonne visibilité':score>=50?'Visibilité à renforcer':'Visibilité faible';
+      const dash=(314*(1-score/100)).toFixed(1);
+      const dateStr=new Date(tm(a)).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
+      let acts=[]; try{ acts=auditActions(a,c,visibilityAudit(a,c)).slice(0,3); }catch(e){ acts=[]; }
+      const actsHtml=acts.length?'<ol>'+acts.map(x=>'<li>'+escHtml(x.label)+'<em>+'+Math.max(1,Math.round(Number(x.gain)||0))+' pts</em></li>').join('')+'</ol>':'<p>Aucune action prioritaire détectée sur les critères mesurés.</p>';
+      const cp=a.site&&a.site.competitors;
+      const own=Number((c.details||{}).reviews||0);
+      let compHtml='<p>Comparaison avec les concurrents non disponible pour ce dossier.</p>';
+      if(cp&&cp.selfRank){ const lead=cp.leader; compHtml='<p><b>'+own.toLocaleString('fr-FR')+' avis</b> · n°'+cp.selfRank+' sur '+cp.total+' comparés</p>'+(lead&&lead.name?'<p>Leader : '+escHtml(lead.name)+' ('+(Number(lead.reviews)||0).toLocaleString('fr-FR')+' avis)</p>':''); }
+      return '<section class="hx-demo" aria-label="Dernier audit"><div class="hx-demo-head">'+head+'<small>'+escHtml(c.name||'Commerce')+' · '+dateStr+'</small></div><div class="hx-demo-grid">'+
+        '<article class="hx-mock"><div class="hx-mock-score"><svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="50" class="hx-trk"/><circle cx="60" cy="60" r="50" class="hx-arc" style="stroke-dasharray:314;stroke-dashoffset:'+dash+'"/></svg><b>'+score+'</b></div><h4>Score de visibilité</h4><p>'+verdict+'</p></article>'+
+        '<article class="hx-mock"><h4>Actions prioritaires</h4>'+actsHtml+'</article>'+
+        '<article class="hx-mock"><h4>Face aux concurrents</h4>'+compHtml+'<button type="button" class="app-btn" data-app-view="Audits" style="margin-top:10px">Voir le dossier</button></article>'+
+        '</div></section>';
+    }
     function auditEvolutionHtml(a,c){
       const isDone=x=>!!(x&&(x.site||x.scan||x.status==='Analysé'||x.status==='Terminé'));
       const tm=x=>new Date(x.updated_at||x.created_at||0).getTime()||0;
@@ -6180,7 +6203,7 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
             '<p>Renseignez-vous sur un commerce et découvrez s’il est vraiment visible : Google, site, réseaux et concurrents.</p></div>'+
             '<img class="hx-robot" src="./home-robot.png" alt="" aria-hidden="true">'+
           '</section>'+
-          '<section class="hx-demo" aria-label="Aperçu des résultats d’un audit"><div class="hx-demo-head"><span class="hx-kicker"><i></i>CE QUE VOUS OBTENEZ</span><small>Exemple illustratif</small></div>'+'<div class="hx-demo-grid">'+'<article class="hx-mock"><div class="hx-mock-score"><svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="50" class="hx-trk"/><circle cx="60" cy="60" r="50" class="hx-arc" style="stroke-dasharray:314;stroke-dashoffset:119"/></svg><b>62</b></div><h4>Score de visibilité</h4><p>Visibilité à renforcer : Google, site et réseaux à compléter.</p></article>'+'<article class="hx-mock"><h4>Plan d’action chiffré</h4><ol><li>Compléter la fiche Google<em>+9 pts</em></li><li>Ajouter une FAQ au site<em>+6 pts</em></li><li>Répondre aux avis clients<em>+4 pts</em></li></ol></article>'+'<article class="hx-mock"><h4>Face aux concurrents</h4><div class="hx-bars"><div><span>Vous</span><span class="hx-bar"><i style="width:62%"></i></span></div><div><span>Médiane</span><span class="hx-bar"><i style="width:58%"></i></span></div><div><span>Meilleur</span><span class="hx-bar"><i style="width:81%"></i></span></div></div></article>'+'</div></section>'+
+          homeResultsHtml()+
           '<section class="hx-tiles" aria-label="Indicateurs">'+hxTile('store','blue',appClients.length,'Commerces','dans la base','Clients')+hxTile('doc','violet',appAudits.length,'Audits','enregistrés','Audits')+hxTile('clock','orange',hxTodo,'À analyser','à compléter','Audits')+hxTile('check','green',hxReady,'Analysés','prêts pour un rapport','Rapports')+'</section>'+
           (function(){if(!scoredAudits.length)return '';const per={};let verifs=0;scoredAudits.forEach(a=>{const c=appClients.find(x=>x.id===a.client_id);try{verifs+=visibilityAudit(a,c).items.length;}catch(e){}const t=new Date(a.updated_at||a.created_at||0).getTime()||0;(per[a.client_id]=per[a.client_id]||[]).push({t,s:Number(a.score)||0,a,c});});let acts=0,gained=0;Object.values(per).forEach(l=>{l.sort((x,y)=>x.t-y.t);const last=l[l.length-1];try{acts+=auditActions(last.a,last.c,visibilityAudit(last.a,last.c)).length;}catch(e){}if(l.length>1)gained+=Math.max(0,last.s-l[0].s);});return '<section class="hx-work" aria-label="Votre travail"><div><b>'+scoredAudits.length+'</b><span>audits réalisés</span></div><div><b>'+verifs+'</b><span>vérifications mesurées</span></div><div><b>'+acts+'</b><span>actions proposées</span></div><div><b class="up">+'+gained+'</b><span>points gagnés</span></div></section>';})()+
           '<button type="button" class="hx-cta" data-app-view="Audits"><span class="hx-cta-ico">'+HXI.search+'</span><span>Lancer un nouvel audit</span><span class="hx-go">'+HXI.chev+'</span></button>'+
