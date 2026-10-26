@@ -4347,6 +4347,7 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
 .hx-work span{font-size:11px;line-height:1.2;color:#ABB0CC}
 .ev-card{margin-top:14px}.ev-stats{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0}.ev-stat{flex:1 1 110px;background:#191C39;border:1px solid #232749;border-radius:14px;padding:10px 12px}.ev-stat b{display:block;font-size:20px;color:#F3F4FF}.ev-stat b.up{color:#3DDC97}.ev-stat b.down{color:#FF6B7A}.ev-stat small{color:#ABB0CC;font-size:12px}.ev-sub{margin:8px 0 4px;font-weight:700;font-size:13px;color:#C9B6FF}.ev-list{margin:0 0 6px 18px;font-size:13px;color:#ABB0CC;line-height:1.5}.ev-list.ok li{color:#3DDC97}.ev-list.ko li{color:#FF6B7A}
 .hx-demo{margin:14px 0}.hx-demo-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}.hx-demo-head small{color:#8B91B8;font-size:11px}.hx-demo-grid{display:grid;grid-template-columns:1fr;gap:10px}.hx-mock{background:linear-gradient(180deg,#191C39,#12142B);border:1px solid #232749;border-radius:18px;padding:14px;box-shadow:0 14px 30px rgba(0,0,0,.25)}.hx-mock h4{margin:8px 0 4px;font-size:14px;color:#F3F4FF}.hx-mock p{margin:0;font-size:12px;line-height:1.45;color:#ABB0CC}.hx-mock-score{position:relative;width:96px;height:96px;margin:0 auto}.hx-mock-score svg{width:100%;height:100%;transform:rotate(-90deg)}.hx-trk{fill:none;stroke:#232749;stroke-width:10}.hx-arc{fill:none;stroke:#7B6CFF;stroke-width:10;stroke-linecap:round}.hx-mock-score b{position:absolute;inset:0;display:grid;place-items:center;font-size:28px;font-weight:800;color:#F3F4FF}.hx-mock ol{margin:4px 0 0;padding-left:18px;font-size:12.5px;color:#E3E5F7;line-height:1.75}.hx-mock li em{font-style:normal;color:#3DDC97;font-weight:700;margin-left:6px}.hx-bars>div{display:grid;grid-template-columns:70px 1fr;gap:8px;align-items:center;margin:8px 0;font-size:12px;color:#ABB0CC}.hx-bar{display:block;height:8px;border-radius:9px;background:#232749;overflow:hidden}.hx-bar i{display:block;height:100%;border-radius:9px;background:linear-gradient(90deg,#8B6CFF,#4F7BFF)}@media (min-width:720px){.hx-demo-grid{grid-template-columns:repeat(3,1fr)}}
+.hx-mock-hero{display:flex;align-items:center;gap:16px}.hx-mock-hero .hx-mock-score{margin:0;flex:none;width:88px;height:88px}.hx-mock-hero h4{margin-top:0}
 </style>
 </head>
 <body>
@@ -6095,15 +6096,15 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
       const score=Math.max(0,Math.min(100,Math.round(Number(a.score)||0)));
       const verdict=score>=75?'Bonne visibilité':score>=50?'Visibilité à renforcer':'Visibilité faible';
       const dash=(314*(1-score/100)).toFixed(1);
-      const dateStr=new Date(tm(a)).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
+      const dateStr=tm(a)>0?new Date(tm(a)).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'}):'';
       let acts=[]; try{ acts=auditActions(a,c,visibilityAudit(a,c)).slice(0,3); }catch(e){ acts=[]; }
       const actsHtml=acts.length?'<ol>'+acts.map(x=>'<li>'+escHtml(x.label)+'<em>+'+Math.max(1,Math.round(Number(x.gain)||0))+' pts</em></li>').join('')+'</ol>':'<p>Aucune action prioritaire détectée sur les critères mesurés.</p>';
       const cp=a.site&&a.site.competitors;
       const own=Number((c.details||{}).reviews||0);
       let compHtml='<p>Comparaison avec les concurrents non disponible pour ce dossier.</p>';
       if(cp&&cp.selfRank){ const lead=cp.leader; compHtml='<p><b>'+own.toLocaleString('fr-FR')+' avis</b> · n°'+cp.selfRank+' sur '+cp.total+' comparés</p>'+(lead&&lead.name?'<p>Leader : '+escHtml(lead.name)+' ('+(Number(lead.reviews)||0).toLocaleString('fr-FR')+' avis)</p>':''); }
-      return '<section class="hx-demo" aria-label="Dernier audit"><div class="hx-demo-head">'+head+'<small>'+escHtml(c.name||'Commerce')+' · '+dateStr+'</small></div><div class="hx-demo-grid">'+
-        '<article class="hx-mock"><div class="hx-mock-score"><svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="50" class="hx-trk"/><circle cx="60" cy="60" r="50" class="hx-arc" style="stroke-dasharray:314;stroke-dashoffset:'+dash+'"/></svg><b>'+score+'</b></div><h4>Score de visibilité</h4><p>'+verdict+'</p></article>'+
+      return '<section class="hx-demo" aria-label="Dernier audit"><div class="hx-demo-head">'+head+'<small>'+escHtml([c.name||'Commerce',dateStr].filter(Boolean).join(' · '))+'</small></div><div class="hx-demo-grid">'+
+        '<article class="hx-mock hx-mock-hero"><div class="hx-mock-score"><svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="50" class="hx-trk"/><circle cx="60" cy="60" r="50" class="hx-arc" style="stroke-dasharray:314;stroke-dashoffset:'+dash+'"/></svg><b>'+score+'</b></div><div><h4>Score de visibilité</h4><p>'+verdict+'</p></div></article>'+
         '<article class="hx-mock"><h4>Actions prioritaires</h4>'+actsHtml+'</article>'+
         '<article class="hx-mock"><h4>Face aux concurrents</h4>'+compHtml+'<button type="button" class="app-btn" data-app-view="Audits" style="margin-top:10px">Voir le dossier</button></article>'+
         '</div></section>';
