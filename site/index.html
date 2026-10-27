@@ -2989,8 +2989,6 @@ body:has(.ai-chat-page){background:radial-gradient(ellipse at 82% 0%,rgba(91,95,
  .mobile-tabbar{position:fixed!important;left:10px!important;right:10px!important;bottom:calc(8px + env(safe-area-inset-bottom))!important;width:auto!important;border-radius:19px!important;padding:5px!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;box-shadow:0 14px 35px #0008!important}
  .mobile-tabbar button{min-height:57px!important;border-radius:14px!important}
  .mobile-tabbar button span:last-child{font-size:10px!important}
- .mobile-tabbar button[data-app-view="Accueil"],.mobile-tabbar button[data-app-view="Clients"],.mobile-tabbar button[data-app-view="Studio"],.mobile-tabbar button[data-app-view="Paramètres"]{display:none!important}
- .mobile-tabbar button[data-app-view="Assistant"],.mobile-tabbar button[data-app-view="Audits"],.mobile-tabbar button[data-app-view="Rapports"]{display:flex!important}
 }
 @media(max-width:390px){.ai-chat-intro{min-height:330px;padding:20px 14px}.ai-chat-intro h2{font-size:29px}.ai-chat-intro p{font-size:12px;max-width:70%}.ai-chat-suggestion{min-height:113px;font-size:11px}.ai-chat-bullets li{font-size:9px}}
 </style>
@@ -3354,10 +3352,9 @@ body:has(.workspace-app) .login-page:has(.workspace-app){min-height:0!important;
   .mobile-tabbar button[data-app-view="Accueil"],
   .mobile-tabbar button[data-app-view="Clients"],
   .mobile-tabbar button[data-app-view="Audits"],
-  .mobile-tabbar button[data-app-view="Rapports"]{display:flex!important}
-  .mobile-tabbar button[data-app-view="Studio"],
-  .mobile-tabbar button[data-app-view="Paramètres"],
-  .mobile-tabbar button[data-app-view="Assistant"]{display:none!important}
+  .mobile-tabbar button[data-app-view="Rapports"],
+  .mobile-tabbar button[data-app-view="Studio"]{display:flex!important}
+  .mobile-tabbar button[data-app-view="Paramètres"]{display:none!important}
 }
 @media(max-width:420px){
   .app-topbar{gap:7px!important;padding-left:10px!important;padding-right:10px!important}
