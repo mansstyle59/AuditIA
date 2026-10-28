@@ -2649,6 +2649,17 @@ button { touch-action: manipulation; }
     .hx-latest-empty b{font-size:13px}
     .hx-compact-note{margin:0;padding:0 2px;font-size:11px;line-height:1.45;color:var(--muted,#a8a8b8)}
     @media(max-width:560px){.hx-hero-compact{padding:16px!important}.hx-compact .nl-search-head{gap:10px!important}.hx-compact .nl-search-head h2{font-size:19px!important}.hx-compact .nl-search-form textarea{min-height:88px!important}.hx-quick-stats{gap:6px}.hx-quick-stats button{display:block;padding:10px 9px}.hx-quick-stats b{display:block;font-size:19px;margin-bottom:3px}.hx-quick-stats span{display:block;font-size:10px;line-height:1.3}.hx-latest{gap:10px}.hx-latest .app-btn{width:100%;justify-content:center}}
+
+    /* Analyse live : hiérarchie courte, résultats avant animations décoratives */
+    .ap-live-compact{max-width:760px;margin-inline:auto}
+    .ap-live-intro{font-size:13px;line-height:1.5;color:var(--muted,#aaa8bb);margin:0 0 14px}
+    .ap-live-compact .ap-live-results{margin-top:18px}
+    .ap-live-compact .ap-live-steps{margin-top:14px}
+    .ap-live-compact .ap-live-step{padding:10px 12px;min-height:42px}
+    .ap-live-compact .ap-step-status{font-size:10px}
+    .ap-live-compact .ap-live-summary{font-size:11px;line-height:1.45;color:var(--muted,#aaa8bb);margin:14px 0 0}
+    .ap-live-compact .ap-fact{padding:10px 12px}
+    @media(max-width:520px){.ap-live-compact{padding:15px!important}.ap-live-compact .ap-live-top{gap:8px}.ap-live-compact .ap-clock{font-size:11px}.ap-live-compact .ap-chapter{font-size:20px}.ap-live-compact .ap-live-step{grid-template-columns:26px minmax(0,1fr) auto;gap:8px;padding:10px 8px}.ap-live-compact .ap-step-status{max-width:74px;text-align:right}}
 </style>
 <style id="auditia-assistant-chat">
 /* Assistant conversationnel AuditIA — inspiration Solina, branché sur les données locales déjà chargées */
@@ -5261,40 +5272,22 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
     }
     let scanningId=null;
     async function runScan(auditId){
-      const a=appAudits.find(x=>x.id===auditId); if(!a) return;
-      const c=appClients.find(x=>x.id===a.client_id);
-      let site=String((c&&c.website)||'').trim();
-      if(!site){ appNotice='Erreur : ajoute un site web à la fiche client avant de lancer l’analyse.'; renderApp(); return; }
-      if(!/^https?:\/\//i.test(site)) site='https://'+site;
-      site=safeHttpUrl(site); if(!site){ appNotice='Erreur : cette adresse de site n’est pas autorisée.'; renderApp(); return; }
-      scanningId=auditId; appNotice='Analyse du site en cours… (20 à 40 secondes)'; renderApp();
+      const a=appAudits.find(x=>String(x.id)===String(auditId)); if(!a) return;
+      const c=appClients.find(x=>String(x.id)===String(a.client_id));
+      const site=safeHttpUrl(String((c&&c.website)||'').trim());
+      if(!site){appNotice='Ajoute une adresse de site web valide à la fiche du commerce avant de lancer PageSpeed.';renderApp();return;}
+      scanningId=auditId;appNotice='Mesure de la performance mobile par Google Lighthouse…';renderApp();
       try{
-        const key=String((appSettings&&appSettings.pagespeed_api_key)||'').trim();
-        const u=new URL('https://www.googleapis.com/pagespeedonline/v5/runPagespeed');
-        u.searchParams.set('url',site); u.searchParams.set('strategy','mobile');
-        ['performance','accessibility','best-practices','seo'].forEach(cat=>u.searchParams.append('category',cat));
-        u.searchParams.set('locale','fr');
-        if(key) u.searchParams.set('key',key);
-        const r=await withTimeout(fetch(u.toString()),60000);
-        if(!r.ok){ if(key&&(r.status===400||r.status===401||r.status===403)) keyStoreSet('pagespeed',false,key); const d=await r.json().catch(()=>null); const m=(d&&d.error&&d.error.message)||('HTTP '+r.status); throw new Error(r.status===429?'Limite d’analyses atteinte (quota). Réessaie dans quelques minutes, ou ajoute une clé PageSpeed dans les Réglages.':r.status===400?'Google n’a pas pu analyser cette adresse. Vérifie le site web du client.':m); }
-        const data=await r.json(); const lh=data.lighthouseResult; if(key) keyStoreSet('pagespeed',true,key);
-        if(!lh||!lh.categories) throw new Error('Aucun résultat exploitable renvoyé par Google.');
-        const sc=k=>typeof (lh.categories[k]||{}).score==='number'?Math.round(lh.categories[k].score*100):null;
-        const au=lh.audits||{}; const dv=k=>(au[k]&&au[k].displayValue)||null;
-        const cleanTxt=s=>String(s||'').replace(/\[([^\]]+)\]\([^)]+\)/g,'$1').replace(/\s+/g,' ').trim();
-        const recommendations=Object.values(au).filter(x=>x&&typeof x.score==='number'&&x.score<0.9&&x.title&&(x.scoreDisplayMode==='metricSavings'||(x.details&&x.details.type==='opportunity')||x.scoreDisplayMode==='binary'||x.scoreDisplayMode==='numeric')).sort((a,b)=>a.score-b.score).slice(0,8).map(x=>({title:cleanTxt(x.title),detail:cleanTxt(x.description),gain:x.displayValue||null,severity:x.score<0.5?'haute':'moyenne'}));
-        const scan={ provider:'Google PageSpeed Insights · Lighthouse (mobile)', analyzedAt:new Date().toISOString(), url:site, finalUrl:lh.finalDisplayedUrl||site,
-          scores:{performance:sc('performance'),accessibility:sc('accessibility'),bestPractices:sc('best-practices'),seo:sc('seo')},
-          metrics:{ 'Contenu affiché (FCP)':dv('first-contentful-paint'), 'Plus grand contenu (LCP)':dv('largest-contentful-paint'), 'Interactivité (TBT)':dv('total-blocking-time'), 'Stabilité visuelle (CLS)':dv('cumulative-layout-shift'), 'Vitesse (Speed Index)':dv('speed-index') },
-          recommendations };
-        const vals=Object.values(scan.scores).filter(v=>typeof v==='number');
-        const overall=vals.length?Math.round(vals.reduce((s,n)=>s+n,0)/vals.length):0;
-        const {error}=await appClient.from('audits').update({scan,score:overall,status:'Analysé',updated_at:new Date().toISOString()}).eq('id',auditId);
-        if(error) throw new Error(error.message);
-        appNotice='Analyse terminée : scores réels enregistrés.';
+        const scan=await fetchPagespeed(site);
+        const vals=Object.values(scan.scores||{}).filter(v=>typeof v==='number');
+        if(!vals.length)throw new Error('Google n’a renvoyé aucun score exploitable.');
+        const score=Math.round(vals.reduce((sum,n)=>sum+n,0)/vals.length);
+        const {error}=await appClient.from('audits').update({scan,score,status:'Analysé',updated_at:new Date().toISOString()}).eq('id',auditId);
+        if(error)throw new Error(error.message);
+        appNotice='Mesures PageSpeed enregistrées. Les autres contrôles restent distincts de ce test.';
         await refreshData();
-      }catch(e){ appNotice='Erreur : '+((e&&e.message)||'analyse impossible').slice(0,160); }
-      finally{ scanningId=null; recomputeKeyAlerts(); renderApp(); }
+      }catch(e){appNotice='PageSpeed : '+String((e&&e.message)||'analyse impossible').slice(0,160);}
+      finally{scanningId=null;recomputeKeyAlerts();renderApp();}
     }
     function scanGauge(label,v){ const val=(v==null?'—':v); const col=v==null?'#8a84a0':v>=90?'#34d399':v>=50?'#fbbf24':'#f87171'; const deg=(v==null?0:v)*3.6; return '<article class="scan-score"><div class="scan-ring" style="background:conic-gradient('+col+' '+deg+'deg,#2c2a42 0)"><span class="scan-ring-in"><strong>'+val+'</strong></span></div><span class="scan-score-label">'+label+'</span></article>'; }
     /* ===== Détection automatique du site & des réseaux (inspiré d'AffiAds Audit 360) =====
@@ -5697,17 +5690,21 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
         const mm=Math.floor(elapsed/60), ss=String(elapsed%60).padStart(2,'0');
         clock.textContent=mm+':'+ss+(fullAuditState.pct>=99?' · finalisation':' · ≈ '+estMin+' min');
       }
-      const stage=el.querySelector('[data-ap-stage]');
-      if(stage){
-        const perf=(fullAuditState.facts||[]).find(x=>x.label==='Performance mobile');
-        const sig=[meta.n,fullAuditState.host||'',(fullAuditState.rivalNames||[]).join('|'),fullAuditState.stats.competitors,fullAuditState.stats.sites,perf?perf.value:''].join('§');
-        if(stage.dataset.sig!==sig){ stage.dataset.sig=sig; stage.innerHTML=liveStageHtml(fullAuditState); }
-      }
       const steps=el.querySelector('[data-ap-steps]');
-      if(steps) steps.innerHTML=fullAuditState.steps.map((st,i)=>'<div class="ap-live-step '+(st.status==='active'?'is-active':st.status==='done'?'is-done':st.status==='limited'?'is-limited':'')+'"><span class="ap-step-icon">'+(st.status==='done'?'✓':st.status==='active'?'↻':st.status==='limited'?'!':String(i+1))+'</span><span>'+escHtml(st.label)+'</span><span class="ap-step-status">'+(st.status==='done'?'Terminé':st.status==='active'?'En cours':st.status==='limited'?'Partiel / indisponible':'À venir')+'</span></div>').join('');
-      const rv=el.querySelector('[data-ap-m-rivals]'); if(rv) rv.textContent=String(fullAuditState.stats.competitors||0);
-      const sq=el.querySelector('[data-ap-m-searches]'); if(sq) sq.textContent=String(fullAuditState.stats.searches||0);
-      const stc=el.querySelector('[data-ap-m-sites]'); if(stc) stc.textContent=String(fullAuditState.stats.sites||0);
+      if(steps){
+        const groups=[
+          {label:'Commerce et site',keys:['fiche','site']},
+          {label:'Présence et mots-clés',keys:['presence','keywords']},
+          {label:'Concurrents locaux',keys:['rivals']},
+          {label:'Performance et signaux techniques',keys:['perf','geo']}
+        ];
+        steps.innerHTML=groups.map((g,i)=>{
+          const items=fullAuditState.steps.filter(st=>g.keys.includes(st.key));
+          const finished=items.filter(st=>st.status==='done'||st.status==='limited');
+          const status=!items.length?'pending':items.some(st=>st.status==='active')?'active':finished.length===items.length?(items.some(st=>st.status==='limited')?'limited':'done'):'pending';
+          return '<div class="ap-live-step '+(status==='active'?'is-active':status==='done'?'is-done':status==='limited'?'is-limited':'')+'"><span class="ap-step-icon">'+(status==='done'?'✓':status==='active'?'↻':status==='limited'?'!':String(i+1))+'</span><span>'+escHtml(g.label)+'</span><span class="ap-step-status">'+(status==='done'?'Terminé':status==='active'?'En cours':status==='limited'?'Partiel':'À venir')+'</span></div>';
+        }).join('');
+      }
       const facts=el.querySelector('[data-ap-facts]');
       if(facts){ const items=fullAuditState.facts||[]; facts.innerHTML=items.length?items.map(x=>'<div class="ap-fact"><span>'+escHtml(x.label)+'</span><b>'+escHtml(x.value)+'</b><small>'+escHtml(x.detail||'Résultat reçu')+'</small></div>').join(''):'<div class="ap-facts-empty">Les premiers résultats apparaîtront ici dès que les sources répondront.</div>'; }
     }
@@ -5822,7 +5819,7 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
     function analysePanelHtml(a,c){
       if(fullAuditState&&fullAuditState.id===a.id){
         const hasWebLive=!!String((c&&c.website)||'').trim();
-        return '<section class="app-panel analyse-panel ap-premium" data-ap-root><div class="ap-live-top"><span class="ap-live-badge"><i></i> Analyse en cours</span><span class="ap-clock" data-ap-clock>0:00 · ≈ '+(hasWebLive?'2':'1')+' min</span></div><h3 class="ap-biz">'+escHtml((c&&c.name)||'Commerce')+'</h3><div class="ap-progress-row"><div class="ap-progress-track"><div class="ap-bar" data-ap-bar style="width:3%"></div></div><b data-ap-pct>3%</b></div><p class="ap-stepkicker" data-ap-kicker>ÉTAPE 1 SUR 4</p><h4 class="ap-chapter" data-ap-chapter>AuditIA découvre l’activité</h4><p class="ap-chapter-sub" data-ap-chapter-sub>La fiche et le site sont lus. Un chiffre n’apparaît que lorsqu’une source a répondu.</p><div class="ap-stage" data-ap-stage></div><div class="ap-live-results"><div class="ap-results-heading"><span class="eyebrow">RÉSULTATS REÇUS</span><span>Uniquement des réponses réelles</span></div><div class="ap-live-facts" data-ap-facts aria-live="polite"><div class="ap-facts-empty">Les premiers résultats apparaîtront ici dès que les sources répondront.</div></div></div><div class="ap-live-steps" data-ap-steps aria-live="polite"><div class="ap-live-step is-active"><span class="ap-step-icon">↻</span><span>Préparation et données du commerce</span><span class="ap-step-status">En cours</span></div></div><div class="ap-metrics" aria-live="polite"><div><b data-ap-m-rivals>0</b><span>concurrents</span></div><div><b data-ap-m-searches>0</b><span>recherches</span></div><div><b data-ap-m-sites>0</b><span>sites lus</span></div></div><p class="ap-live-summary"><b>Pas de chiffre inventé.</b> La barre est une progression estimée, pas une note. Les compteurs restent à zéro tant qu’une source n’a pas répondu.</p></section>';
+        return '<section class="app-panel analyse-panel ap-premium ap-live-compact" data-ap-root><div class="ap-live-top"><span class="ap-live-badge"><i></i>Analyse en direct</span><span class="ap-clock" data-ap-clock>0:00 · calcul en cours</span></div><h3 class="ap-biz">'+escHtml((c&&c.name)||'Commerce')+'</h3><p class="ap-live-intro">AuditIA interroge les sources disponibles. Les résultats et les limites sont affichés au fur et à mesure.</p><div class="ap-progress-row"><div class="ap-progress-track"><div class="ap-bar" data-ap-bar style="width:3%"></div></div><b data-ap-pct>3%</b></div><p class="ap-stepkicker" data-ap-kicker>ÉTAPE 1 SUR 4</p><h4 class="ap-chapter" data-ap-chapter>Commerce et site</h4><p class="ap-chapter-sub" data-ap-chapter-sub>Lecture des données disponibles.</p><div class="ap-live-results"><div class="ap-results-heading"><span class="eyebrow">RÉSULTATS CONFIRMÉS</span><span>Sources réelles uniquement</span></div><div class="ap-live-facts" data-ap-facts aria-live="polite"><div class="ap-facts-empty">Les résultats apparaîtront ici dès que les sources répondront.</div></div></div><div class="ap-live-steps" data-ap-steps aria-live="polite"><div class="ap-live-step is-active"><span class="ap-step-icon">↻</span><span>Commerce et site</span><span class="ap-step-status">En cours</span></div></div><p class="ap-live-summary">La progression est estimative. Une source indisponible sera signalée comme partielle, pas comme un défaut du commerce.</p></section>';
       }
       const site=String((c&&c.website)||'').trim(); const analyzed=!!(a.scan||a.site);
       const sub=site?'Lecture du site, détection des réseaux, performance Google et diagnostic SEO &amp; GEO — en une seule fois.':'Ce commerce n’a pas de site : l’analyse se base sur les données Google. Ajoute un site pour l’analyse complète (performance, réseaux, GEO).';
