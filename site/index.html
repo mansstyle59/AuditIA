@@ -6312,7 +6312,8 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
             '<p>Renseignez-vous sur un commerce et découvrez s’il est vraiment visible : Google, site, réseaux et concurrents.</p></div>'+
             '<img class="hx-robot" src="./home-robot.png" alt="" aria-hidden="true">'+
           '</section>'+
-          homeResultsHtml()+\n          naturalLanguageSearchHtml()+
+          homeResultsHtml()+
+          naturalLanguageSearchHtml()+
           '<section class="hx-tiles" aria-label="Indicateurs">'+hxTile('store','blue',appClients.length,'Commerces','dans la base','Clients')+hxTile('doc','violet',appAudits.length,'Audits','enregistrés','Audits')+hxTile('clock','orange',hxTodo,'À analyser','à compléter','Audits')+hxTile('check','green',hxReady,'Analysés','prêts pour un rapport','Rapports')+'</section>'+
           (function(){if(!scoredAudits.length)return '';const per={};let verifs=0;scoredAudits.forEach(a=>{const c=appClients.find(x=>x.id===a.client_id);try{verifs+=visibilityAudit(a,c).items.length;}catch(e){}const t=new Date(a.updated_at||a.created_at||0).getTime()||0;(per[a.client_id]=per[a.client_id]||[]).push({t,s:Number(a.score)||0,a,c});});let acts=0,gained=0;Object.values(per).forEach(l=>{l.sort((x,y)=>x.t-y.t);const last=l[l.length-1];try{acts+=auditActions(last.a,last.c,visibilityAudit(last.a,last.c)).length;}catch(e){}if(l.length>1)gained+=Math.max(0,last.s-l[0].s);});return '<section class="hx-work" aria-label="Votre travail"><div><b>'+scoredAudits.length+'</b><span>audits réalisés</span></div><div><b>'+verifs+'</b><span>vérifications mesurées</span></div><div><b>'+acts+'</b><span>actions proposées</span></div><div><b class="up">+'+gained+'</b><span>points gagnés</span></div></section>';})()+
           '<button type="button" class="hx-cta" data-app-view="Audits"><span class="hx-cta-ico">'+HXI.search+'</span><span>Lancer un nouvel audit</span><span class="hx-go">'+HXI.chev+'</span></button>'+
