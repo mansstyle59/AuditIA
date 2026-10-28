@@ -6304,44 +6304,68 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
       const col=hexToRgb(brandColor(st.primary_color));
       const K=pdfKit(pdf,st), M=K.M, CW=K.CW;
       pdfHeadBand(pdf,K,st,a,'Aperçu gratuit · 1 page');
-      K.para((c&&c.name)||'Commerce',{style:'bold',size:20});
-      K.para([c&&c.city,c&&(c.category||d.category)].filter(Boolean).join(' · '),{color:K.MUT,size:9});
-      K.gap(1);
-      K.heading('Bilan de visibilité',col);
+      const ink=K.DARK, muted=K.MUT;
+      const txt=(value,x,y,size,color,bold)=>{
+        pdf.setFont('helvetica',bold?'bold':'normal');
+        pdf.setFontSize(size);
+        pdf.setTextColor((color||ink)[0],(color||ink)[1],(color||ink)[2]);
+        pdf.text(String(value==null?'':value),x,y);
+      };
+      const wrap=(value,width,size,maxLines)=>{
+        pdf.setFont('helvetica','normal');pdf.setFontSize(size);
+        return pdf.splitTextToSize(String(value||''),width).slice(0,maxLines||2);
+      };
+      txt((c&&c.name)||'Commerce',M,41,16,ink,true);
+      const subtitle=[c&&c.city,c&&(c.category||d.category)].filter(Boolean).join(' · ');
+      if(subtitle) txt(wrap(subtitle,CW,8.5,1)[0],M,47,8.5,muted,false);
       const idx=diag.index, lab=idx==null?null:visibilityLabel(idx);
-      if(idx==null){
-        K.para('Score indisponible : les données mesurées ne suffisent pas pour conclure.',{size:9,color:K.MUT});
+      const scoreCol=idx==null?muted:pdfScoreCol(idx);
+      pdf.setFillColor(244,241,252);pdf.setDrawColor(col[0],col[1],col[2]);pdf.setLineWidth(.35);
+      pdf.roundedRect(M,52,CW,30,3,3,'FD');
+      txt(idx==null?'—':String(idx),M+5,66,25,scoreCol,true);
+      txt(idx==null?'Score indisponible':'/100',M+5+(idx==null?12:String(idx).length*7.4),66,9,muted,false);
+      txt(idx==null?'Données insuffisantes':lab.t,M+43,61,10,scoreCol,true);
+      const verdict=wrap(idx==null?'Les sources disponibles ne permettent pas encore de conclure.':visibilityVerdict(idx,diag),CW-50,8.2,2);
+      verdict.forEach((line,i)=>txt(line,M+43,67+i*4,8.2,muted,false));
+      txt('FIABILITÉ DES MESURES',M,90,8,col,true);
+      const coverageText=diag.measuredCount+' critères mesurés sur '+diag.totalCount+' ('+diag.coverage+' %). Les critères non mesurés sont exclus du score.';
+      wrap(coverageText,CW,8,2).forEach((line,i)=>txt(line,M,95+i*4,8,muted,false));
+      const facts=[
+        ['SITE',c&&c.website?(a.site&&a.site.pageRead?'Page lue':'URL renseignée'):'Non renseigné'],
+        ['AVIS PUBLICS',d.rating!=null?String(d.rating).replace('.',',')+'/5 · '+(d.reviews==null?'avis non renseignés':d.reviews+' avis'):'Non mesurés'],
+        ['PERFORMANCE',a&&a.scan&&a.scan.scores&&a.scan.scores.performance!=null?a.scan.scores.performance+'/100':'Non mesurée']
+      ];
+      const gap=3, cardW=(CW-gap*2)/3, cardY=106;
+      facts.forEach((fact,i)=>{
+        const x=M+i*(cardW+gap);
+        pdf.setFillColor(250,249,253);pdf.setDrawColor(229,225,239);pdf.roundedRect(x,cardY,cardW,22,2,2,'FD');
+        txt(fact[0],x+2.5,cardY+5,6.5,muted,true);
+        wrap(fact[1],cardW-5,7.2,2).forEach((line,j)=>txt(line,x+2.5,cardY+11+j*3.5,7.2,ink,false));
+      });
+      txt('LES 3 PRIORITÉS À EXAMINER',M,139,9,col,true);
+      const actions=(auditActions(a,c,diag)||[]).filter(x=>x.impact!=='À vérifier').slice(0,3);
+      let y=146;
+      if(actions.length){
+        actions.forEach((x,i)=>{
+          pdf.setFillColor(255,255,255);pdf.setDrawColor(229,225,239);pdf.roundedRect(M,y-4,CW,20,2,2,'S');
+          pdf.setFillColor(col[0],col[1],col[2]);pdf.circle(M+4,y+2,1.4,'F');
+          txt((i+1)+'. '+wrap(x.label,CW-12,8.2,1)[0],M+8,y+2,8.2,ink,true);
+          const detail=String(x.advice||x.why||'À confirmer avec les données détaillées.').replace(/\s+/g,' ').trim();
+          wrap(detail,CW-12,7.1,2).forEach((line,j)=>txt(line,M+8,y+7+j*3.2,7.1,muted,false));
+          y+=23;
+        });
       }else{
-        const scoreCol=pdfScoreCol(idx);
-        K.setF('bold',24); K.setT(scoreCol); pdf.text(idx+'/100',M,K.y+8); K.y+=11;
-        K.setF('bold',10); K.setT(scoreCol); K.para(lab.t,{size:10});
-        K.setF('normal',8.5); K.setT(K.MUT); K.para(visibilityVerdict(idx,diag),{size:8.5});
+        wrap('Les données reçues ne permettent pas encore d’identifier une priorité confirmée. Le rapport complet détaille les contrôles disponibles et les points à vérifier.',CW-4,8,3).forEach((line,i)=>txt(line,M,y+i*4,8,muted,false));
       }
-      K.gap(1);
-      K.heading('Repères disponibles',col);
-      const facts=[];
-      if(c&&c.website) facts.push(['Site',c.website]);
-      if(d.rating!=null) facts.push(['Note publique',String(d.rating)+'/5']);
-      if(d.reviews!=null) facts.push(['Nombre d’avis',String(d.reviews)]);
-      if(a&&a.scan&&a.scan.scores&&a.scan.scores.performance!=null) facts.push(['Performance mobile',a.scan.scores.performance+'/100']);
-      if(facts.length) facts.slice(0,4).forEach(([k,v])=>K.bullet(k,v,col));
-      else K.para('Aucune mesure confirmée dans les sources disponibles.',{size:8.5,color:K.MUT});
-      K.gap(1);
-      K.heading('Priorités à examiner',col);
-      const actions=auditActions(a,c,diag).filter(x=>x.impact!=='À vérifier').slice(0,3);
-      if(actions.length) actions.forEach((x,i)=>K.bullet((i+1)+'. '+x.label,String(x.advice||'').slice(0,180),col));
-      else K.para('Aucune priorité confirmée à partir des mesures disponibles.',{size:8.5,color:K.MUT});
-      K.gap(1);
-      K.heading('Fiabilité',col);
-      K.para(diag.measuredCount+' critères mesurés sur '+diag.totalCount+' contrôles ('+diag.coverage+' %). Les critères non mesurés sont exclus du score.',{size:8,color:K.MUT});
-      K.gap(1);
-      K.para('Aperçu gratuit : synthèse et quelques priorités. Le rapport complet détaille les preuves, les critères SEO/GEO, les concurrents, les limites et le plan d’action.',{size:8,color:K.MUT});
-      K.gap(2); K.hr();
-      K.setF('bold',9); K.setT(col); K.para(String(st.signature_name||st.company_name||'AffiAds'),{size:9});
+      const ctaY=220;
+      pdf.setFillColor(246,243,255);pdf.setDrawColor(col[0],col[1],col[2]);pdf.roundedRect(M,ctaY,CW,29,3,3,'FD');
+      txt('RAPPORT COMPLET',M+4,ctaY+7,9,col,true);
+      wrap('Analyses SEO et GEO détaillées, mesures Lighthouse, concurrents, mots-clés, éléments de preuve, limites des sources et plan d’action priorisé.',CW-8,7.8,3).forEach((line,i)=>txt(line,M+4,ctaY+13+i*3.8,7.8,ink,false));
+      txt(String(st.signature_name||st.company_name||'AffiAds'),M,260,8.5,col,true);
       const contact=[st.contact_email,st.phone,st.website].filter(Boolean).join(' · ');
-      if(contact) K.para(contact,{size:7.5,color:K.MUT});
+      if(contact) txt(wrap(contact,CW,7,1)[0],M,265,7,muted,false);
+      txt('Aperçu limité aux données disponibles. Une donnée non mesurée ne prouve pas une absence.',M,274,6.8,muted,false);
       pdfFooter(pdf,st);
-      // The free teaser is intentionally one page; strip any overflow page created by variable-length content.
       while(pdf.internal.getNumberOfPages()>1) pdf.deletePage(pdf.internal.getNumberOfPages());
     }
     async function exportReport(auditId, mode){
@@ -6501,7 +6525,7 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
       const c=appClients.find(x=>x.id===a.client_id);
       const score=Number(a.score)||0;
       const initial=escHtml(((c&&c.name)||'?').charAt(0).toUpperCase());
-      return '<article class="report-card"><div class="report-top"><span class="audit-mark">'+initial+'</span><div class="audit-copy"><b>'+escHtml((c&&c.name)||'Commerce')+'</b><small>'+escHtml([c&&c.city,a.title].filter(Boolean).join(' · '))+'</small><span class="report-meter" aria-hidden="true"><i style="width:'+score+'%"></i></span></div><span class="audit-state"><b>'+score+'</b><small>/100</small>'+(function(){const prev=appAudits.filter(x=>x.id!==a.id&&x.client_id===a.client_id&&(x.site||x.scan||auditHasAnalysis(x))&&String(x.updated_at||x.created_at||'')<String(a.updated_at||a.created_at||'')).sort((x,y)=>String(y.updated_at||y.created_at||'').localeCompare(String(x.updated_at||x.created_at||'')))[0];if(!prev)return '';const dlt=score-(Number(prev.score)||0);return '<em class="sc-delta '+(dlt>=0?'up':'down')+'">'+(dlt>=0?'▲ +':'▼ ')+dlt+' depuis le '+new Date(prev.updated_at||prev.created_at).toLocaleDateString('fr-FR')+'</em>';})()+'</span></div><div class="report-actions"><button class="app-btn" type="button" data-export-report="'+a.id+'" data-mode="simple">Express</button><button class="app-btn primary" type="button" data-export-report="'+a.id+'" data-mode="full">PDF complet</button><button class="app-btn" type="button" data-open-audit="'+a.id+'">Dossier</button></div></article>';
+      return '<article class="report-card"><div class="report-top"><span class="audit-mark">'+initial+'</span><div class="audit-copy"><b>'+escHtml((c&&c.name)||'Commerce')+'</b><small>'+escHtml([c&&c.city,a.title].filter(Boolean).join(' · '))+'</small><span class="report-meter" aria-hidden="true"><i style="width:'+score+'%"></i></span></div><span class="audit-state"><b>'+score+'</b><small>/100</small>'+(function(){const prev=appAudits.filter(x=>x.id!==a.id&&x.client_id===a.client_id&&(x.site||x.scan||auditHasAnalysis(x))&&String(x.updated_at||x.created_at||'')<String(a.updated_at||a.created_at||'')).sort((x,y)=>String(y.updated_at||y.created_at||'').localeCompare(String(x.updated_at||x.created_at||'')))[0];if(!prev)return '';const dlt=score-(Number(prev.score)||0);return '<em class="sc-delta '+(dlt>=0?'up':'down')+'">'+(dlt>=0?'▲ +':'▼ ')+dlt+' depuis le '+new Date(prev.updated_at||prev.created_at).toLocaleDateString('fr-FR')+'</em>';})()+'</span></div><div class="report-actions"><button class="app-btn" type="button" data-export-report="'+a.id+'" data-mode="simple">Aperçu gratuit · 1 page</button><button class="app-btn primary" type="button" data-export-report="'+a.id+'" data-mode="full">Rapport complet · détaillé</button><button class="app-btn" type="button" data-open-audit="'+a.id+'">Dossier</button></div></article>';
     }
     function renderApp(){
       const completed=appAudits.filter(a=>auditHasAnalysis(a)).length;
