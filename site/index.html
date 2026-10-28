@@ -5645,31 +5645,6 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
       fullAuditState.stats.competitors=names.length;
       tickProgress();
     }
-    function liveStageHtml(st){
-      const n=(st.chapterSeen||liveChapter(st.phase));
-      if(n===1){
-        const host=st.host||'Préparation…';
-        return '<div class="ap-browser" aria-hidden="true"><div class="ap-browser-bar"><i></i><i></i><i></i><b>'+escHtml(host)+'</b></div><div class="ap-skel"></div><div class="ap-skel w60"></div><div class="ap-skel w80"></div><div class="ap-skel-btn"></div></div><p class="ap-stage-note">Squelette de lecture. Ce n’est pas une capture du site.</p>';
-      }
-      if(n===2){
-        return '<div class="ap-radar" aria-hidden="true"><span class="ap-radar-sweep"></span><span class="ap-radar-dot"></span></div><p class="ap-stage-note">Recherche en cours. Aucun nom tant qu’une source n’a pas répondu.</p>';
-      }
-      if(n===3){
-        const names=st.rivalNames||[];
-        const chips=names.length?names.map(nm=>'<span class="ap-chip">'+escHtml(nm)+'</span>').join(''):'<span class="ap-chip is-wait">En attente des noms</span>';
-        return '<div class="ap-radar ap-radar-names">'+(names.length?'<span class="ap-radar-sweep" aria-hidden="true"></span>':'')+chips+'</div><p class="ap-stage-note">Chaque nom est un commerce renvoyé par Google Places.</p>';
-      }
-      const perf=(st.facts||[]).find(x=>x.label==='Performance mobile');
-      const rivals=st.stats?st.stats.competitors:0;
-      const sites=st.stats?st.stats.sites:0;
-      const mods=[
-        ['Veille locale', rivals?rivals+' commerce'+(rivals>1?'s':'')+' proche'+(rivals>1?'s':''):'Pas encore de liste', !!rivals],
-        ['Site', sites?'Page d’accueil lue':(st.host?'Lecture non aboutie':'Pas de site enregistré'), !!sites],
-        ['Performance', perf?perf.value:'Pas encore mesurée', !!(perf&&perf.value&&perf.value!=='Indisponible')],
-        ['Dossier', /rapport|genération|génération/i.test(st.phase||'')?'Synthèse en cours':'En attente des mesures', /rapport|genération|génération/i.test(st.phase||'')]
-      ];
-      return '<div class="ap-modules">'+mods.map(m=>'<article class="ap-module'+(m[2]?' is-ready':'')+'"><b>'+escHtml(m[0])+'</b><span>'+escHtml(m[1])+'</span></article>').join('')+'</div>';
-    }
     function tickProgress(){
       if(!fullAuditState) return;
       fullAuditState.pct += (fullAuditState.target-fullAuditState.pct)*0.09;
