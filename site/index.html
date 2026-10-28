@@ -6189,12 +6189,25 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
       pdf.setDrawColor(255,173,114); pdf.setLineWidth(Math.max(.55,size*.065)); pdf.line(x+size*.58,y+size*.78,x+size*.69,y+size*.88); pdf.line(x+size*.69,y+size*.88,x+size*.88,y+size*.65);
     }
     function pdfHeadBand(pdf,K,st,a,title){ const col=hexToRgb(brandColor(st.primary_color)); pdf.setFillColor(250,249,253); pdf.rect(0,0,K.W,K.H,'F'); pdf.setFillColor(col[0],col[1],col[2]); pdf.rect(0,0,K.W,28,'F'); pdfAuditiaMark(pdf,K.M,5.5,17,col); K.setF('bold',15); pdf.setTextColor(255,255,255); pdf.text(String(st.app_name||'AuditIA'),K.M+22,13); K.setF('normal',8.5); pdf.text(title,K.M+22,20); K.setF('normal',8); pdf.text(new Date(a.updated_at||Date.now()).toLocaleDateString('fr-FR'),K.W-K.M,12,{align:'right'}); pdf.text(String(st.company_name||'AffiAds'),K.W-K.M,20,{align:'right'}); K.y=36; }
-    function pdfClientVerdict(pdf,K,a,c,d,diag){ const idx=diag.index; const lab=visibilityLabel(idx); const ic=pdfScoreCol(idx);
-      K.para((c&&c.name)||'Commerce',{style:'bold',size:21}); K.para([c&&c.city,c&&(c.category||d.category)].filter(Boolean).join('   ·   '),{color:K.MUT,size:9.5}); K.para('BILAN DE VISIBILITÉ NUMÉRIQUE  ·  '+new Date(a.updated_at||Date.now()).toLocaleDateString('fr-FR'),{color:K.MUT,size:7.5}); K.gap(2);
-      K.ensure(27); pdf.setFillColor(244,241,252); pdf.roundedRect(K.M,K.y,K.CW,23,3,3,'F'); pdf.setFillColor(ic[0],ic[1],ic[2]); pdf.rect(K.M,K.y,2,23,'F'); K.setF('bold',34); K.setT(ic); pdf.text(String(idx),K.M+5,K.y+13); K.setF('normal',10); K.setT(K.MUT); pdf.text('/100',K.M+5+String(idx).length*8.5,K.y+13); K.setF('bold',11); K.setT(ic); pdf.text(lab.t,K.M+43,K.y+13); K.y+=27;
-      K.para(visibilityVerdict(idx),{size:9.5}); K.para('Le score résume les signaux disponibles. SEO = visibilité dans les moteurs de recherche ; GEO = chances d’être cité par les assistants IA.',{size:8,color:K.MUT}); K.gap(1);
-      const bar=(label,score,x,w)=>{ const col=pdfScoreCol(score); K.setF('bold',9); K.setT(K.DARK); pdf.text(label,x,K.y+3.2); K.setT(col); pdf.text(score+'/100',x+w,K.y+3.2,{align:'right'}); pdf.setFillColor(230,226,240); pdf.roundedRect(x,K.y+4.6,w,2.1,1,1,'F'); pdf.setFillColor(col[0],col[1],col[2]); pdf.roundedRect(x,K.y+4.6,Math.max(1.4,w*Math.max(0,Math.min(100,Number(score)||0))/100),2.1,1,1,'F'); };
-      K.ensure(12); const gap=6, bw=(K.CW-gap)/2; bar('SEO — Google',diag.seo.score,K.M,bw); bar('GEO — IA',diag.geo.score,K.M+bw+gap,bw); K.y+=12; }
+    function pdfClientVerdict(pdf,K,a,c,d,diag){
+      const idx=diag.index, lab=idx==null?{t:'Données insuffisantes'}:visibilityLabel(idx), ic=idx==null?K.MUT:pdfScoreCol(idx);
+      K.para((c&&c.name)||'Commerce',{style:'bold',size:21});
+      K.para([c&&c.city,c&&(c.category||d.category)].filter(Boolean).join('   ·   '),{color:K.MUT,size:9.5});
+      K.para('BILAN DE VISIBILITÉ NUMÉRIQUE · '+new Date(a.updated_at||Date.now()).toLocaleDateString('fr-FR'),{color:K.MUT,size:7.5}); K.gap(2);
+      K.ensure(27); pdf.setFillColor(244,241,252); pdf.roundedRect(K.M,K.y,K.CW,23,3,3,'F'); pdf.setFillColor(ic[0],ic[1],ic[2]); pdf.rect(K.M,K.y,2,23,'F');
+      K.setF('bold',idx==null?18:34); K.setT(ic); pdf.text(idx==null?'—':String(idx),K.M+5,K.y+13);
+      if(idx!=null){K.setF('normal',10);K.setT(K.MUT);pdf.text('/100',K.M+5+String(idx).length*8.5,K.y+13);}
+      K.setF('bold',11);K.setT(ic);pdf.text(lab.t,K.M+43,K.y+13);K.y+=27;
+      K.para(visibilityVerdict(idx,diag),{size:9.5});
+      K.para('SEO = visibilité dans les moteurs de recherche ; GEO = signaux de lisibilité et de présence susceptibles d’aider les assistants IA à comprendre l’entreprise. Une citation IA n’est jamais garantie.',{size:8,color:K.MUT}); K.gap(1);
+      const bar=(label,score,x,w)=>{
+        K.setF('bold',9);K.setT(K.DARK);pdf.text(label,x,K.y+3.2);
+        K.setT(score==null?K.MUT:pdfScoreCol(score));pdf.text((score==null?'—':score+'/100'),x+w,K.y+3.2,{align:'right'});
+        pdf.setFillColor(230,226,240);pdf.roundedRect(x,K.y+4.6,w,2.1,1,1,'F');
+        if(score!=null){const col=pdfScoreCol(score);pdf.setFillColor(col[0],col[1],col[2]);pdf.roundedRect(x,K.y+4.6,Math.max(1.4,w*Math.max(0,Math.min(100,Number(score)||0))/100),2.1,1,1,'F');}
+      };
+      K.ensure(12);const gap=6,bw=(K.CW-gap)/2;bar('SEO — Google',diag.seo.score,K.M,bw);bar('GEO — IA',diag.geo.score,K.M+bw+gap,bw);K.y+=12;
+    }
     function pdfProgress(pdf,K,a){
       const mine=(appAudits||[]).filter(x=>String(x.client_id)===String(a.client_id)&&(x.site||x.scan||auditHasAnalysis(x))).map(x=>({t:new Date(x.updated_at||x.created_at||0).getTime(),s:Math.max(0,Math.min(100,Number(x.score)||0))})).filter(x=>x.t&&!isNaN(x.t)).sort((p,q)=>p.t-q.t).slice(-8);
       if(mine.length<2) return;
@@ -6261,6 +6274,7 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
       const K=pdfKit(pdf,st); const {W,M,CW}=K;
       pdfHeadBand(pdf,K,st,a,'Rapport de visibilité numérique');
       pdfClientVerdict(pdf,K,a,c,d,diag); pdfExecutiveSummary(pdf,K,a,c,diag,col); pdfProgress(pdf,K,a); K.hr();
+      K.heading('Couverture des mesures',col); K.para(diag.measuredCount+' critères mesurés sur '+diag.totalCount+' contrôles ('+diag.coverage+' %). Les critères non mesurés sont exclus du score. '+visibilityVerdict(diag.index,diag),{size:8.5,color:K.MUT});
       const pillar=(title,sub,p)=>{ K.heading(title,col); K.para(sub,{color:K.MUT,size:8.5}); K.gap(1);
         K.ensure(6); K.setF('bold',10); K.setT(K.DARK); pdf.text('Ce que vous avez',M,K.y+3.4); K.y+=5.6; if(p.have.length) p.have.forEach(x=>K.bullet(x.label,x.advice,[31,157,87])); else K.para('À construire entièrement sur cet axe.',{color:K.MUT,size:9});
         K.gap(1); K.ensure(6); K.setF('bold',10); K.setT(K.DARK); pdf.text('Ce qu’il vous manque',M,K.y+3.4); K.y+=5.6; if(p.miss.length) p.miss.forEach(x=>K.bullet(x.label,x.gap,[192,57,43])); else K.para('Rien de bloquant sur cet axe.',{color:K.MUT,size:9}); K.gap(2); };
@@ -6284,16 +6298,51 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
       pdfFooter(pdf,st);
     }
     function buildPdfSimple(pdf,a,c){
-      const st={...defaultSettings(),...(appSettings||{})}; const d=(c&&c.details)||{}; const diag=visibilityAudit(a,c); const col=hexToRgb(brandColor(st.primary_color));
-      const K=pdfKit(pdf,st); const {W,M,CW}=K;
-      pdfHeadBand(pdf,K,st,a,'Aperçu de visibilité');
-      pdfClientVerdict(pdf,K,a,c,d,diag); K.hr();
-      K.heading('Vos points forts · à conserver',col); if(diag.strengths.length) diag.strengths.slice(0,3).forEach(x=>K.bullet(x.label,'',[31,157,87])); else K.para('Aucun point fort confirmé dans les données disponibles.',{color:K.MUT,size:8.5});
-      K.heading('Priorités · à améliorer',col); if(diag.weaknesses.length) diag.weaknesses.slice(0,4).forEach(x=>K.bullet(x.label,'',[192,57,43])); else K.para('Aucun manque majeur identifié dans les données disponibles.',{color:K.MUT,size:8.5});
-      K.para('Périmètre : résultats limités aux données disponibles à la date de génération. Les éléments non vérifiés ne sont pas des preuves d’absence. Aucun résultat commercial ou classement Google n’est garanti.',{size:7.5,color:K.MUT});
-      K.gap(2); K.ensure(22); pdf.setFillColor(246,243,255); pdf.setDrawColor(col[0],col[1],col[2]); pdf.setLineWidth(0.3); pdf.roundedRect(M,K.y,CW,20,3,3,'FD'); K.setF('bold',10); K.setT(col); pdf.text('La prochaine étape',M+4,K.y+7); K.setF('normal',8.5); K.setT([70,70,70]); pdf.splitTextToSize('Commencez par corriger une priorité à la fois, puis mesurez à nouveau les résultats. Le rapport complet apporte les détails, les concurrents et un plan d’action.',CW-8).slice(0,3).forEach((ln,i)=>pdf.text(ln,M+4,K.y+12+i*4)); K.y+=24;
-      K.setF('bold',10); K.setT(col); pdf.text(String(st.signature_name||st.company_name||'AffiAds'),M,K.y+4); K.y+=5; const contact=[st.contact_email,st.phone,st.website].filter(Boolean).join('   ·   '); if(contact){ K.setF('normal',9); K.setT(K.DARK); pdf.text(contact,M,K.y+3); }
+      const st={...defaultSettings(),...(appSettings||{})};
+      const d=(c&&c.details)||{};
+      const diag=visibilityAudit(a,c);
+      const col=hexToRgb(brandColor(st.primary_color));
+      const K=pdfKit(pdf,st), M=K.M, CW=K.CW;
+      pdfHeadBand(pdf,K,st,a,'Aperçu gratuit · 1 page');
+      K.para((c&&c.name)||'Commerce',{style:'bold',size:20});
+      K.para([c&&c.city,c&&(c.category||d.category)].filter(Boolean).join(' · '),{color:K.MUT,size:9});
+      K.gap(1);
+      K.heading('Bilan de visibilité',col);
+      const idx=diag.index, lab=idx==null?null:visibilityLabel(idx);
+      if(idx==null){
+        K.para('Score indisponible : les données mesurées ne suffisent pas pour conclure.',{size:9,color:K.MUT});
+      }else{
+        const scoreCol=pdfScoreCol(idx);
+        K.setF('bold',24); K.setT(scoreCol); pdf.text(idx+'/100',M,K.y+8); K.y+=11;
+        K.setF('bold',10); K.setT(scoreCol); K.para(lab.t,{size:10});
+        K.setF('normal',8.5); K.setT(K.MUT); K.para(visibilityVerdict(idx,diag),{size:8.5});
+      }
+      K.gap(1);
+      K.heading('Repères disponibles',col);
+      const facts=[];
+      if(c&&c.website) facts.push(['Site',c.website]);
+      if(d.rating!=null) facts.push(['Note publique',String(d.rating)+'/5']);
+      if(d.reviews!=null) facts.push(['Nombre d’avis',String(d.reviews)]);
+      if(a&&a.scan&&a.scan.scores&&a.scan.scores.performance!=null) facts.push(['Performance mobile',a.scan.scores.performance+'/100']);
+      if(facts.length) facts.slice(0,4).forEach(([k,v])=>K.bullet(k,v,col));
+      else K.para('Aucune mesure confirmée dans les sources disponibles.',{size:8.5,color:K.MUT});
+      K.gap(1);
+      K.heading('Priorités à examiner',col);
+      const actions=auditActions(a,c,diag).filter(x=>x.impact!=='À vérifier').slice(0,3);
+      if(actions.length) actions.forEach((x,i)=>K.bullet((i+1)+'. '+x.label,String(x.advice||'').slice(0,180),col));
+      else K.para('Aucune priorité confirmée à partir des mesures disponibles.',{size:8.5,color:K.MUT});
+      K.gap(1);
+      K.heading('Fiabilité',col);
+      K.para(diag.measuredCount+' critères mesurés sur '+diag.totalCount+' contrôles ('+diag.coverage+' %). Les critères non mesurés sont exclus du score.',{size:8,color:K.MUT});
+      K.gap(1);
+      K.para('Aperçu gratuit : synthèse et quelques priorités. Le rapport complet détaille les preuves, les critères SEO/GEO, les concurrents, les limites et le plan d’action.',{size:8,color:K.MUT});
+      K.gap(2); K.hr();
+      K.setF('bold',9); K.setT(col); K.para(String(st.signature_name||st.company_name||'AffiAds'),{size:9});
+      const contact=[st.contact_email,st.phone,st.website].filter(Boolean).join(' · ');
+      if(contact) K.para(contact,{size:7.5,color:K.MUT});
       pdfFooter(pdf,st);
+      // The free teaser is intentionally one page; strip any overflow page created by variable-length content.
+      while(pdf.internal.getNumberOfPages()>1) pdf.deletePage(pdf.internal.getNumberOfPages());
     }
     async function exportReport(auditId, mode){
       if(pdfBusy) return;
