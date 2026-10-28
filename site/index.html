@@ -5825,64 +5825,105 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
     /* Diagnostic en 2 piliers — SEO (être trouvé sur Google) & GEO (être cité par les IA génératives).
        Chaque critère est calculé sur des données réelles ; les manques deviennent des arguments de vente. */
     function visibilityAudit(a,c){
-      const d=(c&&c.details)||{}; const s=a&&a.scan; const si=a&&a.site;
+      const d=(c&&c.details)||{}, scan=a&&a.scan, si=a&&a.site;
       const site=String((c&&c.website)||d.website||'').trim();
       const secure=/^https:\/\//i.test(site);
-      const rating=(d.rating!=null)?Number(d.rating):null;
-      const reviews=Number(d.reviews||0);
+      const rating=(d.rating!=null&&Number.isFinite(Number(d.rating)))?Number(d.rating):null;
+      const reviews=(d.reviews!=null&&Number.isFinite(Number(d.reviews)))?Number(d.reviews):null;
       const phone=String((c&&c.phone)||d.phone||'').trim();
-      const hasGoogle=!!(d.place_id||d.address||rating!=null);
-      const hours=!!(Array.isArray(d.hours)&&d.hours.length);
-      const perf=(s&&s.scores)?s.scores.performance:null;
-      const seoLh=(s&&s.scores)?s.scores.seo:null;
+      const hasGoogle=!!(d.place_id||d.address||rating!=null||reviews!=null);
+      const hours=Array.isArray(d.hours)&&d.hours.length>0;
+      const perf=scan&&scan.scores&&Number.isFinite(Number(scan.scores.performance))?Number(scan.scores.performance):null;
+      const seoLh=scan&&scan.scores&&Number.isFinite(Number(scan.scores.seo))?Number(scan.scores.seo):null;
       const page=!!(si&&si.pageRead);
-      const ns=page?(si.socials||[]).filter(x=>x.source!=='web').length:0;
       const majorNets=['Instagram','Facebook','TikTok','YouTube'];
       const major=si?(si.socials||[]).filter(x=>majorNets.includes(x.net)).length:0;
-      const tier=(v,stops)=>{ for(const st of stops){ if(v>=st[0]) return st[1]; } return 0; };
+      const tier=(v,stops)=>{for(const st of stops){if(v>=st[0])return st[1];}return 0;};
       const items=[];
-      // Notation graduée : 'val' entre 0 et 1 (crédibilité), 'ok' = point fort affiché.
-      const add=(pillar,label,ok,weight,bad,good,val)=>{ const v=(val==null?(ok?1:0):val); items.push({pillar,label,ok,weight,advice:ok?good:bad,gap:bad,val:Math.max(0,Math.min(1,v))}); };
-      /* ---- SEO : être trouvé quand on cherche sur Google ---- */
-      add('seo','Fiche Google Business',hasGoogle,18,'Créer ou revendiquer la fiche Google Business Profile : sans elle, le commerce est quasi invisible dans les recherches locales et sur Maps.','Fiche Google présente et renseignée.');
-      add('seo','Site web',!!site,16,'Aucun site web : impossible d’être bien référencé. Une vitrine (services, coordonnées, horaires) est la base.','Le commerce dispose d’un site web.');
-      if(site) add('seo','Site sécurisé (HTTPS)',secure,4,'Le site n’est pas en HTTPS : les navigateurs le signalent comme « non sécurisé », ce qui nuit au référencement et à la confiance.','Site sécurisé en HTTPS.');
-      if(rating!=null){ const rv=tier(rating,[[4.6,1],[4.2,0.9],[4.0,0.8],[3.5,0.55],[3.0,0.3],[0,0.15]]); add('seo','Note Google',rating>=4.0,10,'Note Google sous 4/5 : elle pèse sur le classement local. Répondre aux avis et solliciter les clients satisfaits.','Bonne note Google ('+rating+'/5).',rv); }
-      else add('seo','Note Google',false,10,'Pas encore de note Google : les premiers avis manquent pour rassurer et bien se classer.','',0);
-      { const rv=tier(reviews,[[50,1],[20,0.85],[10,0.6],[3,0.35],[1,0.15],[0,0]]); add('seo','Volume d’avis',reviews>=20,10,'Trop peu d’avis ('+reviews+') : un flux régulier d’avis améliore le classement et la confiance.',reviews+' avis clients.',rv); }
-      add('seo','Horaires renseignés',hours,5,'Horaires absents de la fiche : Google les affiche dans les résultats, leur absence fait perdre des clics.','Horaires renseignés sur Google.');
-      add('seo','Téléphone visible',!!phone,5,'Numéro absent : moins d’appels directs depuis les résultats de recherche.','Numéro de téléphone renseigné.');
-      if(perf!=null){ const pv=tier(perf,[[90,1],[70,0.8],[50,0.6],[30,0.35],[0,0.15]]); add('seo','Performance mobile',perf>=50,8,'Site lent sur mobile (perf '+perf+'/100) : pénalise le référencement et fait fuir les visiteurs.','Site rapide sur mobile (perf '+perf+'/100).',pv); }
-      if(seoLh!=null){ const lv=tier(seoLh,[[90,1],[70,0.75],[50,0.5],[0,0.25]]); add('seo','Référencement technique (Lighthouse)',seoLh>=80,6,'Bases SEO techniques incomplètes (score '+seoLh+'/100) : balises, structure et liens internes à corriger.','Bases SEO techniques correctes ('+seoLh+'/100).',lv); }
-      if(page){ const tv=(si.title&&si.metaDesc)?1:(si.title||si.metaDesc)?0.5:0; add('seo','Balises SEO (titre + description)',!!(si.title&&si.metaDesc),8,'Titre ou meta-description manquants : Google n’a pas de résumé clair à afficher.','Titre et description présents sur le site.',tv); }
-      if(page) add('seo','Compatible mobile',!!si.viewport,6,'Le site n’est pas déclaré adapté au mobile : Google privilégie les sites « mobile-friendly » dans ses résultats.','Site adapté au mobile (responsive).');
-      if(page){ const nv=ns>=2?1:ns===1?0.6:0; add('seo','Réseaux sociaux reliés',ns>=1,6,'Aucun réseau relié au site : moins de signaux de présence et d’activité.',ns+' réseau'+(ns>1?'x':'')+' relié'+(ns>1?'s':'')+' au site.',nv); }
-      if(d.photoCount!=null){ const pv=tier(d.photoCount,[[10,1],[5,0.8],[1,0.4],[0,0]]); add('seo','Photos sur la fiche Google',d.photoCount>=5,6,'Peu ou pas de photos ('+d.photoCount+') : ajouter des photos récentes (devanture, intérieur, produits) augmente les clics.',d.photoCount+' photo'+(d.photoCount>1?'s':'')+' sur la fiche Google.',pv); }
-      if(si&&si.booking!=null) add('seo','Prise de contact en ligne',!!((si.booking&&si.booking.length)||si.whatsapp),4,'Pas de réservation ni de contact direct en ligne : des clients prêts à agir abandonnent faute d’action simple.','Réservation ou contact direct possible en ligne.');
-      if(si&&si.rankings&&si.rankings.some(r=>!r.error)){ const usable=si.rankings.filter(r=>!r.error); const n=usable.length; const topN=usable.filter(r=>r.pos!=null&&r.pos<=10).length; const top3=usable.filter(r=>r.pos!=null&&r.pos<=3).length; const foundN=usable.filter(r=>r.found).length; const rv=Math.max(top3/n,(topN*0.7+foundN*0.3)/n); add('seo','Classement sur les mots-clés',topN>=1,10,'Introuvable dans les premiers résultats sur vos mots-clés : c’est le cœur du problème à vendre (travailler le SEO local et la fiche Google).',foundN+'/'+n+' mots-clés où le nom ou le site apparaît dans l’adresse de la page.',rv); }
-      /* ---- GEO : être cité et recommandé par les IA (ChatGPT, Gemini, Perplexity…) ---- */
-      add('geo','Présence reconnue (Google/Maps)',hasGoogle,16,'Les IA s’appuient sur des sources fiables : sans fiche Google solide, le commerce n’est pas une « entité » identifiable pour elles.','Entité identifiable via Google/Maps.');
-      if(page){ const sv=si.localSchema?1:((si.ldTypes&&si.ldTypes.length)?0.4:0); add('geo','Données structurées (schema.org)',!!si.localSchema,20,'Aucune donnée structurée LocalBusiness : les IA ont du mal à comprendre qui vous êtes, où et ce que vous proposez. C’est LE levier GEO n°1.','Données structurées LocalBusiness détectées : les IA lisent le commerce facilement.',sv); }
-      if(page){ const wv=tier(si.words||0,[[300,1],[150,0.7],[60,0.4],[0,0.1]]); add('geo','Contenu lisible par les IA',(si.words||0)>=150,10,'Page d’accueil pauvre en texte : les IA ont peu de matière à citer. Ajouter une présentation claire (qui, quoi, où, pourquoi vous).','Contenu texte suffisant pour être compris et cité.',wv); }
-      if(page){ const iv=(si.addressOnSite&&si.hoursOnSite)?1:(si.addressOnSite||si.hoursOnSite)?0.5:0; add('geo','Infos clés en clair (adresse + horaires)',!!(si.addressOnSite&&si.hoursOnSite),10,'Adresse ou horaires absents du texte du site : les IA ne peuvent pas les restituer de façon fiable.','Adresse et horaires présents en clair sur le site.',iv); }
-      if(page){ const dg=v=>String(v||'').replace(/\D/g,'').replace(/^33/,'0').slice(-9); const g=dg(phone); const tels=(Array.isArray(si.tel)?si.tel:[si.tel]).filter(Boolean).map(dg); const same=!!(g&&tels.some(t=>t&&t===g)); const nv=same?1:(tels.length?(g?0.5:0.8):0); add('geo','Cohérence des informations (NAP)',same||(!g&&tels.length>0),8,tels.length&&g&&!same?'Le téléphone du site ne correspond pas à celui de la fiche Google : une information incohérente brouille Google et les IA.':'Téléphone non repris sur le site : une info incohérente entre Google et le site brouille les IA.',same?'Même téléphone sur le site et sur Google.':'Coordonnées reprises sur le site.',nv); }
-      if(page&&si.title){ const nz=v=>String(v||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''); const city=nz(c&&c.city); const okCity=!!(city&&nz(si.title).includes(city)); add('seo','Titre de page avec la ville',okCity,4,'Le titre de la page d’accueil ne cite pas la ville : Google et les clients associent moins le site à la recherche locale.','La ville figure dans le titre de la page.'); }
-      { const rv=tier(reviews,[[50,1],[20,0.85],[10,0.6],[3,0.3],[0,0.1]]); add('geo','Preuve sociale (avis)',reviews>=20,12,'Peu d’avis : les IA privilégient les commerces avec une réputation visible et nombreuse.',reviews+' avis : réputation visible pour les IA.',rv); }
-      if(page) add('geo','Description claire du commerce',!!si.metaDesc,8,'Pas de description : les IA n’ont pas de résumé prêt à l’emploi pour vous présenter.','Description claire disponible pour les IA.');
-      if(si){ const nd=((si.directories)||[]).length; const dv=tier(nd,[[3,1],[2,0.7],[1,0.4],[0,0]]); add('geo','Présence sur le web (annuaires)',nd>=2,10,'Peu présent sur les annuaires/plateformes : être référencé (Pages Jaunes, TripAdvisor, Maps…) renforce la fiabilité pour les IA.',nd+' plateforme'+(nd>1?'s':'')+' où le commerce est référencé.',dv); }
-      if(si){ const mv=major>=2?1:major===1?0.5:0; add('geo','Présence multi-réseaux',major>=2,6,'Peu de réseaux majeurs actifs : une présence sur Instagram/Facebook renforce les signaux d’activité pour les IA.',major+' réseau'+(major>1?'x':'')+' majeur'+(major>1?'s':'')+' détecté'+(major>1?'s':'')+'.',mv); }
-      if(d.sirene&&d.sirene.matched) add('geo','Entreprise officiellement enregistrée',true,6,'','Entreprise enregistrée au registre officiel (SIRENE) : identité légale vérifiable, rassurante pour les IA et les clients.');
+      // Un critère n'entre dans le calcul que si une source a fourni assez de données pour le mesurer.
+      const add=(pillar,label,observed,weight,bad,good,val,source)=>{
+        const measured=observed!==null&&observed!==undefined;
+        const ok=measured?!!observed:null;
+        const v=measured?(val==null?(ok?1:0):Math.max(0,Math.min(1,Number(val)))):null;
+        items.push({pillar,label,ok,measured,weight,source:source||'Données du dossier',advice:!measured?'À vérifier : donnée non disponible.':ok?good:bad,gap:measured&&!ok?bad:'',val:v});
+      };
+      // SEO : présence locale, réputation, site et mesures techniques réellement disponibles.
+      add('seo','Fiche Google Business',hasGoogle,18,'La fiche Google n’est pas confirmée dans les données du dossier. Vérifier la fiche publique avant de conclure.','Fiche Google identifiée.',null,'Fiche commerce');
+      add('seo','Site web',site?true:false,16,'Aucune adresse de site web n’est renseignée sur la fiche client. Confirmer avec le commerçant avant de recommander la création d’un site.','Adresse de site web renseignée.',null,'Fiche client');
+      if(site) add('seo','Site sécurisé (HTTPS)',secure,4,'L’adresse enregistrée n’utilise pas HTTPS. Vérifier la redirection et le certificat depuis le navigateur.','Adresse HTTPS.',null,'Adresse enregistrée');
+      if(rating!=null){const rv=tier(rating,[[4.6,1],[4.2,0.9],[4.0,0.8],[3.5,0.55],[3.0,0.3],[0,0.15]]);add('seo','Note Google',rating>=4,10,'La note publique est inférieure à 4/5. Examiner les avis et les motifs avant de définir une réponse.','Note publique : '+rating+'/5.',rv,'Google Places');}
+      else add('seo','Note Google',null,10,'La note Google n’est pas disponible. Ne pas conclure que le commerce n’a pas d’avis.','Note Google disponible.',null,'Google Places');
+      if(reviews!=null){const rv=tier(reviews,[[50,1],[20,0.85],[10,0.6],[3,0.35],[1,0.15],[0,0]]);add('seo','Volume d’avis',reviews>=20,10,'Le volume observé est de '+reviews+' avis. Comparer aux commerces similaires avant de fixer un objectif.','Volume observé : '+reviews+' avis.',rv,'Google Places');}
+      else add('seo','Volume d’avis',null,10,'Le nombre d’avis n’est pas disponible.','Nombre d’avis disponible.',null,'Google Places');
+      if(d.hours!=null) add('seo','Horaires renseignés',hours,5,'Aucun horaire n’est présent dans les données récupérées. Vérifier la fiche publique avant de conclure.','Horaires présents dans les données récupérées.',null,'Fiche commerce');
+      else add('seo','Horaires renseignés',null,5,'Les horaires n’ont pas été récupérés.','Horaires disponibles.',null,'Fiche commerce');
+      add('seo','Téléphone visible',phone?true:(d.phone===null||d.phone===undefined?null:false),5,'Aucun numéro n’est renseigné sur la fiche client. Vérifier la fiche publique.','Numéro renseigné.',null,'Fiche client');
+      if(perf!=null){const pv=tier(perf,[[90,1],[70,0.8],[50,0.6],[30,0.35],[0,0.15]]);add('seo','Performance mobile',perf>=50,8,'Performance mobile mesurée à '+perf+'/100. Examiner les opportunités Lighthouse avant de choisir les optimisations.','Performance mobile mesurée à '+perf+'/100.',pv,'Google Lighthouse');}
+      else add('seo','Performance mobile',null,8,'La performance mobile n’a pas été mesurée.','Performance mobile mesurée.',null,'Google Lighthouse');
+      if(seoLh!=null){const lv=tier(seoLh,[[90,1],[70,0.75],[50,0.5],[0,0.25]]);add('seo','Référencement technique (Lighthouse)',seoLh>=80,6,'Score SEO technique Lighthouse : '+seoLh+'/100. Consulter les audits détaillés pour identifier les corrections pertinentes.','Score SEO technique : '+seoLh+'/100.',lv,'Google Lighthouse');}
+      else add('seo','Référencement technique (Lighthouse)',null,6,'Le score SEO technique n’a pas été mesuré.','Score SEO technique mesuré.',null,'Google Lighthouse');
+      if(page){
+        const hasTitle=!!si.title,hasMeta=!!si.metaDesc;const tv=hasTitle&&hasMeta?1:(hasTitle||hasMeta)?0.5:0;
+        add('seo','Balises SEO (titre + description)',hasTitle&&hasMeta,8,'Le titre ou la meta-description n’a pas été détecté sur la page lue.','Titre et meta-description détectés.',tv,'Lecture du site');
+        add('seo','Compatible mobile',!!si.viewport,6,'La balise viewport n’a pas été détectée dans le HTML lu. Vérifier le rendu mobile ; ce signal seul ne prouve pas que le site est inutilisable.','Balise viewport détectée.',null,'Lecture du site');
+        const socials=(si.socials||[]).filter(x=>x&&x.url);
+        add('seo','Réseaux sociaux reliés',socials.length>0,6,'Aucun lien de réseau social n’a été détecté dans les pages analysées. Vérifier les liens du pied de page et les profils officiels.','Au moins un lien social détecté.',Math.min(1,socials.length/2),'Lecture du site');
+      }
+      if(d.photoCount!=null&&Number.isFinite(Number(d.photoCount))){const n=Number(d.photoCount),pv=tier(n,[[10,1],[5,0.8],[1,0.4],[0,0]]);add('seo','Photos sur la fiche Google',n>=5,6,'Nombre de photos récupéré : '+n+'. Vérifier la qualité et la récence, pas seulement le volume.','Nombre de photos récupéré : '+n+'.',pv,'Google Places');}
+      if(si&&si.booking!=null) add('seo','Prise de contact en ligne',!!((si.booking&&si.booking.length)||si.whatsapp),4,'Aucun parcours de réservation ou contact direct n’a été détecté sur la page analysée.','Un moyen de prise de contact directe a été détecté.',null,'Lecture du site');
+      if(si&&si.rankings&&si.rankings.some(r=>!r.error)){
+        const usable=si.rankings.filter(r=>!r.error),n=usable.length,topN=usable.filter(r=>r.pos!=null&&r.pos<=10).length,top3=usable.filter(r=>r.pos!=null&&r.pos<=3).length,foundN=usable.filter(r=>r.found).length;
+        const rv=n?Math.max(top3/n,(topN*0.7+foundN*0.3)/n):null;
+        add('seo','Présence sur les mots-clés explorés',n?topN>=1:null,10,n?'Le site ou le nom n’a pas été retrouvé dans les dix premiers résultats de l’échantillon exploré. Ce n’est pas une mesure du classement Google Maps.':'Aucun mot-clé mesurable.','Présence retrouvée dans '+foundN+'/'+n+' recherches explorées.',rv,'Recherche web indicative');
+      }
+      // GEO : critères sur le contenu uniquement lorsque la page a été lue, autres données selon leur source.
+      add('geo','Présence reconnue (Google/Maps)',hasGoogle,16,'La fiche Google n’est pas confirmée dans les données disponibles.','Fiche Google identifiée.',null,'Fiche commerce');
+      if(page){
+        const schema=!!si.localSchema, sv=schema?1:((si.ldTypes||[]).length?0.4:0);
+        add('geo','Données structurées LocalBusiness',schema,20,'Aucun schéma LocalBusiness n’a été détecté sur la page lue. Vérifier aussi les données structurées sur les autres pages pertinentes.','Données structurées LocalBusiness détectées.',sv,'Lecture du site');
+        const words=Number(si.words)||0,wv=tier(words,[[300,1],[150,0.7],[60,0.4],[0,0.1]]);
+        add('geo','Contenu lisible sur la page',words>=150,10,'La page lue contient '+words+' mots environ. Vérifier les pages de services avant d’en conclure que tout le site est pauvre en contenu.','Texte détecté sur la page : '+words+' mots environ.',wv,'Lecture du site');
+        const info=(si.addressOnSite&&si.hoursOnSite)?1:(si.addressOnSite||si.hoursOnSite)?0.5:0;
+        add('geo','Adresse et horaires en clair',!!(si.addressOnSite&&si.hoursOnSite),10,'L’adresse ou les horaires n’ont pas été détectés dans le texte de cette page.','Adresse et horaires détectés dans le texte.',info,'Lecture du site');
+        const dg=v=>String(v||'').replace(/\D/g,'').replace(/^33/,'0').slice(-9);
+        const g=dg(phone), tels=(Array.isArray(si.tel)?si.tel:[si.tel]).filter(Boolean).map(dg), same=!!(g&&tels.some(t=>t&&t===g));
+        if(g&&tels.length) add('geo','Cohérence du téléphone',same,8,same?'':'Le téléphone de la fiche ne correspond pas à celui détecté sur la page.',same?'Téléphone identique dans les deux sources.':'Téléphones différents : vérifier les deux sources.',same?1:0,'Fiche client + site');
+        else add('geo','Cohérence du téléphone',null,8,'La comparaison du téléphone n’est pas possible, car une des sources ne fournit pas de numéro.','Numéros comparables et cohérents.',null,'Fiche client + site');
+        if(si.title){
+          const nz=v=>String(v||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+          const city=nz(c&&c.city),okCity=!!(city&&nz(si.title).includes(city));
+          add('seo','Ville dans le titre',okCity,4,'La ville du commerce n’a pas été retrouvée dans le titre de page.','La ville du commerce figure dans le titre.',null,'Lecture du site');
+        }
+        add('geo','Description claire',!!si.metaDesc,8,'Aucune meta-description n’a été détectée sur la page lue.','Meta-description détectée.',null,'Lecture du site');
+      }
+      if(reviews!=null){const rv=tier(reviews,[[50,1],[20,0.85],[10,0.6],[3,0.3],[0,0.1]]);add('geo','Avis publics',reviews>=20,12,'Le volume public observé est de '+reviews+' avis. Le volume seul ne mesure ni la satisfaction ni la qualité des réponses.','Volume public observé : '+reviews+' avis.',rv,'Google Places');}
+      else add('geo','Avis publics',null,12,'Le nombre d’avis n’est pas disponible.','Nombre d’avis disponible.',null,'Google Places');
+      if(si){
+        const dirs=Array.isArray(si.directories)?si.directories:[];
+        const dv=tier(dirs.length,[[3,1],[2,0.7],[1,0.4],[0,0]]);
+        add('geo','Présence dans les annuaires détectés',dirs.length>=2,10,'Moins de deux annuaires ont été détectés dans les sources consultées. Il s’agit d’un échantillon et non d’un recensement complet.','Annuaire(s) détecté(s) : '+dirs.length+'.',dv,'Recherche web');
+        add('geo','Présence sur plusieurs réseaux',major>=2,6,'Moins de deux profils parmi Instagram, Facebook, TikTok et YouTube ont été détectés. Vérifier les profils officiels avant de conclure.','Profils de réseaux principaux détectés : '+major+'.',Math.min(1,major/2),'Site + recherche web');
+      }
+      if(d.sirene&&d.sirene.matched) add('geo','Entreprise présente dans SIRENE',true,6,'','Identité trouvée dans le registre SIRENE.',1,'Registre officiel');
       const gx=page&&si.geo;
-      if(gx&&gx.robots){ const bl=gx.robots.blocked||[]; add('geo','Robots d’IA autorisés',!bl.length,8,'Le fichier robots.txt bloque '+bl.length+' robot'+(bl.length>1?'s':'')+' d’IA ('+bl.slice(0,3).join(', ')+') : ces assistants ne peuvent pas lire le site pour le recommander.',gx.robots.missing?'Aucun robots.txt restrictif : les IA peuvent lire le site.':'Les robots des IA (ChatGPT, Perplexity, Gemini…) peuvent lire le site.',1-bl.length/Math.max(1,gx.robots.total)); }
-      if(gx&&gx.llms!=null) add('geo','Fichier llms.txt',!!gx.llms,3,'Pas de fichier llms.txt : ce petit fichier résume le commerce pour les assistants IA (qui, quoi, où, horaires).','Fichier llms.txt présent pour guider les IA.');
-      if(gx&&gx.faq!=null) add('geo','Questions fréquentes (FAQ)',!!gx.faq,5,'Pas de section FAQ : les IA reprennent volontiers des réponses courtes aux questions des clients (prix, horaires, livraison…).','Section FAQ présente : réponses faciles à citer pour les IA.');
-      if(gx&&gx.lists!=null) add('geo','Contenu structuré (listes, tableaux)',!!gx.lists,3,'Peu de listes ou tableaux : un contenu structuré (services, tarifs) est plus facile à reprendre pour les IA.','Contenu structuré en listes ou tableaux.');
-      if(gx&&gx.digits!=null){ const dv=gx.digits>=5?1:gx.digits>=2?0.5:0; add('geo','Chiffres concrets (prix, années, délais)',gx.digits>=5,3,'Peu de chiffres concrets : prix, années d’expérience ou délais rendent le commerce plus crédible et citable.','Chiffres concrets présents sur la page.',dv); }
-      if(gx&&gx.dated!=null) add('geo','Date de mise à jour lisible',!!gx.dated,2,'Aucune date de mise à jour lisible par les machines : les IA privilégient les informations récentes.','Date de publication ou de mise à jour lisible.');
-      const pill=p=>{const it=items.filter(x=>x.pillar===p);const t=it.reduce((n,x)=>n+x.weight,0);const g=it.reduce((n,x)=>n+x.weight*(x.val!=null?x.val:(x.ok?1:0)),0);return {score:t?Math.round(g/t*100):0,have:it.filter(x=>x.ok),miss:it.filter(x=>!x.ok&&x.gap)};};
-      const seoP=pill('seo'),geoP=pill('geo');
-      const index=Math.round((seoP.score+geoP.score)/2);
-      return {items,seo:seoP,geo:geoP,index,strengths:items.filter(x=>x.ok),weaknesses:items.filter(x=>!x.ok&&x.gap)};
+      if(gx&&gx.robots&&Array.isArray(gx.robots.blocked)){
+        const blocked=gx.robots.blocked.length,total=Math.max(1,Number(gx.robots.total)||1),v=1-blocked/total;
+        add('geo','Robots IA et robots.txt',blocked===0,8,blocked?'Des robots IA sont listés comme bloqués par le fichier robots.txt. Vérifier les directives et les objectifs du site.':'','Robots listés comme non bloqués.',v,'robots.txt lu');
+      }
+      if(gx&&gx.llms!=null) add('geo','Fichier llms.txt',!!gx.llms,3,'Aucun fichier llms.txt exploitable n’a été trouvé. Ce fichier est facultatif et son absence ne constitue pas à elle seule une anomalie SEO.','Fichier llms.txt exploitable détecté.',null,'Fichier llms.txt');
+      if(gx&&gx.faq!=null) add('geo','FAQ détectée',!!gx.faq,5,'Aucune FAQ détectée sur la page analysée. Une FAQ n’est pertinente que si elle répond à de vraies questions des clients.','FAQ détectée sur la page.',null,'Lecture du site');
+      if(gx&&gx.lists!=null) add('geo','Contenu structuré',!!gx.lists,3,'Peu de listes ou de tableaux détectés sur la page.','Listes ou tableau détectés.',null,'Lecture du site');
+      if(gx&&gx.digits!=null) add('geo','Informations concrètes',Number(gx.digits)>=5,3,'Peu de nombres concrets détectés sur cette page.','Informations chiffrées détectées : '+gx.digits+'.',Number(gx.digits)>=5?1:Number(gx.digits)>=2?0.5:0,'Lecture du site');
+      if(gx&&gx.dated!=null) add('geo','Date de mise à jour lisible',!!gx.dated,2,'Aucune date de publication ou de mise à jour n’a été détectée sur cette page.','Date de publication ou de mise à jour détectée.',null,'Lecture du site');
+      const pill=p=>{
+        const it=items.filter(x=>x.pillar===p&&x.measured),total=it.reduce((n,x)=>n+x.weight,0),earned=it.reduce((n,x)=>n+x.weight*(x.val==null?(x.ok?1:0):x.val),0);
+        const all=items.filter(x=>x.pillar===p),measuredWeight=total,possibleWeight=all.reduce((n,x)=>n+x.weight,0);
+        return {score:total?Math.round(earned/total*100):null,have:it.filter(x=>x.ok),miss:it.filter(x=>x.ok===false),items:all,measuredCount:it.length,totalCount:all.length,coverage:possibleWeight?Math.round(measuredWeight/possibleWeight*100):0,measuredWeight,possibleWeight};
+      };
+      const seoP=pill('seo'),geoP=pill('geo'),valid=[seoP,geoP].filter(p=>p.score!=null&&p.measuredCount>0);
+      const index=valid.length?Math.round(valid.reduce((n,p)=>n+p.score,0)/valid.length):null;
+      const measuredItems=items.filter(x=>x.measured),strengths=measuredItems.filter(x=>x.ok===true),weaknesses=measuredItems.filter(x=>x.ok===false&&x.gap);
+      return {items,seo:seoP,geo:geoP,index,strengths,weaknesses,measuredCount:measuredItems.length,totalCount:items.length,coverage:items.length?Math.round(measuredItems.length/items.length*100):0,hasScore:index!=null};
     }
     function visibilityVerdict(i){ return i>=75?'Bonne présence en ligne, avec quelques optimisations pour dominer la concurrence locale.':i>=50?'Présence correcte mais perfectible : plusieurs leviers simples manquent pour être réellement visible.':i>=25?'Présence fragile : des actions prioritaires sont nécessaires pour être trouvé par les clients et cité par les IA.':'Présence très limitée : aujourd’hui, ce commerce est difficile à trouver sur Google comme sur les assistants IA.'; }
     function actionPlan(a,c,diag){
