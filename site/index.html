@@ -5925,13 +5925,20 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
       const measuredItems=items.filter(x=>x.measured),strengths=measuredItems.filter(x=>x.ok===true),weaknesses=measuredItems.filter(x=>x.ok===false&&x.gap);
       return {items,seo:seoP,geo:geoP,index,strengths,weaknesses,measuredCount:measuredItems.length,totalCount:items.length,coverage:items.length?Math.round(measuredItems.length/items.length*100):0,hasScore:index!=null};
     }
-    function visibilityVerdict(i){ return i>=75?'Bonne présence en ligne, avec quelques optimisations pour dominer la concurrence locale.':i>=50?'Présence correcte mais perfectible : plusieurs leviers simples manquent pour être réellement visible.':i>=25?'Présence fragile : des actions prioritaires sont nécessaires pour être trouvé par les clients et cité par les IA.':'Présence très limitée : aujourd’hui, ce commerce est difficile à trouver sur Google comme sur les assistants IA.'; }
+    function visibilityVerdict(i,diag){
+      if(i==null||!Number.isFinite(Number(i)))return 'Score indisponible : les données mesurées sont insuffisantes pour conclure.';
+      const cover=diag&&diag.coverage!=null?diag.coverage:null;
+      const base=i>=75?'Bonne présence sur les critères mesurés, avec des optimisations possibles.':i>=50?'Présence perfectible : plusieurs améliorations sont identifiables dans les mesures disponibles.':i>=25?'Présence fragile sur les critères vérifiés : des actions prioritaires sont à examiner.':'Présence limitée sur les critères vérifiés : confirmez les données et traitez les points prioritaires.';
+      return cover!=null&&cover<60?base+' Confiance limitée : seuls '+cover+' % des contrôles ont pu être mesurés.':base;
+    }
     function actionPlan(a,c,diag){
-      const plan=[]; const rank={'Haute':0,'Moyenne':1,'À planifier':2};
-      diag.weaknesses.slice().sort((x,y)=>y.weight-x.weight).forEach(x=>plan.push({t:x.label,d:x.advice,p:x.weight>=14?'Haute':x.weight>=10?'Moyenne':'À planifier',axis:x.pillar==='geo'?'GEO':'SEO'}));
-      const s=a&&a.scan;
-      if(s&&s.recommendations) s.recommendations.slice(0,4).forEach(r=>plan.push({t:r.title,d:r.detail||'',p:r.severity==='haute'?'Haute':'Moyenne',axis:'SEO'}));
-      return plan.sort((x,y)=>rank[x.p]-rank[y.p]).slice(0,10);
+      const rank={'Haute':0,'Moyenne':1,'À planifier':2};
+      return auditActions(a,c,diag).map(x=>({
+        t:x.label,
+        d:x.advice,
+        p:x.impact==='Élevé'?'Haute':x.impact==='Moyen'?'Moyenne':'À planifier',
+        axis:x.axis
+      })).sort((x,y)=>(rank[x.p]??3)-(rank[y.p]??3)).slice(0,10);
     }
     function termHelpHtml(term){
       const definitions={
@@ -5966,15 +5973,41 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
       return um;
     }
     function auditActions(a,c,diag){
-      const T={seo:0,geo:0}; diag.items.forEach(x=>{T[x.pillar]+=x.weight;});
-      const d=(c&&c.details)||{}; const site=String((c&&c.website)||d.website||'').trim();
-      const effort=l=>/Note Google|Volume d’avis|Preuve sociale/.test(l)?'Continu':/^Site web$|Performance mobile|Classement|Contenu lisible|Référencement technique/.test(l)?'Projet':/Données structurées|annuaires|multi-réseaux|Prise de contact|Infos clés|Balises/.test(l)?'1 h':'15 min';
-      const where=l=>/Fiche Google|Note Google|avis|Horaires|Téléphone|Photos|Présence reconnue/i.test(l)?{href:'https://business.google.com/',t:'Ouvrir Google Business'}:(site&&!/^Site web$/.test(l)&&/Site|Balises|Compatible|Réseaux sociaux reliés|Données structurées|Contenu|Infos clés|Cohérence|Description|Performance|Référencement|Prise de contact|HTTPS/.test(l))?{href:site,t:'Ouvrir le site'}:null;
-      return diag.items.filter(x=>x.val<1&&x.gap).map(x=>{
-        const gain=Math.round(x.weight*(1-x.val)/Math.max(1,T[x.pillar])*500)/10;
+      const d=(c&&c.details)||{}, site=String((c&&c.website)||d.website||'').trim();
+      const weights={seo:0,geo:0};
+      (diag.items||[]).filter(x=>x.measured).forEach(x=>{weights[x.pillar]=(weights[x.pillar]||0)+x.weight;});
+      const effort=l=>/Note Google|Volume d’avis|Avis publics/.test(l)?'Continu':/^Site web$|Performance mobile|Classement|Contenu lisible|Référencement technique/.test(l)?'Projet':/Données structurées|annuaires|multi-réseaux|Prise de contact|Infos clés|Balises/.test(l)?'1 h':'15 min';
+      const where=l=>/Fiche Google|Note Google|avis|Horaires|Téléphone|Photos|Présence reconnue/i.test(l)?{href:'https://business.google.com/',t:'Ouvrir Google Business'}:(site&&!/^Site web$/.test(l)&&/Site|Balises|Compatible|Réseaux sociaux|Données structurées|Contenu|Infos clés|Cohérence|Description|Performance|Référencement|Prise de contact|HTTPS|Fichier llms|robots/i.test(l))?{href:site,t:'Ouvrir le site'}:null;
+      const fromDiagnostic=(diag.items||[]).filter(x=>x.measured&&x.ok===false&&x.gap).map(x=>{
+        const denominator=Math.max(1,weights[x.pillar]||0);
+        const gain=Math.round(x.weight*(1-(x.val==null?0:x.val))/denominator*500)/10;
         const ef=effort(x.label);
-        return {label:x.label,advice:x.gap,axis:x.pillar==='geo'?'GEO':'SEO',gain,impact:gain>=4?'Élevé':gain>=2?'Moyen':'Faible',effort:ef,quick:(ef==='15 min'||ef==='1 h')&&gain>=1.5,where:where(x.label)};
-      }).sort((p,q)=>q.gain-p.gain);
+        return {label:x.label,advice:x.gap,axis:x.pillar==='geo'?'GEO':'SEO',gain,impact:gain>=4?'Élevé':gain>=2?'Moyen':'Faible',effort:ef,quick:(ef==='15 min'||ef==='1 h')&&gain>=1.5,where:where(x.label),source:x.source||'Diagnostic'};
+      });
+      // Recommandations Lighthouse qui dupliquent un critère déjà pris en charge par le diagnostic sont écartées.
+      const scan=a&&a.scan, scanRecs=(scan&&Array.isArray(scan.recommendations)?scan.recommendations:[]);
+      const canonical=[
+        [/performance|largest contentful paint|first contentful paint|cumulative layout shift|speed index|blocking time/i,'Performance mobile'],
+        [/meta description|title element|document has a title|seo/i,'Référencement technique (Lighthouse)'],
+        [/viewport|tap targets|font sizes/i,'Compatible mobile'],
+        [/https|http requests/i,'Site sécurisé (HTTPS)'],
+        [/accessibility|contrast|aria|label/i,'Accessibilité']
+      ];
+      const already=new Set(fromDiagnostic.map(x=>x.label.toLowerCase()));
+      const extras=[];
+      scanRecs.forEach(r=>{
+        const title=String(r.title||'').trim(); if(!title)return;
+        const match=canonical.find(([rx])=>rx.test(title));
+        const label=match?match[1]:title;
+        if(already.has(label.toLowerCase())||extras.some(x=>x.label.toLowerCase()===label.toLowerCase()))return;
+        const sev=String(r.severity||'').toLowerCase();
+        extras.push({label,advice:String(r.detail||'Vérifier ce point dans le rapport Lighthouse.'),axis:'SEO',gain:null,impact:sev==='haute'?'Élevé':'À vérifier',effort:'À estimer',quick:false,where:site?{href:site,t:'Ouvrir le site'}:null,source:'Google Lighthouse'});
+        already.add(label.toLowerCase());
+      });
+      return fromDiagnostic.concat(extras).sort((p,q)=>{
+        const impact={Élevé:3,Moyen:2,Faible:1,'À vérifier':0};
+        return (impact[q.impact]||0)-(impact[p.impact]||0)||(Number(q.gain)||0)-(Number(p.gain)||0);
+      });
     }
     function benchmarkHtml(a){
       const cp=a&&a.site&&a.site.competitors; if(!cp||!cp.list||!cp.list.length) return '';
