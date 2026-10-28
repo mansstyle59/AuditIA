@@ -4934,31 +4934,31 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
       const text=String(raw||'').trim();
       const low=text.toLocaleLowerCase('fr-FR');
       const rules=[
-        {re:/\\b(coiffeur|coiffeurs|salon de coiffure|salons de coiffure)\\b/i,type:'hair_salon'},
-        {re:/\\b(plombier|plombiers|plomberie)\\b/i,type:'plumber'},
-        {re:/\\b(électricien|électriciens|electricien|electriciens)\\b/i,type:'electrician'},
-        {re:/\\b(restaurant|restaurants|restauration)\\b/i,type:'restaurant'},
-        {re:/\\b(boulangerie|boulangeries|boulanger|boulangers)\\b/i,type:'bakery'},
-        {re:/\\b(garage|garages|mécanicien|mécaniciens|mecanicien|mecaniciens)\\b/i,type:'car_repair'},
-        {re:/\\b(agence immobilière|agences immobilières|agent immobilier|agents immobiliers)\\b/i,type:'real_estate_agency'},
-        {re:/\\b(coiffeur|institut de beauté|instituts de beauté|esthéticienne|esthéticiennes)\\b/i,type:'beauty_salon'},
-        {re:/\\b(hôtel|hôtels|hotel|hotels)\\b/i,type:'hotel'},
-        {re:/\\b(fleuriste|fleuristes|fleuriste)\\b/i,type:'florist'},
-        {re:/\\b(pharmacie|pharmacies)\\b/i,type:'pharmacy'},
-        {re:/\\b(salle de sport|salles de sport|fitness)\\b/i,type:'gym'},
-        {re:/\\b(café|cafés|cafe|cafes)\\b/i,type:'cafe'},
-        {re:/\\b(avocat|avocats|cabinet d'avocats)\\b/i,type:'lawyer'}
+        {re:/\b(coiffeur|coiffeurs|salon de coiffure|salons de coiffure)\b/i,type:'hair_salon'},
+        {re:/\b(plombier|plombiers|plomberie)\b/i,type:'plumber'},
+        {re:/\b(électricien|électriciens|electricien|electriciens)\b/i,type:'electrician'},
+        {re:/\b(restaurant|restaurants|restauration)\b/i,type:'restaurant'},
+        {re:/\b(boulangerie|boulangeries|boulanger|boulangers)\b/i,type:'bakery'},
+        {re:/\b(garage|garages|mécanicien|mécaniciens|mecanicien|mecaniciens)\b/i,type:'car_repair'},
+        {re:/\b(agence immobilière|agences immobilières|agent immobilier|agents immobiliers)\b/i,type:'real_estate_agency'},
+        {re:/\b(institut de beauté|instituts de beauté|esthéticienne|esthéticiennes)\b/i,type:'beauty_salon'},
+        {re:/\b(hôtel|hôtels|hotel|hotels)\b/i,type:'hotel'},
+        {re:/\b(fleuriste|fleuristes)\b/i,type:'florist'},
+        {re:/\b(pharmacie|pharmacies)\b/i,type:'pharmacy'},
+        {re:/\b(salle de sport|salles de sport|fitness)\b/i,type:'gym'},
+        {re:/\b(café|cafés|cafe|cafes)\b/i,type:'cafe'},
+        {re:/\b(avocat|avocats|cabinet d'avocats)\b/i,type:'lawyer'}
       ];
       const matched=rules.find(r=>r.re.test(low));
       const noWebsite=/sans site|sans (?:un )?site web|n'ont pas de site|n’ont pas de site|pas de site web|site web absent/i.test(low);
-      const lowRating=/note(?: google)? (?:inférieure|sous|en dessous de) 4|moins de 4(?:[,.]0)?\\s*(?:/5|sur 5)?|mal notés|mal note[s]?/i.test(low);
-      const minReviews=low.match(/(?:plus de|au moins)\\s*(\\d+)\\s*avis/i);
+      const lowRating=/note(?: google)? (?:inférieure|sous|en dessous de) 4|moins de 4(?:[,.]0)?\s*(?:\/5|sur 5)?|mal notés|mal note[s]?/i.test(low);
+      const minReviews=low.match(/(?:plus de|au moins)\s*(\d+)\s*avis/i);
       let query=text;
-      query=query.replace(/\\b(avec|qui ont|ayant)\\s+(?:un |une )?site web\\b/ig,'');
-      query=query.replace(/\\b(sans|qui n'ont pas de|qui n’ont pas de|pas de)\\s+(?:un |de )?site(?: web)?\\b/ig,'');
-      query=query.replace(/\\b(note(?: google)? (?:inférieure|sous|en dessous de) 4|moins de 4(?:[,.]0)?\\s*(?:/5|sur 5)?|mal notés|mal note[s]?)\\b/ig,'');
-      query=query.replace(/\\b(?:plus de|au moins)\\s*\\d+\\s*avis\\b/ig,'');
-      query=query.replace(/\\s+/g,' ').trim();
+      query=query.replace(/\b(avec|qui ont|ayant)\s+(?:un |une )?site web\b/ig,'');
+      query=query.replace(/\b(sans|qui n'ont pas de|qui n’ont pas de|pas de)\s+(?:un |de )?site(?: web)?\b/ig,'');
+      query=query.replace(/\b(note(?: google)? (?:inférieure|sous|en dessous de) 4|moins de 4(?:[,.]0)?\s*(?:\/5|sur 5)?|mal notés|mal note[s]?)\b/ig,'');
+      query=query.replace(/\b(?:plus de|au moins)\s*\d+\s*avis\b/ig,'');
+      query=query.replace(/\s+/g,' ').trim();
       return {query:query||text,type:matched&&matched.type,noWebsite,lowRating,minReviews:minReviews?Number(minReviews[1]):0,raw:text};
     }
     function naturalLanguageSearchHtml(){
