@@ -2579,6 +2579,32 @@ button { touch-action: manipulation; }
 
 /* Live Scan : résultats progressifs réels */
 .ap-live-results{margin:18px 0;padding:16px;border:1px solid rgba(123,108,255,.24);border-radius:18px;background:linear-gradient(145deg,rgba(123,108,255,.12),rgba(10,11,26,.28))}.ap-results-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}.ap-results-heading>span:last-child{font-size:11px;color:var(--muted)}.ap-live-facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.ap-fact{min-width:0;padding:12px;border:1px solid rgba(255,255,255,.09);border-radius:13px;background:rgba(255,255,255,.035)}.ap-fact span,.ap-fact small{display:block;color:var(--muted);font-size:11px}.ap-fact b{display:block;margin:5px 0;font-size:16px;overflow-wrap:anywhere}.ap-fact small{line-height:1.4}.ap-facts-empty{grid-column:1/-1;padding:14px;border:1px dashed rgba(255,255,255,.14);border-radius:12px;color:var(--muted);font-size:12px}.ap-live-step{transition:background .2s ease,border-color .2s ease}.ap-live-step.is-active .ap-step-icon{animation:apPulse 1.4s ease-in-out infinite}@keyframes apPulse{0%,100%{box-shadow:0 0 0 3px rgba(123,108,255,.1)}50%{box-shadow:0 0 0 6px rgba(123,108,255,.2)}}@media(max-width:480px){.ap-live-facts{grid-template-columns:1fr}.ap-results-heading{align-items:flex-start;flex-direction:column}.ap-fact{padding:11px}}
+
+    /* Parcours guidé : de la recherche au rapport client */
+    .journey{margin:18px 0 22px;padding:clamp(16px,3vw,24px);border:1px solid var(--line,#343344);border-radius:22px;background:var(--panel,#14141c)}
+    .journey-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin-bottom:18px}
+    .journey-kicker{display:flex;align-items:center;gap:7px;color:var(--muted,#a8a8b8);font-size:10px;font-weight:850;letter-spacing:1.4px;text-transform:uppercase}
+    .journey-kicker i{width:7px;height:7px;border-radius:50%;background:#9b8cff;display:inline-block}
+    .journey h2{margin:7px 0 5px;font-size:clamp(19px,3vw,25px);letter-spacing:-.5px}
+    .journey-sub{margin:0;color:var(--muted,#a8a8b8);font-size:13px;line-height:1.55;max-width:570px}
+    .journey-progress{flex:0 0 auto;min-width:82px;text-align:right;color:var(--muted,#a8a8b8);font-size:11px}
+    .journey-progress b{display:block;color:var(--text,#fff);font-size:21px;letter-spacing:-.5px}
+    .journey-track{height:4px;border-radius:99px;background:#77777726;overflow:hidden;margin:0 0 17px}
+    .journey-track span{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#8d7aff,#55c6a4);transition:width .2s ease}
+    .journey-steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+    .journey-step{display:flex;flex-direction:column;align-items:flex-start;min-width:0;padding:14px 12px 12px;border:1px solid var(--line,#343344);border-radius:16px;background:var(--surface,#101017)}
+    .journey-step-top{display:flex;align-items:center;justify-content:space-between;width:100%;gap:7px;margin-bottom:13px}
+    .journey-number{display:grid;place-items:center;width:34px;height:34px;border-radius:11px;background:#39345f;color:#ded8ff;font-weight:850;font-size:12px}
+    .journey-state{font-size:9px;line-height:1.3;text-align:right;color:var(--muted,#a8a8b8);font-weight:750}
+    .journey-state.done{color:#69d5b2}
+    .journey-step h3{font-size:14px;line-height:1.3;margin:0 0 7px}
+    .journey-step p{font-size:12px;line-height:1.5;color:var(--muted,#a8a8b8);margin:0 0 14px;flex:1}
+    .journey-action{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;min-height:39px;border:1px solid #8b7cff66;border-radius:11px;background:#7b6cff18;color:var(--text,#fff);font-size:11px;font-weight:800;padding:8px 9px;cursor:pointer;text-align:center}
+    .journey-action.primary{background:#7565f4;color:#fff;border-color:transparent}
+    .journey-action:focus-visible{outline:2px solid #b6adff;outline-offset:3px}
+    .journey-foot{margin:14px 0 0;color:var(--muted,#a8a8b8);font-size:11px;line-height:1.5}
+    @media(max-width:760px){.journey-steps{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(max-width:420px){.journey{border-radius:18px;padding:15px}.journey-steps{grid-template-columns:1fr}.journey-step{display:grid;grid-template-columns:38px minmax(0,1fr);column-gap:10px;align-items:start;padding:12px}.journey-step-top{grid-column:1;grid-row:1 / span 3;display:flex;flex-direction:column;align-items:center;margin:0}.journey-number{width:34px;height:34px}.journey-state{font-size:8px}.journey-step h3{grid-column:2;margin:1px 0 5px}.journey-step p{grid-column:2;margin:0 0 10px}.journey-action{grid-column:2;min-height:36px}.journey-head{gap:8px}.journey-progress{min-width:56px}.journey-progress b{font-size:18px}}
 </style>
 <style id="auditia-assistant-chat">
 /* Assistant conversationnel AuditIA — inspiration Solina, branché sur les données locales déjà chargées */
@@ -4756,6 +4782,8 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
       page.querySelectorAll('[data-run-site]').forEach(b=>b.addEventListener('click',()=>runSiteScan(b.dataset.runSite)));
       page.querySelectorAll('[data-nearby-load]').forEach(b=>b.addEventListener('click',loadNearbyBusinesses));
       page.querySelectorAll('[data-natural-search]').forEach(form=>form.addEventListener('submit',runNaturalLanguageSearch));
+      page.querySelectorAll('[data-focus-natural-search]').forEach(b=>b.addEventListener('click',()=>{const target=page.querySelector('[data-natural-search] textarea');if(target){target.scrollIntoView({behavior:'smooth',block:'center'});target.focus();}}));
+
       page.querySelectorAll('[data-nl-prompt]').forEach(b=>b.addEventListener('click',()=>{nlSearchQuery=b.dataset.nlPrompt||'';renderApp();const input=document.querySelector('[data-natural-search] textarea');if(input){input.focus();input.setSelectionRange(input.value.length,input.value.length);}}));
       page.querySelectorAll('[data-nl-audit]').forEach(b=>b.addEventListener('click',()=>createAuditFromNaturalResult(Number(b.dataset.nlAudit),b)));
 
@@ -4960,6 +4988,19 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
       query=query.replace(/\b(?:plus de|au moins)\s*\d+\s*avis\b/ig,'');
       query=query.replace(/\s+/g,' ').trim();
       return {query:query||text,type:matched&&matched.type,noWebsite,lowRating,minReviews:minReviews?Number(minReviews[1]):0,raw:text};
+    }
+
+    function auditJourneyHtml(){
+      const analyzed=appAudits.filter(a=>a.site||a.scan||a.status==='Analysé'||a.status==='Terminé');
+      const latest=analyzed.slice().sort((a,b)=>(new Date(b.updated_at||b.created_at||0).getTime()||0)-(new Date(a.updated_at||a.created_at||0).getTime()||0))[0];
+      const steps=[
+        {n:'01',title:'Trouver un commerce',desc:'Décris ton prospect en français : activité, ville et critères. Vérifie les résultats avant de choisir.',state:nlSearchResults.length?'Recherche effectuée':appClients.length?'Commerces enregistrés':'À commencer',done:!!(nlSearchResults.length||appClients.length),action:'Lancer une recherche',kind:'search'},
+        {n:'02',title:'Examiner sa visibilité',desc:'Ouvre un dossier et lance les contrôles disponibles sur la fiche Google, le site et les signaux publics.',state:analyzed.length?'Analyse disponible':appAudits.length?'Dossiers à analyser':'Après la recherche',done:analyzed.length>0,action:'Voir les dossiers',kind:'audits'},
+        {n:'03',title:'Prioriser les opportunités',desc:'Consulte les constats mesurés, les éléments à confirmer et les actions proposées par impact.',state:latest?'Dossier prêt à consulter':'Après l’analyse',done:!!latest,action:latest?'Voir les constats':'Ouvrir les dossiers',kind:latest?'latest':'audits'},
+        {n:'04',title:'Préparer le rapport client',desc:'Génère le PDF express ou complet avec synthèse, indicateurs, preuves disponibles et recommandations.',state:latest?'Export PDF disponible':'Après l’analyse',done:!!latest,action:'Accéder aux rapports',kind:'reports'}
+      ];
+      const done=steps.filter(x=>x.done).length;
+      return '<section class="journey" aria-labelledby="journey-title"><div class="journey-head"><div><div class="journey-kicker"><i></i>PARCOURS DE TRAVAIL</div><h2 id="journey-title">De la recherche au rapport client</h2><p class="journey-sub">Un chemin clair pour transformer une recherche commerciale en audit exploitable, sans présenter les données manquantes comme des défauts.</p></div><div class="journey-progress"><b>'+done+'/4</b>étapes disponibles</div></div><div class="journey-track" role="progressbar" aria-label="Étapes disponibles" aria-valuemin="0" aria-valuemax="4" aria-valuenow="'+done+'"><span style="width:'+(done/4*100)+'%"></span></div><div class="journey-steps">'+steps.map(x=>'<article class="journey-step"><div class="journey-step-top"><span class="journey-number">'+x.n+'</span><span class="journey-state'+(x.done?' done':'')+'">'+(x.done?'✓ ':'')+escHtml(x.state)+'</span></div><h3>'+escHtml(x.title)+'</h3><p>'+escHtml(x.desc)+'</p><button type="button" class="journey-action'+(x.n==='01'?' primary':'')+'" '+(x.kind==='search'?'data-focus-natural-search':'')+(x.kind==='audits'?' data-app-view="Audits"':'')+(x.kind==='latest'?' data-open-audit="'+escHtml(latest&&latest.id)+'"':'')+(x.kind==='reports'?' data-app-view="Rapports"':'')+'>'+escHtml(x.action)+' ↗</button></article>').join('')+'</div><p class="journey-foot">La progression indique les étapes pour lesquelles un dossier ou des résultats existent. Elle ne garantit pas que tous les contrôles ont pu être effectués.</p></section>';
     }
     function naturalLanguageSearchHtml(){
       const examples=['Restaurants à Narbonne sans site web','Plombiers dans l’Aude avec au moins 20 avis','Coiffeurs près de Carcassonne mal notés'];
@@ -6314,6 +6355,7 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
           '</section>'+
           homeResultsHtml()+
           naturalLanguageSearchHtml()+
+          auditJourneyHtml()+
           '<section class="hx-tiles" aria-label="Indicateurs">'+hxTile('store','blue',appClients.length,'Commerces','dans la base','Clients')+hxTile('doc','violet',appAudits.length,'Audits','enregistrés','Audits')+hxTile('clock','orange',hxTodo,'À analyser','à compléter','Audits')+hxTile('check','green',hxReady,'Analysés','prêts pour un rapport','Rapports')+'</section>'+
           (function(){if(!scoredAudits.length)return '';const per={};let verifs=0;scoredAudits.forEach(a=>{const c=appClients.find(x=>x.id===a.client_id);try{verifs+=visibilityAudit(a,c).items.length;}catch(e){}const t=new Date(a.updated_at||a.created_at||0).getTime()||0;(per[a.client_id]=per[a.client_id]||[]).push({t,s:Number(a.score)||0,a,c});});let acts=0,gained=0;Object.values(per).forEach(l=>{l.sort((x,y)=>x.t-y.t);const last=l[l.length-1];try{acts+=auditActions(last.a,last.c,visibilityAudit(last.a,last.c)).length;}catch(e){}if(l.length>1)gained+=Math.max(0,last.s-l[0].s);});return '<section class="hx-work" aria-label="Votre travail"><div><b>'+scoredAudits.length+'</b><span>audits réalisés</span></div><div><b>'+verifs+'</b><span>vérifications mesurées</span></div><div><b>'+acts+'</b><span>actions proposées</span></div><div><b class="up">+'+gained+'</b><span>points gagnés</span></div></section>';})()+
           '<button type="button" class="hx-cta" data-app-view="Audits"><span class="hx-cta-ico">'+HXI.search+'</span><span>Lancer un nouvel audit</span><span class="hx-go">'+HXI.chev+'</span></button>'+
