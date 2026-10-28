@@ -2685,6 +2685,31 @@ button { touch-action: manipulation; }
       .analyse-panel[data-ap-root] .ap-bar::after{animation:none}
       .analyse-panel[data-ap-root] .ap-bar{transition:none!important}
     }
+
+    /* Recherche en langage naturel — AuditIA */
+    .nl-search{margin:18px 0 22px;padding:clamp(18px,3vw,28px);border:1px solid #7B6CFF55;border-radius:24px;background:linear-gradient(145deg,#232749,#191C39 62%,#12142B);box-shadow:0 18px 44px #0A0B1A22}
+    .nl-search-head{display:flex;align-items:flex-start;gap:14px;margin-bottom:17px}
+    .nl-search-mark{display:grid;place-items:center;flex:0 0 44px;height:44px;border-radius:15px;background:#333863;color:#C9B6FF;font-size:22px}
+    .nl-search h2{margin:2px 0 6px;font-size:clamp(20px,3vw,27px);letter-spacing:-.7px}
+    .nl-search p{margin:0;color:var(--muted);font-size:13px;line-height:1.55}
+    .nl-search-form{display:grid;gap:10px}
+    .nl-search-form textarea{display:block;width:100%;min-height:112px;resize:vertical;border:1px solid #5A5F89;border-radius:16px;padding:15px;background:#12142B;color:#fff;font:inherit;font-size:15px;line-height:1.55;outline:none}
+    .nl-search-form textarea:focus{border-color:#9A8EFF;box-shadow:0 0 0 4px #7B6CFF22}
+    .nl-search-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .nl-search-submit{min-height:46px;padding:0 18px;border:0;border-radius:13px;background:linear-gradient(135deg,#7B6CFF,#5B5FEF);color:#fff;font-weight:800;cursor:pointer}
+    .nl-search-submit:disabled{opacity:.65;cursor:wait}
+    .nl-search-hint{font-size:11px;color:#9298BC}
+    .nl-prompts{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}
+    .nl-prompts button{border:1px solid #ffffff1b;background:#12142B;color:#DCD8F7;border-radius:999px;padding:8px 11px;font-size:12px;cursor:pointer}
+    .nl-status{margin-top:13px;border-radius:12px;padding:11px 13px;background:#12142B;color:#D7D3F4;font-size:13px;line-height:1.5}
+    .nl-status.error{background:#5a2c38;color:#ffc4cc}
+    .nl-results{display:grid;gap:9px;margin-top:14px}
+    .nl-results-top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;font-size:13px;color:#DCD8F7}
+    .nl-result-card{display:flex;align-items:center;gap:12px;padding:13px;border:1px solid #ffffff16;border-radius:15px;background:#12142B}
+    .nl-result-copy{flex:1;min-width:0}.nl-result-copy b{display:block;font-size:14px;overflow-wrap:anywhere}.nl-result-copy small{display:block;color:var(--muted);font-size:12px;margin-top:3px;overflow-wrap:anywhere}
+    .nl-result-copy .nl-tag{display:inline-block;margin-top:7px;padding:4px 7px;border-radius:7px;background:#333863;color:#C9B6FF;font-size:10px;font-weight:800}
+    .nl-result-card .app-btn{flex:0 0 auto}
+    @media(max-width:540px){.nl-search{border-radius:19px}.nl-search-head{gap:10px}.nl-search-mark{flex-basis:38px;height:38px}.nl-result-card{align-items:flex-start;flex-wrap:wrap}.nl-result-copy{flex-basis:calc(100% - 52px)}.nl-result-card .app-btn{margin-left:48px;width:calc(100% - 48px)}.nl-search-actions>*{width:100%}}
   </style>
 
 <style id="auditia-visibility-logos">
@@ -4730,6 +4755,10 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
       page.querySelectorAll('[data-run-scan]').forEach(b=>b.addEventListener('click',()=>runScan(b.dataset.runScan)));
       page.querySelectorAll('[data-run-site]').forEach(b=>b.addEventListener('click',()=>runSiteScan(b.dataset.runSite)));
       page.querySelectorAll('[data-nearby-load]').forEach(b=>b.addEventListener('click',loadNearbyBusinesses));
+      page.querySelectorAll('[data-natural-search]').forEach(form=>form.addEventListener('submit',runNaturalLanguageSearch));
+      page.querySelectorAll('[data-nl-prompt]').forEach(b=>b.addEventListener('click',()=>{nlSearchQuery=b.dataset.nlPrompt||'';renderApp();const input=document.querySelector('[data-natural-search] textarea');if(input){input.focus();input.setSelectionRange(input.value.length,input.value.length);}}));
+      page.querySelectorAll('[data-nl-audit]').forEach(b=>b.addEventListener('click',()=>createAuditFromNaturalResult(Number(b.dataset.nlAudit),b)));
+
       page.querySelectorAll('[data-nearby-audit]').forEach(b=>b.addEventListener('click',()=>createAuditFromNearby(Number(b.dataset.nearbyAudit),b)));
       page.querySelectorAll('[data-run-full]').forEach(b=>b.addEventListener('click',()=>runFullAudit(b.dataset.runFull)));
       page.querySelectorAll('[data-export-report]').forEach(b=>b.addEventListener('click',()=>exportReport(b.dataset.exportReport,b.dataset.mode)));
@@ -4895,6 +4924,87 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
       if(p.status==='CLOSED_PERMANENTLY'){score=0;reasons.splice(0,reasons.length,'établissement signalé fermé définitivement');}
       return {score:Math.min(100,score),reasons:reasons.slice(0,3),closed:p.status==='CLOSED_PERMANENTLY'};
     }
+
+    let nlSearchQuery='';
+    let nlSearchStatus='';
+    let nlSearchError=false;
+    let nlSearchBusy=false;
+    let nlSearchResults=[];
+    function parseNaturalLanguageTarget(raw){
+      const text=String(raw||'').trim();
+      const low=text.toLocaleLowerCase('fr-FR');
+      const rules=[
+        {re:/\b(coiffeur|coiffeurs|salon de coiffure|salons de coiffure)\b/i,type:'hair_salon'},
+        {re:/\b(plombier|plombiers|plomberie)\b/i,type:'plumber'},
+        {re:/\b(électricien|électriciens|electricien|electriciens)\b/i,type:'electrician'},
+        {re:/\b(restaurant|restaurants|restauration)\b/i,type:'restaurant'},
+        {re:/\b(boulangerie|boulangeries|boulanger|boulangers)\b/i,type:'bakery'},
+        {re:/\b(garage|garages|mécanicien|mécaniciens|mecanicien|mecaniciens)\b/i,type:'car_repair'},
+        {re:/\b(agence immobilière|agences immobilières|agent immobilier|agents immobiliers)\b/i,type:'real_estate_agency'},
+        {re:/\b(institut de beauté|instituts de beauté|esthéticienne|esthéticiennes)\b/i,type:'beauty_salon'},
+        {re:/\b(hôtel|hôtels|hotel|hotels)\b/i,type:'hotel'},
+        {re:/\b(fleuriste|fleuristes)\b/i,type:'florist'},
+        {re:/\b(pharmacie|pharmacies)\b/i,type:'pharmacy'},
+        {re:/\b(salle de sport|salles de sport|fitness)\b/i,type:'gym'},
+        {re:/\b(café|cafés|cafe|cafes)\b/i,type:'cafe'},
+        {re:/\b(avocat|avocats|cabinet d'avocats)\b/i,type:'lawyer'}
+      ];
+      const matched=rules.find(r=>r.re.test(low));
+      const noWebsite=/sans site|sans (?:un )?site web|n'ont pas de site|n’ont pas de site|pas de site web|site web absent/i.test(low);
+      const lowRating=/note(?: google)? (?:inférieure|sous|en dessous de) 4|moins de 4(?:[,.]0)?\s*(?:\/5|sur 5)?|mal notés|mal note[s]?/i.test(low);
+      const minReviews=low.match(/(?:plus de|au moins)\s*(\d+)\s*avis/i);
+      let query=text;
+      query=query.replace(/\b(avec|qui ont|ayant)\s+(?:un |une )?site web\b/ig,'');
+      query=query.replace(/\b(sans|qui n'ont pas de|qui n’ont pas de|pas de)\s+(?:un |de )?site(?: web)?\b/ig,'');
+      query=query.replace(/\b(note(?: google)? (?:inférieure|sous|en dessous de) 4|moins de 4(?:[,.]0)?\s*(?:\/5|sur 5)?|mal notés|mal note[s]?)\b/ig,'');
+      query=query.replace(/\b(?:plus de|au moins)\s*\d+\s*avis\b/ig,'');
+      query=query.replace(/\s+/g,' ').trim();
+      return {query:query||text,type:matched&&matched.type,noWebsite,lowRating,minReviews:minReviews?Number(minReviews[1]):0,raw:text};
+    }
+    function naturalLanguageSearchHtml(){
+      const examples=['Restaurants à Narbonne sans site web','Plombiers dans l’Aude avec au moins 20 avis','Coiffeurs près de Carcassonne mal notés'];
+      const results=nlSearchResults.map((p,i)=>'<article class="nl-result-card"><div class="nl-result-copy"><b>'+escHtml(p.name)+'</b><small>'+escHtml([p.category,p.address].filter(Boolean).join(' · '))+(p.rating!=null?' · ★ '+p.rating+' ('+(p.reviews||0)+' avis)':'')+'</small><span class="nl-tag">'+escHtml(p.website?'Site détecté':'Aucun site détecté')+' · '+escHtml(p.phone?'Téléphone disponible':'Téléphone non fourni')+'</span></div><button type="button" class="app-btn primary" data-nl-audit="'+i+'">Créer l’audit ↗</button></article>').join('');
+      return '<section class="nl-search" aria-labelledby="nl-title"><div class="nl-search-head"><span class="nl-search-mark" aria-hidden="true">⌕</span><div><div class="eyebrow">RECHERCHE INTELLIGENTE</div><h2 id="nl-title">Décrivez les commerces que vous cherchez</h2><p>Écrivez comme vous parleriez à un collègue. AuditIA lance une recherche Google Places, applique les critères simples reconnus et vous laisse choisir les commerces à auditer.</p></div></div><form class="nl-search-form" data-natural-search><textarea name="query" maxlength="500" required placeholder="Ex. : restaurants indépendants à Narbonne sans site web, ou plombiers dans l’Aude avec au moins 20 avis">'+escHtml(nlSearchQuery)+'</textarea><div class="nl-search-actions"><button class="nl-search-submit" type="submit" '+(nlSearchBusy?'disabled':'')+'>'+(nlSearchBusy?'Recherche en cours…':'⌕ Rechercher les commerces')+'</button><span class="nl-search-hint">Utilise la clé Google Places configurée dans Réglages. Aucun résultat n’est inventé.</span></div></form><div class="nl-prompts">'+examples.map(x=>'<button type="button" data-nl-prompt="'+escHtml(x)+'">'+escHtml(x)+'</button>').join('')+'</div>'+(nlSearchStatus?'<div class="nl-status'+(nlSearchError?' error':'')+'" role="status">'+escHtml(nlSearchStatus)+'</div>':'')+(nlSearchResults.length?'<div class="nl-results"><div class="nl-results-top"><b>'+nlSearchResults.length+' résultat'+(nlSearchResults.length>1?'s':'')+' affiché'+(nlSearchResults.length>1?'s':'')+'</b><span>Source : Google Places · critères appliqués quand détectables</span></div>'+results+'</div>':'')+'</section>';
+    }
+    async function runNaturalLanguageSearch(event){
+      event.preventDefault();
+      const form=event.currentTarget;
+      const input=form.querySelector('[name="query"]');
+      nlSearchQuery=String(input&&input.value||'').trim();
+      if(!nlSearchQuery)return;
+      const key=placesKey();
+      if(!key){nlSearchError=true;nlSearchStatus='Configure et teste ta clé Google Places dans Réglages avant de lancer la recherche.';renderApp();return;}
+      const parsed=parseNaturalLanguageTarget(nlSearchQuery);
+      nlSearchBusy=true;nlSearchError=false;nlSearchStatus='Recherche des établissements correspondant à ta demande…';nlSearchResults=[];renderApp();
+      try{
+        const body={textQuery:parsed.query,languageCode:'fr',regionCode:'FR',maxResultCount:20};
+        if(parsed.type)body.includedType=parsed.type;
+        const response=await withTimeout(fetch('https://places.googleapis.com/v1/places:searchText',{
+          method:'POST',
+          headers:{'Content-Type':'application/json','X-Goog-Api-Key':key,'X-Goog-FieldMask':'places.id,places.displayName,places.formattedAddress,places.addressComponents,places.primaryType,places.types,places.nationalPhoneNumber,places.websiteUri,places.rating,places.userRatingCount,places.businessStatus,places.regularOpeningHours'},
+          body:JSON.stringify(body)
+        }),18000);
+        if(!response.ok){const d=await response.json().catch(()=>null);throw new Error(response.status===403?'Google refuse la recherche : vérifie Places API (New) et les restrictions de la clé.':(d&&d.error&&d.error.message)||('Erreur Google Places HTTP '+response.status));}
+        const data=await response.json();
+        let rows=(data.places||[]).map(normalizePlace).filter(p=>p.placeId&&p.name);
+        if(parsed.noWebsite)rows=rows.filter(p=>!p.website);
+        if(parsed.lowRating)rows=rows.filter(p=>p.rating!=null&&p.rating<4);
+        if(parsed.minReviews)rows=rows.filter(p=>Number(p.reviews||0)>=parsed.minReviews);
+        nlSearchResults=rows;
+        nearbyBusinesses=rows;
+        nlSearchStatus=rows.length?'Recherche terminée. Vérifie les fiches avant de créer un audit. '+((parsed.noWebsite||parsed.lowRating||parsed.minReviews)?'Les filtres simples reconnus ont été appliqués aux données disponibles.':''): 'Aucun résultat après application des critères. Essaie une formulation plus courte ou une autre ville.';
+        keyStoreSet('places',true,key);recomputeKeyAlerts();
+      }catch(error){nlSearchError=true;nlSearchStatus=(error&&error.message)||'La recherche a échoué. Réessaie.';}
+      finally{nlSearchBusy=false;renderApp();}
+    }
+    async function createAuditFromNaturalResult(index,button){
+      const p=nlSearchResults[index];if(!p)return;
+      const nearbyIndex=nearbyBusinesses.findIndex(x=>x.placeId===p.placeId);
+      if(nearbyIndex>=0){await createAuditFromNearby(nearbyIndex,button);return;}
+      nearbyBusinesses=nlSearchResults;
+      await createAuditFromNearby(index,button);
+    }
+
     function nearbyBannerHtml(){
       const rows=nearbyBusinesses.map((p,i)=>{const opp=nearbyOpportunity(p);return '<article class="nearby-card"><span class="nearby-card-icon" aria-hidden="true">'+(p.category==='Restaurant'?'🍽️':p.category==='Beauté & bien-être'?'✂️':p.category==='Automobile'?'🚗':p.category==='Artisan'?'🛠️':p.category==='Hébergement'?'🏨':'🏪')+'</span><div class="nearby-card-main"><b>'+escHtml(p.name||'Commerce')+'</b><small>'+escHtml([p.category,p.address].filter(Boolean).join(' · '))+(p.rating!=null?' · ★ '+p.rating+' ('+(p.reviews||0)+' avis)':'')+'</small><span class="nearby-priority">'+(opp.closed?'À vérifier · fermé selon Google':opp.score>=45?'Priorité d’audit élevée':opp.score>=25?'Priorité d’audit moyenne':'Priorité d’audit à confirmer')+' · '+opp.score+'/100</span><small class="nearby-evidence">'+escHtml(opp.reasons.join(' · ')||'Peu de signaux publics manquants détectés — audit complet nécessaire.')+'</small></div><button type="button" class="app-btn primary nearby-audit-btn" data-nearby-audit="'+i+'">Analyser ↗</button></article>';}).join('');
       return '<section class="nearby-banner"><div class="nearby-banner-head"><div><div class="eyebrow">PROSPECTION LOCALE</div><h2>Les commerces à auditer en priorité</h2><p>Classement indicatif à partir des données publiques Google Places : site, horaires, note et volume d’avis. Ce score signale des points à vérifier, pas un chiffre d’affaires ni une preuve de manque de clients. Votre position n’est utilisée qu’après autorisation.</p></div><button type="button" class="app-btn primary nearby-load" data-nearby-load '+(nearbyBusy?'disabled':'')+'>'+(nearbyBusy?'Recherche en cours…':'⌖ Trouver les commerces autour de moi')+'</button></div>'+(nearbyStatus?'<div class="nearby-status" role="status">'+escHtml(nearbyStatus)+'</div>':'')+(rows?'<div class="nearby-list">'+rows+'</div>':'')+'</section>';
@@ -6203,6 +6313,7 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
             '<img class="hx-robot" src="./home-robot.png" alt="" aria-hidden="true">'+
           '</section>'+
           homeResultsHtml()+
+          naturalLanguageSearchHtml()+
           '<section class="hx-tiles" aria-label="Indicateurs">'+hxTile('store','blue',appClients.length,'Commerces','dans la base','Clients')+hxTile('doc','violet',appAudits.length,'Audits','enregistrés','Audits')+hxTile('clock','orange',hxTodo,'À analyser','à compléter','Audits')+hxTile('check','green',hxReady,'Analysés','prêts pour un rapport','Rapports')+'</section>'+
           (function(){if(!scoredAudits.length)return '';const per={};let verifs=0;scoredAudits.forEach(a=>{const c=appClients.find(x=>x.id===a.client_id);try{verifs+=visibilityAudit(a,c).items.length;}catch(e){}const t=new Date(a.updated_at||a.created_at||0).getTime()||0;(per[a.client_id]=per[a.client_id]||[]).push({t,s:Number(a.score)||0,a,c});});let acts=0,gained=0;Object.values(per).forEach(l=>{l.sort((x,y)=>x.t-y.t);const last=l[l.length-1];try{acts+=auditActions(last.a,last.c,visibilityAudit(last.a,last.c)).length;}catch(e){}if(l.length>1)gained+=Math.max(0,last.s-l[0].s);});return '<section class="hx-work" aria-label="Votre travail"><div><b>'+scoredAudits.length+'</b><span>audits réalisés</span></div><div><b>'+verifs+'</b><span>vérifications mesurées</span></div><div><b>'+acts+'</b><span>actions proposées</span></div><div><b class="up">+'+gained+'</b><span>points gagnés</span></div></section>';})()+
           '<button type="button" class="hx-cta" data-app-view="Audits"><span class="hx-cta-ico">'+HXI.search+'</span><span>Lancer un nouvel audit</span><span class="hx-go">'+HXI.chev+'</span></button>'+
