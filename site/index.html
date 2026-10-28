@@ -2605,6 +2605,23 @@ button { touch-action: manipulation; }
     .journey-foot{margin:14px 0 0;color:var(--muted,#a8a8b8);font-size:11px;line-height:1.5}
     @media(max-width:760px){.journey-steps{grid-template-columns:repeat(2,minmax(0,1fr))}}
     @media(max-width:420px){.journey{border-radius:18px;padding:15px}.journey-steps{grid-template-columns:1fr}.journey-step{display:grid;grid-template-columns:38px minmax(0,1fr);column-gap:10px;align-items:start;padding:12px}.journey-step-top{grid-column:1;grid-row:1 / span 3;display:flex;flex-direction:column;align-items:center;margin:0}.journey-number{width:34px;height:34px}.journey-state{font-size:8px}.journey-step h3{grid-column:2;margin:1px 0 5px}.journey-step p{grid-column:2;margin:0 0 10px}.journey-action{grid-column:2;min-height:36px}.journey-head{gap:8px}.journey-progress{min-width:56px}.journey-progress b{font-size:18px}}
+
+    /* Transparence des preuves dans le rapport écran */
+    .r-evidence{border:1px solid var(--line,#343344);border-radius:16px;padding:15px;margin:14px 0;background:var(--panel,#14141c)}
+    .r-evidence h2{font-size:15px;margin:0 0 6px}
+    .r-evidence-intro{font-size:12px;line-height:1.55;color:var(--muted,#a8a8b8);margin:0 0 12px}
+    .r-evidence-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+    .r-evidence-item{min-width:0;border:1px solid var(--line,#343344);border-radius:11px;padding:10px;background:var(--surface,#101017)}
+    .r-evidence-item b{display:block;font-size:12px;margin-bottom:4px}
+    .r-evidence-item span{display:block;font-size:11px;line-height:1.45;color:var(--muted,#a8a8b8);overflow-wrap:anywhere}
+    .r-evidence-dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px;background:#34d399}
+    .r-evidence-dot.partial{background:#fbbf24}.r-evidence-dot.none{background:#9b96aa}
+    .r-evidence-unmeasured{margin-top:12px;padding-top:11px;border-top:1px solid var(--line,#343344)}
+    .r-evidence-unmeasured summary{font-size:12px;font-weight:750;cursor:pointer}
+    .r-evidence-unmeasured ul{margin:9px 0 0;padding-left:18px}
+    .r-evidence-unmeasured li{font-size:11px;line-height:1.5;color:var(--muted,#a8a8b8);margin:6px 0}
+    .r-evidence-foot{font-size:10px;line-height:1.5;color:var(--muted,#a8a8b8);margin:12px 0 0}
+    @media(max-width:520px){.r-evidence{padding:12px}.r-evidence-grid{grid-template-columns:1fr}}
 </style>
 <style id="auditia-assistant-chat">
 /* Assistant conversationnel AuditIA — inspiration Solina, branché sur les données locales déjà chargées */
@@ -5969,6 +5986,21 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
         +'<circle cx="'+cx+'" cy="'+cx+'" r="'+r+'" fill="none" stroke="'+col+'" stroke-width="'+stroke+'" stroke-linecap="round" stroke-dasharray="'+circ.toFixed(2)+'" stroke-dashoffset="'+off.toFixed(2)+'" transform="rotate(-90 '+cx+' '+cx+')"></circle>'
         +'<text x="'+cx+'" y="'+cx+'" text-anchor="middle" dominant-baseline="central" font-family="-apple-system,system-ui,sans-serif" font-size="'+(size*0.32).toFixed(0)+'" font-weight="800" fill="#1c1830">'+(v==null?'—':val)+'</text></svg>';
     }
+
+    function reportEvidenceHtml(a,c){
+      const d=(c&&c.details)||{}, scan=a&&a.scan, site=a&&a.site;
+      const sources=[];
+      const hasGoogle=!!(d.place_id||d.address||d.rating!=null||d.reviews!=null);
+      sources.push({title:'Fiche commerce',state:hasGoogle?'complete':'partial',detail:hasGoogle?'Données de fiche présentes : identité, adresse, note ou autres champs disponibles.':'Données Google incomplètes : certains champs ne sont pas disponibles dans le dossier.'});
+      sources.push({title:'Site web',state:site&&site.pageRead?'complete':c&&c.website?'partial':'none',detail:site&&site.pageRead?'Page lue et signaux du site extraits.':c&&c.website?'Adresse renseignée, mais lecture du contenu non confirmée.':'Aucune adresse de site web renseignée.'});
+      sources.push({title:'Google Lighthouse mobile',state:scan&&scan.scores?'complete':'none',detail:scan&&scan.scores?'Mesures de performance, accessibilité, bonnes pratiques et SEO disponibles selon les scores renvoyés.':'Aucune mesure PageSpeed enregistrée dans cet audit.'});
+      sources.push({title:'Classement sur les mots-clés',state:site&&site.rankings&&site.rankings.some(x=>!x.error)?'complete':'none',detail:site&&site.rankings&&site.rankings.some(x=>!x.error)?'Résultats de recherche explorés pour les mots-clés listés.':'Aucun résultat exploitable de classement dans ce dossier.'});
+      sources.push({title:'Concurrents locaux',state:site&&site.competitors&&site.competitors.list&&site.competitors.list.length?'complete':'none',detail:site&&site.competitors&&site.competitors.list&&site.competitors.list.length?'Échantillon de concurrents obtenu. Il ne représente pas nécessairement tout le marché.':'Aucun échantillon concurrentiel enregistré.'});
+      const badge=state=>state==='complete'?'Données présentes':state==='partial'?'Partiel':'Non mesuré';
+      const um=typeof auditUnmeasured==='function'?auditUnmeasured(a,c).filter(x=>x.n!==0):[];
+      const count=sources.filter(x=>x.state==='complete').length;
+      return '<section class="r-evidence" aria-labelledby="r-evidence-title"><h2 id="r-evidence-title">Sources et fiabilité de l’analyse</h2><p class="r-evidence-intro">'+count+' source'+(count>1?'s':'')+' avec données présentes sur '+sources.length+'. Les indicateurs ci-dessous décrivent le périmètre disponible, pas une garantie d’exhaustivité.</p><div class="r-evidence-grid">'+sources.map(x=>'<div class="r-evidence-item"><b><i class="r-evidence-dot '+(x.state==='partial'?'partial':x.state==='none'?'none':'')+'"></i>'+escHtml(x.title)+'</b><span><strong>'+badge(x.state)+'.</strong> '+escHtml(x.detail)+'</span></div>').join('')+'</div>'+(um.length?'<details class="r-evidence-unmeasured"><summary>'+um.length+' contrôle'+(um.length>1?'s':'')+' non mesuré'+(um.length>1?'s':'')+' ou incomplet'+(um.length>1?'s':'')+'</summary><ul>'+um.map(x=>'<li><b>'+escHtml(x.label)+':</b> '+escHtml(x.why)+'.</li>').join('')+'</ul></details>':'')+'<p class="r-evidence-foot">Important : « non mesuré » ne signifie pas « absent ». Les constats automatiques sont des pistes à vérifier avec le commerçant avant de les présenter comme des faits établis.</p></section>';
+    }
     function reportHtml(a,c){
       const d=(c&&c.details)||{}; const s=a.scan; const st={...defaultSettings(),...(appSettings||{})};
       const list=Array.isArray(a.checklist)?a.checklist:[]; const done=list.filter(x=>x.done).length;
@@ -5987,6 +6019,7 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
       return '<div class="r-head"><div class="r-brand"><img src="'+escHtml(logo)+'" alt=""><div><b>'+escHtml(st.app_name||'AuditIA')+'</b><span>'+escHtml(st.company_name||'AffiAds')+'</span></div></div><div class="r-meta"><b>Rapport de visibilité numérique</b><span>'+escHtml(new Date(a.updated_at||Date.now()).toLocaleDateString('fr-FR'))+'</span></div></div>'
         +'<h1 class="r-client">'+escHtml(c?.name||'Commerce')+'</h1><p class="r-sub">'+escHtml([c?.city,c?.category||d.category].filter(Boolean).join(' · '))+'</p>'
         +'<div class="r-verdict"><div class="r-verdict-score"><div class="r-ring-wrap">'+rSvgRing(idx,80,9)+'</div><small>visibilité</small></div><div class="r-verdict-txt"><b>Note de visibilité : '+idx+'/100 <span class="r-vis-label r-vis-'+visibilityLabel(idx).c+'">'+visibilityLabel(idx).t+'</span></b><p>'+escHtml(visibilityVerdict(idx))+'</p><span class="r-verdict-meta">Analyse automatique du '+escHtml(new Date(a.updated_at||Date.now()).toLocaleDateString('fr-FR'))+(s?' · performance mesurée par Google':'')+(a.site?' · site lu automatiquement':'')+'</span></div></div>'
+        +reportEvidenceHtml(a,c)
         +'<div class="r-axes"><div class="r-axis"><span>SEO · Google</span><b style="color:'+axisCol(diag.seo.score)+'">'+diag.seo.score+'/100</b></div><div class="r-axis"><span>GEO · IA génératives</span><b style="color:'+axisCol(diag.geo.score)+'">'+diag.geo.score+'/100</b></div></div>'
         +pillarSection('SEO — être trouvé sur Google','Quand un client cherche votre activité près de chez lui, apparaissez-vous ?',diag.seo)
         +pillarSection('GEO — être cité par les IA','ChatGPT, Gemini et Perplexity recommandent de plus en plus de commerces. GEO, c’est être la réponse que l’IA donne.',diag.geo)
