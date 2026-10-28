@@ -5741,23 +5741,35 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
           const st={key,label,status:'active'}; srcSteps.push(st); fullAuditState.steps.push(st);
           return (async()=>{
             let v=null;
-            try{ v=await withTimeout(promise,ms); if(onOk&&v!=null) onOk(v); st.status='done'; }
-            catch(e){ st.status='limited'; if(issue) issues.push(issue); v=null; }
+            try{
+              v=await withTimeout(promise,ms);
+              if(v==null){
+                st.status='limited';
+                if(issue) issues.push(issue);
+              }else{
+                if(onOk) onOk(v);
+                st.status='done';
+              }
+            }catch(e){
+              st.status='limited';
+              if(issue) issues.push(issue);
+              v=null;
+            }
             advance(); return v;
           })();
         };
         tickProgress();
         const [html,web,sir,photos,domain,shot,cp,speed,rk,gf]=await Promise.all([
           hasWeb?track('site','Lecture du site','lecture du site impossible', readSiteHtml(site), 20000):Promise.resolve(null),
-          track('presence','Réseaux et annuaires','', findWebPresence(c), 35000),
-          track('fiche','Informations légales (SIRENE)','', fetchSirene(c), 15000),
-          track('fiche','Photos de la fiche Google','', fetchPlacePhotos((c&&c.details&&c.details.place_id)||''), 15000),
-          hasWeb?track('fiche','Ancienneté du domaine','', fetchDomainDate(site), 12000):Promise.resolve(null),
-          hasWeb?track('site','Capture du site','', fetchScreenshot(site), 20000):Promise.resolve(null),
-          track('rivals','Concurrents proches','', fetchCompetitors(c), 25000, value=>{ noteLiveRivals(value.list); setAuditFact('Concurrents locaux', value.total!=null?value.total+' commerces':'Résultats reçus', value.selfRank?'N°'+value.selfRank+' par nombre d’avis, pas le rang Google':'Comparaison du volume d’avis'); }),
+          track('presence','Réseaux et annuaires','présence web indisponible', findWebPresence(c), 35000),
+          track('fiche','Informations légales (SIRENE)','données légales indisponibles', fetchSirene(c), 15000),
+          track('fiche','Photos de la fiche Google','photos Google indisponibles', fetchPlacePhotos((c&&c.details&&c.details.place_id)||''), 15000),
+          hasWeb?track('fiche','Ancienneté du domaine','date de création du domaine indisponible', fetchDomainDate(site), 12000):Promise.resolve(null),
+          hasWeb?track('site','Capture du site','capture du site indisponible', fetchScreenshot(site), 20000):Promise.resolve(null),
+          track('rivals','Concurrents proches','comparaison des concurrents indisponible', fetchCompetitors(c), 25000, value=>{ noteLiveRivals(value.list); setAuditFact('Concurrents locaux', value.total!=null?value.total+' commerces':'Résultats reçus', value.selfRank?'N°'+value.selfRank+' par nombre d’avis, pas le rang Google':'Comparaison du volume d’avis'); }),
           hasWeb?track('perf','Performance mobile (PageSpeed)','performance indisponible', fetchPagespeed(site), 60000, value=>{ scan=value; setAuditFact('Performance mobile', value.scores&&value.scores.performance!=null?value.scores.performance+'/100':'Mesurée','Google PageSpeed Insights · Lighthouse'); }):Promise.resolve(null),
-          track('keywords','Mots-clés recherchés','', checkRankings(c), 45000),
-          hasWeb?track('site','Fichiers lus par les IA (robots.txt, llms.txt)','', fetchGeoFiles(site), 20000):Promise.resolve(null)
+          track('keywords','Mots-clés recherchés','classement des mots-clés indisponible', checkRankings(c), 45000),
+          hasWeb?track('site','Fichiers lus par les IA (robots.txt, llms.txt)','fichiers techniques GEO indisponibles', fetchGeoFiles(site), 20000):Promise.resolve(null)
         ]);
         if(html){ siteRes=analyzeSite(html,site); siteRes.hasWebsite=true; siteRes.pageRead=true; siteRes.geo=Object.assign({},geoFromHtml(html),gf||{}); noteLiveSite(siteRes.finalUrl||site); setAuditFact('Site web','Page lue',(siteRes.finalUrl||site)+' · '+((siteRes.socials||[]).length)+' réseaux sur la page'); }
         else if(hasWeb){ siteRes={socials:[],directories:[],hasWebsite:true,pageRead:false,analyzedAt:new Date().toISOString(),finalUrl:site}; setAuditFact('Site web','Page non lue','Les critères de la page ne sont pas notés'); }
