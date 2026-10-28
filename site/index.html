@@ -67,7 +67,33 @@
     ]
   }
   </script>
+    
+    <style id="auditia-insights-v1">
+    .ai-insights{position:relative;overflow:hidden;border-color:rgba(139,108,255,.34)!important;background:radial-gradient(ellipse at 100% 0,rgba(123,108,255,.14),transparent 45%),linear-gradient(145deg,#12142B,#0A0B1A)!important}
+    .ai-insights-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px}
+    .ai-insights-head h3{margin:5px 0 0;font-size:clamp(19px,3vw,23px);letter-spacing:-.5px}
+    .ai-evidence-chip{flex:0 0 auto;border:1px solid rgba(141,227,187,.25);background:rgba(39,79,68,.25);color:#8de3bb;border-radius:999px;padding:6px 9px;font-size:10px;font-weight:800}
+    .ai-chart-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+    .ai-chart-card{min-width:0;border:1px solid rgba(255,255,255,.09);border-radius:16px;padding:15px;background:rgba(255,255,255,.025)}
+    .ai-chart-card h4{margin:0;font-size:14px;letter-spacing:-.2px}.ai-chart-card>p{margin:5px 0 16px;color:#ABB0CC;font-size:11px;line-height:1.45}
+    .ai-chart-row{margin:0 0 14px}.ai-chart-row:last-child{margin-bottom:2px}
+    .ai-chart-label{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:7px;font-size:12px;color:#DEE0F2}
+    .ai-chart-label span{min-width:0;overflow-wrap:anywhere}.ai-chart-label b{font-size:14px;color:#fff;font-variant-numeric:tabular-nums}
+    .ai-chart-track,.ai-coverage-track{height:9px;overflow:hidden;background:rgba(255,255,255,.09);border-radius:999px}
+    .ai-chart-track i,.ai-coverage-track i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#6a46ee,#B79CFF);transform-origin:left center;animation:aiChartIn .65s ease both}
+    .ai-chart-track i.mint{background:linear-gradient(90deg,#4F7BFF,#5ee6b8)}
+    .ai-chart-empty{display:flex;flex-direction:column;justify-content:center;min-height:150px}.ai-chart-empty>p{margin-bottom:0}
+    .ai-coverage{display:grid;grid-template-columns:auto minmax(40px,1fr) auto;gap:13px;align-items:center;margin-top:14px;padding:14px;border:1px solid rgba(255,255,255,.08);border-radius:14px;background:rgba(255,255,255,.025)}
+    .ai-coverage>div:first-child b,.ai-coverage>div:first-child span{display:block}.ai-coverage>div:first-child b{font-size:19px;font-variant-numeric:tabular-nums}.ai-coverage>div:first-child span{font-size:10px;color:#ABB0CC}
+    .ai-coverage-track i{background:linear-gradient(90deg,#4F7BFF,#5ee6b8)}.ai-coverage>strong{font-size:14px;font-variant-numeric:tabular-nums}
+    .ai-chart-note{margin:12px 0 0!important;color:#ABB0CC!important;font-size:10.5px!important;line-height:1.55!important}
+    @keyframes aiChartIn{from{transform:scaleX(.25);opacity:.55}to{transform:scaleX(1);opacity:1}}
+    @media(max-width:600px){.ai-chart-grid{grid-template-columns:1fr}.ai-insights-head{align-items:flex-start}.ai-evidence-chip{font-size:9px;padding:5px 7px}.ai-chart-card{padding:13px}.ai-coverage{gap:9px;padding:12px}}
+    @media(prefers-reduced-motion:reduce){.ai-chart-track i,.ai-coverage-track i{animation:none}}
+  </style>
+
   <style>
+
     :root{color-scheme:dark;--bg:#12142B;--panel:#191C39;--panel2:#232749;--text:#f8f6ff;--muted:#ABB0CC;--purple:#7B6CFF;--orange:#ffad72;--line:#333863}
     *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(ellipse at 85% 0%,#333863 0,transparent 35%),radial-gradient(ellipse at 0% 45%,#232749 0,transparent 35%),var(--bg);color:var(--text);font:16px/1.55 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
     a{color:inherit}.wrap{width:min(1120px,100% - 40px);margin:auto}.top{height:78px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #ffffff12}.brand{display:flex;align-items:center;gap:12px;text-decoration:none}.brand img{width:42px;height:42px}.brand strong{display:block;font-size:18px;letter-spacing:-.5px}.brand small{display:block;color:var(--muted);font-size:11px;letter-spacing:1px;text-transform:uppercase}.toplink{font-size:13px;text-decoration:none;color:var(--muted)}
@@ -4453,7 +4479,9 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
 .hx-mock-hero{display:flex;align-items:center;gap:16px}.hx-mock-hero .hx-mock-score{margin:0;flex:none;width:88px;height:88px}.hx-mock-hero h4{margin-top:0}
 .hx-lex{margin:14px 0;border:1px solid #232749;border-radius:18px;background:linear-gradient(180deg,#191C39,#12142B);padding:0 16px}.hx-lex summary{list-style:none;cursor:pointer;display:flex;flex-direction:column;gap:4px;padding:16px 0;color:#F3F4FF}.hx-lex summary::-webkit-details-marker{display:none}.hx-lex-hint{font-size:13px;color:#ABB0CC}.hx-lex dl{margin:0 0 12px}.hx-lex-item{padding:10px 0;border-top:1px solid #232749}.hx-lex dt{font-weight:700;font-size:14px;color:#F3F4FF}.hx-lex dd{margin:4px 0 0;font-size:13px;line-height:1.5;color:#ABB0CC}
 </style>
-</head>
+  
+
+  </head>
 <body>
   <div class="status-safe" aria-hidden="true"></div>
   <header class="wrap top">
@@ -5813,6 +5841,32 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
       const last=(a.scan&&a.scan.analyzedAt)||(a.site&&a.site.analyzedAt)||null;
       return '<section class="app-panel analyse-panel"><div class="eyebrow">ANALYSE AUTOMATIQUE</div><h3 style="margin:4px 0 6px">Analyse complète du commerce</h3><p class="app-muted" style="margin:0 0 12px">'+sub+'</p><ol class="audit-plan"><li>Fiche, site et réseaux</li><li>Présence web et informations légales</li><li>Performance, concurrents, mots-clés</li><li>Score calculé seulement sur les données reçues</li></ol><button class="app-btn primary ap-cta" data-run-full="'+a.id+'">'+(analyzed?'Relancer l’analyse':'Lancer l’analyse')+'</button>'+(last?'<p class="ap-last">Dernière analyse : '+escHtml(new Date(last).toLocaleString('fr-FR'))+'</p>':'')+'</section>';
     }
+
+    /* AuditIA Insights v1 — graphiques sur données réellement disponibles uniquement. */
+    function auditInsightsChartHtml(a,c){
+      if(!a || !(a.site || a.scan || auditHasAnalysis(a))) return '';
+      const diag=visibilityAudit(a,c);
+      const esc=v=>escHtml(String(v==null?'':v));
+      const scoreRows=[
+        {label:'SEO · Google',value:diag.seo&&diag.seo.score,color:'violet'},
+        {label:'GEO · IA',value:diag.geo&&diag.geo.score,color:'mint'}
+      ].filter(x=>x.value!==null&&x.value!==undefined&&Number.isFinite(Number(x.value)));
+      const l=a.scan&&a.scan.scores||{};
+      const lighthouse=[
+        {label:'Performance',value:l.performance},{label:'Accessibilité',value:l.accessibility},
+        {label:'Bonnes pratiques',value:l.bestPractices},{label:'SEO technique',value:l.seo}
+      ].filter(x=>x.value!==null&&x.value!==undefined&&Number.isFinite(Number(x.value)));
+      const measured=(diag.items||[]).filter(x=>x.measured).length;
+      const total=(diag.items||[]).length;
+      const coverage=total?Math.round(measured/total*100):0;
+      const bar=x=>'<div class="ai-chart-row"><div class="ai-chart-label"><span>'+esc(x.label)+'</span><b>'+esc(x.value)+'</b></div><div class="ai-chart-track"><i class="'+(x.color||'')+'" style="width:'+Math.max(0,Math.min(100,Number(x.value)||0))+'%"></i></div></div>';
+      return '<section class="app-panel ai-insights"><div class="ai-insights-head"><div><div class="eyebrow">LECTURE VISUELLE</div><h3>Vue d’ensemble de l’analyse</h3></div><span class="ai-evidence-chip">Données du dossier</span></div>'+
+        '<div class="ai-chart-grid"><article class="ai-chart-card"><h4>Axes de visibilité</h4><p>Scores calculés sur les contrôles mesurés.</p>'+(scoreRows.length?scoreRows.map(bar).join(''):'<div class="audit-insight-empty">Scores indisponibles : données insuffisantes.</div>')+'</article>'+
+        (lighthouse.length?'<article class="ai-chart-card"><h4>Performance du site</h4><p>Mesures Google Lighthouse · mobile.</p>'+lighthouse.map(bar).join('')+'</article>':'<article class="ai-chart-card ai-chart-empty"><h4>Performance du site</h4><p>Pas encore de résultat Lighthouse sauvegardé. Relance l’analyse pour mesurer le site.</p></article>')+'</div>'+
+        '<div class="ai-coverage"><div><b>'+measured+' / '+total+'</b><span>contrôles mesurés</span></div><div class="ai-coverage-track"><i style="width:'+coverage+'%"></i></div><strong>'+coverage+'%</strong></div>'+
+        '<p class="ai-chart-note">Un contrôle non mesuré est exclu du diagnostic. Les scores ne sont pas un rang Google Maps. Les graphes reflètent les données conservées pour cet audit.</p></section>';
+    }
+
     function scanPanelHtml(a,c){
       const site=String((c&&c.website)||'').trim(); const s=a.scan;
       const head='<div class="scan-head"><div><div class="eyebrow">PERFORMANCE DU SITE</div><h3 style="margin:4px 0 0">Google PageSpeed · Lighthouse mobile</h3></div></div>';
@@ -6592,7 +6646,7 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
         const c=appClients.find(x=>x.id===a.client_id);
         const list=Array.isArray(a.checklist)?a.checklist:[];
         const analyzed=!!(a.site||a.scan||a.status==='Analysé');
-        const diagBlocks=analyzed?(visibilitySummaryHtml(a,c)+auditEvolutionHtml(a,c)+dxWrap('d-actions',auditActionsHtml(a,c))+identityHtml(a,c)+'<!--AP-->'+ficheCompareHtml(c)+dxWrap('d-fiche',clientInfoHtml(c))+siteShotHtml(a)+dxWrap('d-perf',scanPanelHtml(a,c))+dxWrap('d-social',socialPresenceHtml(a))+dxWrap('d-rank',rankingsHtml(a))+dxWrap('d-comp',competitorsHtml(a,c))+targetingPanelHtml(a,c)+(improvementHtml(a,c)?'<details class="dx-more set-anchor" id="d-imp"><summary>Recommandations détaillées (pourquoi, comment)</summary>'+improvementHtml(a,c)+'</details>':'')+'<details class="cd-edit" style="margin-top:14px"><summary>Notes personnelles (facultatif)</summary><form class="app-form" data-save-notes style="padding:0 16px 16px"><label>Notes internes<textarea name="notes" placeholder="Remarques pour toi — n’apparaissent dans le rapport que si tu les remplis.">'+escHtml(a.notes||'')+'</textarea></label><button class="app-btn primary" type="submit">Enregistrer les notes</button></form></details><div class="detail-actions" style="margin-top:16px;flex-wrap:wrap"><button class="app-btn" data-export-report="'+a.id+'" data-mode="simple">📄 Rapport express (1 page · gratuit)</button><button class="app-btn primary" data-export-report="'+a.id+'" data-mode="full">📑 Rapport complet (PDF)</button><button class="app-btn" data-delete-audit="'+a.id+'">Supprimer cet audit</button></div><p class="app-muted" style="margin:8px 0 0;font-size:12px">Le <b>rapport express</b> est l’aperçu gratuit à laisser au prospect ; le <b>rapport complet</b> est le document détaillé que tu peux facturer.</p>'):ficheCompareHtml(c)+'<div class="app-panel" style="margin-top:14px"><div class="app-empty">Rien n’est encore analysé. Touche <b>Lancer l’analyse</b> ci-dessus : AuditIA récupère les données Google, lit le site, trouve les réseaux, les informations légales (SIRET) et la performance, puis génère le rapport complet.</div><div class="detail-actions" style="margin-top:14px"><button class="app-btn" data-delete-audit="'+a.id+'">Supprimer cet audit</button></div></div>';
+        const diagBlocks=analyzed?(visibilitySummaryHtml(a,c)+auditInsightsChartHtml(a,c)+auditEvolutionHtml(a,c)+dxWrap('d-actions',auditActionsHtml(a,c))+identityHtml(a,c)+'<!--AP-->'+ficheCompareHtml(c)+dxWrap('d-fiche',clientInfoHtml(c))+siteShotHtml(a)+dxWrap('d-perf',scanPanelHtml(a,c))+dxWrap('d-social',socialPresenceHtml(a))+dxWrap('d-rank',rankingsHtml(a))+dxWrap('d-comp',competitorsHtml(a,c))+targetingPanelHtml(a,c)+(improvementHtml(a,c)?'<details class="dx-more set-anchor" id="d-imp"><summary>Recommandations détaillées (pourquoi, comment)</summary>'+improvementHtml(a,c)+'</details>':'')+'<details class="cd-edit" style="margin-top:14px"><summary>Notes personnelles (facultatif)</summary><form class="app-form" data-save-notes style="padding:0 16px 16px"><label>Notes internes<textarea name="notes" placeholder="Remarques pour toi — n’apparaissent dans le rapport que si tu les remplis.">'+escHtml(a.notes||'')+'</textarea></label><button class="app-btn primary" type="submit">Enregistrer les notes</button></form></details><div class="detail-actions" style="margin-top:16px;flex-wrap:wrap"><button class="app-btn" data-export-report="'+a.id+'" data-mode="simple">📄 Rapport express (1 page · gratuit)</button><button class="app-btn primary" data-export-report="'+a.id+'" data-mode="full">📑 Rapport complet (PDF)</button><button class="app-btn" data-delete-audit="'+a.id+'">Supprimer cet audit</button></div><p class="app-muted" style="margin:8px 0 0;font-size:12px">Le <b>rapport express</b> est l’aperçu gratuit à laisser au prospect ; le <b>rapport complet</b> est le document détaillé que tu peux facturer.</p>'):ficheCompareHtml(c)+'<div class="app-panel" style="margin-top:14px"><div class="app-empty">Rien n’est encore analysé. Touche <b>Lancer l’analyse</b> ci-dessus : AuditIA récupère les données Google, lit le site, trouve les réseaux, les informations légales (SIRET) et la performance, puis génère le rapport complet.</div><div class="detail-actions" style="margin-top:14px"><button class="app-btn" data-delete-audit="'+a.id+'">Supprimer cet audit</button></div></div>';
         body='<button class="app-btn" data-app-view="Audits">← Audits</button><section class="app-panel page-dossier" style="margin-top:14px"><div class="dossier-head"><div><div class="eyebrow">DOSSIER D’AUDIT</div><h2 style="margin-top:8px">'+escHtml(c?.name||'Commerce')+'</h2><p>'+escHtml(c?.city||'')+' · '+escHtml(a.title)+'</p></div>'+(analyzed?'<div class="audit-score-chip"><b>'+(Number(a.score)||0)+'</b><span>/100</span></div>':'<div class="audit-score-chip is-wait"><span>Pas encore analysé</span></div>')+'</div>'+((analyzed&&!(fullAuditState&&fullAuditState.id===a.id))?diagBlocks.replace('<!--AP-->',analysePanelHtml(a,c)):analysePanelHtml(a,c)+diagBlocks.replace('<!--AP-->',''))+'</section>';
       }
       appShell(body);
