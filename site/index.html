@@ -2622,6 +2622,33 @@ button { touch-action: manipulation; }
     .r-evidence-unmeasured li{font-size:11px;line-height:1.5;color:var(--muted,#a8a8b8);margin:6px 0}
     .r-evidence-foot{font-size:10px;line-height:1.5;color:var(--muted,#a8a8b8);margin:12px 0 0}
     @media(max-width:520px){.r-evidence{padding:12px}.r-evidence-grid{grid-template-columns:1fr}}
+
+    /* Accueil simplifié : une action principale, un résumé, un dossier récent */
+    .hx-compact{max-width:1000px;margin:0 auto;gap:14px}
+    .hx-hero-compact{min-height:0!important;padding:20px 22px!important;margin-bottom:0!important}
+    .hx-hero-compact .hx-hero-copy{max-width:760px}
+    .hx-hero-compact h1{font-size:clamp(24px,4vw,34px)!important;margin:4px 0 6px!important}
+    .hx-hero-compact p{font-size:14px!important;line-height:1.5!important;margin:0!important;max-width:620px}
+    .hx-compact .nl-search{margin:0!important}
+    .hx-compact .nl-search-head{margin-bottom:12px!important}
+    .hx-compact .nl-search-head p{max-width:650px}
+    .hx-compact .nl-prompts{gap:6px!important}
+    .hx-compact .nl-prompts button{font-size:11px!important;padding:7px 10px!important}
+    .hx-quick-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+    .hx-quick-stats button{display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0;padding:12px 14px;border:1px solid var(--line,#343344);border-radius:13px;background:var(--panel,#14141c);color:var(--text,#fff);text-align:left;cursor:pointer}
+    .hx-quick-stats b{font-size:20px;letter-spacing:-.4px}
+    .hx-quick-stats span{font-size:12px;color:var(--muted,#a8a8b8)}
+    .hx-latest{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:15px 17px;border:1px solid var(--line,#343344);border-radius:15px;background:var(--panel,#14141c)}
+    .hx-latest>div:first-child{flex:1;min-width:150px}
+    .hx-latest h2{font-size:15px;margin:6px 0 3px}
+    .hx-latest p{font-size:12px;line-height:1.45;color:var(--muted,#a8a8b8);margin:0}
+    .hx-latest-score{display:flex;align-items:baseline;gap:3px;white-space:nowrap}
+    .hx-latest-score b{font-size:25px;letter-spacing:-.8px}
+    .hx-latest-score span{font-size:11px;color:var(--muted,#a8a8b8)}
+    .hx-latest-empty{padding:14px 17px}
+    .hx-latest-empty b{font-size:13px}
+    .hx-compact-note{margin:0;padding:0 2px;font-size:11px;line-height:1.45;color:var(--muted,#a8a8b8)}
+    @media(max-width:560px){.hx-hero-compact{padding:16px!important}.hx-compact .nl-search-head{gap:10px!important}.hx-compact .nl-search-head h2{font-size:19px!important}.hx-compact .nl-search-form textarea{min-height:88px!important}.hx-quick-stats{gap:6px}.hx-quick-stats button{display:block;padding:10px 9px}.hx-quick-stats b{display:block;font-size:19px;margin-bottom:3px}.hx-quick-stats span{display:block;font-size:10px;line-height:1.3}.hx-latest{gap:10px}.hx-latest .app-btn{width:100%;justify-content:center}}
 </style>
 <style id="auditia-assistant-chat">
 /* Assistant conversationnel AuditIA — inspiration Solina, branché sur les données locales déjà chargées */
@@ -4600,9 +4627,9 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
     }
     function buildAuditIAAssistantReply(question){
       const q=String(question||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-      const analysed=appAudits.filter(a=>a.site||a.scan||a.status==='Analysé'||a.status==='Terminé');
+      const analysed=appAudits.filter(a=>a.site||a.scan||auditHasAnalysis(a));
       const pending=appAudits.filter(a=>!analysed.includes(a));
-      const high=appAudits.filter(a=>{const score=Number(a.score);return (a.site||a.scan||a.status==='Analysé'||a.status==='Terminé')&&score>0&&score<50;});
+      const high=appAudits.filter(a=>{const score=Number(a.score);return (a.site||a.scan||auditHasAnalysis(a))&&score>0&&score<50;});
       const next=appAudits.find(a=>!analysed.includes(a))||appAudits[0];
       const clientForAudit=a=>a&&appClients.find(c=>String(c.id)===String(a.client_id));
       if(/priorit|urgent|commencer|prochain|a traiter/.test(q)){
@@ -5008,7 +5035,7 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
     }
 
     function auditJourneyHtml(){
-      const analyzed=appAudits.filter(a=>a.site||a.scan||a.status==='Analysé'||a.status==='Terminé');
+      const analyzed=appAudits.filter(a=>a.site||a.scan||auditHasAnalysis(a));
       const latest=analyzed.slice().sort((a,b)=>(new Date(b.updated_at||b.created_at||0).getTime()||0)-(new Date(a.updated_at||a.created_at||0).getTime()||0))[0];
       const steps=[
         {n:'01',title:'Trouver un commerce',desc:'Décris ton prospect en français : activité, ville et critères. Vérifie les résultats avant de choisir.',state:nlSearchResults.length?'Recherche effectuée':appClients.length?'Commerces enregistrés':'À commencer',done:!!(nlSearchResults.length||appClients.length),action:'Lancer une recherche',kind:'search'},
@@ -5217,7 +5244,7 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
     function clientDetailHtml(c){
       const d=c.details||{};
       const audits=appAudits.filter(a=>a.client_id===c.id);
-      const scoredAudits=audits.filter(x=>x.site||x.scan||x.status==='Analysé'||x.status==='Terminé');
+      const scoredAudits=audits.filter(x=>x.site||x.scan||auditHasAnalysis(x));
       const avg=scoredAudits.length?Math.round(scoredAudits.reduce((s,a)=>s+(Number(a.score)||0),0)/scoredAudits.length):null;
       const last=scoredAudits[0];
       const scoredOldToNew=[...audits].reverse().map(a=>Number(a.score)||0);
@@ -6111,7 +6138,7 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
       const bar=(label,score,x,w)=>{ const col=pdfScoreCol(score); K.setF('bold',9); K.setT(K.DARK); pdf.text(label,x,K.y+3.2); K.setT(col); pdf.text(score+'/100',x+w,K.y+3.2,{align:'right'}); pdf.setFillColor(230,226,240); pdf.roundedRect(x,K.y+4.6,w,2.1,1,1,'F'); pdf.setFillColor(col[0],col[1],col[2]); pdf.roundedRect(x,K.y+4.6,Math.max(1.4,w*Math.max(0,Math.min(100,Number(score)||0))/100),2.1,1,1,'F'); };
       K.ensure(12); const gap=6, bw=(K.CW-gap)/2; bar('SEO — Google',diag.seo.score,K.M,bw); bar('GEO — IA',diag.geo.score,K.M+bw+gap,bw); K.y+=12; }
     function pdfProgress(pdf,K,a){
-      const mine=(appAudits||[]).filter(x=>String(x.client_id)===String(a.client_id)&&(x.site||x.scan||x.status==='Analysé'||x.status==='Terminé')).map(x=>({t:new Date(x.updated_at||x.created_at||0).getTime(),s:Math.max(0,Math.min(100,Number(x.score)||0))})).filter(x=>x.t&&!isNaN(x.t)).sort((p,q)=>p.t-q.t).slice(-8);
+      const mine=(appAudits||[]).filter(x=>String(x.client_id)===String(a.client_id)&&(x.site||x.scan||auditHasAnalysis(x))).map(x=>({t:new Date(x.updated_at||x.created_at||0).getTime(),s:Math.max(0,Math.min(100,Number(x.score)||0))})).filter(x=>x.t&&!isNaN(x.t)).sort((p,q)=>p.t-q.t).slice(-8);
       if(mine.length<2) return;
       K.heading('Progression des scores');
       K.para('Chaque point est un audit déjà enregistré pour ce commerce. Aucune valeur n’est estimée.',{size:8,color:K.MUT});
@@ -6215,7 +6242,7 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
       const a=appAudits.find(x=>x.id===auditId);
       if(!a){appNotice='Audit introuvable. Réessaie.';renderApp();return;}
       const c=appClients.find(x=>String(x.id)===String(a.client_id));
-      const hasAuditEvidence=!!(a.site||a.scan||a.status==='Analysé'||a.status==='Terminé');
+      const hasAuditEvidence=!!(a.site||a.scan||auditHasAnalysis(a));
       if(!hasAuditEvidence){appNotice='Rapport non exporté : ce dossier ne contient pas encore de résultat d’analyse. Lancez d’abord l’analyse du commerce pour éviter un rapport trompeur.';renderApp();return;}
       mode=(mode==='simple')?'simple':'full';
       pdfBusy=true;pdfCancelled=false;appNotice='';renderApp();
@@ -6269,7 +6296,7 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
       if(shareBtn) shareBtn.addEventListener('click',async()=>{ try{ const file=new File([blob],fname,{type:'application/pdf'}); await navigator.share({files:[file],title:fname}); }catch(err){ if(err&&err.name!=='AbortError'){ try{ window.open(url,'_blank'); }catch(_){} } } });
     }
     function homeResultsHtml(){
-      const isDone=x=>!!(x&&(x.site||x.scan||x.status==='Analysé'||x.status==='Terminé'));
+      const isDone=x=>!!(x&&(x.site||x.scan||auditHasAnalysis(x)));
       const tm=x=>new Date(x.updated_at||x.created_at||0).getTime()||0;
       const head='<span class="hx-kicker"><i></i>DERNIER AUDIT</span>';
       const list=appAudits.filter(isDone).sort((x,y)=>tm(y)-tm(x));
@@ -6292,7 +6319,7 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
         '</div></section>';
     }
     function auditEvolutionHtml(a,c){
-      const isDone=x=>!!(x&&(x.site||x.scan||x.status==='Analysé'||x.status==='Terminé'));
+      const isDone=x=>!!(x&&(x.site||x.scan||auditHasAnalysis(x)));
       const tm=x=>new Date(x.updated_at||x.created_at||0).getTime()||0;
       if(!isDone(a)) return '';
       const prev=appAudits.filter(x=>String(x.client_id)===String(a.client_id)&&x.id!==a.id&&isDone(x)&&tm(x)<tm(a)).sort((x,y)=>tm(y)-tm(x))[0];
@@ -6312,7 +6339,7 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
     }
     function progressChartHtml(rows, opts){
       opts=opts||{};
-      const done=(rows||[]).filter(a=>a&&(a.site||a.scan||a.status==='Analysé'||a.status==='Terminé'));
+      const done=(rows||[]).filter(a=>a&&(a.site||a.scan||auditHasAnalysis(a)));
       if(!done.length) return opts.quiet?'':'<section class="app-panel prog-card"><div class="eyebrow">PROGRESSION</div><h3>Évolution par commerce</h3><p class="app-muted">Aucune analyse pour le moment. L’évolution apparaîtra après la première analyse d’un commerce.</p></section>';
       const fmt=t=>new Date(t).toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
       const byClient={};
@@ -6323,7 +6350,7 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
     }
     function reportBoardHtml(source){
       const rows=source||appAudits;
-      const isDone=a=>a&&(a.site||a.scan||a.status==='Analysé'||a.status==='Terminé');
+      const isDone=a=>a&&(a.site||a.scan||auditHasAnalysis(a));
       const done=rows.filter(isDone).slice().sort((a,b)=>new Date(b.updated_at||b.created_at||0)-new Date(a.updated_at||a.created_at||0));
       const wait=Math.max(0,rows.length-done.length);
       const pct=rows.length?Math.round(done.length/rows.length*100):0;
@@ -6349,28 +6376,33 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
       }
       return '<div class="schema-grid">'+progressChartHtml(rows)+'<section class="app-panel schema-card"><div class="eyebrow">RÉPARTITION</div><h3>Dossiers analysés</h3><div class="schema-split">'+donut+'<div class="schema-legend"><p><b>'+done.length+'</b><span>analysés</span></p><p><b>'+wait+'</b><span>en attente</span></p></div></div></section><section class="app-panel schema-card"><div class="eyebrow">COMPARAISON</div><h3>Dernier score par commerce</h3>'+bars+'</section>'+(axes?'<section class="app-panel schema-card"><div class="eyebrow">AXES</div><h3>SEO et GEO</h3>'+axes+'</section>':'')+(light?'<section class="app-panel schema-card"><div class="eyebrow">PERFORMANCE</div><h3>Site mesuré</h3>'+light+'</section>':'')+'</div>';
     }
+
+    function auditHasAnalysis(a){
+      // A checklist completed by hand is not the same thing as an evidence-backed analysis.
+      return !!(a&&(a.scan||a.site||a.status==='Analysé'));
+    }
     function auditRowHtml(a){
       const c=appClients.find(x=>x.id===a.client_id);
-      const done=!!(a.site||a.scan||a.status==='Analysé'||a.status==='Terminé');
+      const done=!!(a.site||a.scan||auditHasAnalysis(a));
       const score=Number(a.score)||0;
       const initial=escHtml(((c&&c.name)||'?').charAt(0).toUpperCase());
       return '<article class="audit-card'+(done?' is-done':'')+'"><span class="audit-mark">'+initial+'</span><div class="audit-copy"><b>'+escHtml((c&&c.name)||'Commerce')+'</b><small>'+escHtml([c&&c.city,a.title].filter(Boolean).join(' · '))+'</small></div><span class="audit-state">'+(done?'<b>'+score+'</b><small>/100</small>':'<em>À analyser</em>')+'</span><button class="app-btn'+(done?'':' primary')+'" type="button" data-open-audit="'+a.id+'"'+(done?'':' data-start-audit="1"')+'>'+(done?'Ouvrir':'Analyser')+'</button></article>';
     }
     function reportCardHtml(a){
-      const done=!!(a.site||a.scan||a.status==='Analysé'||a.status==='Terminé');
+      const done=!!(a.site||a.scan||auditHasAnalysis(a));
       if(!done) return auditRowHtml(a);
       const c=appClients.find(x=>x.id===a.client_id);
       const score=Number(a.score)||0;
       const initial=escHtml(((c&&c.name)||'?').charAt(0).toUpperCase());
-      return '<article class="report-card"><div class="report-top"><span class="audit-mark">'+initial+'</span><div class="audit-copy"><b>'+escHtml((c&&c.name)||'Commerce')+'</b><small>'+escHtml([c&&c.city,a.title].filter(Boolean).join(' · '))+'</small><span class="report-meter" aria-hidden="true"><i style="width:'+score+'%"></i></span></div><span class="audit-state"><b>'+score+'</b><small>/100</small>'+(function(){const prev=appAudits.filter(x=>x.id!==a.id&&x.client_id===a.client_id&&(x.site||x.scan||x.status==='Analysé'||x.status==='Terminé')&&String(x.updated_at||x.created_at||'')<String(a.updated_at||a.created_at||'')).sort((x,y)=>String(y.updated_at||y.created_at||'').localeCompare(String(x.updated_at||x.created_at||'')))[0];if(!prev)return '';const dlt=score-(Number(prev.score)||0);return '<em class="sc-delta '+(dlt>=0?'up':'down')+'">'+(dlt>=0?'▲ +':'▼ ')+dlt+' depuis le '+new Date(prev.updated_at||prev.created_at).toLocaleDateString('fr-FR')+'</em>';})()+'</span></div><div class="report-actions"><button class="app-btn" type="button" data-export-report="'+a.id+'" data-mode="simple">Express</button><button class="app-btn primary" type="button" data-export-report="'+a.id+'" data-mode="full">PDF complet</button><button class="app-btn" type="button" data-open-audit="'+a.id+'">Dossier</button></div></article>';
+      return '<article class="report-card"><div class="report-top"><span class="audit-mark">'+initial+'</span><div class="audit-copy"><b>'+escHtml((c&&c.name)||'Commerce')+'</b><small>'+escHtml([c&&c.city,a.title].filter(Boolean).join(' · '))+'</small><span class="report-meter" aria-hidden="true"><i style="width:'+score+'%"></i></span></div><span class="audit-state"><b>'+score+'</b><small>/100</small>'+(function(){const prev=appAudits.filter(x=>x.id!==a.id&&x.client_id===a.client_id&&(x.site||x.scan||auditHasAnalysis(x))&&String(x.updated_at||x.created_at||'')<String(a.updated_at||a.created_at||'')).sort((x,y)=>String(y.updated_at||y.created_at||'').localeCompare(String(x.updated_at||x.created_at||'')))[0];if(!prev)return '';const dlt=score-(Number(prev.score)||0);return '<em class="sc-delta '+(dlt>=0?'up':'down')+'">'+(dlt>=0?'▲ +':'▼ ')+dlt+' depuis le '+new Date(prev.updated_at||prev.created_at).toLocaleDateString('fr-FR')+'</em>';})()+'</span></div><div class="report-actions"><button class="app-btn" type="button" data-export-report="'+a.id+'" data-mode="simple">Express</button><button class="app-btn primary" type="button" data-export-report="'+a.id+'" data-mode="full">PDF complet</button><button class="app-btn" type="button" data-open-audit="'+a.id+'">Dossier</button></div></article>';
     }
     function renderApp(){
-      const completed=appAudits.filter(a=>a.status==='Terminé'||a.status==='Analysé').length;
+      const completed=appAudits.filter(a=>auditHasAnalysis(a)).length;
       let body='';
       if(appView==='Accueil'){
         const latest=appAudits.slice(0,4);
         const completedPct=appAudits.length?Math.round(completed/appAudits.length*100):0;
-        const scoredAudits=appAudits.filter(a=>a.site||a.scan||a.status==='Analysé'||a.status==='Terminé');
+        const scoredAudits=appAudits.filter(a=>a.site||a.scan||auditHasAnalysis(a));
         const avgScore=scoredAudits.length?Math.round(scoredAudits.reduce((sum,a)=>sum+(Number(a.score)||0),0)/scoredAudits.length):0;
         const runningAudits=appAudits.filter(a=>!scoredAudits.includes(a)&&/cours|progress/i.test(String(a.status||''))).length;
         const freshAudits=Math.max(0,appAudits.length-scoredAudits.length-runningAudits);
@@ -6379,24 +6411,14 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
         const hxReady=scoredAudits.length, hxTodo=Math.max(0,appAudits.length-scoredAudits.length);
         const hxTile=(ic,tone,n,l1,l2,view)=>'<button type="button" class="hx-tile hx-tile-'+tone+'" data-app-view="'+view+'" aria-label="'+l1+' : '+n+'"><span class="hx-ico hx-'+tone+'">'+HXI[ic]+'</span><strong>'+n+'</strong><b>'+l1+'</b><small>'+l2+'</small><span class="hx-go">'+HXI.chev+'</span></button>';
         const hxPrompts=['Quels audits traiter en priorité ?','Comment démarrer un audit ?','Aide sur les rapports'];
-        body='<div class="hx">'+
-          '<section class="hx-hero" aria-labelledby="hx-title">'+
-            '<div class="hx-hero-copy"><div class="hx-kicker"><i></i>ASSISTANT IA</div>'+
-            '<h1 id="hx-title">Assistant <span class="hx-grad">AuditIA</span></h1>'+
-            '<p>Renseignez-vous sur un commerce et découvrez s’il est vraiment visible : Google, site, réseaux et concurrents.</p></div>'+
-            '<img class="hx-robot" src="./home-robot.png" alt="" aria-hidden="true">'+
-          '</section>'+
-          homeResultsHtml()+
+        const latest=appAudits.filter(a=>auditHasAnalysis(a)).sort((a,b)=>String(b.updated_at||b.created_at||'').localeCompare(String(a.updated_at||a.created_at||'')))[0];
+        const waiting=appAudits.filter(a=>!auditHasAnalysis(a)).length;
+        body='<div class="hx hx-compact">'+
+          '<section class="hx-hero hx-hero-compact" aria-labelledby="hx-title"><div class="hx-hero-copy"><div class="hx-kicker"><i></i>AUDIT COMMERCIAL</div><h1 id="hx-title">AuditIA <span class="hx-grad">AffiAds</span></h1><p>Trouvez un commerce, vérifiez sa visibilité et préparez un rapport client.</p></div></section>'+
           naturalLanguageSearchHtml()+
-          auditJourneyHtml()+
-          '<section class="hx-tiles" aria-label="Indicateurs">'+hxTile('store','blue',appClients.length,'Commerces','dans la base','Clients')+hxTile('doc','violet',appAudits.length,'Audits','enregistrés','Audits')+hxTile('clock','orange',hxTodo,'À analyser','à compléter','Audits')+hxTile('check','green',hxReady,'Analysés','prêts pour un rapport','Rapports')+'</section>'+
-          (function(){if(!scoredAudits.length)return '';const per={};let verifs=0;scoredAudits.forEach(a=>{const c=appClients.find(x=>x.id===a.client_id);try{verifs+=visibilityAudit(a,c).items.length;}catch(e){}const t=new Date(a.updated_at||a.created_at||0).getTime()||0;(per[a.client_id]=per[a.client_id]||[]).push({t,s:Number(a.score)||0,a,c});});let acts=0,gained=0;Object.values(per).forEach(l=>{l.sort((x,y)=>x.t-y.t);const last=l[l.length-1];try{acts+=auditActions(last.a,last.c,visibilityAudit(last.a,last.c)).length;}catch(e){}if(l.length>1)gained+=Math.max(0,last.s-l[0].s);});return '<section class="hx-work" aria-label="Votre travail"><div><b>'+scoredAudits.length+'</b><span>audits réalisés</span></div><div><b>'+verifs+'</b><span>vérifications mesurées</span></div><div><b>'+acts+'</b><span>actions proposées</span></div><div><b class="up">+'+gained+'</b><span>points gagnés</span></div></section>';})()+
-          '<button type="button" class="hx-cta" data-app-view="Audits"><span class="hx-cta-ico">'+HXI.search+'</span><span>Lancer un nouvel audit</span><span class="hx-go">'+HXI.chev+'</span></button>'+
-          '<section class="hx-note"><span class="hx-ico hx-violet hx-ico-lg">'+HXI.bulb+'</span><div><strong>Bon à savoir</strong><p>Je m’appuie uniquement sur les données présentes dans vos dossiers. Je n’invente pas d’informations et je vous indique toujours ce qui doit être confirmé.</p></div></section>'+
-          '<details class="hx-lex"><summary><span class="hx-kicker"><i></i>COMPRENDRE LES TERMES</span><span class="hx-lex-hint">Lexique, en langage simple</span></summary><dl>'+
-          '<div class="hx-lex-item"><dt>SEO local</dt><dd>Ensemble des actions qui font apparaître un commerce quand on cherche près de chez soi, par exemple « boulangerie à Lille ».</dd></div><div class="hx-lex-item"><dt>Fiche Google Business Profile</dt><dd>La fiche gratuite qui affiche votre commerce sur Google et Google Maps : adresse, horaires, photos, avis. Elle se gère sur business.google.com.</dd></div><div class="hx-lex-item"><dt>Pack local</dt><dd>Les trois résultats Google Maps affichés en haut de la recherche locale. C’est souvent là que les clients cliquent.</dd></div><div class="hx-lex-item"><dt>NAP (nom, adresse, téléphone)</dt><dd>Les trois informations qui doivent être strictement identiques partout : fiche Google, site, annuaires. Une différence, même minime, brouille la confiance de Google et des IA.</dd></div><div class="hx-lex-item"><dt>Avis Google</dt><dd>Les notes et commentaires laissés par les clients. Leur nombre, leur note et les réponses que vous y apportez comptent pour la confiance et le classement.</dd></div><div class="hx-lex-item"><dt>Balises SEO</dt><dd>Le titre et le court texte d’une page du site, affichés dans les résultats de recherche. Ils doivent décrire clairement l’activité et la ville.</dd></div><div class="hx-lex-item"><dt>Données structurées (schema.org)</dt><dd>Des informations cachées dans le code du site qui décrivent le commerce (nom, adresse, horaires) pour que Google et les IA les lisent sans ambiguïté.</dd></div><div class="hx-lex-item"><dt>GEO</dt><dd>Generative Engine Optimization : rendre un commerce facile à citer par les assistants IA comme ChatGPT, Gemini ou Perplexity, quand un client leur demande une adresse ou une recommandation.</dd></div><div class="hx-lex-item"><dt>robots.txt</dt><dd>Un fichier du site qui indique aux robots ce qu’ils ont le droit de lire. Il peut autoriser ou bloquer les robots des IA.</dd></div><div class="hx-lex-item"><dt>llms.txt</dt><dd>Un court fichier qui présente le site aux IA : qui vous êtes, ce que vous faites, et quelles pages sont importantes.</dd></div><div class="hx-lex-item"><dt>Contenu lisible par les IA</dt><dd>Le texte réel de la page, accessible sans script ni image seule. Une IA ne peut pas citer ce qu’elle ne lit pas.</dd></div><div class="hx-lex-item"><dt>Éléments non mesurables</dt><dd>Les points qu’AuditIA n’a pas pu vérifier, par exemple faute d’accès au site. Ils ne sont jamais comptés comme des défauts et la fiabilité de l’audit indique combien de points ont été mesurés.</dd></div>'+'</dl></details>'+
-          '<section class="hx-ask-wrap" aria-label="Poser une question à Audit Chat IA"><form class="hx-ask" data-home-ask><input name="q" type="text" maxlength="1200" autocomplete="off" enterkeyhint="send" placeholder="Posez une question sur vos audits…" aria-label="Votre question pour Audit Chat IA"><button type="submit" aria-label="Envoyer la question">'+HXI.send+'</button></form>'+
-            '<div class="hx-chips">'+hxPrompts.map(q=>'<button type="button" data-home-prompt="'+q+'">'+HXI.arrow+'<span>'+q+'</span></button>').join('')+'</div></section>'+
+          '<section class="hx-quick-stats" aria-label="Résumé de l’activité"><button type="button" data-app-view="Clients"><b>'+appClients.length+'</b><span>Commerces</span></button><button type="button" data-app-view="Audits"><b>'+appAudits.length+'</b><span>Dossiers d’audit</span></button><button type="button" data-app-view="Audits"><b>'+waiting+'</b><span>À analyser</span></button></section>'+
+          (latest?'<section class="hx-latest"><div><span class="hx-kicker"><i></i>DERNIER AUDIT</span><h2>'+escHtml((appClients.find(c=>String(c.id)===String(latest.client_id))||{}).name||latest.title||'Commerce')+'</h2><p>'+escHtml([((appClients.find(c=>String(c.id)===String(latest.client_id))||{}).city),latest.title].filter(Boolean).join(' · '))+'</p></div><div class="hx-latest-score"><b>'+Math.max(0,Math.min(100,Math.round(Number(latest.score)||0)))+'</b><span>/100</span></div><button type="button" class="app-btn primary" data-open-audit="'+escHtml(latest.id)+'">Ouvrir le dossier</button></section>':'<section class="hx-latest hx-latest-empty"><div><b>Pas encore d’audit terminé</b><p>Lancez une recherche ci-dessus, puis choisissez un commerce pour créer son dossier.</p></div></section>')+
+          '<p class="hx-compact-note">Les résultats proviennent des sources configurées. Une information non disponible n’est pas automatiquement un défaut.</p>'+
         '</div>';
       } else if(appView==='Studio'){
         const selected=appClients.find(c=>c.id===studioClientId)||appClients[0];
@@ -6413,7 +6435,7 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
         const cd=clientDraft||{}; const catOpts=['Commerce','Restaurant','Artisan','Beauté & bien-être','Automobile','Hébergement','Autre'].map(o=>'<option'+(cd.category===o?' selected':'')+'>'+o+'</option>').join('');
         const addForm='<div class="add-client">'+placeSearchHtml()+'<section class="app-panel"><h3 style="margin:0 0 4px">Ou saisir à la main</h3><form class="app-form" data-create-client style="margin-top:10px"><label>Nom du commerce<input name="name" required maxlength="120" placeholder="Ex. Boulangerie du Centre" value="'+escHtml(cd.name||'')+'"></label><label>Ville<input name="city" required maxlength="100" placeholder="Ex. Azille" value="'+escHtml(cd.city||'')+'"></label><label>Catégorie<select name="category">'+catOpts+'</select></label><label>Site web (facultatif)<input name="website" type="text" placeholder="https://exemple.fr" value="'+escHtml(cd.website||'')+'"></label><button class="app-btn primary" type="submit">Enregistrer le client</button>'+(cd.name?'<button class="app-btn" type="button" data-clear-draft>Vider</button>':'')+'</form></section></div>';
         const openAdd=(!appClients.length||cd.name)?' open':'';
-        const cStat=c=>{const done=appAudits.filter(a=>a.client_id===c.id&&(a.site||a.scan||a.status==='Analysé'||a.status==='Terminé')).sort((x,y)=>String(y.updated_at||y.created_at||'').localeCompare(String(x.updated_at||x.created_at||'')));const last=done[0],prev=done[1];const sc=last?Number(last.score)||0:null;return {sc,delta:(last&&prev)?sc-(Number(prev.score)||0):null,date:last?(last.updated_at||last.created_at):null,tier:sc==null?'none':sc>=75?'top':sc>=50?'good':'low'};};
+        const cStat=c=>{const done=appAudits.filter(a=>a.client_id===c.id&&(a.site||a.scan||auditHasAnalysis(a))).sort((x,y)=>String(y.updated_at||y.created_at||'').localeCompare(String(x.updated_at||x.created_at||'')));const last=done[0],prev=done[1];const sc=last?Number(last.score)||0:null;return {sc,delta:(last&&prev)?sc-(Number(prev.score)||0):null,date:last?(last.updated_at||last.created_at):null,tier:sc==null?'none':sc>=75?'top':sc>=50?'good':'low'};};
         const tierOf=c=>cStat(c).tier;
         const baseRows=appClients.filter(c=>{const q=norm(clientFilter);if(!q)return true;const d=c.details||{};return norm([c.name,c.city,c.category,d.category,d.address,c.phone].filter(Boolean).join(' ')).includes(q);});
         const scored=baseRows.map(cStat).filter(x=>x.sc!=null); const avg=scored.length?Math.round(scored.reduce((n,x)=>n+x.sc,0)/scored.length):null;
@@ -6426,7 +6448,7 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
         if(!c){ appView='Clients'; renderApp(); return; }
         body=clientDetailHtml(c);
       } else if(appView==='Audits'){
-        const ready=appAudits.filter(a=>a.site||a.scan||a.status==='Analysé'||a.status==='Terminé').length;
+        const ready=appAudits.filter(a=>a.site||a.scan||auditHasAnalysis(a)).length;
         const waiting=Math.max(0, appAudits.length-ready);
         const createForm=appClients.length?'<form class="app-form" data-create-audit><label>Client<select name="client_id" required>'+appClients.map(c=>'<option value="'+c.id+'">'+escHtml(c.name)+' — '+escHtml(c.city)+'</option>').join('')+'</select></label><label>Nom de l’audit<input name="title" required maxlength="120" value="Audit de visibilité numérique"></label><button class="app-btn primary" type="submit">Créer et ouvrir le dossier</button></form>':'<div class="app-empty">Ajoute d’abord un commerce dans Clients.</div>';
         const auditList=(function(){const q=auditFilter.trim().toLowerCase();const rows=appAudits.filter(a=>{if(!q)return true;const c=appClients.find(x=>x.id===a.client_id);const d=c&&c.details||{};return norm([(c?.name||''),(c?.city||''),(c?.category||''),(d.category||''),(a.title||''),(a.status||''),String(a.score||'')].join(' ')).includes(norm(q));});return rows.length?'<div class="audit-list">'+rows.map(auditRowHtml).join('')+'</div>':'<div class="app-empty">'+(appAudits.length?'Aucun audit ne correspond à « '+escHtml(auditFilter)+' ».':'Aucun audit pour le moment. '+(appClients.length?'Crée le premier dossier ci-dessus.':'Ajoute d’abord un commerce dans Clients.'))+'</div>';})();
@@ -6434,7 +6456,7 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
       } else if(appView==='Rapports'){
         const q=norm(auditFilter);
         const reportRows=appAudits.filter(a=>{if(!q)return true;const c=appClients.find(x=>x.id===a.client_id);const d=c&&c.details||{};return norm([(c&&c.name)||'',(c&&c.city)||'',(c&&c.category)||'',(d.category||''),(a.title||''),(a.status||''),String(a.score||'')].join(' ')).includes(q);});
-        const readyReports=reportRows.filter(a=>a.site||a.scan||a.status==='Analysé'||a.status==='Terminé').length;
+        const readyReports=reportRows.filter(a=>a.site||a.scan||auditHasAnalysis(a)).length;
         const reportList=reportRows.length?'<div class="report-list">'+reportRows.map(reportCardHtml).join('')+'</div>':'<div class="app-empty">'+(appAudits.length?'Aucun rapport pour « '+escHtml(auditFilter)+' ».':'Les rapports apparaissent ici après un audit.')+'</div>';
         body='<div class="reports-page"><div class="audit-kpis"><article><b>'+reportRows.length+'</b><span>Dossiers</span></article><article><b>'+readyReports+'</b><span>Prêts à exporter</span></article><article><b>'+Math.max(0,reportRows.length-readyReports)+'</b><span>Sans analyse</span></article></div>'+(appAudits.length?'<input class="app-filter" data-audit-filter placeholder="Filtrer les graphiques par commerce, ville…" value="'+escHtml(auditFilter)+'">':'')+reportBoardHtml(reportRows)+'<section class="app-panel"><div class="rp-head"><h2>Exporter</h2>'+(appAudits.length?'<button type="button" class="app-btn" data-export-csv>Exporter en CSV</button>':'')+'</div>'+reportList+'</section></div>';
       } else if(appView==='Profil') {
