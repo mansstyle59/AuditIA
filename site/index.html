@@ -5312,7 +5312,7 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
       if(!c) return '';
       const d=c.details||{}, sir=d.sirene&&d.sirene.matched?d.sirene:null;
       const esc=escHtml;
-      const normPhone=v=>String(v||'').replace(/[^\\d+]/g,'');
+      const normPhone=v=>String(v||'').replace(/[^\d+]/g,'');
       const tel=String(c.phone||d.phone||'').trim();
       const website=safeHttpUrl(c.website||d.website||'');
       const rating=d.rating==null?null:Number(d.rating);
@@ -5328,8 +5328,9 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
       const data=[
         ['Adresse',d.address||c.city],
         ['Téléphone',tel],
-        ['Site internet',website?website.replace(/^https?:\\/\\//,'').replace(/\\/$/,''):''],
+        ['Site internet',website||''],
         ['Avis Google',rating==null?'':rating.toLocaleString('fr-FR',{maximumFractionDigits:1})+'/5'+(reviews==null?'':' · '+reviews.toLocaleString('fr-FR')+' avis')],
+        ['Chiffre d’affaires','Non disponible via les sources actuellement connectées'],
         ['Statut',d.status==='OPERATIONAL'?'En activité':d.status==='CLOSED_TEMPORARILY'?'Fermé temporairement':d.status==='CLOSED_PERMANENTLY'?'Fermé définitivement':d.status||''],
         ['Horaires',Array.isArray(d.hours)&&d.hours.length?d.hours.join(' · '):'']
       ];
