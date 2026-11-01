@@ -28,105 +28,6 @@
   <meta property="og:description" content="Mesurez la présence Google, Maps et le site web de vos commerces, puis suivez les actions à mener.">
   <meta property="og:image" content="https://mansstyle59.github.io/AuditIA/icon-512.png?v=5">
   <meta name="twitter:card" content="summary">
-
-  <style id="auditia-formia-theme-v200">
-:root{
-  --bg:#F3F0FF;--panel:#FFFFFF;--panel2:#EAE6FC;--text:#1A1530;--muted:#58527A;
-  --purple:#7158EA;--orange:#FF9F3F;--line:#DDD8F2;
-  --surface:#FFFFFF;--surface-2:#EAE6FC;--primary:#7158EA;--primary-ink:#5A3FD0;
-  --primary-tint:#ECE8FF;--good:#16A36B;--bad:#E5484D;--shadow-soft:0 10px 30px rgba(28,20,82,.07);
-  color-scheme:light;
-}
-html,body{background:var(--bg)!important;color:var(--text)!important}
-body{font-family:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif!important;background:radial-gradient(ellipse at 92% 0%,rgba(113,88,234,.09),transparent 32%),#F3F0FF!important}
-a{color:var(--primary-ink)}
-.workspace-app{width:min(1320px,100%)!important;padding:18px 20px calc(40px + env(safe-area-inset-bottom,0px))!important;color:var(--text)!important}
-.workspace-layout{grid-template-columns:236px minmax(0,1fr)!important;gap:22px!important}
-.workspace-sidebar{background:#fff!important;border:1px solid #DDD8F2!important;border-radius:22px!important;box-shadow:var(--shadow-soft)!important}
-.sidebar-brand{border-color:#EEEAF9!important}
-.sidebar-brand b{color:#1A1530!important}
-.sidebar-brand small{color:#8C87A0!important}
-.sidebar-brand img{background:#ECE8FF!important}
-.sidebar-nav button{color:#58527A!important}
-.sidebar-nav button.active{background:#ECE8FF!important;border-color:#DDD8F2!important;color:#5A3FD0!important}
-.sidebar-nav button.active .nav-icon{color:#7158EA!important}
-.sidebar-bottom{border-color:#EEEAF9!important;color:#8C87A0!important}
-.workspace-head{border-bottom:1px solid #DDD8F2!important}
-.workspace-head h1,.workspace-head .page-title{color:#1A1530!important;font-family:"Bricolage Grotesque","Avenir Next",system-ui,sans-serif!important;letter-spacing:-.045em!important}
-.workspace-head p{color:#58527A!important}
-.workspace-head .eyebrow,.eyebrow{color:#7158EA!important}
-.app-topbar{background:rgba(243,240,255,.92)!important;border-bottom:1px solid #DDD8F2!important;backdrop-filter:blur(16px)!important}
-.tb-brand,.tb-brand b{color:#1A1530!important}
-.tb-brand small{color:#77718F!important}
-.burger-btn{background:#fff!important;border:1px solid #DDD8F2!important;color:#5A3FD0!important}
-.app-btn{background:#fff!important;border:1px solid #DDD8F2!important;color:#3D365D!important;border-radius:13px!important;box-shadow:0 1px 2px rgba(26,21,48,.04)!important}
-.app-btn:hover{background:#F7F5FF!important;border-color:#BDB2F3!important}
-.app-btn.primary{background:#7158EA!important;color:#fff!important;border-color:#7158EA!important;box-shadow:0 7px 18px rgba(113,88,234,.20)!important}
-.app-panel,.app-stat,.app-row,.integration-group,.home-next-steps,.home-recent-panel,.audit-card,.report-card{background:#fff!important;border:1px solid #DDD8F2!important;color:#1A1530!important;box-shadow:0 8px 25px rgba(28,20,82,.045)!important;border-radius:20px!important}
-.app-panel h2,.app-panel h3,.app-panel h4,.audit-copy b,.audit-card b,.report-card b{color:#1A1530!important}
-.app-panel p,.app-row small,.app-muted,.scan-note{color:#696282!important}
-.app-stat span{color:#77718F!important}
-.app-stat strong{color:#1A1530!important}
-.app-row,.app-list .app-row{background:#FAF9FF!important;border-color:#EEEAF9!important}
-.app-empty{background:#FAF9FF!important;border:1px dashed #CFC6F0!important;color:#77718F!important;border-radius:16px!important}
-.app-form label{color:#433B63!important}
-.app-form input,.app-form select,.app-form textarea,.app-filter{background:#fff!important;color:#1A1530!important;border:1px solid #D8D2EA!important;border-radius:13px!important}
-.app-form input:focus,.app-form select:focus,.app-form textarea:focus,.app-filter:focus{outline:3px solid rgba(113,88,234,.14)!important;border-color:#7158EA!important}
-.settings-chip{background:#fff!important;color:#58527A!important;border:1px solid #DDD8F2!important}
-.settings-chip.active{background:#ECE8FF!important;color:#5A3FD0!important;border-color:#CFC6F0!important}
-.mobile-tabbar{background:rgba(255,255,255,.95)!important;border-top:1px solid #DDD8F2!important;box-shadow:0 -8px 25px rgba(28,20,82,.07)!important}
-.mobile-tabbar button{color:#77718F!important}
-.mobile-tabbar button.active{color:#5A3FD0!important}
-.mobile-tabbar button.active .tab-icon{background:#ECE8FF!important;color:#5A3FD0!important;border-radius:12px!important}
-.sidebar-backdrop.open{background:rgba(26,21,48,.28)!important}
-.workspace-sidebar.open{background:#fff!important}
-.app-notice{background:#DDF6EA!important;color:#0B7A4E!important;border:1px solid #B7E9D0!important}
-.app-notice.error{background:#FDE6E7!important;color:#B72A33!important}
-.integration-status{background:#FFF0DE!important;color:#C4610F!important}
-.integration-status.ready{background:#DDF6EA!important;color:#0B7A4E!important}
-.ap-live-compact,.analyse-panel,.studio-tool-card,.studio-intro,.nl-search,.journey,.schema-card,.info-panel,.tgt-panel,.dx-actions,.scan-panel,.audit-roadmap{background:#fff!important;color:#1A1530!important;border:1px solid #DDD8F2!important;box-shadow:0 8px 25px rgba(28,20,82,.045)!important}
-.ap-live-compact h3,.ap-live-compact h4,.analyse-panel h3,.studio-intro h2,.studio-tool-card h3{color:#1A1530!important}
-.ap-live-intro,.ap-chapter-sub,.ap-live-summary,.ap-step-status,.ap-clock,.ap-live-compact .ap-results-heading>span:last-child{color:#696282!important}
-.ap-live-results,.ap-live-step,.ap-fact,.ap-module,.ap-metrics div{background:#FAF9FF!important;border-color:#EEEAF9!important;color:#1A1530!important}
-.ap-fact b,.ap-module b,.ap-metrics b,.ap-live-step{color:#1A1530!important}
-.ap-fact span,.ap-fact small,.ap-module span,.ap-metrics span{color:#696282!important}
-.ap-progress-track{background:#EAE6FC!important}
-.ap-progress-row>b{color:#5A3FD0!important}
-.ap-live-step.is-active{background:#F0EDFF!important;border-color:#CFC6F0!important}
-.ap-step-icon{background:#ECE8FF!important;color:#5A3FD0!important}
-.dx-identity,.identity-card{background:#fff!important}
-.info-row,.dx-id-row,.audit-step,.audit-roadmap .audit-step{background:#FAF9FF!important;border-color:#EEEAF9!important;color:#1A1530!important}
-.info-row span,.dx-id-row small{color:#696282!important}
-.info-row b,.dx-id-row b{color:#1A1530!important}
-.login-page{color:#1A1530!important}
-.login-card{background:#fff!important;color:#1A1530!important;border:1px solid #DDD8F2!important;box-shadow:0 18px 55px rgba(28,20,82,.10)!important}
-.login-card h1,.login-field{color:#1A1530!important}
-.login-subtitle,.login-foot,.login-status{color:#696282!important}
-.login-control{background:#fff!important;color:#1A1530!important;border-color:#D8D2EA!important}
-.login-mark{background:linear-gradient(145deg,#7158EA,#4F7BFF)!important}
-.login-submit{background:#7158EA!important;box-shadow:0 10px 26px rgba(113,88,234,.24)!important}
-.login-reset,.login-create button{color:#5A3FD0!important}
-.login-message{background:#ECE8FF!important;color:#5A3FD0!important}
-.login-message.error{background:#FDE6E7!important;color:#B72A33!important}
-.login-message.success{background:#DDF6EA!important;color:#0B7A4E!important}
-@media(max-width:760px){
- body{background:#F3F0FF!important;color:#1A1530!important}
- .workspace-app{padding:8px 12px calc(104px + env(safe-area-inset-bottom,0px))!important}
- .workspace-layout{display:block!important}
- .workspace-head{background:#F3F0FF!important}
- .workspace-head h1{font-size:26px!important}
- .workspace-sidebar{background:#fff!important;box-shadow:0 0 0 100vmax rgba(26,21,48,.25)!important}
- .app-topbar{padding-top:env(safe-area-inset-top,0px)!important;min-height:calc(62px + env(safe-area-inset-top,0px))!important}
- .mobile-tabbar{padding-bottom:env(safe-area-inset-bottom,0px)!important}
- .app-stats{gap:8px!important}
- .app-stat{padding:13px!important}
- .app-stat strong{font-size:23px!important}
- .app-stat span{font-size:11px!important}
- .workspace-head p{white-space:normal!important}
-}
-@media(prefers-reduced-motion:reduce){.workspace-app *{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
-
-  </style>
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -5308,42 +5209,6 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
       const col=(kind)=>rows.map(r=>'<div class="ba-line"><b>'+escHtml(r[0])+'</b><span>'+escHtml(r[kind])+'</span></div>').join('');
       return '<section class="app-panel ba-panel"><div class="eyebrow">CE QUE L’ON VEND</div><h3>Une fiche plus professionnelle</h3><p class="app-muted">À gauche, la fiche telle que Google la renvoie. À droite, la version visée. Ce n’est pas une fiche déjà publiée.</p><div class="ba-board"><article class="ba-col is-before"><header>Avant</header>'+col(1)+'</article><article class="ba-col is-after"><header>Après</header>'+col(2)+'</article></div></section>';
     }
-    function dossierBusinessSummaryHtml(a,c){
-      if(!c) return '';
-      const d=c.details||{}, sir=d.sirene&&d.sirene.matched?d.sirene:null;
-      const esc=escHtml;
-      const normPhone=v=>String(v||'').replace(/[^\d+]/g,'');
-      const tel=String(c.phone||d.phone||'').trim();
-      const website=safeHttpUrl(c.website||d.website||'');
-      const rating=d.rating==null?null:Number(d.rating);
-      const reviews=d.reviews==null?null:Number(d.reviews);
-      const legal=[
-        ['Raison sociale',sir&&sir.denomination],
-        ['Dirigeant',sir&&sir.dirigeant],
-        ['SIRET',sir&&sir.siret],
-        ['SIREN',sir&&sir.siren],
-        ['Forme juridique',sir&&FORME_JURIDIQUE[String(sir.formeJuridique)]],
-        ['Code NAF',sir&&sir.naf]
-      ];
-      const data=[
-        ['Adresse',d.address||c.city],
-        ['Téléphone',tel],
-        ['Site internet',website||''],
-        ['Avis Google',rating==null?'':rating.toLocaleString('fr-FR',{maximumFractionDigits:1})+'/5'+(reviews==null?'':' · '+reviews.toLocaleString('fr-FR')+' avis')],
-        ['Chiffre d’affaires','Non disponible via les sources actuellement connectées'],
-        ['Statut',d.status==='OPERATIONAL'?'En activité':d.status==='CLOSED_TEMPORARILY'?'Fermé temporairement':d.status==='CLOSED_PERMANENTLY'?'Fermé définitivement':d.status||''],
-        ['Horaires',Array.isArray(d.hours)&&d.hours.length?d.hours.join(' · '):'']
-      ];
-      const tile=(label,value,kind)=>'<div class="dossier-data-item"><span>'+esc(label)+'</span><b>'+(value?esc(value):'<i>Non renseigné</i>')+'</b>'+(kind==='url'&&website?'<a href="'+esc(website)+'" target="_blank" rel="noopener noreferrer">Ouvrir le site ↗</a>':'')+(kind==='tel'&&tel?'<a href="tel:'+esc(normPhone(tel))+'">Appeler ↗</a>':'')+'</div>';
-      const source=sir?'Registre SIRENE · données publiques':'Registre SIRENE · non rapproché';
-      const score=Number(a&&a.score);
-      const scoreLabel=(a&&(a.scan||a.site||a.status==='Analysé'))?'<div class="dossier-score"><strong>'+Math.max(0,Math.min(100,Math.round(score||0)))+'</strong><span>/100</span></div>':'<span class="dossier-pending">Analyse à lancer</span>';
-      return '<section class="app-panel dossier-business" aria-labelledby="dossier-business-title"><div class="dossier-business-head"><div><div class="eyebrow">FICHE ENTREPRISE · VUE IMMÉDIATE</div><h3 id="dossier-business-title">'+esc(c.name||'Entreprise')+'</h3><p>'+esc([c.category||d.category,c.city].filter(Boolean).join(' · '))+'</p></div>'+scoreLabel+'</div><div class="dossier-data-grid">'+
-        data.map(x=>tile(x[0],x[1],x[0]==='Site internet'?'url':x[0]==='Téléphone'?'tel':'')).join('')+
-      '</div><div class="dossier-legal-head"><b>Identité légale</b><span>'+source+'</span></div><div class="dossier-data-grid dossier-legal-grid">'+legal.map(x=>tile(x[0],x[1]||'','')).join('')+'</div>'+
-      (!sir?'<p class="dossier-data-foot">Aucune correspondance SIRENE confirmée pour le moment. Les informations légales ne sont pas inventées : relance l’analyse ou vérifie le SIRET manuellement.</p>':'<p class="dossier-data-foot">Les informations légales affichées sont celles renvoyées par le registre. Vérifie que l’établissement correspond bien à la fiche Google auditée.</p>')+
-      '</section>';
-    }
     function clientInfoHtml(c){
       if(!c) return '';
       const d=c.details||{}; const rows=[];
@@ -6728,7 +6593,7 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
         const list=Array.isArray(a.checklist)?a.checklist:[];
         const analyzed=!!(a.site||a.scan||a.status==='Analysé');
         const diagBlocks=analyzed?(visibilitySummaryHtml(a,c)+auditEvolutionHtml(a,c)+dxWrap('d-actions',auditActionsHtml(a,c))+identityHtml(a,c)+'<!--AP-->'+ficheCompareHtml(c)+dxWrap('d-fiche',clientInfoHtml(c))+siteShotHtml(a)+dxWrap('d-perf',scanPanelHtml(a,c))+dxWrap('d-social',socialPresenceHtml(a))+dxWrap('d-rank',rankingsHtml(a))+dxWrap('d-comp',competitorsHtml(a,c))+targetingPanelHtml(a,c)+(improvementHtml(a,c)?'<details class="dx-more set-anchor" id="d-imp"><summary>Recommandations détaillées (pourquoi, comment)</summary>'+improvementHtml(a,c)+'</details>':'')+'<details class="cd-edit" style="margin-top:14px"><summary>Notes personnelles (facultatif)</summary><form class="app-form" data-save-notes style="padding:0 16px 16px"><label>Notes internes<textarea name="notes" placeholder="Remarques pour toi — n’apparaissent dans le rapport que si tu les remplis.">'+escHtml(a.notes||'')+'</textarea></label><button class="app-btn primary" type="submit">Enregistrer les notes</button></form></details><div class="detail-actions" style="margin-top:16px;flex-wrap:wrap"><button class="app-btn" data-export-report="'+a.id+'" data-mode="simple">📄 Rapport express (1 page · gratuit)</button><button class="app-btn primary" data-export-report="'+a.id+'" data-mode="full">📑 Rapport complet (PDF)</button><button class="app-btn" data-delete-audit="'+a.id+'">Supprimer cet audit</button></div><p class="app-muted" style="margin:8px 0 0;font-size:12px">Le <b>rapport express</b> est l’aperçu gratuit à laisser au prospect ; le <b>rapport complet</b> est le document détaillé que tu peux facturer.</p>'):ficheCompareHtml(c)+'<div class="app-panel" style="margin-top:14px"><div class="app-empty">Rien n’est encore analysé. Touche <b>Lancer l’analyse</b> ci-dessus : AuditIA récupère les données Google, lit le site, trouve les réseaux, les informations légales (SIRET) et la performance, puis génère le rapport complet.</div><div class="detail-actions" style="margin-top:14px"><button class="app-btn" data-delete-audit="'+a.id+'">Supprimer cet audit</button></div></div>';
-        body='<button class="app-btn" data-app-view="Audits">← Audits</button>'+dossierBusinessSummaryHtml(a,c)+'<section class="app-panel page-dossier" style="margin-top:14px"><div class="dossier-head"><div><div class="eyebrow">DOSSIER D’AUDIT</div><h2 style="margin-top:8px">'+escHtml(c?.name||'Commerce')+'</h2><p>'+escHtml(c?.city||'')+' · '+escHtml(a.title)+'</p></div>'+(analyzed?'<div class="audit-score-chip"><b>'+(Number(a.score)||0)+'</b><span>/100</span></div>':'<div class="audit-score-chip is-wait"><span>Pas encore analysé</span></div>')+'</div>'+((analyzed&&!(fullAuditState&&fullAuditState.id===a.id))?diagBlocks.replace('<!--AP-->',analysePanelHtml(a,c)):analysePanelHtml(a,c)+diagBlocks.replace('<!--AP-->',''))+'</section>';
+        body='<button class="app-btn" data-app-view="Audits">← Audits</button><section class="app-panel page-dossier" style="margin-top:14px"><div class="dossier-head"><div><div class="eyebrow">DOSSIER D’AUDIT</div><h2 style="margin-top:8px">'+escHtml(c?.name||'Commerce')+'</h2><p>'+escHtml(c?.city||'')+' · '+escHtml(a.title)+'</p></div>'+(analyzed?'<div class="audit-score-chip"><b>'+(Number(a.score)||0)+'</b><span>/100</span></div>':'<div class="audit-score-chip is-wait"><span>Pas encore analysé</span></div>')+'</div>'+((analyzed&&!(fullAuditState&&fullAuditState.id===a.id))?diagBlocks.replace('<!--AP-->',analysePanelHtml(a,c)):analysePanelHtml(a,c)+diagBlocks.replace('<!--AP-->',''))+'</section>';
       }
       appShell(body);
     }
@@ -6866,30 +6731,6 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
     if('serviceWorker' in navigator){ window.addEventListener('load',()=>{ navigator.serviceWorker.register('./sw.js').catch(()=>{}); }); }
 
   </script>
-
-  <style id="auditia-dossier-business-v201">
-  .dossier-business{margin:14px 0 18px!important;padding:clamp(16px,2.5vw,23px)!important}
-  .dossier-business-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:16px}
-  .dossier-business-head h3{font-size:clamp(21px,3vw,27px);margin:5px 0 4px;letter-spacing:-.7px}
-  .dossier-business-head p{margin:0;color:#696282!important;font-size:13px}
-  .dossier-score{display:flex;align-items:baseline;gap:3px;white-space:nowrap;color:#5A3FD0}
-  .dossier-score strong{font-size:34px;line-height:1;font-variant-numeric:tabular-nums}
-  .dossier-score span{font-size:12px;color:#77718F}
-  .dossier-pending{display:inline-flex;padding:7px 11px;border-radius:99px;background:#FFF0DE;color:#A75A0A;font-size:11px;font-weight:750}
-  .dossier-data-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
-  .dossier-data-item{min-width:0;display:flex;flex-direction:column;gap:4px;padding:11px 12px;border:1px solid #EEEAF9;border-radius:13px;background:#FAF9FF}
-  .dossier-data-item>span{font-size:10px;font-weight:750;letter-spacing:.04em;text-transform:uppercase;color:#77718F}
-  .dossier-data-item>b{font-size:13px;line-height:1.4;color:#1A1530;overflow-wrap:anywhere}
-  .dossier-data-item>b i{font-style:normal;font-weight:500;color:#A29BB5}
-  .dossier-data-item>a{font-size:11px;font-weight:750;text-decoration:none;color:#5A3FD0}
-  .dossier-legal-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:16px 0 9px;padding-top:14px;border-top:1px solid #EEEAF9}
-  .dossier-legal-head b{font-size:13px;color:#1A1530}
-  .dossier-legal-head span{font-size:10px;color:#77718F}
-  .dossier-legal-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
-  .dossier-data-foot{margin:12px 0 0!important;font-size:11px!important;line-height:1.5;color:#77718F!important}
-  @media(max-width:760px){.dossier-data-grid,.dossier-legal-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.dossier-business-head h3{font-size:21px}}
-  @media(max-width:390px){.dossier-data-grid,.dossier-legal-grid{grid-template-columns:1fr}.dossier-business-head{gap:8px}}
-  </style>
   <footer class="wrap foot"><span>© <span id="year"></span> AuditIA · AffiAds</span><span>Espace privé AuditIA · Vos paramètres sont synchronisés.</span></footer>
   <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
 </body>
