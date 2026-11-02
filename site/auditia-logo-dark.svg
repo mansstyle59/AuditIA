@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 250 72" role="img" aria-labelledby="t">
+  <title id="t">AuditIA by AffiAds</title>
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#9A86FF"/>
+      <stop offset="1" stop-color="#5B3FD6"/>
+    </linearGradient>
+  </defs>
+  <rect x="0" y="6" width="60" height="60" rx="18" fill="url(#g)"/>
+  <path d="M30 17 C31.4 29 35 32.6 47 34 C35 35.4 31.4 39 30 51 C28.6 39 25 35.4 13 34 C25 32.6 28.6 29 30 17Z" fill="#fff"/>
+  <path d="M47 46 C47.6 50.6 49 52 53.6 52.6 C49 53.2 47.6 54.6 47 59 C46.4 54.6 45 53.2 40.4 52.6 C45 52 46.4 50.6 47 46Z" fill="#fff" opacity=".7"/>
+  <text x="74" y="38" font-family="Inter, Arial, Helvetica, sans-serif" font-size="30" font-weight="800" letter-spacing="-0.8" fill="#F4F2FF">Audit<tspan fill="#A99BFF">IA</tspan></text>
+  <text x="75" y="54" font-family="Inter, Arial, Helvetica, sans-serif" font-size="13" font-weight="700" letter-spacing=".3" fill="#A99BFF">AffiAds</text>
+  <text x="75" y="68" font-family="Inter, Arial, Helvetica, sans-serif" font-size="9" font-weight="500" fill="#8E88B8">Assistant de visibilité locale</text>
+</svg>
