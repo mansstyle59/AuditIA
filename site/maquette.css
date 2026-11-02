@@ -222,3 +222,23 @@ html body:has(.workspace-app) .workspace-app :is(.audit-mark,.cc-avatar,.cd-avat
   html body:has(.workspace-app) .workspace-app .audit-state em{font-size:12px!important;font-style:normal}
   html body:has(.workspace-app) .workspace-app .workspace-main>.workspace-head .eyebrow{display:none!important}
 }
+
+/* ---------- Correctifs visibilité (toutes tailles) ---------- */
+html body:has(.workspace-app) .workspace-app .mq-banner{background:linear-gradient(125deg,#7B5CF0 0%,#5B3FD6 55%,#3F2BA8 100%)!important}
+html body:has(.workspace-app) .workspace-app .mq-banner-art{
+  -webkit-mask-image:radial-gradient(ellipse 52% 58% at 55% 56%,#000 50%,transparent 100%)!important;
+  mask-image:radial-gradient(ellipse 52% 58% at 55% 56%,#000 50%,transparent 100%)!important;
+  -webkit-mask-composite:source-over!important;mask-composite:add!important;mix-blend-mode:normal}
+/* Carte « Recherche intelligente » : claire, texte lisible */
+html body:has(.workspace-app) .workspace-app .nl-search{background:#fff!important;border:1px solid #DDD6F5!important;box-shadow:0 8px 22px rgba(91,63,214,.08)!important;padding:16px 18px!important;border-radius:20px!important}
+html body:has(.workspace-app) .workspace-app .nl-search *{text-shadow:none!important}
+html body:has(.workspace-app) .workspace-app .nl-search h2{color:#241C4D!important;font-size:20px!important;margin:0 0 4px!important}
+html body:has(.workspace-app) .workspace-app .nl-search p,html body:has(.workspace-app) .workspace-app .nl-search small,html body:has(.workspace-app) .workspace-app .nl-search label{color:#5E5883!important}
+html body:has(.workspace-app) .workspace-app .nl-search .eyebrow{color:#5B3FD6!important}
+html body:has(.workspace-app) .workspace-app .nl-search-mark{background:#EFEAFF!important;color:#5B3FD6!important}
+html body:has(.workspace-app) .workspace-app .nl-search textarea,html body:has(.workspace-app) .workspace-app .nl-search input{background:#F7F5FF!important;color:#241C4D!important;border:1px solid #DDD6F5!important;border-radius:14px!important}
+html body:has(.workspace-app) .workspace-app .nl-search textarea::placeholder{color:#8A84AD!important}
+html body:has(.workspace-app) .workspace-app .nl-search button:not(.app-btn.primary):not([type=submit]){background:#F1EDFF!important;color:#4A3FB5!important;border:1px solid #DDD6F5!important}
+html body:has(.workspace-app) .workspace-app .nl-search [type=submit],html body:has(.workspace-app) .workspace-app .nl-search .app-btn.primary{background:linear-gradient(135deg,#7B5CF0,#5B3FD6)!important;color:#fff!important;border:0!important}
+html body:has(.workspace-app) .workspace-app .nl-result-card{background:#F7F5FF!important;border:1px solid #DDD6F5!important}
+html body:has(.workspace-app) .workspace-app .nl-result-card b{color:#241C4D!important}
