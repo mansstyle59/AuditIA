@@ -1,5 +1,5 @@
 /* AuditIA — coque et accueil selon la maquette (nouvelles classes mq-*, sans surcharge de l'ancien CSS) */
-html body .status-safe{background:#EEEAF8!important;z-index:250!important;opacity:1!important}
+html body:has(.workspace-app) .status-safe{background:#EEEAF8!important;z-index:250!important;opacity:1!important}
 html:has(.workspace-app),html body:has(.workspace-app){background:#EEEAF8!important}
 
 .mq-top,.mq-menu,.mq-tabbar{display:none}
@@ -148,7 +148,8 @@ html body:has(.workspace-app) .workspace-app :is(.audit-mark,.cc-avatar,.cd-avat
   .mq-btn,.mq-spacer{width:42px;height:42px}
   .mq-btn{border-radius:14px}
   .mq-top{grid-template-columns:42px minmax(0,1fr) auto}
-  .mq-logo img{height:54px}
+  /* home-logo.png fait 334×126 px : 42 px de haut = 126 px physiques sur écran 3x, donc net (sans agrandissement) */
+  .mq-logo img{height:42px}
   .mq-top-actions{gap:6px}
 
   html body .workspace-main>.workspace-head{margin:2px 0 8px!important;padding:0 2px!important}

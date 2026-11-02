@@ -4655,7 +4655,7 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
 <style id="auditia-zone-securite">
 /* Zone de l'encoche et de la barre d'état (heure, batterie) : bande pleine, couleur du fond clair */
 @media (prefers-color-scheme: light){
-  .status-safe{background:#EEEAF8!important;height:max(var(--safe-top,0px),env(safe-area-inset-top,0px))!important;opacity:1!important;filter:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+  body:has(.workspace-app) .status-safe{background:#EEEAF8!important;height:max(var(--safe-top,0px),env(safe-area-inset-top,0px))!important;opacity:1!important;filter:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
   html{background:#EEEAF8}
 }
 </style>
@@ -7144,51 +7144,5 @@ function renderApp(){
   <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
 <script src="./oca-lavender.js?v=4" defer></script>
 
-<style id="auditia-iphone-safe-area-fix">
-<!-- AuditIA iPhone safe-area fix: opaque status-bar backdrop -->
-/* iOS Safari: neutralise the translucent/blurred strip behind the status bar. */
-@media (max-width: 760px) {
-  html, body { background-color: #0A0B1A !important; }
-  body { isolation: isolate; }
-  body::before {
-    content: "";
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    height: env(safe-area-inset-top, 0px);
-    background: #0A0B1A !important;
-    opacity: 1 !important;
-    filter: none !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    pointer-events: none;
-    z-index: 9999;
-  }
-  header.app-topbar {
-    position: sticky !important;
-    top: 0 !important;
-    z-index: 1000 !important;
-    background: #0A0B1A !important;
-    background-image: none !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    padding-top: calc(env(safe-area-inset-top, 0px) + 12px) !important;
-  }
-}
-
-/* iOS Home Screen PWA: solid status-bar area, no glass/blur */
-@media (display-mode: standalone) and (max-width: 760px) {
-  html, body { background: #0A0B1A !important; }
-  body { background-image: none !important; }
-  body::before {
-    content: "" !important;
-    position: fixed !important; inset: 0 0 auto 0 !important;
-    height: env(safe-area-inset-top, 0px) !important;
-    background: #0A0B1A !important; opacity: 1 !important;
-    filter: none !important; backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    pointer-events: none !important; z-index: 99999 !important;
-  }
-}
-</style>
 </body>
 </html>
