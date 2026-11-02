@@ -447,3 +447,9 @@ html body:has(.workspace-app) .workspace-app .mq-logo{justify-self:start!importa
 .login-logo-img{display:block;height:64px!important;width:auto!important;margin:0 auto}
 @media(max-width:600px){.login-logo-img{height:54px!important}}
 body:not(:has(.workspace-app)) .status-safe{background:#0A0B1A!important}
+
+/* ---------- Mobile : contenu descendu sous la zone d'état, sans voile flou ---------- */
+@media(max-width:760px){
+  html body:has(.workspace-app) .workspace-app{padding-top:calc(max(var(--safe-top,0px),env(safe-area-inset-top,0px)) + 26px)!important}
+  html body:has(.workspace-app) .status-safe{opacity:1!important;filter:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;background:#EEEAF8!important}
+}
