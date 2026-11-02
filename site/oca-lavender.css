@@ -349,3 +349,114 @@ body:has(.workspace-app) .nl-search textarea::placeholder,
 body:has(.workspace-app) .nl-search input::placeholder{
   color:#9A94B4!important;
 }
+
+/* ---- Schémas, mécanismes et système : même langage visuel que la maquette ---- */
+
+/* Parcours d'audit : étapes reliées par un fil vertical, pastilles numérotées */
+body:has(.workspace-app) .audit-roadmap{
+  position:relative;
+  background:rgba(255,255,255,.6)!important;
+  border:1px solid #fff!important;
+  border-radius:20px!important;
+  padding:18px!important;
+}
+body:has(.workspace-app) .audit-step{
+  position:relative;
+  border-top:0!important;
+  padding:10px 0 10px 4px!important;
+  color:var(--text)!important;
+}
+body:has(.workspace-app) .audit-step:not(:last-child)::after{
+  content:"";position:absolute;left:17px;top:44px;bottom:-10px;width:2px;
+  background:linear-gradient(180deg,#B7AEEB,#E4DFF3);
+}
+body:has(.workspace-app) .audit-step-number{
+  background:linear-gradient(135deg,#8B7DFF,#6A5BE8)!important;
+  color:#fff!important;
+  box-shadow:0 6px 14px rgba(106,91,232,.3);
+  border-radius:50%!important;
+  position:relative;z-index:1;
+}
+body:has(.workspace-app) .audit-step b{color:#23203D!important}
+body:has(.workspace-app) .audit-step small,
+body:has(.workspace-app) .audit-step span{color:var(--muted)!important}
+
+/* Diagrammes de répartition (anneau et barres) */
+body:has(.workspace-app) .schema-donut circle{stroke:#ECE8F9!important}
+body:has(.workspace-app) .schema-donut .meter{stroke:#7B6CFF!important}
+body:has(.workspace-app) .schema-bar{
+  background:transparent!important;
+}
+body:has(.workspace-app) .schema-bar span,
+body:has(.workspace-app) .schema-bar em,
+body:has(.workspace-app) .schema-legend span{color:var(--muted)!important}
+body:has(.workspace-app) .schema-bar b{
+  background:linear-gradient(90deg,#8B7DFF,#BDB4FF)!important;
+  border-radius:99px;
+}
+body:has(.workspace-app) .schema-bar i,
+body:has(.workspace-app) .prog-line,
+body:has(.workspace-app) .report-meter,
+body:has(.workspace-app) .pf-bar,
+body:has(.workspace-app) .meter{
+  background:#ECE8F9!important;
+  border-radius:99px!important;
+}
+body:has(.workspace-app) .report-meter i{
+  background:linear-gradient(90deg,#8B7DFF,#6A5BE8)!important;
+}
+
+/* Étapes d'état (mécanisme en cours / terminé) */
+body:has(.workspace-app) .ap-step-icon{
+  background:#EEE9FD!important;
+  color:#5B4FD8!important;
+  border-radius:50%!important;
+}
+body:has(.workspace-app) .ap-live-step.is-active .ap-step-icon{
+  background:linear-gradient(135deg,#8B7DFF,#6A5BE8)!important;
+  color:#fff!important;
+}
+body:has(.workspace-app) .ap-live-step.is-done .ap-step-icon{
+  background:#DDF5EA!important;
+  color:#1F8A5E!important;
+}
+body:has(.workspace-app) .ap-step-status{color:var(--muted)!important}
+body:has(.workspace-app) .ap-live-step.is-active .ap-step-status{color:#5B4FD8!important}
+body:has(.workspace-app) .ap-live-step.is-done .ap-step-status{color:#1F8A5E!important}
+
+/* Cartes de parcours (journey) */
+body:has(.workspace-app) .journey-step{
+  background:rgba(255,255,255,.75)!important;
+  border:1px solid #fff!important;
+  border-radius:18px!important;
+  box-shadow:0 8px 22px rgba(92,74,180,.08);
+  color:var(--text)!important;
+}
+body:has(.workspace-app) .journey-step b{color:#23203D!important}
+body:has(.workspace-app) .journey-step small,
+body:has(.workspace-app) .journey-step p{color:var(--muted)!important}
+
+/* Repères chiffrés : petites pastilles lavande */
+body:has(.workspace-app) .oca-count,
+body:has(.workspace-app) .oca-method-num{
+  background:#EEE9FD!important;color:#5B4FD8!important;border-radius:12px!important;
+}
+
+/* ---- Corrections de lisibilité des schémas ---- */
+body:has(.workspace-app) .audit-roadmap h4{
+  color:#23203D!important;
+  opacity:1!important;
+}
+body:has(.workspace-app) .audit-step-number{
+  opacity:1!important;
+  -webkit-text-fill-color:#fff!important;
+}
+body:has(.workspace-app) .ap-live-step{
+  color:var(--text)!important;
+}
+body:has(.workspace-app) .ap-live-step.is-active{
+  background:#F4F1FC!important;
+}
+body:has(.workspace-app) .schema-donut text{
+  fill:#23203D!important;
+}
