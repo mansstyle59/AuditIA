@@ -49,6 +49,11 @@ function ocaMergeWorkspaces(localData,remoteData){
   if(idx==null){const n=merged.leads.length;merged.leads.push(l);if(l.id)byId.set('id:'+l.id,n);if(l.auditClientId)byId.set('client:'+l.auditClientId,n);return;}
   const current=merged.leads[idx],lt=Date.parse(l.updatedAt||l.createdAt||'')||0,rt=Date.parse(current.updatedAt||current.createdAt||'')||0;
   if(lt>rt)merged.leads[idx]={...current,...l};
+  else{
+   const combined={...l,...current};
+   ['name','city','category','website','email','phone','source','service','value','nextDate','nextAction','lostReason','notes','auditId','auditStatus','auditScore','lastContactAt'].forEach(k=>{if((combined[k]==null||combined[k]==='')&&l[k]!=null&&l[k]!=='')combined[k]=l[k];});
+   merged.leads[idx]=combined;
+  }
  });
  const localTs=Date.parse(local.updatedAt||'')||0,remoteTs=Date.parse(remote.updatedAt||'')||0,preferLocal=localTs>remoteTs;
  const localAvatar=Object.keys(OCA_DEFAULT.avatar).some(k=>String(local.avatar[k]||'')!==String(OCA_DEFAULT.avatar[k]||''));
