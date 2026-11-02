@@ -242,7 +242,10 @@ function bindOCAEvents(page,ctx={}){
  const setNotice=message=>{if(typeof ctx.setNotice==='function')ctx.setNotice(message);};
  const getData=()=>ocaLoad(userId);
  const save=d=>{const stored=ocaSave(userId,d);if(!stored){setNotice('Impossible d’enregistrer : stockage local indisponible. Exporte tes données puis libère de l’espace.');ocaSyncState(userId,'error','Échec de la sauvegarde locale.');return false;}ocaQueueCloudSave(userId,ctx.supabase,stored);return true;};
- if(page.querySelector('.oca-root'))ocaSyncCloud(userId,ctx.supabase,()=>{if(page.isConnected)rerender();});
+ const refreshAfterSync=()=>{if(page.isConnected)rerender();};
+ window.__ocaCurrentSync={userId,supabase:ctx.supabase,onChange:refreshAfterSync};
+ if(!window.__ocaOnlineListener){window.__ocaOnlineListener=()=>{const current=window.__ocaCurrentSync;if(!current)return;window.__ocaSyncAt=window.__ocaSyncAt||{};window.__ocaSyncAt[String(current.userId||'local')]=0;ocaSyncCloud(current.userId,current.supabase,current.onChange);};window.addEventListener('online',window.__ocaOnlineListener);}
+ if(page.querySelector('.oca-root'))ocaSyncCloud(userId,ctx.supabase,refreshAfterSync);
  page.querySelectorAll('[data-oca-tab]').forEach(b=>b.addEventListener('click',()=>{window.__ocaTab=b.dataset.ocaTab||'dashboard';rerender();}));
  const create=page.querySelector('[data-oca-create]');
  if(create)create.addEventListener('submit',e=>{e.preventDefault();const fd=new FormData(create),d=getData(),name=String(fd.get('name')||'').trim();if(!name)return;const now=new Date().toISOString();d.leads.unshift({id:ocaId(),name,city:String(fd.get('city')||'').trim(),category:String(fd.get('category')||'').trim(),website:String(fd.get('website')||'').trim(),email:String(fd.get('email')||'').trim(),phone:String(fd.get('phone')||'').trim(),source:String(fd.get('source')||'Ajout manuel'),service:String(fd.get('service')||''),value:String(fd.get('value')||''),nextDate:String(fd.get('nextDate')||''),nextAction:String(fd.get('nextAction')||'').trim(),notes:String(fd.get('notes')||'').trim(),stage:'À qualifier',stageHistory:[],activities:[],createdAt:now,updatedAt:now});if(!save(d)){rerender();return;}window.__ocaTab='leads';setNotice('Prospect ajouté au pipeline O.C.A.');rerender();});
