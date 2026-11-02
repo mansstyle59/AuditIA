@@ -4734,6 +4734,31 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
 
 
 <link rel="stylesheet" href="./maquette.css?v=23">
+
+<style id="auditia-ios-safe-area-no-blur-final">
+/* iPhone PWA : zone d'encoche totalement opaque, sans blur ni transparence */
+@media (max-width: 760px) {
+  html, body { filter:none !important; -webkit-filter:none !important; }
+  body:has(.workspace-app) .status-safe,
+  body:has(.workspace-app) .status-safe[aria-hidden="true"] {
+    display:block !important;
+    position:fixed !important;
+    top:0 !important; left:0 !important; right:0 !important;
+    height:env(safe-area-inset-top, 0px) !important;
+    min-height:env(safe-area-inset-top, 0px) !important;
+    background:#EEEAF8 !important;
+    background-color:#EEEAF8 !important;
+    opacity:1 !important; filter:none !important;
+    -webkit-backdrop-filter:none !important; backdrop-filter:none !important;
+    mix-blend-mode:normal !important;
+    z-index:99999 !important; pointer-events:none !important;
+  }
+  body:has(.workspace-app) header.app-topbar {
+    -webkit-backdrop-filter:none !important; backdrop-filter:none !important;
+    filter:none !important; opacity:1 !important;
+  }
+}
+</style>
 </head>
 <body>
   <div class="status-safe" aria-hidden="true"></div>
