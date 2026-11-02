@@ -4729,41 +4729,44 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
 }
 </style>
 <style id="auditia-nav-flottante">
-/* Mobile : barre de navigation flottante avec bouton central, sans menu burger */
+/* Mobile : barre de navigation flottante à 5 entrées, sans menu burger */
 @media (max-width:760px){
   html body .burger-btn,html body .topbar-menu-btn,html body .sidebar-backdrop,html body .workspace-sidebar{display:none!important}
-  html body .workspace-app .workspace-main .desktop-nav,html body .desktop-nav.desktop-nav{display:flex!important;visibility:visible!important;overflow-x:auto;scrollbar-width:none;gap:6px!important;padding:6px!important;margin:0 0 12px!important;border-radius:999px!important}
+  html body .workspace-app .workspace-main .desktop-nav{display:flex!important;visibility:visible!important;overflow-x:auto;scrollbar-width:none;gap:6px!important;padding:6px!important;margin:0 0 12px!important;border-radius:999px!important}
   html body .workspace-app .desktop-nav::-webkit-scrollbar{display:none}
-  html body .desktop-nav button{flex:0 0 auto!important;min-height:36px!important;padding:8px 14px!important;border-radius:999px!important;font-size:13px!important;white-space:nowrap}
+  html body .workspace-app .desktop-nav button{flex:0 0 auto!important;min-height:36px!important;padding:8px 14px!important;border-radius:999px!important;font-size:13px!important;white-space:nowrap}
   html body .mobile-tabbar{
     display:grid!important;visibility:visible!important;pointer-events:auto!important;
-    grid-template-columns:repeat(4,minmax(0,1fr))!important;
-    position:fixed!important;z-index:160!important;
+    grid-template-columns:repeat(5,minmax(0,1fr))!important;position:fixed!important;z-index:160!important;
     left:50%!important;right:auto!important;bottom:calc(10px + env(safe-area-inset-bottom))!important;transform:translateX(-50%)!important;
-    width:min(92vw,380px)!important;height:68px!important;padding:0 10px!important;align-items:center!important;
+    width:min(94vw,400px)!important;height:68px!important;padding:0 8px!important;align-items:center!important;
     border-radius:999px!important;background:#fff!important;border:1px solid #EAE5F7!important;overflow:visible!important;
     box-shadow:0 14px 34px rgba(60,40,140,.18)!important;
   }
-  html body .mobile-tabbar button{min-height:48px!important;background:transparent!important;border:0!important;color:#2A2545!important;padding:0!important;display:flex!important;align-items:center!important;justify-content:center!important}
+  html body .mobile-tabbar button{min-height:48px!important;background:transparent!important;border:0!important;color:#4A4470!important;padding:0!important;display:flex!important;align-items:center!important;justify-content:center!important}
+  html body .mobile-tabbar button:nth-child(n+6){display:none!important}
   html body .mobile-tabbar button>span:last-child{display:none!important}
   html body .mobile-tabbar .tab-icon svg{width:24px!important;height:24px!important;stroke:currentColor!important}
-  html body .mobile-tabbar button.active{color:#5B4FD8!important}
-  html body .mobile-tabbar button:nth-child(1){order:1}
-  html body .mobile-tabbar button:nth-child(3){order:2}
-  html body .mobile-tabbar button:nth-child(2){order:3}
-  html body .mobile-tabbar button:nth-child(4){order:4}
-  html body .mobile-tabbar button:nth-child(5){display:none!important}
-  html body .mobile-tabbar button:nth-child(6){order:5}
-  html body .mobile-tabbar button:nth-child(2){
-    width:58px!important;height:58px!important;min-height:58px!important;margin-top:-26px!important;justify-self:center;
-    border-radius:50%!important;background:linear-gradient(135deg,#A392F5,#6A5BE8)!important;color:#fff!important;
-    box-shadow:0 10px 24px rgba(106,91,232,.45)!important;
-  }
-  html body .mobile-tabbar button:nth-child(2) .tab-icon svg{stroke:#fff!important}
+  html body .mobile-tabbar button.active{color:#5B4FD8!important;background:#F1EDFC!important;border-radius:999px!important}
   html body .workspace-main{padding-bottom:calc(120px + env(safe-area-inset-bottom))!important}
 }
 </style>
 <link rel="stylesheet" href="./theme-clair.css?v=2">
+<style id="auditia-accueil-maquette">
+/* Accueil : bannière, raccourcis et recherche, selon la maquette */
+html body:has(.workspace-app) .hx-banner{position:relative;overflow:hidden;border-radius:22px;padding:22px 20px;margin:0 0 14px;background:linear-gradient(135deg,#7B5CF0 0%,#5B3FD6 60%,#4B2FBF 100%);color:#fff;box-shadow:0 16px 34px rgba(91,63,214,.28)}
+html body:has(.workspace-app) .hx-banner-tag{display:inline-block;padding:6px 12px;border-radius:999px;background:rgba(255,255,255,.2);color:#fff!important;font-size:12px;font-weight:700;letter-spacing:0}
+html body:has(.workspace-app) .hx-banner h1{color:#fff!important;font-size:clamp(22px,6vw,28px);line-height:1.15;letter-spacing:-.6px;margin:12px 0 8px}
+html body:has(.workspace-app) .hx-banner p{color:rgba(255,255,255,.88)!important;font-size:14px;line-height:1.5;margin:0 0 16px;max-width:34ch}
+html body:has(.workspace-app) .hx-banner-cta{min-height:46px;padding:0 20px;border:0;border-radius:999px;background:#fff;color:#4B2FBF;font-weight:800;font-size:15px;cursor:pointer;box-shadow:0 8px 18px rgba(20,10,60,.22)}
+html body:has(.workspace-app) .hx-tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:0 0 14px}
+html body:has(.workspace-app) .hx-tiles button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:96px;padding:10px 6px;border:1px solid #fff;border-radius:18px;background:rgba(255,255,255,.85);color:#23203D;font-size:12px;font-weight:700;line-height:1.25;text-align:center;cursor:pointer;box-shadow:0 8px 20px rgba(92,74,180,.08)}
+html body:has(.workspace-app) .hx-tiles button b{color:#23203D!important;font-size:11px;word-break:normal!important;overflow-wrap:normal!important;hyphens:none!important;line-height:1.2}
+html body:has(.workspace-app) .hx-tiles button{word-break:normal;overflow-wrap:normal;hyphens:none}
+html body:has(.workspace-app) .hx-tile-ic{display:grid;place-items:center;width:38px;height:38px;border-radius:12px;background:#EEE9FD;color:#6A5BE8}
+html body:has(.workspace-app) .hx-tile-ic svg{width:22px;height:22px;stroke:currentColor}
+@media (max-width:380px){html body:has(.workspace-app) .hx-tiles{gap:6px}html body:has(.workspace-app) .hx-tiles button{font-size:11px;min-height:88px}}
+</style>
 </head>
 <body>
   <div class="status-safe" aria-hidden="true"></div>
@@ -4998,7 +5001,7 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
     }
     function appShell(body) {
       const page = document.querySelector('.login-page');
-      const navItems=[['Accueil','home'],['Audit','audits','Audits'],['Rapports','reports'],['Studio','sparkles'],['O.C.A.','trend','Prospection'],['Réglages','settings','Paramètres']];
+      const navItems=[['Accueil','home'],['Recherche','clients','Clients'],['Audit','audits','Audits'],['Rapports','reports'],['Plus','settings','Paramètres'],['Studio','sparkles'],['O.C.A.','trend','Prospection']];
       const sectionLabel = appView==='ClientDétail'?'Clients':appView==='Détail'?'Audits':appView==='Paramètres'?'Réglages':appView==='Profil'?'Profil':appView==='Assistant'?'Assistant':appView;
       const navActive = appView==='ClientDétail'?'Clients':appView==='Détail'?'Audits':appView;
       const headTitle = appView==='Accueil'?'Accueil':appView==='Assistant'?'Audit Chat IA':appView==='Paramètres'?'Réglages':appView==='Profil'?'Mon profil':appView==='ClientDétail'?'Fiche client':appView==='Détail'?'Dossier d’audit':appView;
@@ -6910,10 +6913,10 @@ function renderApp(){
         const latest=appAudits.filter(a=>auditHasAnalysis(a)).sort((a,b)=>String(b.updated_at||b.created_at||'').localeCompare(String(a.updated_at||a.created_at||'')))[0];
         const waiting=appAudits.filter(a=>!auditHasAnalysis(a)).length;
         body='<div class="hx hx-compact">'+
-          '<section class="hx-hero hx-hero-compact" aria-labelledby="hx-title"><div class="hx-hero-copy"><div class="hx-kicker"><i></i>AUDIT COMMERCIAL</div><h1 id="hx-title">AuditIA <span class="hx-grad">AffiAds</span></h1><p>Trouvez un commerce, vérifiez sa visibilité et préparez un rapport client.</p></div></section>'+
-          naturalLanguageSearchHtml()+
-          '<section class="hx-quick-stats" aria-label="Résumé de l’activité"><button type="button" data-app-view="Clients"><b>'+appClients.length+'</b><span>Commerces</span></button><button type="button" data-app-view="Audits"><b>'+appAudits.length+'</b><span>Dossiers d’audit</span></button><button type="button" data-app-view="Audits"><b>'+waiting+'</b><span>À analyser</span></button></section>'+
-          (latest?'<section class="hx-latest"><div><span class="hx-kicker"><i></i>DERNIER AUDIT</span><h2>'+escHtml((appClients.find(c=>String(c.id)===String(latest.client_id))||{}).name||latest.title||'Commerce')+'</h2><p>'+escHtml([((appClients.find(c=>String(c.id)===String(latest.client_id))||{}).city),latest.title].filter(Boolean).join(' · '))+'</p></div><div class="hx-latest-score"><b>'+Math.max(0,Math.min(100,Math.round(Number(latest.score)||0)))+'</b><span>/100</span></div><button type="button" class="app-btn primary" data-open-audit="'+escHtml(latest.id)+'">Ouvrir le dossier</button></section>':'<section class="hx-latest hx-latest-empty"><div><b>Pas encore d’audit terminé</b><p>Lancez une recherche ci-dessus, puis choisissez un commerce pour créer son dossier.</p></div></section>')+
+          '<section class="hx-banner" aria-labelledby="hx-title"><div class="hx-banner-copy"><span class="hx-banner-tag">Audit commercial IA</span><h1 id="hx-title">Boostez la visibilité de votre commerce</h1><p>Trouvez un commerce, analysez sa présence en ligne et générez un rapport client professionnel.</p><button type="button" class="hx-banner-cta" data-app-view="Clients">Lancer un audit</button></div></section>'+
+           naturalLanguageSearchHtml()+
+          '<section class="hx-tiles" aria-label="Actions rapides"><button type="button" data-app-view="Clients"><span class="hx-tile-ic">'+navIcon('clients')+'</span><b>Rechercher<br>un commerce</b></button><button type="button" data-app-view="Audits"><span class="hx-tile-ic">'+navIcon('audits')+'</span><b>Audit complet</b></button><button type="button" data-app-view="Rapports"><span class="hx-tile-ic">'+navIcon('reports')+'</span><b>Rapport client</b></button><button type="button" data-app-view="Paramètres"><span class="hx-tile-ic">'+navIcon('settings')+'</span><b>Paramètres<br>&amp; clés</b></button></section>'+
+           (latest?'<section class="hx-latest"><div><span class="hx-kicker"><i></i>DERNIER AUDIT</span><h2>'+escHtml((appClients.find(c=>String(c.id)===String(latest.client_id))||{}).name||latest.title||'Commerce')+'</h2><p>'+escHtml([((appClients.find(c=>String(c.id)===String(latest.client_id))||{}).city),latest.title].filter(Boolean).join(' · '))+'</p></div><div class="hx-latest-score"><b>'+Math.max(0,Math.min(100,Math.round(Number(latest.score)||0)))+'</b><span>/100</span></div><button type="button" class="app-btn primary" data-open-audit="'+escHtml(latest.id)+'">Ouvrir le dossier</button></section>':'<section class="hx-latest hx-latest-empty"><div><b>Pas encore d’audit terminé</b><p>Lancez une recherche ci-dessus, puis choisissez un commerce pour créer son dossier.</p></div></section>')+
           '<p class="hx-compact-note">Les résultats proviennent des sources configurées. Une information non disponible n’est pas automatiquement un défaut.</p>'+
         '</div>';
       } else if(appView==='Studio'){
