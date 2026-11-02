@@ -242,3 +242,25 @@ html body:has(.workspace-app) .workspace-app .nl-search button:not(.app-btn.prim
 html body:has(.workspace-app) .workspace-app .nl-search [type=submit],html body:has(.workspace-app) .workspace-app .nl-search .app-btn.primary{background:linear-gradient(135deg,#7B5CF0,#5B3FD6)!important;color:#fff!important;border:0!important}
 html body:has(.workspace-app) .workspace-app .nl-result-card{background:#F7F5FF!important;border:1px solid #DDD6F5!important}
 html body:has(.workspace-app) .workspace-app .nl-result-card b{color:#241C4D!important}
+
+/* ---------- Dossier : fiche commerce + réputation lisibles ---------- */
+html body:has(.workspace-app) .workspace-app .info-panel{background:#fff!important;border:1px solid #DDD6F5!important;padding:18px!important}
+html body:has(.workspace-app) .workspace-app .audit-insight-grid{display:grid!important;grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr)!important;gap:14px!important;align-items:start}
+html body:has(.workspace-app) .workspace-app .audit-profile-data,html body:has(.workspace-app) .workspace-app .audit-reputation{background:#F7F5FF!important;border:1px solid #E3DDF8!important;border-radius:16px!important;padding:14px!important;min-width:0!important}
+html body:has(.workspace-app) .workspace-app .audit-profile-data h4,html body:has(.workspace-app) .workspace-app .audit-reputation h4{color:#241C4D!important}
+html body:has(.workspace-app) .workspace-app .info-row{display:flex!important;justify-content:space-between!important;align-items:baseline!important;gap:12px!important;background:#fff!important;border:1px solid #E7E2FA!important;border-radius:12px!important;padding:9px 12px!important;min-width:0!important}
+html body:has(.workspace-app) .workspace-app .info-row span{color:#6B6590!important;flex:0 0 auto!important;white-space:nowrap!important}
+html body:has(.workspace-app) .workspace-app .info-row b{color:#241C4D!important;text-align:right!important;min-width:0!important;overflow-wrap:anywhere!important;word-break:normal!important}
+html body:has(.workspace-app) .workspace-app .info-hours{background:#fff!important;border:1px solid #E7E2FA!important;color:#241C4D!important}
+html body:has(.workspace-app) .workspace-app .info-hours *{color:#4A4470!important}
+html body:has(.workspace-app) .workspace-app .audit-insight-ring{background:conic-gradient(#7B5CF0 var(--audit-progress),#E3DDF8 0)!important}
+html body:has(.workspace-app) .workspace-app .audit-insight-ring:before{background:#fff!important}
+html body:has(.workspace-app) .workspace-app .audit-insight-ring strong{color:#241C4D!important}
+html body:has(.workspace-app) .workspace-app .audit-insight-ring small{color:#6B6590!important}
+html body:has(.workspace-app) .workspace-app .audit-insight-score-copy b{color:#241C4D!important}
+html body:has(.workspace-app) .workspace-app .audit-insight-score-copy span,html body:has(.workspace-app) .workspace-app .audit-insight-empty,html body:has(.workspace-app) .workspace-app .audit-reputation p{color:#5E5883!important}
+html body:has(.workspace-app) .workspace-app .audit-step{background:#fff!important;border:1px solid #E7E2FA!important}
+html body:has(.workspace-app) .workspace-app .audit-step b{color:#241C4D!important}
+html body:has(.workspace-app) .workspace-app .audit-step small{color:#6B6590!important}
+html body:has(.workspace-app) .workspace-app .audit-source-badge{background:#E9F8F1!important;color:#12724E!important;border-color:#BFE8D3!important}
+@media(max-width:760px){html body:has(.workspace-app) .workspace-app .audit-insight-grid{grid-template-columns:minmax(0,1fr)!important}}
