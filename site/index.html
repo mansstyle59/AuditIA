@@ -4733,7 +4733,7 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
 
 
 
-<link rel="stylesheet" href="./maquette.css?v=12">
+<link rel="stylesheet" href="./maquette.css?v=13">
 </head>
 <body>
   <div class="status-safe" aria-hidden="true"></div>
@@ -5546,7 +5546,7 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
         {label:'Recherche locale',url:'https://www.google.com/maps/search/'+encodeURIComponent((c.category||d.category||'commerce')+' near '+(d.address||''))}
       ];
       const links=urls.map(x=>'<a class="audit-source-link" href="'+x.url+'" target="_blank" rel="noopener noreferrer">'+x.label+' ↗</a>').join('');
-      return '<section class="app-panel info-panel"><div class="audit-section-head"><div><div class="eyebrow">FICHE COMMERCE · DONNÉES PUBLIQUES</div><h3 style="margin:4px 0 4px">Vue d’ensemble du commerce</h3><p>Les indicateurs ci-dessous s’appuient sur les informations réellement disponibles.</p></div><span class="audit-source-badge">Google Places</span></div><div class="audit-insight-grid"><div class="audit-profile-data"><h4>Informations vérifiables</h4><div class="info-grid">'+rows.map(([k,v])=>'<div class="info-row"><span>'+escHtml(k)+'</span><b>'+escHtml(v)+'</b></div>').join('')+'</div>'+hours+'</div><div class="audit-reputation"><h4>Signal de réputation</h4>'+reputation+'<p class="audit-disclaimer">Ce score décrit uniquement la note Google connue, pas le score global de visibilité ni le classement du commerce.</p></div></div><div class="audit-roadmap"><h4>Parcours d’audit recommandé</h4><p>Une lecture claire, inspirée des rapports d’audit local : profil, réputation, site et visibilité.</p>'+steps+'</div><div class="audit-source-actions"><h4>Vérifier les sources publiques</h4><div class="audit-source-links">'+links+'</div></div><p class="scan-note">Source : Google Places et liens de recherche publics. Les recherches servent à vérifier les informations ; elles ne prétendent pas mesurer le classement, le taux de réponse aux avis ni la cohérence multi-annuaire automatiquement.</p></section>';
+      return '<section class="app-panel info-panel"><div class="audit-section-head"><div><h3 style="margin:0">Fiche du commerce</h3></div><span class="audit-source-badge">Google Places</span></div><div class="audit-insight-grid"><div class="audit-profile-data"><h4>Coordonnées</h4><div class="info-grid">'+rows.map(([k,v])=>'<div class="info-row"><span>'+escHtml(k)+'</span><b>'+escHtml(v)+'</b></div>').join('')+'</div>'+hours+'</div><div class="audit-reputation"><h4>Note Google</h4>'+reputation+'<p class="audit-disclaimer">Calculé à partir de la note Google uniquement.</p></div></div><div class="audit-source-actions"><h4>Voir sur Google</h4><div class="audit-source-links">'+links+'</div></div></section>';
     }
     function sparkline(vals){
       if(!vals||vals.length<2) return '';
