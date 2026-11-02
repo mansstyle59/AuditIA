@@ -326,6 +326,9 @@ html body:has(.workspace-app) .workspace-app .mq-logo{justify-self:start!importa
   html body:has(.workspace-app) .status-safe{display:block!important;position:fixed!important;top:0!important;left:0!important;right:0!important;
     height:max(var(--safe-top,0px),env(safe-area-inset-top,0px))!important;background:#EEEAF8!important;opacity:1!important;filter:none!important;
     -webkit-backdrop-filter:none!important;backdrop-filter:none!important;z-index:260!important;pointer-events:none!important;box-shadow:none!important}
+  /* En-tête nette sous la zone de sécurité : fond plein, aucun flou ni filtre hérité */
+  html body:has(.workspace-app) .workspace-app .mq-top{background:#EEEAF8!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;filter:none!important;opacity:1!important}
+  html body:has(.workspace-app) .workspace-app .mq-top *{text-shadow:none!important;filter:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
 }
 
 /* ---------- iPhone (app installée) : bande du haut sombre + heure blanche, reste de l'app lavande ---------- */
