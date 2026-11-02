@@ -359,3 +359,21 @@ html body:has(.workspace-app) .workspace-app .mq-logo{justify-self:start!importa
   html body:has(.workspace-app) .workspace-app{overflow:visible!important;margin-left:0!important;margin-right:0!important;width:100%!important;contain:none!important}
   html body:has(.workspace-app) .workspace-app .workspace-layout{overflow:visible!important}
 }
+
+/* ---------- Ordinateur : boutons d'en-tête au-dessus de l'image, harmonisés ---------- */
+@media(min-width:900px){
+  html body[data-view]:has(.workspace-app) .workspace-app .workspace-main>.workspace-head{overflow:hidden!important}
+  html body[data-view]:has(.workspace-app) .workspace-app .workspace-main>.workspace-head>*{position:relative;z-index:2}
+  html body[data-view]:has(.workspace-app) .workspace-app .workspace-main>.workspace-head::after{z-index:0!important}
+  html body[data-view]:has(.workspace-app) .workspace-app .workspace-head .workspace-actions{position:relative;z-index:3;display:flex!important;gap:8px!important;align-items:center;flex-wrap:nowrap!important}
+  html body[data-view]:has(.workspace-app) .workspace-app .workspace-head .workspace-actions .app-btn,
+  html body[data-view]:has(.workspace-app) .workspace-app .workspace-head .workspace-actions button{background:rgba(255,255,255,.96)!important;color:#3D2A9E!important;border:1px solid #E4DFF3!important;border-radius:14px!important;box-shadow:0 6px 14px rgba(40,20,120,.14)!important;min-height:42px!important;font-weight:700!important;font-size:14px!important;padding:0 16px!important}
+  html body[data-view]:has(.workspace-app) .workspace-app .workspace-head .workspace-actions .app-btn.primary{background:linear-gradient(135deg,#7B5CF0,#5B3FD6)!important;color:#fff!important;border:0!important}
+  html body[data-view]:has(.workspace-app) .workspace-app .workspace-main>.workspace-head::after{width:30%!important;background-size:auto 78%!important}
+}
+@media(min-width:900px){
+  html body[data-view]:has(.workspace-app) .workspace-app .workspace-main>.workspace-head{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:24px!important}
+  html body[data-view]:has(.workspace-app) .workspace-app .workspace-head>div:first-child{position:relative;z-index:2;min-width:0}
+  html body[data-view]:has(.workspace-app) .workspace-app .workspace-head .workspace-actions{margin-left:auto;flex:0 0 auto}
+  html body[data-view]:has(.workspace-app) .workspace-app .workspace-main>.workspace-head::after{right:calc(max(32px,calc(50vw - 590px)) + 300px)!important;width:200px!important;top:50%!important;bottom:auto!important;height:92%!important;transform:translateY(-50%);background-size:auto 100%!important;background-position:center!important}
+}
