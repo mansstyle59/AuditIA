@@ -2,13 +2,13 @@
    Stratégie « cache d'abord, mise à jour en arrière-plan » (stale-while-revalidate) :
    l'app s'affiche tout de suite depuis le cache, et la dernière version est
    récupérée en arrière-plan pour la prochaine ouverture. */
-const CACHE = 'auditia-v154';
+const CACHE = 'auditia-v33';
 const ASSETS = [
   './', './index.html', './manifest.webmanifest',
-  './auditia-icon.svg', './audit-chat-robot.svg', './favicon-32.png',
+  './auditia-icon.svg', './favicon-32.png',
   './apple-touch-icon.png', './icon-192.png', './icon-512.png',
   './vendor/html2canvas.min.js', './vendor/jspdf.umd.min.js',
-  './vendor/supabase.js', './oca.js', './oca.css', './oca-lavender.css', './oca-lavender.js', './home-robot.png', './page-clients.png', './page-studio.png', './chat-robot.png'
+  './vendor/supabase.js'
 ];
 
 self.addEventListener('install', e => {
@@ -29,18 +29,12 @@ self.addEventListener('fetch', e => {
   if (req.method !== 'GET') return;
   let url;
   try { url = new URL(req.url); } catch (_) { return; }
+  // Laisser passer tout ce qui n'est pas notre origine (Google, Logo.dev, RDAP…)
   if (url.origin !== location.origin) return;
-  const allowed = ASSETS.some(asset => {
-    const name = asset.replace(/^\.\//, '');
-    if (!name) return url.pathname.endsWith('/') || url.pathname.endsWith('/AuditIA');
-    return url.pathname.endsWith('/' + name);
-  });
-  if (!allowed || url.search) return;
   e.respondWith((async () => {
-    // Toujours vérifier la dernière version réseau pour les pages HTML.
-    // L'ancien comportement servait d'abord le HTML en cache, ce qui pouvait
-    // laisser l'iPhone exécuter une ancienne version après un correctif.
-    if (req.mode === 'navigate' || /\.html$/i.test(url.pathname)) {
+    // Pages HTML : toujours la dernière version réseau, pour qu'un correctif soit pris en compte
+    // dès l'ouverture (sinon l'iPhone peut garder une ancienne version).
+    if (req.mode === 'navigate' || /\.html$/i.test(url.pathname) || url.pathname.endsWith('/')) {
       try {
         const fresh = await fetch(req, { cache: 'no-store' });
         if (fresh && fresh.ok) {
