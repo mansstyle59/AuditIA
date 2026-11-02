@@ -4666,6 +4666,27 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
   .report-actions .app-btn{width:100%!important;min-height:48px!important;white-space:normal!important;word-break:normal!important;overflow-wrap:break-word!important;hyphens:none!important;font-size:14px!important;line-height:1.3!important;padding:12px 14px!important;text-align:center}
 }
 </style>
+<style id="auditia-icones-clair">
+/* Mode clair : boutons d'icônes (menu, profil, connexion) bien contrastés */
+@media (prefers-color-scheme: light){
+  html body header.app-topbar .burger-btn,
+  html body header.app-topbar .topbar-menu-btn,
+  html body header.app-topbar .tb-actions button,
+  html body header.app-topbar .tb-actions .app-btn{
+    background:#fff!important;color:#5B4FD8!important;border:1px solid #CFC6F0!important;
+    box-shadow:0 6px 16px rgba(92,74,180,.14)!important;opacity:1!important;
+  }
+  html body header.app-topbar .burger-btn svg,
+  html body header.app-topbar .topbar-menu-btn svg,
+  html body header.app-topbar .tb-actions svg{
+    stroke:#5B4FD8!important;fill:none!important;opacity:1!important;
+  }
+  html body header.app-topbar .burger-btn span,html body header.app-topbar .burger-btn i,
+  html body header.app-topbar .topbar-menu-btn span,html body header.app-topbar .topbar-menu-btn i{
+    background:#5B4FD8!important;color:#5B4FD8!important;
+  }
+}
+</style>
 </head>
 <body>
   <div class="status-safe" aria-hidden="true"></div>
