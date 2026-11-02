@@ -4698,6 +4698,36 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
   html body .scan-score-label{color:#5F5A7E!important}
 }
 </style>
+<style id="auditia-affichage-adaptatif">
+/* Affichage compact et élégant, adapté au téléphone et à l'ordinateur */
+.workspace-main{max-width:1080px;margin:0 auto}
+.workspace-head{margin:8px 0 14px!important;gap:12px!important}
+.workspace-head h1{font-size:clamp(24px,3.2vw,32px)!important;letter-spacing:-.8px!important}
+.workspace-head p{font-size:13px!important}
+.app-panel{padding:clamp(14px,2vw,20px)!important;border-radius:18px!important;box-shadow:0 8px 24px rgba(92,74,180,.07)!important}
+.app-stats{gap:10px!important;margin:10px 0 14px!important}
+.app-stat{padding:12px 14px!important;border-radius:16px!important}
+.app-stat strong{font-size:clamp(22px,3vw,26px)!important}
+.app-btn{min-height:40px;padding:9px 14px!important;font-size:13px!important}
+.desktop-nav{margin:0 0 12px!important;padding:5px!important}
+.desktop-nav button{min-height:38px!important;font-size:13px!important}
+.app-list,.report-list{gap:8px!important}
+.app-stat::before,.app-stat::after,.workspace-head::before,.workspace-head::after{display:none!important;content:none!important}
+@media (min-width:900px){
+  .report-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .app-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .studio-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+}
+@media (max-width:640px){
+  .workspace-app{padding:12px 12px 120px!important}
+  .workspace-head{margin:4px 0 10px!important}
+  .app-panel{padding:14px!important;border-radius:16px!important}
+  .app-stats{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:8px!important}
+  .app-stat strong{font-size:22px!important}
+  .app-stat span{font-size:11px!important}
+  .app-btn{min-height:42px}
+}
+</style>
 </head>
 <body>
   <div class="status-safe" aria-hidden="true"></div>
