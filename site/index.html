@@ -4733,7 +4733,7 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
 
 
 
-<link rel="stylesheet" href="./maquette.css?v=7">
+<link rel="stylesheet" href="./maquette.css?v=8">
 </head>
 <body>
   <div class="status-safe" aria-hidden="true"></div>
@@ -5564,10 +5564,10 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
       const avg=scoredAudits.length?Math.round(scoredAudits.reduce((s,a)=>s+(Number(a.score)||0),0)/scoredAudits.length):null;
       const last=scoredAudits[0];
       const scoredOldToNew=[...audits].reverse().map(a=>Number(a.score)||0);
-      const initial=(c.name||'?').charAt(0).toUpperCase();
+      const initial=bizIconSvg(c);
       const tel=String(c.phone||d.phone||'').replace(/[^\d+]/g,'');
       const mapsQ=encodeURIComponent([c.name,d.address||c.city].filter(Boolean).join(' '));
-      const header='<section class="app-panel cd-head"><div class="cd-id"><span class="cd-avatar">'+escHtml(initial)+'</span><div class="cd-id-txt"><h2>'+escHtml(c.name)+'</h2><p>'+escHtml([c.city,c.category||d.category].filter(Boolean).join(' · '))+'</p>'+(d.rating!=null?'<span class="cd-rating">★ '+d.rating+' · '+(d.reviews||0)+' avis Google</span>':'')+'</div></div><div class="cd-actions"><button class="app-btn primary" data-new-audit-for="'+c.id+'">＋ Nouvel audit</button>'+(tel?'<a class="app-btn" href="tel:'+escHtml(tel)+'">📞 Appeler</a>':'')+(safeHttpUrl(c.website)?'<a class="app-btn" href="'+escHtml(safeHttpUrl(c.website))+'" target="_blank" rel="noopener noreferrer">🌐 Site</a>':'')+'<a class="app-btn" href="https://www.google.com/maps/search/?api=1&query='+mapsQ+'" target="_blank" rel="noopener noreferrer">📍 Localiser</a></div></section>';
+      const header='<section class="app-panel cd-head"><div class="cd-id"><span class="cd-avatar">'+initial+'</span><div class="cd-id-txt"><h2>'+escHtml(c.name)+'</h2><p>'+escHtml([c.city,c.category||d.category].filter(Boolean).join(' · '))+'</p>'+(d.rating!=null?'<span class="cd-rating">★ '+d.rating+' · '+(d.reviews||0)+' avis Google</span>':'')+'</div></div><div class="cd-actions"><button class="app-btn primary" data-new-audit-for="'+c.id+'">＋ Nouvel audit</button>'+(tel?'<a class="app-btn" href="tel:'+escHtml(tel)+'">📞 Appeler</a>':'')+(safeHttpUrl(c.website)?'<a class="app-btn" href="'+escHtml(safeHttpUrl(c.website))+'" target="_blank" rel="noopener noreferrer">🌐 Site</a>':'')+'<a class="app-btn" href="https://www.google.com/maps/search/?api=1&query='+mapsQ+'" target="_blank" rel="noopener noreferrer">📍 Localiser</a></div></section>';
       const stats='<div class="app-stats"><article class="app-stat"><span class="stat-with-ic">'+navIcon('chart')+' Audits</span><strong>'+audits.length+'</strong></article><article class="app-stat"><span class="stat-with-ic">'+navIcon('score')+' Score moyen</span><strong>'+(avg==null?'—':avg+'<small>/100</small>')+'</strong></article><article class="app-stat"><span class="stat-with-ic">'+navIcon('trend')+' Dernier score</span><strong>'+(last?(last.score||0)+'<small>/100</small>':'—')+'</strong></article></div>';
       const evo=(scoredOldToNew.filter(v=>v>0).length>=2)?'<section class="app-panel"><div class="eyebrow">ÉVOLUTION DU SCORE</div><div class="cd-spark">'+sparkline(scoredOldToNew)+'</div><p class="scan-note">Du plus ancien au plus récent audit.</p></section>':'';
       const auditList='<section class="app-panel"><div class="scan-head"><div><h3 style="margin:0">Audits de ce client</h3></div><button class="app-btn primary" data-new-audit-for="'+c.id+'">Nouvel audit</button></div>'+(audits.length?'<div class="app-list" style="margin-top:10px">'+audits.map(a=>'<div class="app-row"><div><b>'+escHtml(a.title||'Audit')+'</b><small>'+escHtml(a.status||'À démarrer')+' · '+navIcon('score')+' '+(a.score||0)+'/100</small></div><button class="app-btn" data-open-audit="'+a.id+'">Ouvrir</button></div>').join('')+'</div>':'<div class="app-empty" style="margin-top:10px">Aucun audit pour ce client. Lance son premier audit.</div>')+'</section>';
@@ -6847,7 +6847,7 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
       const c=appClients.find(x=>x.id===a.client_id);
       const done=!!(a.site||a.scan||auditHasAnalysis(a));
       const score=Number(a.score)||0;
-      const initial=escHtml(((c&&c.name)||'?').charAt(0).toUpperCase());
+      const initial=bizIconSvg(c);
       return '<article class="audit-card'+(done?' is-done':'')+'"><span class="audit-mark">'+initial+'</span><div class="audit-copy"><b>'+escHtml((c&&c.name)||'Commerce')+'</b><small>'+escHtml([c&&c.city,a.title].filter(Boolean).join(' · '))+'</small></div><span class="audit-state">'+(done?'<b>'+score+'</b><small>/100</small>':'<em>À analyser</em>')+'</span><button class="app-btn'+(done?'':' primary')+'" type="button" data-open-audit="'+a.id+'"'+(done?'':' data-start-audit="1"')+'>'+(done?'Ouvrir':'Analyser')+'</button></article>';
     }
     function reportCardHtml(a){
@@ -6855,7 +6855,7 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
       if(!done) return auditRowHtml(a);
       const c=appClients.find(x=>x.id===a.client_id);
       const score=Number(a.score)||0;
-      const initial=escHtml(((c&&c.name)||'?').charAt(0).toUpperCase());
+      const initial=bizIconSvg(c);
       return '<article class="report-card"><div class="report-top"><span class="audit-mark">'+initial+'</span><div class="audit-copy"><b>'+escHtml((c&&c.name)||'Commerce')+'</b><small>'+escHtml([c&&c.city,a.title].filter(Boolean).join(' · '))+'</small><span class="report-meter" aria-hidden="true"><i style="width:'+score+'%"></i></span></div><span class="audit-state"><b>'+score+'</b><small>/100</small>'+(function(){const prev=appAudits.filter(x=>x.id!==a.id&&x.client_id===a.client_id&&(x.site||x.scan||auditHasAnalysis(x))&&String(x.updated_at||x.created_at||'')<String(a.updated_at||a.created_at||'')).sort((x,y)=>String(y.updated_at||y.created_at||'').localeCompare(String(x.updated_at||x.created_at||'')))[0];if(!prev)return '';const dlt=score-(Number(prev.score)||0);return '<em class="sc-delta '+(dlt>=0?'up':'down')+'">'+(dlt>=0?'▲ +':'▼ ')+dlt+' depuis le '+new Date(prev.updated_at||prev.created_at).toLocaleDateString('fr-FR')+'</em>';})()+'</span></div><div class="report-actions"><button class="app-btn" type="button" data-export-report="'+a.id+'" data-mode="simple">Aperçu gratuit · 1 page</button><button class="app-btn primary" type="button" data-export-report="'+a.id+'" data-mode="full">Rapport complet · détaillé</button><button class="app-btn" type="button" data-open-audit="'+a.id+'">Dossier</button></div></article>';
     }
     const STUDIO_AI_SYSTEM='Tu es rédacteur pour un consultant en visibilité locale. Tu reformules un brouillon déjà préparé pour un commerce. Règles : français naturel et professionnel ; n’invente jamais de fait, de prix, de chiffre, d’avis, de note, de délai ni de promesse de résultat ; conserve tous les passages entre crochets [à compléter] et les consignes « à vérifier » ; garde la structure et les titres du brouillon ; ne publie rien, rends seulement le texte.';
@@ -6876,9 +6876,31 @@ async function claudeAssist(system, prompt, maxTokens){
     throw e;
   }finally{ clearTimeout(timer); }
 }
+function bizIconSvg(c){
+  const d=(c&&c.details)||{};
+  const raw=[c&&c.name,c&&c.category,d.category,d.primaryType,Array.isArray(d.types)?d.types.join(' '):''].filter(Boolean).join(' ').toLowerCase();
+  const t=raw.normalize('NFD').replace(/[̀-ͯ]/g,'');
+  const rules=[
+    [/multiservice|multi-service|bricol|plomb|electric|peintre|peinture|macon|menuis|serrur|chauffag|climatis|couvreur|travaux|renovation|facad|artisan|depann|general_contractor|plumber|electrician|painter|roofing|locksmith|home_improvement/,'<path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2.1-.5-.5-2.1z"/><path d="m15 15 5 5"/>'],
+    [/boulang|patisser|chocolat|glac|bakery/,'<path d="M4 15c0-4 3-7 8-7s8 3 8 7v2H4z"/><path d="M8 12v3M12 11v4M16 12v3"/>'],
+    [/cafe|bistro|salon de the|coffee/,'<path d="M5 8h11v6a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4z"/><path d="M16 9h2a2 2 0 0 1 0 5h-2M8 3v2M12 3v2"/>'],
+    [/restaurant|brasserie|pizz|burger|traiteur|snack|kebab|sushi|cuisine|food|meal/,'<path d="M5 3v8a2 2 0 0 0 2 2v8M9 3v8a2 2 0 0 1-2 2M15 3c-2 1-3 4-3 7s1 4 3 4v7"/>'],
+    [/bijou|joaill|montre|jewel/,'<path d="M6 4h12l3 5-9 11L3 9z"/><path d="M3 9h18M9 4l3 5 3-5M12 9v11"/>'],
+    [/coiff|barbier|esthet|beaute|institut|ongle|massage|spa|hair|beauty|salon/,'<circle cx="6" cy="7" r="3"/><circle cx="6" cy="17" r="3"/><path d="M8.5 8.5 20 18M8.5 15.5 20 6"/>'],
+    [/immobil|habitat|agence|logement|syndic|real_estate/,'<path d="m3 11 9-7 9 7"/><path d="M5 10v10h14V10M10 20v-5h4v5"/>'],
+    [/medecin|dentist|pharma|kine|sante|clinique|optic|osteo|doctor|health|dental/,'<rect x="3" y="3" width="18" height="18" rx="4"/><path d="M12 8v8M8 12h8"/>'],
+    [/garage|auto|voiture|carross|moto|pneu|car_/,'<path d="M5 16v-5l2-5h10l2 5v5M5 16h14M5 16v2M19 16v2"/><circle cx="8" cy="13" r="1"/><circle cx="16" cy="13" r="1"/>'],
+    [/fleur|jardin|paysag|pepini|florist|garden/,'<circle cx="12" cy="8" r="3"/><path d="M12 11v9M12 16c-3 0-5-1-6-3 3 0 5 1 6 3zM12 17c3 0 5-1 6-3-3 0-5 1-6 3z"/>'],
+    [/avocat|notaire|comptab|assurance|conseil|banque|expert|consult|lawyer|accounting/,'<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M3 13h18"/>'],
+    [/vetement|mode|boutique|pret-a-porter|chaussure|clothing|shoe/,'<path d="M6 8h12l1 12H5z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>']
+  ];
+  const hit=rules.find(([re])=>re.test(t));
+  const path=hit?hit[1]:'<path d="M4 9l1.5-5h13L20 9"/><path d="M4 9v11h16V9M4 9h16M9 20v-6h6v6"/>';
+  return '<svg class="biz-ic" viewBox="0 0 24 24" aria-hidden="true">'+path+'</svg>';
+}
 function mqChromeHtml(){
   const li=(v,ico,label)=>'<button type="button" class="mq-menu-item" data-app-view="'+v+'">'+navIcon(ico)+'<span>'+label+'</span></button>';
-  return '<header class="mq-top"><button type="button" class="mq-btn mq-burger" data-mq-menu aria-label="Ouvrir le menu" aria-expanded="false">'+navIcon('menu')+'</button>'
+  return '<header class="mq-top"><span class="mq-spacer" aria-hidden="true"></span>'
    +'<a class="mq-logo" href="./" aria-label="AuditIA — accueil"><img src="./home-logo.png" alt="AuditIA AffiAds"></a>'
    +'<div class="mq-top-actions"><button type="button" class="mq-btn mq-bell" data-app-view="Audits" aria-label="Notifications"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10.3 20a1.9 1.9 0 0 0 3.4 0"/></svg><i aria-hidden="true"></i></button>'
    +'<button type="button" class="mq-btn" data-app-view="Profil" aria-label="Profil">'+navIcon('profile')+'</button></div></header>'
@@ -6906,7 +6928,7 @@ function mqLatestHtml(){
   return '<section class="mq-latest"><div class="mq-latest-head"><h2>Derniers audits</h2><button type="button" data-app-view="Audits">Voir tout →</button></div>'+rows.map(a=>{
     const c=appClients.find(x=>String(x.id)===String(a.client_id))||{};
     const name=c.name||a.title||'Commerce', done=auditHasAnalysis(a), score=Math.max(0,Math.min(100,Math.round(Number(a.score)||0)));
-    return '<article class="mq-audit-row"><span class="mq-audit-av">'+escHtml(String(name).trim().charAt(0).toUpperCase()||'A')+'</span><div class="mq-audit-main"><b>'+escHtml(name)+'</b><small>'+escHtml([c.city,done?'Audit terminé':'À analyser'].filter(Boolean).join(' · '))+'</small></div>'
+    return '<article class="mq-audit-row"><span class="mq-audit-av">'+bizIconSvg(c)+'</span><div class="mq-audit-main"><b>'+escHtml(name)+'</b><small>'+escHtml([c.city,done?'Audit terminé':'À analyser'].filter(Boolean).join(' · '))+'</small></div>'
      +'<span class="mq-audit-score">'+(done?score+'<i>/100</i>':'—')+'</span><button type="button" class="mq-audit-go" data-open-audit="'+escHtml(a.id)+'">Ouvrir</button></article>';
   }).join('')+'</section>';
 }
@@ -6918,7 +6940,6 @@ function renderApp(){
         const waiting=appAudits.filter(a=>!auditHasAnalysis(a)).length;
         body='<div class="hx hx-compact mq-home">'+
           '<section class="mq-banner" aria-labelledby="mq-title"><div class="mq-banner-copy"><span class="mq-tag"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>Audit commercial IA</span><h1 id="mq-title">Boostez la visibilité de votre commerce</h1><p>Trouvez un commerce, analysez sa présence en ligne et générez un rapport client professionnel.</p><button type="button" class="mq-cta" data-app-view="Clients"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12-7.5z"/></svg>Lancer un audit</button></div><img class="mq-banner-art" src="./home-banner.png" alt="" aria-hidden="true"></section>'+
-           '<section class="mq-tiles" aria-label="Actions rapides"><button type="button" data-app-view="Clients">'+navIcon('search')+'<b>Rechercher<br>un commerce</b></button><button type="button" data-app-view="Audits">'+navIcon('reports')+'<b>Audit<br>complet</b></button><button type="button" data-app-view="Rapports">'+navIcon('audits')+'<b>Rapport<br>client</b></button><button type="button" data-app-view="Paramètres">'+navIcon('settings')+'<b>Paramètres<br>&amp; clés</b></button></section>'+
            naturalLanguageSearchHtml()+
           mqStatsHtml()+
            mqLatestHtml()+
@@ -6946,7 +6967,7 @@ function renderApp(){
         const scored=baseRows.map(cStat).filter(x=>x.sc!=null); const avg=scored.length?Math.round(scored.reduce((n,x)=>n+x.sc,0)/scored.length):null;
         const tiers=[['low','À améliorer'],['good','Bon'],['top','Très bon'],['none','Sans audit']].map(([k,t])=>[k,t,baseRows.filter(c=>tierOf(c)===k).length]);
         const portfolio=appClients.length?'<div class="pf-bar"><div class="pf-avg"><b>'+(avg==null?'—':avg)+'</b><small>score moyen'+(clientFilter||clientTier?' (filtré)':'')+'</small></div><div class="pf-tiers">'+tiers.map(([k,t,n])=>'<button type="button" class="pf-t pf-'+k+(clientTier===k?' is-on':'')+'" data-client-tier="'+k+'"><b>'+n+'</b><span>'+t+'</span></button>').join('')+'</div><label class="pf-sort">Trier<select data-client-sort><option value="urgence"'+(clientSort==='urgence'?' selected':'')+'>Plus urgent d’abord</option><option value="recent"'+(clientSort==='recent'?' selected':'')+'>Dernier audit</option><option value="nom"'+(clientSort==='nom'?' selected':'')+'>Nom A → Z</option></select></label></div>':'';
-        const clientRows=baseRows.filter(c=>!clientTier||tierOf(c)===clientTier).sort((x,y)=>{if(clientSort==='nom')return String(x.name||'').localeCompare(String(y.name||''),'fr');const X=cStat(x),Y=cStat(y);if(clientSort==='recent')return String(Y.date||'').localeCompare(String(X.date||''));const ax=X.sc==null?-1:X.sc, ay=Y.sc==null?-1:Y.sc;return ax-ay;});const cards=appClients.length?(clientRows.length?'<div class="client-cards">'+clientRows.map(c=>{const d=c.details||{};const n=appAudits.filter(a=>a.client_id===c.id);const last=n[0];const rating=d.rating!=null?' · ★ '+d.rating:'';return '<button class="client-card" data-open-client="'+c.id+'"><span class="cc-avatar">'+escHtml((c.name||'?').charAt(0).toUpperCase())+'</span><span class="cc-txt"><b>'+escHtml(c.name)+'</b><small>'+escHtml(c.city)+' · '+escHtml(c.category||d.category||'Commerce')+rating+'</small><small class="cc-meta">'+n.length+' audit'+(n.length>1?'s':'')+(function(){const st=cStat(c);if(st.sc==null)return ' · <em class="sc sc-none">à analyser</em>';const days=st.date?Math.floor((Date.now()-new Date(st.date).getTime())/864e5):null;return ' · <em class="sc sc-'+(st.sc>=75?'good':st.sc>=50?'mid':'low')+'">'+st.sc+'/100</em>'+(st.delta?' <em class="sc-delta '+(st.delta>0?'up':'down')+'">'+(st.delta>0?'▲ +':'▼ ')+st.delta+'</em>':'')+(days!=null?' <em class="sc-age'+(days>30?' old':'')+'">'+(days<1?'aujourd’hui':'il y a '+days+' j')+'</em>':'');})()+'</small></span><span class="cc-go" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></span></button>'}).join('')+'</div>':'<div class="app-empty">Aucun commerce pour « '+escHtml(clientFilter)+' ».</div>'):'<div class="app-empty">Aucun client pour le moment. Ajoute ton premier commerce ci-dessus 👆</div>';
+        const clientRows=baseRows.filter(c=>!clientTier||tierOf(c)===clientTier).sort((x,y)=>{if(clientSort==='nom')return String(x.name||'').localeCompare(String(y.name||''),'fr');const X=cStat(x),Y=cStat(y);if(clientSort==='recent')return String(Y.date||'').localeCompare(String(X.date||''));const ax=X.sc==null?-1:X.sc, ay=Y.sc==null?-1:Y.sc;return ax-ay;});const cards=appClients.length?(clientRows.length?'<div class="client-cards">'+clientRows.map(c=>{const d=c.details||{};const n=appAudits.filter(a=>a.client_id===c.id);const last=n[0];const rating=d.rating!=null?' · ★ '+d.rating:'';return '<button class="client-card" data-open-client="'+c.id+'"><span class="cc-avatar">'+bizIconSvg(c)+'</span><span class="cc-txt"><b>'+escHtml(c.name)+'</b><small>'+escHtml(c.city)+' · '+escHtml(c.category||d.category||'Commerce')+rating+'</small><small class="cc-meta">'+n.length+' audit'+(n.length>1?'s':'')+(function(){const st=cStat(c);if(st.sc==null)return ' · <em class="sc sc-none">à analyser</em>';const days=st.date?Math.floor((Date.now()-new Date(st.date).getTime())/864e5):null;return ' · <em class="sc sc-'+(st.sc>=75?'good':st.sc>=50?'mid':'low')+'">'+st.sc+'/100</em>'+(st.delta?' <em class="sc-delta '+(st.delta>0?'up':'down')+'">'+(st.delta>0?'▲ +':'▼ ')+st.delta+'</em>':'')+(days!=null?' <em class="sc-age'+(days>30?' old':'')+'">'+(days<1?'aujourd’hui':'il y a '+days+' j')+'</em>':'');})()+'</small></span><span class="cc-go" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></span></button>'}).join('')+'</div>':'<div class="app-empty">Aucun commerce pour « '+escHtml(clientFilter)+' ».</div>'):'<div class="app-empty">Aucun client pour le moment. Ajoute ton premier commerce ci-dessus 👆</div>';
         body='<details class="add-toggle"'+openAdd+'><summary class="pg-cta"><span class="pg-cta-ico">＋</span><span>Ajouter un client</span><span class="hx-go"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></span></summary>'+addForm+'</details>'+(appClients.length?portfolio+'<input class="app-filter" data-client-filter placeholder="Rechercher un commerce, une ville, une catégorie…" value="'+escHtml(clientFilter)+'">'+(function(){const cats=[...new Set(appClients.map(c=>c.category||(c.details&&c.details.category)||'').filter(Boolean))].slice(0,6);if(!cats.length)return '';const cur=norm(clientFilter);return '<div class="pg-chips" role="group" aria-label="Filtrer par catégorie"><button type="button" class="'+(cur?'':'is-on')+'" data-client-chip="">Tous</button>'+cats.map(k=>'<button type="button" class="'+(cur===norm(k)?'is-on':'')+'" data-client-chip="'+escHtml(k)+'">'+escHtml(k)+'</button>').join('')+'</div>';})():'')+cards;
       } else if(appView==='ClientDétail'){
         const c=appClients.find(x=>x.id===activeClient);
