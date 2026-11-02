@@ -1,0 +1,67 @@
+/* AuditIA — thème clair unifié (remplace les surcharges successives).
+   Ne s'applique qu'en mode clair du système et dans l'espace de travail.
+   Contrastes : texte principal #2A2545 sur blanc (≈ 13:1), texte secondaire #5F5A7E (≈ 6.5:1),
+   boutons primaires : texte blanc sur #6A5BE8 (≈ 5.2:1). */
+@media (prefers-color-scheme: light){
+  html body:has(.workspace-app){background:#EEEAF8!important;color:#2A2545!important}
+
+  /* Surfaces : cartes blanches, bordure lavande, ombre douce */
+  html body .workspace-app :is(.app-panel,.app-stat,.report-card,.studio-tool-card,.oca-panel,.oca-kpis article,
+    .oca-method-card,.oca-lead-card,.nearby-card,.nl-search,.hx-hero,.hx-hero-compact,.ai-insights,.settings-preview,
+    .app-row,.info-row,.journey-step,.audit-roadmap,.add-toggle,.cd-edit,.rec-item,.sp-card,.rk-row,.api-test-btn,
+    .lv-light-bg,.ai-chart-card,.ai-coverage,.ai-evidence-chip,.analyse-panel){
+    background:#fff!important;background-image:none!important;color:#2A2545!important;
+    border:1px solid #E4DFF3!important;box-shadow:0 8px 22px rgba(92,74,180,.07)!important;
+  }
+
+  /* Textes */
+  html body .workspace-app :is(h1,h2,h3,h4,b,strong,label,td,th,li){color:#2A2545!important}
+  html body .workspace-app :is(p,small,span,dt,dd,figcaption){color:#5F5A7E!important}
+  html body .workspace-app .eyebrow,html body .workspace-app .oca-kicker{color:#5B4FD8!important}
+
+  /* Boutons */
+  html body .workspace-app .app-btn,html body .workspace-app .oca-btn{
+    background:#fff!important;color:#3D3766!important;border:1px solid #CFC6F0!important;border-radius:999px!important;
+  }
+  html body .workspace-app .app-btn:hover,html body .workspace-app .oca-btn:hover{color:#5B4FD8!important;border-color:#8B7DFF!important}
+  html body .workspace-app .app-btn.primary{
+    background:linear-gradient(135deg,#8B7DFF,#6A5BE8)!important;color:#fff!important;border:0!important;
+    box-shadow:0 10px 22px rgba(106,91,232,.3)!important;
+  }
+  html body .workspace-app .app-btn:disabled{opacity:.6!important}
+
+  /* Champs */
+  html body .workspace-app :is(input,select,textarea){
+    background:#fff!important;color:#2A2545!important;border:1px solid #CFC6F0!important;border-radius:14px!important;
+  }
+  html body .workspace-app :is(input,textarea)::placeholder{color:#7C7896!important;opacity:1!important}
+
+  /* Navigation et chips */
+  html body .workspace-app .desktop-nav,html body .workspace-app .set-jump,html body .workspace-app .oca-tabs{
+    background:#fff!important;border:1px solid #E4DFF3!important;
+  }
+  html body .workspace-app .desktop-nav button,html body .workspace-app .set-jump a,html body .workspace-app .set-jump button,
+  html body .workspace-app .settings-chip,html body .workspace-app .oca-tabs button{
+    background:transparent!important;color:#4A4470!important;border:1px solid transparent!important;
+  }
+  html body .workspace-app .desktop-nav button.active,html body .workspace-app .set-jump a.active,
+  html body .workspace-app .set-jump button.active,html body .workspace-app .settings-chip.active,
+  html body .workspace-app .oca-tabs button.active{
+    background:linear-gradient(135deg,#8B7DFF,#6A5BE8)!important;color:#fff!important;border-color:transparent!important;
+  }
+  html body .workspace-app .mobile-tabbar button{color:#4A4470!important}
+  html body .workspace-app .mobile-tabbar button.active{color:#5B4FD8!important}
+  html body .workspace-app .mobile-tabbar button:nth-child(2){color:#fff!important}
+
+  /* Barre haute et icônes */
+  html body header.app-topbar .burger-btn,html body header.app-topbar .tb-actions button{
+    background:#fff!important;color:#5B4FD8!important;border:1px solid #CFC6F0!important;
+  }
+  html body header.app-topbar svg,html body .workspace-app svg{stroke:currentColor}
+
+  /* Scores et badges : fond clair, texte foncé */
+  html body .workspace-app .dx-ring{background:conic-gradient(var(--c) calc(var(--p)*1%),#ECE8F9 0)!important}
+  html body .workspace-app .dx-ring::before{background:#1B1F3B!important}
+  html body .workspace-app .dx-ring b{color:#fff!important}
+  html body .workspace-app .dx-ring small{color:#D9D4F2!important}
+}
