@@ -4852,6 +4852,22 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
       page.querySelectorAll('[data-nearby-audit]').forEach(b=>b.addEventListener('click',()=>createAuditFromNearby(Number(b.dataset.nearbyAudit),b)));
       page.querySelectorAll('[data-run-full]').forEach(b=>b.addEventListener('click',()=>runFullAudit(b.dataset.runFull)));
       page.querySelectorAll('[data-export-report]').forEach(b=>b.addEventListener('click',()=>exportReport(b.dataset.exportReport,b.dataset.mode)));
+      const aiBtn=page.querySelector('#studioAi');
+      if(aiBtn) aiBtn.addEventListener('click', async()=>{
+        if(!studioOutputText) return;
+        const out=page.querySelector('#studioOutput'), note=page.querySelector('.studio-output-note');
+        const label=aiBtn.textContent; aiBtn.disabled=true; aiBtn.textContent='Claude rédige…';
+        try{
+          const d=await claudeAssist(STUDIO_AI_SYSTEM, studioOutputText, 900);
+          studioOutputText=d.text;
+          if(out){out.textContent=d.text; out.className='studio-output';}
+          if(note) note.textContent='Texte affiné par Claude ('+d.remaining+' demande(s) restante(s) aujourd’hui). Avant publication : vérifie les faits, les prix, les coordonnées et les droits sur les visuels.';
+          aiBtn.textContent='Affiné ✓';
+        }catch(e){
+          if(note) note.textContent='Affinage impossible : '+(e.message||'erreur')+'. Le brouillon initial est conservé.';
+          aiBtn.textContent=label; aiBtn.disabled=false;
+        }
+      });
       const studioSelect=page.querySelector('#studioClientSelect');
       if(studioSelect) studioSelect.addEventListener('change',()=>{studioClientId=studioSelect.value;studioOutputText='';renderApp();});
       page.querySelectorAll('[data-studio-generate]').forEach(b=>b.addEventListener('click',()=>{
@@ -6534,7 +6550,25 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
       const initial=escHtml(((c&&c.name)||'?').charAt(0).toUpperCase());
       return '<article class="report-card"><div class="report-top"><span class="audit-mark">'+initial+'</span><div class="audit-copy"><b>'+escHtml((c&&c.name)||'Commerce')+'</b><small>'+escHtml([c&&c.city,a.title].filter(Boolean).join(' · '))+'</small><span class="report-meter" aria-hidden="true"><i style="width:'+score+'%"></i></span></div><span class="audit-state"><b>'+score+'</b><small>/100</small>'+(function(){const prev=appAudits.filter(x=>x.id!==a.id&&x.client_id===a.client_id&&(x.site||x.scan||auditHasAnalysis(x))&&String(x.updated_at||x.created_at||'')<String(a.updated_at||a.created_at||'')).sort((x,y)=>String(y.updated_at||y.created_at||'').localeCompare(String(x.updated_at||x.created_at||'')))[0];if(!prev)return '';const dlt=score-(Number(prev.score)||0);return '<em class="sc-delta '+(dlt>=0?'up':'down')+'">'+(dlt>=0?'▲ +':'▼ ')+dlt+' depuis le '+new Date(prev.updated_at||prev.created_at).toLocaleDateString('fr-FR')+'</em>';})()+'</span></div><div class="report-actions"><button class="app-btn" type="button" data-export-report="'+a.id+'" data-mode="simple">Aperçu gratuit · 1 page</button><button class="app-btn primary" type="button" data-export-report="'+a.id+'" data-mode="full">Rapport complet · détaillé</button><button class="app-btn" type="button" data-open-audit="'+a.id+'">Dossier</button></div></article>';
     }
-    function renderApp(){
+    const STUDIO_AI_SYSTEM='Tu es rédacteur pour un consultant en visibilité locale. Tu reformules un brouillon déjà préparé pour un commerce. Règles : français naturel et professionnel ; n’invente jamais de fait, de prix, de chiffre, d’avis, de note, de délai ni de promesse de résultat ; conserve tous les passages entre crochets [à compléter] et les consignes « à vérifier » ; garde la structure et les titres du brouillon ; ne publie rien, rends seulement le texte.';
+async function claudeAssist(system, prompt, maxTokens){
+  const client=await getClient();
+  const {data}=await client.auth.getSession();
+  const token=data&&data.session&&data.session.access_token;
+  if(!token) throw new Error('session expirée, reconnecte-toi.');
+  const ctrl=new AbortController(); const timer=setTimeout(()=>ctrl.abort(),45000);
+  try{
+    const r=await fetch(SUPABASE_URL+'/functions/v1/claude-assist',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token,'apikey':SUPABASE_PUBLISHABLE_KEY},body:JSON.stringify({system,prompt,maxTokens}),signal:ctrl.signal});
+    const d=await r.json().catch(()=>({}));
+    if(!r.ok) throw new Error(d.error||('erreur '+r.status));
+    if(!d.text) throw new Error('réponse vide.');
+    return d;
+  }catch(e){
+    if(e.name==='AbortError') throw new Error('délai dépassé, réessaie.');
+    throw e;
+  }finally{ clearTimeout(timer); }
+}
+function renderApp(){
       const completed=appAudits.filter(a=>auditHasAnalysis(a)).length;
       let body='';
       if(appView==='Accueil'){
@@ -6557,7 +6591,7 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
           '<article class="app-panel studio-tool-card set-anchor" id="studio-tool-site"><span class="studio-tool-icon hx-ico hx-violet" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M9.5 13h5M9.5 17h5"/></svg></span><div class="eyebrow">PRÉSENCE WEB</div><h3>Brief de site</h3><p>Une structure claire pour une vitrine web et ses informations essentielles.</p><button class="app-btn primary" type="button" data-studio-generate="site" '+(selected?'':'disabled')+'>Préparer le brief <span aria-hidden="true">→</span></button></article>'+
           '<article class="app-panel studio-tool-card set-anchor" id="studio-tool-pitch"><span class="studio-tool-icon hx-ico hx-green" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/><path d="M8.5 10.5h.01M12 10.5h.01M15.5 10.5h.01"/></svg></span><div class="eyebrow">PROSPECTION</div><h3>Argumentaire</h3><p>Un message professionnel de prise de contact, sans promesse inventée.</p><button class="app-btn primary" type="button" data-studio-generate="pitch" '+(selected?'':'disabled')+'>Préparer le message <span aria-hidden="true">→</span></button></article>'+
           '<article class="app-panel studio-tool-card set-anchor" id="studio-tool-review"><span class="studio-tool-icon hx-ico hx-orange" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.6 5.6 6.1.7-4.5 4.2 1.2 6-5.4-3.1-5.4 3.1 1.2-6-4.5-4.2 6.1-.7z"/></svg></span><div class="eyebrow">AVIS CLIENTS</div><h3>Demande d’avis</h3><p>Un message court à envoyer après la visite, avec le lien direct pour laisser un avis Google, sans contrepartie.</p><button class="app-btn primary" type="button" data-studio-generate="review" '+(selected?'':'disabled')+'>Préparer la demande <span aria-hidden="true">→</span></button></article></div></section>'+
-          '<section class="app-panel studio-output-panel"><div class="studio-output-head"><div><div class="eyebrow">3 · VOTRE BROUILLON</div><h2>Contenu à relire et personnaliser</h2></div><span class="studio-draft-badge">Modifiable</span></div><div id="studioOutput" class="app-empty">Choisis un outil ci-dessus. Les informations manquantes seront signalées plutôt qu’inventées.</div><button type="button" class="app-btn primary" id="studioCopy" style="margin-top:12px" disabled>Copier le texte</button><p class="studio-output-note">Avant publication : vérifie les faits, les prix, les coordonnées et les droits sur les visuels.</p></section>';
+          '<section class="app-panel studio-output-panel"><div class="studio-output-head"><div><div class="eyebrow">3 · VOTRE BROUILLON</div><h2>Contenu à relire et personnaliser</h2></div><span class="studio-draft-badge">Modifiable</span></div><div id="studioOutput" class="app-empty">Choisis un outil ci-dessus. Les informations manquantes seront signalées plutôt qu’inventées.</div><button type="button" class="app-btn primary" id="studioCopy" style="margin-top:12px" disabled>Copier le texte</button>'+'<button type="button" class="app-btn" id="studioAi"'+(studioOutputText?'':' disabled')+'>Affiner avec Claude</button><p class="studio-output-note">Avant publication : vérifie les faits, les prix, les coordonnées et les droits sur les visuels.</p></section>';
       } else if(appView==='Prospection'){
          body=window.renderOCAView({userId:appUser?.id,clients:appClients,audits:appAudits,supabase:appClient});
        } else if(appView==='Clients'){

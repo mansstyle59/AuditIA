@@ -22,3 +22,15 @@ La connexion s'appuie sur **Supabase** (e-mail + mot de passe, lien de réinitia
 ## Mettre à jour le site
 
 Toute modification poussée sur la branche `main` est publiée automatiquement par GitHub Pages en une minute environ.
+
+## Assistant Claude (Studio)
+
+Le bouton « Affiner avec Claude » du Studio passe par la fonction Supabase `claude-assist` (`supabase/functions/claude-assist`). La clé API Anthropic n'est jamais dans le navigateur ni dans le dépôt.
+
+Secrets à définir dans Supabase (Edge Functions → Secrets) :
+- `ANTHROPIC_API_KEY` : la clé API Anthropic (obligatoire).
+- `ADMIN_EMAIL` : l'adresse du compte autorisé à utiliser l'assistant (obligatoire, sinon accès refusé).
+- `AI_DAILY_LIMIT` : nombre maximal de demandes par jour (facultatif, 30 par défaut).
+- `ANTHROPIC_MODEL` : modèle Claude utilisé (facultatif, `claude-sonnet-5-5` par défaut).
+
+Le quota est tenu dans la table `public.ai_usage` (migration `20261102120000_ai_usage_quota.sql`).
