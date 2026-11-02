@@ -7143,5 +7143,37 @@ function renderApp(){
   <footer class="wrap foot"><span>© <span id="year"></span> AuditIA · AffiAds</span><span>Espace privé AuditIA · Vos paramètres sont synchronisés.</span></footer>
   <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
 <script src="./oca-lavender.js?v=4" defer></script>
+
+<style id="auditia-iphone-safe-area-fix">
+<!-- AuditIA iPhone safe-area fix: opaque status-bar backdrop -->
+/* iOS Safari: neutralise the translucent/blurred strip behind the status bar. */
+@media (max-width: 760px) {
+  html, body { background-color: #0A0B1A !important; }
+  body { isolation: isolate; }
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: env(safe-area-inset-top, 0px);
+    background: #0A0B1A !important;
+    opacity: 1 !important;
+    filter: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    pointer-events: none;
+    z-index: 9999;
+  }
+  header.app-topbar {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 1000 !important;
+    background: #0A0B1A !important;
+    background-image: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    padding-top: calc(env(safe-area-inset-top, 0px) + 12px) !important;
+  }
+}
+</style>
 </body>
 </html>
