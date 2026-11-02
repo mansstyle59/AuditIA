@@ -2,7 +2,7 @@
    Ne s'applique qu'en mode clair du système et dans l'espace de travail.
    Contrastes : texte principal #2A2545 sur blanc (≈ 13:1), texte secondaire #5F5A7E (≈ 6.5:1),
    boutons primaires : texte blanc sur #6A5BE8 (≈ 5.2:1). */
-@media (prefers-color-scheme: light){
+@media all{
   html body:has(.workspace-app){background:#EEEAF8!important;color:#2A2545!important}
 
   /* Surfaces : cartes blanches, bordure lavande, ombre douce */
