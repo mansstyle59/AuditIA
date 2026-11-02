@@ -133,3 +133,9 @@
  .oca-edit-form .oca-lead-controls button{width:100%}
  .oca-kpis article small{font-size:9.5px}
 }
+
+.oca-history{margin-top:10px;border-top:1px solid #ffffff12;padding-top:8px}
+.oca-history summary{cursor:pointer;color:#BDB4FF;font-size:11px;font-weight:800;padding:5px 0}
+.oca-history>div{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:6px 0;font-size:11px}
+.oca-history>div b{color:#DEE0F2;font-weight:700}
+.oca-history>div small{color:#8F95B6;white-space:nowrap}
