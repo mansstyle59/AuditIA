@@ -33,6 +33,34 @@ function ocaWriteCache(userId,data){
 function ocaSave(userId,data){
  try{const next=ocaNormalize(data);next.updatedAt=new Date().toISOString();localStorage.setItem(OCA_KEY(userId),JSON.stringify(next));localStorage.removeItem(OCA_LEGACY_KEY(userId));return next;}catch(e){return null;}
 }
+function ocaHasContent(data){
+ const d=ocaNormalize(data);
+ const customAvatar=Object.keys(OCA_DEFAULT.avatar).some(k=>String(d.avatar[k]||'')!==String(OCA_DEFAULT.avatar[k]||''));
+ const customOffers=JSON.stringify(d.offers)!==JSON.stringify(OCA_DEFAULT.offers);
+ return d.leads.length>0||!!d.notes.trim()||customAvatar||customOffers;
+}
+function ocaMergeWorkspaces(localData,remoteData){
+ const local=ocaNormalize(localData),remote=ocaNormalize(remoteData),merged={...remote};
+ const byId=new Map();
+ merged.leads=remote.leads.slice();
+ merged.leads.forEach((l,i)=>{if(l.id)byId.set('id:'+l.id,i);if(l.auditClientId)byId.set('client:'+l.auditClientId,i);});
+ local.leads.forEach(l=>{
+  const idx=(l.id&&byId.get('id:'+l.id))??(l.auditClientId&&byId.get('client:'+l.auditClientId));
+  if(idx==null){const n=merged.leads.length;merged.leads.push(l);if(l.id)byId.set('id:'+l.id,n);if(l.auditClientId)byId.set('client:'+l.auditClientId,n);return;}
+  const current=merged.leads[idx],lt=Date.parse(l.updatedAt||l.createdAt||'')||0,rt=Date.parse(current.updatedAt||current.createdAt||'')||0;
+  if(lt>rt)merged.leads[idx]={...current,...l};
+ });
+ const localTs=Date.parse(local.updatedAt||'')||0,remoteTs=Date.parse(remote.updatedAt||'')||0,preferLocal=localTs>remoteTs;
+ const localAvatar=Object.keys(OCA_DEFAULT.avatar).some(k=>String(local.avatar[k]||'')!==String(OCA_DEFAULT.avatar[k]||''));
+ const remoteAvatar=Object.keys(OCA_DEFAULT.avatar).some(k=>String(remote.avatar[k]||'')!==String(OCA_DEFAULT.avatar[k]||''));
+ if(localAvatar&&(!remoteAvatar||preferLocal))merged.avatar=local.avatar;
+ const localOffers=JSON.stringify(local.offers)!==JSON.stringify(OCA_DEFAULT.offers),remoteOffers=JSON.stringify(remote.offers)!==JSON.stringify(OCA_DEFAULT.offers);
+ if(localOffers&&(!remoteOffers||preferLocal))merged.offers=local.offers;
+ const notes=[remote.notes,local.notes].map(x=>String(x||'').trim()).filter(Boolean);
+ merged.notes=[...new Set(notes)].join('\n\n');
+ merged.updatedAt=new Date(Math.max(localTs,remoteTs,Date.now())).toISOString();
+ return ocaNormalize(merged);
+}
 function ocaSyncState(userId,state,message){
  const key=String(userId||'local');
  window.__ocaSyncStates=window.__ocaSyncStates||{};
@@ -84,15 +112,21 @@ async function ocaSyncCloud(userId,supabase,onChange){
     remote.updatedAt=remote.updatedAt||row.updated_at||'';
     const localTime=Date.parse(local.data.updatedAt||'')||0;
     const remoteTime=Date.parse(row.updated_at||remote.updatedAt||'')||0;
-    if(!local.exists||remoteTime>=localTime){
+    if(local.legacy&&ocaHasContent(local.data)){
+     const merged=ocaMergeWorkspaces(local.data,remote),localData=ocaSave(key,merged);
+     if(!localData)throw new Error('Stockage local indisponible');
+     await ocaCloudWrite(key,supabase,localData);
+     dataChanged=true;
+     ocaSyncState(key,'synced','Anciennes données locales fusionnées avec le cloud sans écraser les prospects.');
+    }else if(!local.exists||remoteTime>=localTime){
      if(!ocaWriteCache(key,remote))throw new Error('Stockage local indisponible');
      dataChanged=true;
      ocaSyncState(key,'synced','Données cloud récupérées et mises en cache sur cet appareil.');
     }else{
-     const localData=local.legacy?ocaSave(key,local.data):local.data;
+     const localData=ocaSave(key,local.data);
      if(!localData)throw new Error('Stockage local indisponible');
      await ocaCloudWrite(key,supabase,localData);
-     ocaSyncState(key,'synced','Anciennes données locales transférées vers le cloud.');
+     ocaSyncState(key,'synced','Données locales plus récentes transférées vers le cloud.');
     }
    }else if(local.exists){
     const localData=local.legacy||!local.data.updatedAt?ocaSave(key,local.data):local.data;
