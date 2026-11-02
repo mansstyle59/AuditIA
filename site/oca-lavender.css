@@ -302,3 +302,50 @@ body:has(.workspace-app) .app-panel::after{
   display:none!important;
   content:none!important;
 }
+
+/* ---- Correctif lisibilité : titre de la barre haute, panneau de recherche, champs ---- */
+body:has(.workspace-app) header.app-topbar .tb-brand b{
+  color:#23203D!important;
+}
+body:has(.workspace-app) header.app-topbar .tb-brand em{
+  color:#7B6CFF!important;
+}
+body:has(.workspace-app) header.app-topbar .tb-brand small{
+  color:var(--muted)!important;
+}
+body:has(.workspace-app) header.app-topbar .topbar-menu-btn,
+body:has(.workspace-app) header.app-topbar .tb-actions .app-btn{
+  background:#fff!important;
+  color:#5B4FD8!important;
+  border:1px solid #DCD5F0!important;
+  box-shadow:0 6px 16px rgba(92,74,180,.12)!important;
+}
+body:has(.workspace-app) .nl-search{
+  background:rgba(255,255,255,.78)!important;
+  border:1px solid rgba(255,255,255,.95)!important;
+  border-radius:22px!important;
+  box-shadow:0 12px 32px rgba(92,74,180,.10)!important;
+  color:var(--text)!important;
+}
+body:has(.workspace-app) .nl-search h2{
+  color:#23203D!important;
+}
+body:has(.workspace-app) .nl-search p{
+  color:var(--muted)!important;
+}
+body:has(.workspace-app) .nl-search-mark{
+  background:#EEE9FD!important;
+  color:#5B4FD8!important;
+}
+body:has(.workspace-app) .nl-search textarea,
+body:has(.workspace-app) .nl-search input,
+body:has(.workspace-app) .nl-search select{
+  background:#fff!important;
+  color:#2A2545!important;
+  border:1px solid #DCD5F0!important;
+  border-radius:14px!important;
+}
+body:has(.workspace-app) .nl-search textarea::placeholder,
+body:has(.workspace-app) .nl-search input::placeholder{
+  color:#9A94B4!important;
+}
