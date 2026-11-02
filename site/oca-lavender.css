@@ -1,0 +1,304 @@
+/* AuditIA — thème « lavande » (style dashboard clair : fond lilas, cartes en verre, menu violet, pastille flottante).
+   Ne s'applique qu'à l'espace de travail connecté (.workspace-app). La page de connexion reste inchangée. */
+
+body:has(.workspace-app){
+  --bg:#EEEAF8;
+  --panel:rgba(255,255,255,.78);
+  --panel2:#F4F1FC;
+  --text:#2A2545;
+  --muted:#7C7896;
+  --line:#E4DFF3;
+  --purple:#7B6CFF;
+  background:
+    radial-gradient(ellipse at 90% 0%,#FFFFFF8c 0,transparent 40%),
+    radial-gradient(ellipse at 0% 100%,#CFC4F5 0,transparent 45%),
+    linear-gradient(160deg,#DCD3F4 0%,#ECE8F9 55%,#E6E0F7 100%)!important;
+  color:var(--text)!important;
+  min-height:100vh}
+
+
+/* ---- Neutraliser les fonds sombres du conteneur d'origine ---- */
+body:has(.workspace-app) .login-page,
+body:has(.workspace-app) .login-page:before,
+body:has(.workspace-app) .workspace-app,
+body:has(.workspace-app) #authRoot{
+  background:transparent!important;
+  background-image:none!important}
+body:has(.workspace-app) .workspace-main>.workspace-head{
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+  background-image:none!important;
+  padding:6px 4px!important}
+body:has(.workspace-app) .workspace-main>.workspace-head>div{
+  background:none!important;border:0!important;box-shadow:none!important}
+
+/* ---- Cadre principal : grande carte claire arrondie ---- */
+body:has(.workspace-app) .workspace-app{
+  color:var(--text)!important}
+body:has(.workspace-app) .workspace-layout{
+  background:rgba(255,255,255,.55)!important;
+  border:1px solid rgba(255,255,255,.9)!important;
+  border-radius:28px!important;
+  box-shadow:0 24px 60px rgba(92,74,180,.14)!important;
+  padding:18px 22px 22px;
+  margin-top:12px;
+  backdrop-filter:blur(14px)!important;
+  -webkit-backdrop-filter:blur(14px)!important}
+body:has(.workspace-app) .workspace-head h1{
+  color:#23203D!important;
+  font-weight:800;
+  letter-spacing:-1px}
+body:has(.workspace-app) .workspace-head p,
+body:has(.workspace-app) .workspace-head .eyebrow{
+  color:var(--muted)!important}
+
+/* ---- Menu latéral violet ---- */
+body:has(.workspace-app) .workspace-sidebar{
+  background:linear-gradient(170deg,#A392F5 0%,#8170E8 45%,#6A5BD8 100%)!important;
+  border:0!important;
+  border-radius:28px!important;
+  box-shadow:0 20px 44px rgba(106,91,216,.35)!important;
+  padding:22px 16px!important;
+  color:#fff!important}
+body:has(.workspace-app) .sidebar-brand{
+  display:flex;align-items:center;gap:12px;
+  padding:6px 6px 22px;
+  color:#fff!important}
+body:has(.workspace-app) .sidebar-brand b,
+body:has(.workspace-app) .sidebar-brand em{color:#fff!important}
+body:has(.workspace-app) .sidebar-brand small{color:rgba(255,255,255,.7)!important}
+body:has(.workspace-app) .sb-mark{
+  background:rgba(255,255,255,.22)!important;
+  border:2px solid rgba(255,255,255,.55)!important;
+  box-shadow:0 0 0 5px rgba(255,255,255,.12)!important}
+body:has(.workspace-app) .sidebar-nav button{
+  color:rgba(255,255,255,.86)!important;
+  background:transparent!important;
+  border:0!important;
+  border-radius:16px!important;
+  font-weight:700;
+  padding:13px 14px;
+  transition:background .18s,color .18s,transform .18s}
+body:has(.workspace-app) .sidebar-nav button:hover{
+  background:rgba(255,255,255,.14)!important;
+  color:#fff!important}
+body:has(.workspace-app) .sidebar-nav button.active{
+  background:#fff!important;
+  color:#5B4FD8!important;
+  box-shadow:0 10px 24px rgba(40,22,120,.22)!important}
+body:has(.workspace-app) .sidebar-nav button.active .nav-icon{color:#7B6CFF!important}
+body:has(.workspace-app) .nav-icon{color:inherit!important}
+body:has(.workspace-app) .nav-count{
+  background:#fff!important;color:#5B4FD8!important;border-radius:999px!important;font-size:11px;font-weight:800;
+  min-width:22px;height:22px;display:grid;place-items:center;padding:0 7px}
+body:has(.workspace-app) .sidebar-bottom{
+  color:rgba(255,255,255,.72)!important;
+  border-top:1px solid rgba(255,255,255,.2);
+  margin-top:22px;padding-top:16px;font-size:12px;line-height:1.5}
+
+/* ---- Barre de navigation (version bureau) : pilule claire ---- */
+body:has(.workspace-app) .desktop-nav{
+  background:rgba(255,255,255,.85)!important;
+  border:1px solid #fff!important;
+  border-radius:999px!important;
+  box-shadow:0 10px 26px rgba(92,74,180,.10)!important;
+  padding:6px}
+body:has(.workspace-app) .desktop-nav button{
+  color:var(--muted)!important;
+  border-radius:999px!important;
+  font-weight:700;
+  min-height:42px}
+body:has(.workspace-app) .desktop-nav button:hover{color:#5B4FD8!important}
+body:has(.workspace-app) .desktop-nav button.active{
+  background:linear-gradient(135deg,#8B7DFF,#6A5BE8)!important;
+  color:#fff!important;
+  border-color:transparent!important;
+  box-shadow:0 8px 18px rgba(106,91,232,.35)!important}
+
+/* ---- Barre haute mobile ---- */
+body:has(.workspace-app) .app-topbar{
+  background:rgba(255,255,255,.75)!important;
+  border:1px solid #fff!important;
+  border-radius:22px!important;
+  box-shadow:0 10px 26px rgba(92,74,180,.10)!important;
+  color:var(--text)!important}
+body:has(.workspace-app) .tb-brand b{color:#23203D!important}
+body:has(.workspace-app) .tb-brand em{color:#7B6CFF!important}
+body:has(.workspace-app) .tb-brand small{color:var(--muted)!important}
+
+/* ---- Cartes en verre : bordure blanche, ombre douce, léger soulèvement au survol ---- */
+body:has(.workspace-app) .app-panel,
+body:has(.workspace-app) .app-stat,
+body:has(.workspace-app) .oca-panel,
+body:has(.workspace-app) .oca-kpis article,
+body:has(.workspace-app) .oca-hero,
+body:has(.workspace-app) .oca-method-card,
+body:has(.workspace-app) .oca-lead-card,
+body:has(.workspace-app) .oca-add,
+body:has(.workspace-app) .nearby-banner,
+body:has(.workspace-app) .nearby-card,
+body:has(.workspace-app) .settings-preview,
+body:has(.workspace-app) .info-row{
+  background:rgba(255,255,255,.72)!important;
+  border:1px solid rgba(255,255,255,.95)!important;
+  border-radius:22px!important;
+  box-shadow:0 12px 32px rgba(92,74,180,.10)!important;
+  -webkit-backdrop-filter:blur(10px)!important;
+  backdrop-filter:blur(10px)!important;
+  color:var(--text)!important;
+  transition:transform .22s ease,box-shadow .22s ease}
+body:has(.workspace-app) .app-stat:hover,
+body:has(.workspace-app) .app-panel:hover,
+body:has(.workspace-app) .oca-kpis article:hover,
+body:has(.workspace-app) .oca-method-card:hover,
+body:has(.workspace-app) .oca-lead-card:hover,
+body:has(.workspace-app) .nearby-card:hover{
+  transform:translateY(-5px);
+  box-shadow:0 20px 40px rgba(92,74,180,.18)!important}
+body:has(.workspace-app) .app-panel h2,
+body:has(.workspace-app) .app-panel h3,
+body:has(.workspace-app) .oca-panel h3,
+body:has(.workspace-app) .oca-hero h2,
+body:has(.workspace-app) .oca-section-title h2,
+body:has(.workspace-app) .oca-method-card h3,
+body:has(.workspace-app) .app-stat strong,
+body:has(.workspace-app) .oca-kpis article b,
+body:has(.workspace-app) .app-row b,
+body:has(.workspace-app) .oca-follow-row b{
+  color:#23203D!important}
+body:has(.workspace-app) .app-stat span,
+body:has(.workspace-app) .app-panel p,
+body:has(.workspace-app) .app-muted,
+body:has(.workspace-app) .oca-panel p,
+body:has(.workspace-app) .oca-kpis article span,
+body:has(.workspace-app) .app-row small,
+body:has(.workspace-app) .oca-follow-row small{
+  color:var(--muted)!important}
+body:has(.workspace-app) .eyebrow,
+body:has(.workspace-app) .oca-kicker{
+  color:#6C5CE7!important}
+body:has(.workspace-app) .app-score{color:#6C5CE7!important}
+body:has(.workspace-app) .oca-tabs{
+  background:rgba(255,255,255,.7)!important;
+  border:1px solid #fff!important;
+  border-radius:999px!important;
+  box-shadow:0 8px 20px rgba(92,74,180,.08)!important}
+body:has(.workspace-app) .oca-tabs button{color:var(--muted)!important;border-radius:999px!important}
+body:has(.workspace-app) .oca-tabs button.active{
+  background:linear-gradient(135deg,#8B7DFF,#6A5BE8)!important;
+  color:#fff!important;border-color:transparent!important}
+body:has(.workspace-app) .oca-count,
+body:has(.workspace-app) .oca-stage-badge{
+  background:#EEE9FD!important;color:#5B4FD8!important;border-color:#DCD3F7!important}
+
+/* ---- Boutons : pilules, violet dégradé pour l'action principale ---- */
+body:has(.workspace-app) .app-btn,
+body:has(.workspace-app) .oca-btn{
+  background:#fff!important;
+  color:#3D3766!important;
+  border:1px solid #E4DFF3!important;
+  border-radius:999px!important;
+  box-shadow:0 4px 12px rgba(92,74,180,.06)!important;
+  transition:transform .16s ease,box-shadow .16s ease,border-color .16s}
+body:has(.workspace-app) .app-btn:hover,
+body:has(.workspace-app) .oca-btn:hover{
+  transform:translateY(-2px);
+  border-color:#B7AEEB!important;
+  color:#5B4FD8!important;
+  box-shadow:0 10px 20px rgba(92,74,180,.14)!important}
+body:has(.workspace-app) .app-btn.primary{
+  background:linear-gradient(135deg,#8B7DFF,#6A5BE8)!important;
+  color:#fff!important;
+  border:0!important;
+  box-shadow:0 10px 22px rgba(106,91,232,.32)!important}
+body:has(.workspace-app) .app-btn.primary:hover{color:#fff!important}
+
+/* ---- Champs de saisie : fonds blancs, bordures lavande ---- */
+body:has(.workspace-app) .app-form input,
+body:has(.workspace-app) .app-form select,
+body:has(.workspace-app) .app-form textarea,
+body:has(.workspace-app) .oca-form input,
+body:has(.workspace-app) .oca-form select,
+body:has(.workspace-app) .oca-form textarea,
+body:has(.workspace-app) .oca-filter-row input,
+body:has(.workspace-app) .oca-filter-row select,
+body:has(.workspace-app) .app-filter,
+body:has(.workspace-app) .ac-input,
+body:has(.workspace-app) .oca-message-text{
+  background:#fff!important;
+  color:#2A2545!important;
+  border:1px solid #DCD5F0!important;
+  border-radius:14px!important}
+body:has(.workspace-app) .app-form input:focus,
+body:has(.workspace-app) .app-form select:focus,
+body:has(.workspace-app) .app-form textarea:focus,
+body:has(.workspace-app) .oca-form input:focus,
+body:has(.workspace-app) .oca-form select:focus,
+body:has(.workspace-app) .oca-form textarea:focus,
+body:has(.workspace-app) .app-filter:focus,
+body:has(.workspace-app) .ac-input:focus{
+  border-color:#7B6CFF!important;
+  box-shadow:0 0 0 4px rgba(123,108,255,.18)!important;
+  outline:none}
+
+/* ---- Lignes et listes ---- */
+body:has(.workspace-app) .app-row,
+body:has(.workspace-app) .oca-lead-card{
+  background:rgba(255,255,255,.8)!important;
+  border:1px solid #EEEAF8!important;
+  border-radius:18px!important}
+body:has(.workspace-app) .app-empty,
+body:has(.workspace-app) .oca-empty{
+  background:rgba(255,255,255,.5)!important;
+  border:1px dashed #C9BFEB!important;
+  color:var(--muted)!important;
+  border-radius:18px!important}
+body:has(.workspace-app) .oca-lead-avatar,
+body:has(.workspace-app) .cd-avatar{
+  background:linear-gradient(145deg,#A392F5,#6A5BE8)!important;
+  color:#fff!important;
+  box-shadow:0 6px 14px rgba(106,91,232,.3)!important}
+
+/* ---- Mobile : pastille flottante en bas, comme sur la maquette ---- */
+@media(max-width:760px){
+  body:has(.workspace-app) .workspace-layout{
+    padding:12px;border-radius:22px!important;margin-top:6px}
+  body:has(.workspace-app) .mobile-tabbar{
+    background:rgba(255,255,255,.92)!important;
+    border:1px solid #fff!important;
+    border-radius:999px!important;
+    box-shadow:0 14px 34px rgba(92,74,180,.22)!important;
+    left:14px!important;right:14px!important}
+  body:has(.workspace-app) .mobile-tabbar button{color:var(--muted)!important}
+  body:has(.workspace-app) .mobile-tabbar button.active{
+    background:linear-gradient(135deg,#8B7DFF,#6A5BE8)!important;
+    color:#fff!important;
+    border-radius:999px!important}
+  body:has(.workspace-app) .mobile-tabbar button.active .tab-icon svg{stroke:#fff!important}
+}
+
+/* ---- Accessibilité : réduire les animations si demandé ---- */
+@media (prefers-reduced-motion: reduce){
+  body:has(.workspace-app) *{transition:none!important}
+}
+
+/* ---- Boutons secondaires dans les listes et cartes : même lecture que la maquette ---- */
+body:has(.workspace-app) .app-row .app-btn,
+body:has(.workspace-app) .app-panel .app-btn:not(.primary),
+body:has(.workspace-app) .app-stat .app-btn{
+  background:#fff!important;
+  color:#3D3766!important;
+  border:1px solid #DCD5F0!important;
+  opacity:1!important;
+}
+body:has(.workspace-app) .app-btn:disabled{opacity:.55!important}
+
+/* ---- Pas de motif décoratif dans les cartes de statistiques ---- */
+body:has(.workspace-app) .app-stat::before,
+body:has(.workspace-app) .app-stat::after,
+body:has(.workspace-app) .app-panel::before,
+body:has(.workspace-app) .app-panel::after{
+  display:none!important;
+  content:none!important;
+}
