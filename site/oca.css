@@ -97,3 +97,10 @@
  .oca-section-title{align-items:flex-start;flex-direction:column}
  .oca-tabs button{padding:9px 10px;font-size:11px}
 }
+
+/* O.C.A. added to the six-item mobile navigation */
+@media(max-width:760px){
+ .mobile-tabbar{grid-template-columns:repeat(6,minmax(0,1fr))!important}
+ .mobile-tabbar button[data-app-view="Prospection"]{display:flex!important}
+ .mobile-tabbar button span:last-child{font-size:8.5px!important;letter-spacing:-.25px}
+}
