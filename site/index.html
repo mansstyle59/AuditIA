@@ -6240,12 +6240,12 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
       const pill=p=>{
         const it=items.filter(x=>x.pillar===p&&x.measured),total=it.reduce((n,x)=>n+x.weight,0),earned=it.reduce((n,x)=>n+x.weight*(x.val==null?(x.ok?1:0):x.val),0);
         const all=items.filter(x=>x.pillar===p),measuredWeight=total,possibleWeight=all.reduce((n,x)=>n+x.weight,0);
-        return {score:total?Math.round(earned/total*100):null,have:it.filter(x=>x.ok),miss:it.filter(x=>x.ok===false),items:all,measuredCount:it.length,totalCount:all.length,coverage:possibleWeight?Math.round(measuredWeight/possibleWeight*100):0,measuredWeight,possibleWeight};
+        const unmeasuredW=all.filter(x=>!x.measured).reduce((n,x)=>n+x.weight,0);const low=possibleWeight?Math.round(earned/possibleWeight*100):null;const high=possibleWeight?Math.round((earned+unmeasuredW)/possibleWeight*100):null;return {score:total?Math.round(earned/total*100):null,low,high,have:it.filter(x=>x.ok),miss:it.filter(x=>x.ok===false),items:all,measuredCount:it.length,totalCount:all.length,coverage:possibleWeight?Math.round(measuredWeight/possibleWeight*100):0,measuredWeight,possibleWeight};
       };
       const seoP=pill('seo'),geoP=pill('geo'),valid=[seoP,geoP].filter(p=>p.score!=null&&p.measuredCount>0);
       const index=valid.length?Math.round(valid.reduce((n,p)=>n+p.score,0)/valid.length):null;
       const measuredItems=items.filter(x=>x.measured),strengths=measuredItems.filter(x=>x.ok===true),weaknesses=measuredItems.filter(x=>x.ok===false&&x.gap);
-      return {items,seo:seoP,geo:geoP,index,strengths,weaknesses,measuredCount:measuredItems.length,totalCount:items.length,coverage:items.length?Math.round(measuredItems.length/items.length*100):0,hasScore:index!=null};
+      return {items,seo:seoP,geo:geoP,index,strengths,weaknesses,measuredCount:measuredItems.length,totalCount:items.length,coverage:items.length?Math.round(measuredItems.length/items.length*100):0,hasScore:index!=null,scoreRange:valid.length?{low:Math.round(valid.reduce((n,p)=>n+(p.low||0),0)/valid.length),high:Math.round(valid.reduce((n,p)=>n+(p.high||0),0)/valid.length)}:null};
     }
     function visibilityVerdict(i,diag){
       if(i==null||!Number.isFinite(Number(i)))return 'Score indisponible : les données mesurées sont insuffisantes pour conclure.';
