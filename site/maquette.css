@@ -332,3 +332,30 @@ html body:has(.workspace-app) .workspace-app .mq-logo{justify-self:start!importa
   html:has(.workspace-app),html body:has(.workspace-app){background:#EEEAF8!important}
   html body:has(.workspace-app) .status-safe{background:#0A0B1A!important}
 }
+
+/* ---------- Ordinateur : vraie mise en page de site web (bandeaux pleine largeur) ---------- */
+@media(min-width:900px){
+  html:has(.workspace-app){overflow-x:clip}
+  html body:has(.workspace-app) .workspace-app{padding-left:0!important;padding-right:0!important;max-width:none!important}
+  html body:has(.workspace-app) .workspace-app .mq-top{margin:0 calc(50% - 50vw) 0!important;width:100vw!important;max-width:100vw!important;padding:8px max(32px,calc(50vw - 590px))!important;border-radius:0!important}
+  html body:has(.workspace-app) .workspace-app .workspace-main{padding:0 0 48px!important}
+  /* Bandeau d'accueil (hero) pleine largeur */
+  html body:has(.workspace-app) .workspace-app .mq-banner{margin:0 calc(50% - 50vw) 8px!important;width:100vw!important;border-radius:0!important;min-height:380px!important;
+    padding:56px max(32px,calc(50vw - 590px))!important;box-shadow:none!important;display:flex;align-items:center}
+  html body:has(.workspace-app) .workspace-app .mq-banner-copy{max-width:min(620px,52%)!important;min-height:0!important}
+  html body:has(.workspace-app) .workspace-app .mq-banner h1{font-size:clamp(38px,4vw,54px)!important;line-height:1.05!important;letter-spacing:-1.6px!important;margin:18px 0 14px!important}
+  html body:has(.workspace-app) .workspace-app .mq-banner p{font-size:18px!important;line-height:1.55!important;max-width:100%!important;margin:0 0 6px!important}
+  html body:has(.workspace-app) .workspace-app .mq-cta{min-height:54px!important;padding:0 30px!important;font-size:16px!important;margin-top:22px!important}
+  html body:has(.workspace-app) .workspace-app .mq-banner-art{right:max(32px,calc(50vw - 590px))!important;height:92%!important;bottom:auto!important;top:4%!important}
+  html body:has(.workspace-app) .workspace-app .mq-home{gap:20px!important}
+  html body:has(.workspace-app) .workspace-app .mq-home>*:not(.mq-banner){max-width:1180px;margin-inline:auto;width:100%}
+  /* En-têtes de pages : bandeau pleine largeur */
+  html body[data-view]:has(.workspace-app) .workspace-app .workspace-main>.workspace-head{margin:0 calc(50% - 50vw) 22px!important;width:100vw!important;border-radius:0!important;box-shadow:none!important;min-height:150px!important;
+    padding:34px max(32px,calc(50vw - 590px)) 34px!important}
+  html body[data-view]:has(.workspace-app) .workspace-app .workspace-main>.workspace-head h1{font-size:40px!important}
+  html body[data-view]:has(.workspace-app) .workspace-app .workspace-main>.workspace-head::after{width:34%;right:max(32px,calc(50vw - 590px))!important}
+}
+@media(min-width:900px){
+  html body:has(.workspace-app) .workspace-app{overflow:visible!important;margin-left:0!important;margin-right:0!important;width:100%!important;contain:none!important}
+  html body:has(.workspace-app) .workspace-app .workspace-layout{overflow:visible!important}
+}
