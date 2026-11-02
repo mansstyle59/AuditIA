@@ -95,3 +95,7 @@ function bindOCAEvents(page,ctx={}){
  const applyFilter=()=>{const q=String(search?.value||'').toLowerCase().trim(),stage=String(filter?.value||''),list=page.querySelector('[data-oca-lead-list]');if(!list)return;let visible=0;list.querySelectorAll('.oca-lead-card').forEach(card=>{const ok=(!stage||card.querySelector('[data-oca-stage]')?.value===stage)&&(!q||String(card.dataset.ocaSearchText||'').includes(q));card.hidden=!ok;if(ok)visible++;});let empty=list.querySelector('.oca-filter-empty');if(!empty){empty.hidden=visible>0;}else if(!visible){empty=document.createElement('div');empty.className='oca-empty oca-filter-empty';empty.textContent='Aucun prospect ne correspond à ce filtre.';list.appendChild(empty);}};
  if(search)search.addEventListener('input',applyFilter);if(filter)filter.addEventListener('change',applyFilter);
 }
+
+/* Expose the isolated module to the existing authenticated app shell. */
+window.renderOCAView = renderOCAView;
+window.bindOCAEvents = bindOCAEvents;
