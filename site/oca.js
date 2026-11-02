@@ -1,23 +1,133 @@
 /* AuditIA — O.C.A. (Organisation commerciale & acquisition) */
-const OCA_KEY = userId => 'auditia.oca.v1:' + String(userId || 'local');
+const OCA_KEY = userId => 'auditia.oca.v2:' + String(userId || 'local');
+const OCA_LEGACY_KEY = userId => 'auditia.oca.v1:' + String(userId || 'local');
 const OCA_STAGES = [
   ['À qualifier','À qualifier'],['À contacter','À contacter'],['Contacté','Contacté'],
   ['Relance','Relance'],['Rendez-vous','Rendez-vous'],['Devis envoyé','Devis envoyé'],
-  ['Gagné','Gagné'],['Perdu','Perdu']
+  ['Gagné','Gagné'],['Perdu','Perdu'],['Ne plus contacter','Ne plus contacter']
 ];
+const OCA_TERMINAL_STAGES = ['Gagné','Perdu','Ne plus contacter'];
+const OCA_CONTACT_STAGES = ['Contacté','Relance','Rendez-vous','Devis envoyé'];
 const OCA_SERVICES = ['Audit de visibilité locale','Site vitrine','Référencement local','Automatisation IA','Maintenance web','Création de contenus','Autre prestation'];
 const OCA_DEFAULT = { leads:[], avatar:{niche:'Commerces locaux, artisans et indépendants',problem:'Manque de visibilité, site vieillissant ou présence numérique incohérente',budget:'À qualifier',decision:'Dirigeant ou responsable du commerce',area:'Narbonne et alentours'}, offers:[
   {name:'Audit de visibilité locale',price:'',description:'Diagnostic documenté, priorités et plan d’action.'},
   {name:'Site vitrine professionnel',price:'',description:'Site responsive, informations essentielles et prise de contact.'},
   {name:'Accompagnement visibilité & IA',price:'',description:'SEO local, contenus et automatisations adaptées.'}
-], notes:''};
+], notes:'',updatedAt:''};
 const ocaEsc = v => String(v ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-function ocaLoad(userId){try{const d=JSON.parse(localStorage.getItem(OCA_KEY(userId))||'{}');return {...structuredClone(OCA_DEFAULT),...d,leads:Array.isArray(d.leads)?d.leads:[],offers:Array.isArray(d.offers)?d.offers:structuredClone(OCA_DEFAULT.offers),avatar:{...OCA_DEFAULT.avatar,...(d.avatar||{})}}}catch(e){return structuredClone(OCA_DEFAULT)}}
-function ocaSave(userId,data){try{localStorage.setItem(OCA_KEY(userId),JSON.stringify(data));return true}catch(e){return false}}
+function ocaNormalize(data){
+ const d=data&&typeof data==='object'?data:{};
+ return {...structuredClone(OCA_DEFAULT),...d,leads:Array.isArray(d.leads)?d.leads:[],offers:Array.isArray(d.offers)?d.offers:structuredClone(OCA_DEFAULT.offers),avatar:{...OCA_DEFAULT.avatar,...(d.avatar||{})},notes:String(d.notes||''),updatedAt:String(d.updatedAt||'')};
+}
+function ocaReadLocal(userId){
+ try{
+  let raw=localStorage.getItem(OCA_KEY(userId)),legacy=false;
+  if(!raw){raw=localStorage.getItem(OCA_LEGACY_KEY(userId));legacy=!!raw;}
+  return raw?{data:ocaNormalize(JSON.parse(raw)),exists:true,legacy}:{data:ocaNormalize(null),exists:false,legacy:false};
+ }catch(e){return {data:ocaNormalize(null),exists:false,legacy:false};}
+}
+function ocaLoad(userId){return ocaReadLocal(userId).data;}
+function ocaWriteCache(userId,data){
+ try{localStorage.setItem(OCA_KEY(userId),JSON.stringify(ocaNormalize(data)));localStorage.removeItem(OCA_LEGACY_KEY(userId));return true;}catch(e){return false;}
+}
+function ocaSave(userId,data){
+ try{const next=ocaNormalize(data);next.updatedAt=new Date().toISOString();localStorage.setItem(OCA_KEY(userId),JSON.stringify(next));localStorage.removeItem(OCA_LEGACY_KEY(userId));return next;}catch(e){return null;}
+}
+function ocaSyncState(userId,state,message){
+ const key=String(userId||'local');
+ window.__ocaSyncStates=window.__ocaSyncStates||{};
+ window.__ocaSyncStates[key]={state,message:message||'',at:Date.now()};
+ const labels={pending:'Synchronisation…',synced:'Cloud synchronisé',local:'Sauvegarde locale',offline:'Hors ligne · données locales',error:'Cloud indisponible · données locales'};
+ document.querySelectorAll('[data-oca-sync-status]').forEach(el=>{if(el.dataset.ocaSyncUser!==key)return;el.dataset.state=state;el.textContent=labels[state]||'O.C.A.';el.title=message||labels[state]||'État de synchronisation';});
+}
+function ocaSyncBadge(userId){
+ const key=String(userId||'local'),st=(window.__ocaSyncStates||{})[key],state=st?st.state:(key==='local'?'local':'pending');
+ const labels={pending:'Synchronisation…',synced:'Cloud synchronisé',local:'Sauvegarde locale',offline:'Hors ligne · données locales',error:'Cloud indisponible · données locales'};
+ return '<span class="oca-sync-status" data-oca-sync-status data-oca-sync-user="'+ocaEsc(key)+'" data-state="'+ocaEsc(state)+'" title="'+ocaEsc(st&&st.message||labels[state]||'')+'">'+ocaEsc(labels[state]||'O.C.A.')+'</span>';
+}
+async function ocaCloudWrite(userId,supabase,data){
+ const payload=ocaNormalize(data);
+ if(!payload.updatedAt)payload.updatedAt=new Date().toISOString();
+ const {error}=await supabase.from('oca_workspaces').upsert({user_id:userId,data:payload,updated_at:payload.updatedAt},{onConflict:'user_id'});
+ if(error)throw error;
+ return payload;
+}
+function ocaQueueCloudSave(userId,supabase,data){
+ const key=String(userId||'local');
+ if(!supabase||!userId||key==='local'){ocaSyncState(key,'local','Compte connecté indisponible : O.C.A. reste enregistré sur cet appareil.');return;}
+ if(typeof navigator!=='undefined'&&navigator.onLine===false){ocaSyncState(key,'offline','Modifications conservées localement. Elles seront synchronisées au retour du réseau.');return;}
+ window.__ocaCloudTimers=window.__ocaCloudTimers||{};
+ if(window.__ocaCloudTimers[key])clearTimeout(window.__ocaCloudTimers[key]);
+ ocaSyncState(key,'pending','Enregistrement de tes modifications dans Supabase.');
+ window.__ocaCloudTimers[key]=setTimeout(async()=>{
+  try{await ocaCloudWrite(key,supabase,data);ocaSyncState(key,'synced','Prospects, offres et suivi enregistrés dans ton espace cloud.');window.__ocaSyncAt=window.__ocaSyncAt||{};window.__ocaSyncAt[key]=Date.now();}
+  catch(e){ocaSyncState(key,'error','Sauvegarde locale conservée. Vérifie la connexion puis rouvre O.C.A. pour réessayer.');}
+  delete window.__ocaCloudTimers[key];
+ },500);
+}
+async function ocaSyncCloud(userId,supabase){
+ const key=String(userId||'local');
+ if(!supabase||!userId||key==='local'){ocaSyncState(key,'local','O.C.A. fonctionne en mode local pour cette session.');return;}
+ window.__ocaSyncPromises=window.__ocaSyncPromises||{};
+ if(window.__ocaSyncPromises[key])return window.__ocaSyncPromises[key];
+ window.__ocaSyncAt=window.__ocaSyncAt||{};
+ if(Date.now()-(window.__ocaSyncAt[key]||0)<20000)return;
+ const task=(async()=>{
+  ocaSyncState(key,'pending','Récupération du dernier espace O.C.A. sauvegardé.');
+  try{
+   const {data:row,error}=await supabase.from('oca_workspaces').select('data,updated_at').eq('user_id',key).maybeSingle();
+   if(error)throw error;
+   const local=ocaReadLocal(key);
+   if(row){
+    const remote=ocaNormalize(row.data);
+    remote.updatedAt=remote.updatedAt||row.updated_at||'';
+    const localTime=Date.parse(local.data.updatedAt||'')||0;
+    const remoteTime=Date.parse(row.updated_at||remote.updatedAt||'')||0;
+    if(!local.exists||remoteTime>=localTime){
+     if(!ocaWriteCache(key,remote))throw new Error('Stockage local indisponible');
+     ocaSyncState(key,'synced','Données cloud récupérées et mises en cache sur cet appareil.');
+    }else{
+     const localData=local.legacy?ocaSave(key,local.data):local.data;
+     if(!localData)throw new Error('Stockage local indisponible');
+     await ocaCloudWrite(key,supabase,localData);
+     ocaSyncState(key,'synced','Anciennes données locales transférées vers le cloud.');
+    }
+   }else if(local.exists){
+    const localData=local.legacy||!local.data.updatedAt?ocaSave(key,local.data):local.data;
+    if(!localData)throw new Error('Stockage local indisponible');
+    await ocaCloudWrite(key,supabase,localData);
+    ocaSyncState(key,'synced','Données O.C.A. existantes transférées vers le cloud.');
+   }else{
+    ocaSyncState(key,'synced','Espace cloud prêt. Les prochaines modifications seront synchronisées.');
+   }
+   window.__ocaSyncAt[key]=Date.now();
+  }catch(e){
+   const offline=typeof navigator!=='undefined'&&navigator.onLine===false;
+   ocaSyncState(key,offline?'offline':'error',offline?'Réseau indisponible : les données restent en local.':'Synchronisation impossible pour le moment. Les données locales sont conservées.');
+  }finally{delete window.__ocaSyncPromises[key];}
+ })();
+ window.__ocaSyncPromises[key]=task;
+ return task;
+}
 function ocaId(){return 'oca_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,8)}
 function ocaDate(v){if(!v)return 'Non planifiée';const d=new Date(v+'T12:00:00');return isNaN(d)?v:d.toLocaleDateString('fr-FR',{day:'2-digit',month:'short'})}
-function ocaToday(){return new Date().toISOString().slice(0,10)}
+function ocaToday(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
 function ocaStageSelect(value,id){return '<select class="oca-stage-select" data-oca-stage="'+ocaEsc(id)+'" aria-label="Étape commerciale">'+OCA_STAGES.map(([v,l])=>'<option value="'+ocaEsc(v)+'"'+(v===value?' selected':'')+'>'+ocaEsc(l)+'</option>').join('')+'</select>'}
+function ocaApplyStage(l,nextStage){
+ const previous=l.stage||'À qualifier';if(previous===nextStage)return;
+ const at=new Date().toISOString();l.stageHistory=Array.isArray(l.stageHistory)?l.stageHistory:[];
+ l.stageHistory.unshift({from:previous,to:nextStage,at});l.stageHistory=l.stageHistory.slice(0,40);
+ l.stage=nextStage;l.stageChangedAt=at;
+ if(OCA_CONTACT_STAGES.includes(nextStage)){l.lastContactAt=at;}
+ if(nextStage==='Gagné'){l.wonAt=at;l.nextDate='';}
+ if(nextStage==='Perdu'||nextStage==='Ne plus contacter'){l.closedAt=at;l.nextDate='';}
+}
+function ocaDueText(l){
+ if(!l.nextDate)return 'Aucune relance planifiée';
+ if(l.nextDate<ocaToday())return 'En retard · '+ocaDate(l.nextDate);
+ if(l.nextDate===ocaToday())return 'À traiter aujourd’hui';
+ return 'À venir · '+ocaDate(l.nextDate);
+}
 function ocaLeadName(l){return [l.name,l.city].filter(Boolean).join(' · ')}
 function ocaLeadCard(l){
  const stage=l.stage||'À qualifier';
