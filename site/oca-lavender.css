@@ -460,3 +460,30 @@ body:has(.workspace-app) .ap-live-step.is-active{
 body:has(.workspace-app) .schema-donut text{
   fill:#23203D!important;
 }
+
+/* ---- Classes posées par oca-lavender.js (fonds sombres et textes clairs de l'appli) ---- */
+body:has(.workspace-app) .workspace-app .workspace-app .lv-light-bg,
+body:has(.workspace-app) .workspace-app .lv-light-bg.app-btn,
+body:has(.workspace-app) .workspace-app .app-btn.lv-light-bg{
+  background:rgba(255,255,255,.84)!important;
+  background-image:none!important;
+  border-color:#E4DFF3!important;
+  box-shadow:0 8px 22px rgba(92,74,180,.08)!important;
+}
+body:has(.workspace-app) .workspace-app .lv-dark-text,
+body:has(.workspace-app) .workspace-app .app-btn.lv-dark-text{
+  color:#2A2545!important;
+}
+body:has(.workspace-app) .lv-dark-text small,
+body:has(.workspace-app) .lv-dark-text.muted{
+  color:var(--muted)!important;
+}
+/* Icônes de la barre haute et des boutons clairs */
+body:has(.workspace-app) header.app-topbar svg,
+body:has(.workspace-app) .app-btn svg,
+body:has(.workspace-app) .oca-btn svg{
+  stroke:currentColor!important;
+}
+body:has(.workspace-app) header.app-topbar svg{
+  stroke:#5B4FD8!important;
+}
