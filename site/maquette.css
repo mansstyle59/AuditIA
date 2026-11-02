@@ -304,3 +304,18 @@ html body:has(.workspace-app) .workspace-app .mq-logo{justify-self:start!importa
   html body:has(.workspace-app) .workspace-app .mq-btn svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
   html body:has(.workspace-app) .workspace-app .mq-top-actions{display:flex;gap:8px}
 }
+
+/* ---------- Ordinateur : présentation site web (barre de navigation en haut) ---------- */
+.mq-web-nav{display:none}
+@media(min-width:900px){
+  html body:has(.workspace-app) .workspace-app .desktop-nav{display:none!important}
+  html body:has(.workspace-app) .workspace-app .mq-top{position:sticky;top:0;z-index:60;max-width:none!important;margin:0 -24px 18px!important;padding:8px 32px!important;
+    grid-template-columns:auto minmax(0,1fr) auto!important;gap:24px;background:rgba(255,255,255,.92)!important;backdrop-filter:blur(10px);border-bottom:1px solid #E4DFF3;box-shadow:0 4px 18px rgba(91,63,214,.07)}
+  html body:has(.workspace-app) .workspace-app .mq-logo img{height:44px}
+  html body:has(.workspace-app) .workspace-app .mq-web-nav{display:flex;justify-content:center;align-items:center;gap:4px}
+  html body:has(.workspace-app) .workspace-app .mq-web-link{position:relative;border:0;background:transparent;color:#4A4470;font:inherit;font-weight:700;font-size:14px;padding:10px 14px;border-radius:10px;cursor:pointer}
+  html body:has(.workspace-app) .workspace-app .mq-web-link:hover{background:#F1EDFF;color:#4A3FB5}
+  html body:has(.workspace-app) .workspace-app .mq-web-link.is-on{color:#5B3FD6;background:#F1EDFF}
+  html body:has(.workspace-app) .workspace-app .mq-web-link.is-on::after{content:"";position:absolute;left:14px;right:14px;bottom:2px;height:3px;border-radius:3px;background:linear-gradient(90deg,#7B5CF0,#5B3FD6)}
+  html body:has(.workspace-app) .workspace-app .workspace-main{max-width:1180px!important;margin-inline:auto!important}
+}
