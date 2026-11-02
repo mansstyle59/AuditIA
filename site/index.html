@@ -4728,6 +4728,41 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
   .app-btn{min-height:42px}
 }
 </style>
+<style id="auditia-nav-flottante">
+/* Mobile : barre de navigation flottante avec bouton central, sans menu burger */
+@media (max-width:760px){
+  html body .burger-btn,html body .topbar-menu-btn,html body .sidebar-backdrop,html body .workspace-sidebar{display:none!important}
+  html body .workspace-app .workspace-main .desktop-nav,html body .desktop-nav.desktop-nav{display:flex!important;visibility:visible!important;overflow-x:auto;scrollbar-width:none;gap:6px!important;padding:6px!important;margin:0 0 12px!important;border-radius:999px!important}
+  html body .workspace-app .desktop-nav::-webkit-scrollbar{display:none}
+  html body .desktop-nav button{flex:0 0 auto!important;min-height:36px!important;padding:8px 14px!important;border-radius:999px!important;font-size:13px!important;white-space:nowrap}
+  html body .mobile-tabbar{
+    display:grid!important;visibility:visible!important;pointer-events:auto!important;
+    grid-template-columns:repeat(4,minmax(0,1fr))!important;
+    position:fixed!important;z-index:160!important;
+    left:50%!important;right:auto!important;bottom:calc(10px + env(safe-area-inset-bottom))!important;transform:translateX(-50%)!important;
+    width:min(92vw,380px)!important;height:68px!important;padding:0 10px!important;align-items:center!important;
+    border-radius:999px!important;background:#fff!important;border:1px solid #EAE5F7!important;overflow:visible!important;
+    box-shadow:0 14px 34px rgba(60,40,140,.18)!important;
+  }
+  html body .mobile-tabbar button{min-height:48px!important;background:transparent!important;border:0!important;color:#2A2545!important;padding:0!important;display:flex!important;align-items:center!important;justify-content:center!important}
+  html body .mobile-tabbar button>span:last-child{display:none!important}
+  html body .mobile-tabbar .tab-icon svg{width:24px!important;height:24px!important;stroke:currentColor!important}
+  html body .mobile-tabbar button.active{color:#5B4FD8!important}
+  html body .mobile-tabbar button:nth-child(1){order:1}
+  html body .mobile-tabbar button:nth-child(3){order:2}
+  html body .mobile-tabbar button:nth-child(2){order:3}
+  html body .mobile-tabbar button:nth-child(4){order:4}
+  html body .mobile-tabbar button:nth-child(5){display:none!important}
+  html body .mobile-tabbar button:nth-child(6){order:5}
+  html body .mobile-tabbar button:nth-child(2){
+    width:58px!important;height:58px!important;min-height:58px!important;margin-top:-26px!important;justify-self:center;
+    border-radius:50%!important;background:linear-gradient(135deg,#A392F5,#6A5BE8)!important;color:#fff!important;
+    box-shadow:0 10px 24px rgba(106,91,232,.45)!important;
+  }
+  html body .mobile-tabbar button:nth-child(2) .tab-icon svg{stroke:#fff!important}
+  html body .workspace-main{padding-bottom:calc(120px + env(safe-area-inset-bottom))!important}
+}
+</style>
 </head>
 <body>
   <div class="status-safe" aria-hidden="true"></div>
