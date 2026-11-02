@@ -4659,6 +4659,13 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
   html{background:#EEEAF8}
 }
 </style>
+<style id="auditia-boutons-export">
+/* Rapports : les boutons d'export ne se coupent plus lettre par lettre sur téléphone */
+@media (max-width:640px){
+  .report-actions{grid-template-columns:1fr!important;gap:8px!important}
+  .report-actions .app-btn{width:100%!important;min-height:48px!important;white-space:normal!important;word-break:normal!important;overflow-wrap:break-word!important;hyphens:none!important;font-size:14px!important;line-height:1.3!important;padding:12px 14px!important;text-align:center}
+}
+</style>
 </head>
 <body>
   <div class="status-safe" aria-hidden="true"></div>
