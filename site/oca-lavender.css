@@ -462,7 +462,7 @@ body:has(.workspace-app) .schema-donut text{
 }
 
 /* ---- Classes posées par oca-lavender.js (fonds sombres et textes clairs de l'appli) ---- */
-body:has(.workspace-app) .workspace-app .workspace-app .lv-light-bg,
+body:has(.workspace-app) .workspace-app .lv-light-bg,
 body:has(.workspace-app) .workspace-app .lv-light-bg.app-btn,
 body:has(.workspace-app) .workspace-app .app-btn.lv-light-bg{
   background:rgba(255,255,255,.84)!important;
@@ -486,4 +486,74 @@ body:has(.workspace-app) .oca-btn svg{
 }
 body:has(.workspace-app) header.app-topbar svg{
   stroke:#5B4FD8!important;
+}
+
+/* ---- Bandeau d'accueil : fond clair, comme la maquette ---- */
+body:has(.workspace-app) .hx-hero,
+body:has(.workspace-app) .hx-hero-compact{
+  background:linear-gradient(135deg,#FFFFFF 0%,#F1EDFC 100%)!important;
+  border:1px solid #fff!important;
+  box-shadow:0 14px 36px rgba(92,74,180,.12)!important;
+  color:#23203D!important;
+}
+body:has(.workspace-app) .hx-hero h1,
+body:has(.workspace-app) .hx-hero h2{
+  color:#23203D!important;
+}
+body:has(.workspace-app) .hx-hero p{
+  color:var(--muted)!important;
+}
+body:has(.workspace-app) .hx-hero .hx-kicker{
+  color:#5B4FD8!important;
+}
+
+/* ---- Harmonisation : mêmes rayons, ombres et graisses sur tous les écrans ---- */
+body:has(.workspace-app){
+  --lv-radius-card:20px;
+  --lv-radius-field:14px;
+  --lv-radius-pill:999px;
+  --lv-shadow-card:0 12px 32px rgba(92,74,180,.10);
+  --lv-shadow-lift:0 20px 40px rgba(92,74,180,.18);
+  --lv-accent:#6A5BE8;
+  --lv-accent-ink:#5B4FD8;
+  --lv-ink:#23203D;
+}
+body:has(.workspace-app) .app-panel,
+body:has(.workspace-app) .app-stat,
+body:has(.workspace-app) .oca-panel,
+body:has(.workspace-app) .oca-kpis article,
+body:has(.workspace-app) .oca-method-card,
+body:has(.workspace-app) .oca-lead-card,
+body:has(.workspace-app) .nearby-card,
+body:has(.workspace-app) .nl-search,
+body:has(.workspace-app) .journey-step,
+body:has(.workspace-app) .audit-roadmap,
+body:has(.workspace-app) .lv-light-bg{
+  border-radius:var(--lv-radius-card)!important;
+}
+body:has(.workspace-app) .app-form input,
+body:has(.workspace-app) .app-form select,
+body:has(.workspace-app) .app-form textarea,
+body:has(.workspace-app) .oca-form input,
+body:has(.workspace-app) .oca-form select,
+body:has(.workspace-app) .oca-form textarea,
+body:has(.workspace-app) .nl-search textarea,
+body:has(.workspace-app) .app-filter{
+  border-radius:var(--lv-radius-field)!important;
+}
+body:has(.workspace-app) .app-btn,
+body:has(.workspace-app) .oca-btn,
+body:has(.workspace-app) .oca-tabs button,
+body:has(.workspace-app) .desktop-nav button{
+  border-radius:var(--lv-radius-pill)!important;
+}
+body:has(.workspace-app) .workspace-app h1,
+body:has(.workspace-app) .workspace-app h2,
+body:has(.workspace-app) .workspace-app h3{
+  color:var(--lv-ink);
+  letter-spacing:-.4px;
+}
+body:has(.workspace-app) .workspace-app .eyebrow,
+body:has(.workspace-app) .workspace-app .oca-kicker{
+  color:var(--lv-accent-ink)!important;
 }
