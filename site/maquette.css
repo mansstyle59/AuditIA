@@ -420,3 +420,20 @@ html body:has(.workspace-app) .workspace-app .mq-logo{justify-self:start!importa
 @media(min-width:900px){
   html body[data-view]:has(.workspace-app) .workspace-app .workspace-main>.workspace-head::after{top:10px!important;bottom:10px!important;width:200px!important;right:250px!important;background-size:auto 100%!important;background-position:center center!important}
 }
+
+/* ---------- Logo AuditIA en texte et SVG : vectoriel, net à toutes les tailles (remplace home-logo.png) ---------- */
+.mq-wm{display:inline-flex;align-items:center;gap:10px;line-height:1.1;text-decoration:none;color:#2A2545}
+.mq-wm-star{width:38px;height:38px;flex:0 0 38px;display:block}
+.mq-wm-t{display:flex;flex-direction:column;min-width:0}
+.mq-wm-t b{font-size:22px;font-weight:800;letter-spacing:-.4px;color:#1E1B3A}
+.mq-wm-t b i{font-style:normal;color:#6A5BE8}
+.mq-wm-t small{font-size:13px;font-weight:600;color:#4A4470;margin-top:1px}
+.mq-wm-t em{font-style:normal;font-size:11px;color:#6F6A8E;margin-top:2px;white-space:nowrap}
+@media(max-width:760px){
+  .mq-wm{gap:8px}
+  .mq-wm-star{width:30px;height:30px;flex-basis:30px}
+  .mq-wm-t b{font-size:19px}
+  .mq-wm-t small{font-size:12px}
+  .mq-wm-t em{font-size:10px}
+}
+.mq-wm-star *,.mq-wm-star{stroke:none!important}
