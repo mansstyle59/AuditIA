@@ -141,3 +141,84 @@ html body:has(.workspace-app) .workspace-app :is(.audit-mark,.cc-avatar,.cd-avat
 html body:has(.workspace-app) .workspace-app :is(.audit-mark,.cc-avatar,.cd-avatar,.mq-audit-av) .biz-ic{stroke:#fff!important;fill:none!important;width:24px;height:24px}
 .mq-spacer{display:block;width:46px;height:46px}
 .mq-tiles{display:none!important}
+
+/* ---------- Plus compact, plus élégant (téléphone) ---------- */
+@media (max-width:760px){
+  .mq-top{padding:calc(max(var(--safe-top,0px),env(safe-area-inset-top,0px)) + 4px) 14px 2px;gap:6px}
+  .mq-btn,.mq-spacer{width:42px;height:42px}
+  .mq-btn{border-radius:14px}
+  .mq-top{grid-template-columns:42px minmax(0,1fr) auto}
+  .mq-logo img{height:54px}
+  .mq-top-actions{gap:6px}
+
+  html body .workspace-main>.workspace-head{margin:2px 0 8px!important;padding:0 2px!important}
+  html body .workspace-main>.workspace-head h1{font-size:26px!important;letter-spacing:-.7px!important;margin:0 0 2px!important;line-height:1.1!important}
+  html body .workspace-main>.workspace-head p{font-size:13px!important;line-height:1.4!important;margin:0!important}
+  html body .workspace-main>.workspace-head .eyebrow{display:none!important}
+
+  html body:has(.workspace-app) .workspace-app .app-panel{padding:14px!important;border-radius:18px!important}
+  html body:has(.workspace-app) .workspace-app .app-stats{gap:8px!important;margin:6px 0 10px!important}
+  html body:has(.workspace-app) .workspace-app .app-stat{padding:10px 12px!important;border-radius:16px!important}
+  html body:has(.workspace-app) .workspace-app .app-stat strong{font-size:22px!important}
+
+  /* Pastilles décoratives sombres des cartes de schémas */
+  .schema-card::before,.schema-card::after,.progress-card::before,.progress-card::after,
+  html body:has(.workspace-app) .workspace-app .app-panel::before,html body:has(.workspace-app) .workspace-app .app-panel::after{display:none!important}
+
+  /* Lignes d'audit : une seule ligne compacte */
+  html body:has(.workspace-app) .workspace-app .audit-card{display:grid!important;grid-template-columns:44px minmax(0,1fr) auto auto!important;align-items:center!important;gap:10px!important;padding:10px 12px!important;border-radius:16px!important;min-height:0!important}
+  html body:has(.workspace-app) .workspace-app .audit-mark{width:44px!important;height:44px!important;min-width:44px!important;border-radius:14px!important;box-shadow:none!important}
+  html body:has(.workspace-app) .workspace-app .audit-copy{min-width:0}
+  html body:has(.workspace-app) .workspace-app .audit-copy b{display:block!important;font-size:15px!important;line-height:1.25!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  html body:has(.workspace-app) .workspace-app .audit-copy small{display:block!important;font-size:12px!important;line-height:1.3!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  html body:has(.workspace-app) .workspace-app .audit-state{display:flex!important;align-items:baseline;gap:2px;white-space:nowrap}
+  html body:has(.workspace-app) .workspace-app .audit-state b{font-size:18px!important}
+  html body:has(.workspace-app) .workspace-app .audit-state small{font-size:11px!important;display:inline!important}
+  html body:has(.workspace-app) .workspace-app .audit-card .app-btn{min-height:34px!important;padding:0 12px!important;font-size:13px!important}
+  html body:has(.workspace-app) .workspace-app .audit-card.is-done .app-btn{width:34px;height:34px;min-height:34px!important;padding:0!important;border-radius:50%!important;font-size:0!important;position:relative}
+  html body:has(.workspace-app) .workspace-app .audit-card.is-done .app-btn::after{content:"›";position:absolute;inset:0;display:grid;place-items:center;font-size:22px;line-height:1;color:#5B4FD8;padding-bottom:2px}
+
+  /* Cartes de rapport */
+  html body:has(.workspace-app) .workspace-app .report-card{padding:12px!important;border-radius:18px!important}
+  html body:has(.workspace-app) .workspace-app .report-top{grid-template-columns:44px minmax(0,1fr)!important;column-gap:10px!important;align-items:center!important}
+  html body:has(.workspace-app) .workspace-app .report-card .audit-mark{grid-row:auto}
+  html body:has(.workspace-app) .workspace-app .report-actions{gap:6px!important;margin-top:10px!important}
+  html body:has(.workspace-app) .workspace-app .report-actions .app-btn{min-height:42px!important;font-size:13px!important}
+}
+
+/* ---------- Ordinateur : compact, harmonisé, lisible ---------- */
+@media (min-width:761px){
+  html body:has(.workspace-app) .workspace-app .workspace-main{max-width:1120px!important;margin-inline:auto!important}
+  html body:has(.workspace-app) .workspace-app .desktop-nav{display:flex!important;gap:4px!important;padding:5px!important;margin:0 0 14px!important;border-radius:18px!important;background:rgba(255,255,255,.78)!important;border:1px solid #DDD6F5!important;box-shadow:0 6px 18px rgba(91,63,214,.08)!important}
+  html body:has(.workspace-app) .workspace-app .desktop-nav button{min-height:40px!important;padding:6px 10px!important;border-radius:13px!important;font-size:13px!important;font-weight:700!important;color:#4A4470!important;background:transparent!important;border-color:transparent!important}
+  html body:has(.workspace-app) .workspace-app .desktop-nav button svg{width:18px!important;height:18px!important;stroke:#6B5FD0!important}
+  html body:has(.workspace-app) .workspace-app .desktop-nav button.active{background:linear-gradient(135deg,#7B5CF0,#5B3FD6)!important;border-color:transparent!important;color:#fff!important;box-shadow:0 6px 14px rgba(91,63,214,.28)!important}
+  html body:has(.workspace-app) .workspace-app .desktop-nav button.active *,html body:has(.workspace-app) .workspace-app .desktop-nav button.active svg{color:#fff!important;stroke:#fff!important}
+
+  .mq-home{gap:12px}
+  .mq-banner{min-height:0;padding:26px 32px;border-radius:24px;background:linear-gradient(125deg,#7B5CF0 0%,#5B3FD6 55%,#3F2BA8 100%)!important;box-shadow:0 12px 28px rgba(91,63,214,.22)}
+  .mq-banner-copy{min-height:0;max-width:58%}
+  .mq-banner h1{font-size:30px;margin:12px 0 6px}
+  .mq-banner p{max-width:100%;margin:0 0 4px;font-size:14px}
+  .mq-cta{margin-top:12px;min-height:44px;padding:0 22px;font-size:14px}
+  .mq-banner-art{height:92%;right:16px}
+
+  html body:has(.workspace-app) .workspace-app .workspace-main>.workspace-head{margin:0 0 12px!important}
+  html body:has(.workspace-app) .workspace-app .workspace-main>.workspace-head h1{font-size:30px!important;letter-spacing:-.8px!important;margin:0 0 2px!important}
+  html body:has(.workspace-app) .workspace-app .workspace-main>.workspace-head p{font-size:14px!important;margin:0!important}
+  html body:has(.workspace-app) .workspace-app .app-panel{padding:18px!important;border-radius:20px!important}
+  html body:has(.workspace-app) .workspace-app .audit-card{display:grid!important;grid-template-columns:48px minmax(0,1fr) auto auto!important;align-items:center!important;gap:14px!important;padding:10px 14px!important;border-radius:16px!important}
+  html body:has(.workspace-app) .workspace-app .audit-mark{width:48px!important;height:48px!important;border-radius:14px!important;box-shadow:none!important}
+  html body:has(.workspace-app) .workspace-app .audit-copy b{font-size:15px!important}
+  html body:has(.workspace-app) .workspace-app .audit-copy small{font-size:12.5px!important}
+  html body:has(.workspace-app) .workspace-app .audit-card .app-btn{min-height:36px!important;padding:0 16px!important;font-size:13px!important}
+}
+@media (min-width:761px){
+  html body:has(.workspace-app) .workspace-app .audit-card>.audit-mark{grid-column:1!important;grid-row:1!important}
+  html body:has(.workspace-app) .workspace-app .audit-card>.audit-copy{grid-column:2!important;grid-row:1!important}
+  html body:has(.workspace-app) .workspace-app .audit-card>.audit-state{grid-column:3!important;grid-row:1!important;margin:0!important;display:flex!important;align-items:baseline;gap:3px;white-space:nowrap}
+  html body:has(.workspace-app) .workspace-app .audit-card>.app-btn{grid-column:4!important;grid-row:1!important}
+  html body:has(.workspace-app) .workspace-app .audit-state b{font-size:20px!important}
+  html body:has(.workspace-app) .workspace-app .audit-state em{font-size:12px!important;font-style:normal}
+  html body:has(.workspace-app) .workspace-app .workspace-main>.workspace-head .eyebrow{display:none!important}
+}
