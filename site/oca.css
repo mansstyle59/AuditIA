@@ -104,3 +104,32 @@
  .mobile-tabbar button[data-app-view="Prospection"]{display:flex!important}
  .mobile-tabbar button span:last-child{font-size:8.5px!important;letter-spacing:-.25px}
 }
+
+/* O.C.A. CRM workflow and cloud-sync states */
+.oca-root{overflow-x:clip}
+.oca-sync-status{display:flex;align-items:center;justify-content:flex-end;width:max-content;max-width:100%;margin:0 0 9px auto;padding:6px 10px;border:1px solid #333863;border-radius:999px;background:#12142B;color:#ABB0CC;font-size:10px;font-weight:800;letter-spacing:.15px}
+.oca-sync-status[data-state="synced"]{color:#9BE4C0;border-color:#285845;background:#11271F}
+.oca-sync-status[data-state="pending"]{color:#BDB4FF}
+.oca-sync-status[data-state="offline"],.oca-sync-status[data-state="error"]{color:#FFC2A8;border-color:#68443C;background:#2A1A1C}
+.oca-kpis article small{display:block;color:#8F95B6;font-size:10px;line-height:1.45;margin-top:6px}
+.oca-due.is-overdue{color:#FFB6A6!important;font-weight:850}
+.oca-due.is-due-today{color:#F4D58B!important;font-weight:850}
+.oca-outcome-summary{display:flex;gap:7px;flex-wrap:wrap;margin-top:14px}
+.oca-outcome-summary span{display:flex;align-items:center;gap:7px;padding:7px 9px;border:1px solid #333863;border-radius:9px;color:#ABB0CC;font-size:10px}
+.oca-outcome-summary b{color:#DEE0F2}
+.oca-lead-editing{border-color:#6B5CE7;background:linear-gradient(145deg,#1B1E3B,#12142B)}
+.oca-edit-form{margin-top:12px}
+.oca-edit-form .oca-lead-controls{display:flex;flex-wrap:wrap}
+.oca-edit-form .oca-lead-controls button{min-height:42px}
+.oca-lead-card[hidden]{display:none!important}
+@media(max-width:760px){
+ .oca-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));overflow:visible;gap:6px;padding:7px}
+ .oca-tabs button{min-width:0;white-space:normal;line-height:1.3;min-height:44px;padding:10px 7px;font-size:12px}
+ .oca-tabs button:last-child{grid-column:1/-1}
+ .oca-sync-status{margin:0 0 8px auto;font-size:9.5px}
+ .oca-lead-controls{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .oca-lead-controls .oca-stage-select{grid-column:1/-1}
+ .oca-edit-form .oca-lead-controls{display:grid;grid-template-columns:minmax(0,1fr)}
+ .oca-edit-form .oca-lead-controls button{width:100%}
+ .oca-kpis article small{font-size:9.5px}
+}
