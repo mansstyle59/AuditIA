@@ -4733,7 +4733,7 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
 
 
 
-<link rel="stylesheet" href="./maquette.css?v=13">
+<link rel="stylesheet" href="./maquette.css?v=14">
 </head>
 <body>
   <div class="status-safe" aria-hidden="true"></div>
@@ -4972,6 +4972,7 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
       const navItems=[['Accueil','home'],['Recherche','search','Clients'],['Audit','reports','Audits'],['Rapports','audits'],['Plus','grid','Paramètres'],['Studio','sparkles'],['O.C.A.','trend','Prospection']];
       const sectionLabel = appView==='ClientDétail'?'Clients':appView==='Détail'?'Audits':appView==='Paramètres'?'Réglages':appView==='Profil'?'Profil':appView==='Assistant'?'Assistant':appView;
       const navActive = appView==='ClientDétail'?'Clients':appView==='Détail'?'Audits':appView;
+      try{document.body.setAttribute('data-view',appView);}catch(_){}
       const headTitle = appView==='Accueil'?'Accueil':appView==='Assistant'?'Audit Chat IA':appView==='Paramètres'?'Réglages':appView==='Profil'?'Mon profil':appView==='ClientDétail'?'Fiche client':appView==='Détail'?'Dossier d’audit':appView;
       const headLead = appView==='Assistant'?'Conseils et actions à partir des données réellement disponibles.':appView==='Clients'?(appClients.length?appClients.length+' commerce'+(appClients.length>1?'s':'')+' suivi'+(appClients.length>1?'s':'')+'.':'Ajoute un commerce pour commencer.'):appView==='Audits'?'Un dossier par commerce. Le score n’apparaît qu’après une analyse.':appView==='Rapports'?'Schémas et PDF, uniquement à partir des audits analysés.':appView==='Studio'?'Contenus et argumentaire à partir des dossiers.':appView==='Prospection'?'Cible, offres, prospects et suivi commercial AffiAds.':appView==='Paramètres'?'Identité, signature et connexions des rapports.':appView==='Profil'?'Ton nom et ton accès. L’e-mail ne se change pas ici.':appView==='ClientDétail'?(function(){const c=appClients.find(x=>x.id===activeClient);return c?[c.name,c.city].filter(Boolean).join(' · '):'Fiche d’un commerce.';})():appView==='Détail'?(function(){const a=appAudits.find(x=>x.id===activeAudit);const c=a&&appClients.find(x=>x.id===a.client_id);return c?[c.name,c.city].filter(Boolean).join(' · '):'Le score n’apparaît qu’après l’analyse.';})():'';
       const showEyebrow = sectionLabel.trim().toLowerCase()!==headTitle.trim().toLowerCase();

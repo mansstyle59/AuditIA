@@ -269,3 +269,23 @@ html body:has(.workspace-app) .workspace-app .audit-source-actions h4{color:#241
 html body:has(.workspace-app) .workspace-app .audit-source-links{display:flex!important;flex-wrap:wrap!important;gap:8px!important}
 html body:has(.workspace-app) .workspace-app .audit-source-link{background:#F1EDFF!important;color:#4A3FB5!important;border:1px solid #DDD6F5!important;border-radius:999px!important;padding:8px 14px!important;font-weight:700!important;font-size:13px!important;text-decoration:none!important}
 html body:has(.workspace-app) .workspace-app .audit-disclaimer{font-size:12px!important;color:#6B6590!important;margin:10px 0 0!important}
+
+/* ---------- En-têtes de page : bannière lavande avec image en fond ---------- */
+html body:is([data-view="Clients"],[data-view="Audits"],[data-view="Rapports"],[data-view="Studio"],[data-view="Prospection"]):has(.workspace-app) .workspace-app .workspace-main>.workspace-head{
+  position:relative!important;overflow:hidden!important;isolation:isolate;display:block!important;
+  min-height:104px!important;margin:4px 0 14px!important;padding:18px 150px 18px 20px!important;border:0!important;border-radius:22px!important;
+  background:linear-gradient(125deg,#7B5CF0 0%,#5B3FD6 58%,#3F2BA8 100%)!important;box-shadow:0 12px 26px rgba(91,63,214,.22)!important}
+html body[data-view]:has(.workspace-app) .workspace-app .workspace-main>.workspace-head::after{display:block!important;content:""!important;position:absolute;right:0;top:0;bottom:0;width:46%;z-index:-1;pointer-events:none;
+  background:var(--hd-img) no-repeat right 0 center/auto 100%;
+  -webkit-mask-image:radial-gradient(ellipse 60% 70% at 58% 52%,#000 48%,transparent 100%);mask-image:radial-gradient(ellipse 60% 70% at 58% 52%,#000 48%,transparent 100%)}
+html body[data-view="Clients"]{--hd-img:url(./page-clients.png)}
+html body[data-view="Studio"]{--hd-img:url(./page-studio.png)}
+html body[data-view="Audits"]{--hd-img:url(./home-banner.png)}
+html body[data-view="Rapports"]{--hd-img:url(./home-robot.png)}
+html body[data-view="Prospection"]{--hd-img:url(./chat-robot.png)}
+html body:is([data-view="Clients"],[data-view="Audits"],[data-view="Rapports"],[data-view="Studio"],[data-view="Prospection"]):has(.workspace-app) .workspace-app .workspace-main>.workspace-head :is(h1,h2){color:#fff!important;margin:0 0 4px!important}
+html body:is([data-view="Clients"],[data-view="Audits"],[data-view="Rapports"],[data-view="Studio"],[data-view="Prospection"]):has(.workspace-app) .workspace-app .workspace-main>.workspace-head :is(p,small,span){color:rgba(255,255,255,.9)!important;white-space:normal!important}
+@media(max-width:760px){
+  html body:is([data-view="Clients"],[data-view="Audits"],[data-view="Rapports"],[data-view="Studio"],[data-view="Prospection"]):has(.workspace-app) .workspace-app .workspace-main>.workspace-head{min-height:92px!important;padding:14px 104px 14px 16px!important;border-radius:20px!important}
+  html body[data-view]:has(.workspace-app) .workspace-app .workspace-main>.workspace-head::after{width:50%;background-size:auto 80%}
+}
