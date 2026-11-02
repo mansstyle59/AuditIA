@@ -4733,7 +4733,7 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
 
 
 
-<link rel="stylesheet" href="./maquette.css?v=6">
+<link rel="stylesheet" href="./maquette.css?v=7">
 </head>
 <body>
   <div class="status-safe" aria-hidden="true"></div>
@@ -4746,7 +4746,7 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
   <!-- Supabase embarqué, chargé tôt en parallèle : prêt dès le démarrage (plus d'attente d'un serveur externe) -->
   <link rel="preload" as="script" href="./vendor/supabase.js">
   <script defer src="./vendor/supabase.js"></script>
-  <script defer src="./oca.js"></script>
+  <script defer src="./oca.js?v=5"></script>
   <script type="module">
 
     /* ===== AuditIA — connexion (expérience FormIA, accès réservé à l'administrateur) ===== */
@@ -6894,6 +6894,22 @@ function mqTabbarHtml(active){
     return '<button type="button" class="mq-tab'+(on?' is-on':'')+'"'+(t?' data-app-view="'+t+'"':' data-mq-menu')+' aria-label="'+l+'"'+(on?' aria-current="page"':'')+'><span class="mq-tab-ic">'+navIcon(ico)+'</span><span class="mq-tab-tx">'+l+'</span></button>';
   }).join('')+'</nav>';
 }
+function mqStatsHtml(){
+  const waiting=appAudits.filter(a=>!auditHasAnalysis(a)).length;
+  return '<section class="mq-stats" aria-label="Résumé"><button type="button" data-app-view="Clients"><b>'+appClients.length+'</b><span>Commerces</span></button>'
+   +'<button type="button" data-app-view="Audits"><b>'+appAudits.length+'</b><span>Audits</span></button>'
+   +'<button type="button" data-app-view="Audits"><b>'+waiting+'</b><span>À analyser</span></button></section>';
+}
+function mqLatestHtml(){
+  const rows=appAudits.slice().sort((a,b)=>String(b.updated_at||b.created_at||'').localeCompare(String(a.updated_at||a.created_at||''))).slice(0,3);
+  if(!rows.length) return '<section class="mq-latest"><div class="mq-latest-head"><h2>Derniers audits</h2></div><p class="mq-empty">Aucun audit pour le moment. Lance une recherche ci-dessus pour créer le premier dossier.</p></section>';
+  return '<section class="mq-latest"><div class="mq-latest-head"><h2>Derniers audits</h2><button type="button" data-app-view="Audits">Voir tout →</button></div>'+rows.map(a=>{
+    const c=appClients.find(x=>String(x.id)===String(a.client_id))||{};
+    const name=c.name||a.title||'Commerce', done=auditHasAnalysis(a), score=Math.max(0,Math.min(100,Math.round(Number(a.score)||0)));
+    return '<article class="mq-audit-row"><span class="mq-audit-av">'+escHtml(String(name).trim().charAt(0).toUpperCase()||'A')+'</span><div class="mq-audit-main"><b>'+escHtml(name)+'</b><small>'+escHtml([c.city,done?'Audit terminé':'À analyser'].filter(Boolean).join(' · '))+'</small></div>'
+     +'<span class="mq-audit-score">'+(done?score+'<i>/100</i>':'—')+'</span><button type="button" class="mq-audit-go" data-open-audit="'+escHtml(a.id)+'">Ouvrir</button></article>';
+  }).join('')+'</section>';
+}
 function renderApp(){
       const completed=appAudits.filter(a=>auditHasAnalysis(a)).length;
       let body='';
@@ -6904,9 +6920,9 @@ function renderApp(){
           '<section class="mq-banner" aria-labelledby="mq-title"><div class="mq-banner-copy"><span class="mq-tag"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>Audit commercial IA</span><h1 id="mq-title">Boostez la visibilité de votre commerce</h1><p>Trouvez un commerce, analysez sa présence en ligne et générez un rapport client professionnel.</p><button type="button" class="mq-cta" data-app-view="Clients"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12-7.5z"/></svg>Lancer un audit</button></div><img class="mq-banner-art" src="./home-banner.png" alt="" aria-hidden="true"></section>'+
            '<section class="mq-tiles" aria-label="Actions rapides"><button type="button" data-app-view="Clients">'+navIcon('search')+'<b>Rechercher<br>un commerce</b></button><button type="button" data-app-view="Audits">'+navIcon('reports')+'<b>Audit<br>complet</b></button><button type="button" data-app-view="Rapports">'+navIcon('audits')+'<b>Rapport<br>client</b></button><button type="button" data-app-view="Paramètres">'+navIcon('settings')+'<b>Paramètres<br>&amp; clés</b></button></section>'+
            naturalLanguageSearchHtml()+
-          (latest?'<section class="hx-latest"><div><span class="hx-kicker"><i></i>DERNIER AUDIT</span><h2>'+escHtml((appClients.find(c=>String(c.id)===String(latest.client_id))||{}).name||latest.title||'Commerce')+'</h2><p>'+escHtml([((appClients.find(c=>String(c.id)===String(latest.client_id))||{}).city),latest.title].filter(Boolean).join(' · '))+'</p></div><div class="hx-latest-score"><b>'+Math.max(0,Math.min(100,Math.round(Number(latest.score)||0)))+'</b><span>/100</span></div><button type="button" class="app-btn primary" data-open-audit="'+escHtml(latest.id)+'">Ouvrir le dossier</button></section>':'<section class="hx-latest hx-latest-empty"><div><b>Pas encore d’audit terminé</b><p>Lancez une recherche ci-dessus, puis choisissez un commerce pour créer son dossier.</p></div></section>')+
-          '<p class="hx-compact-note">Les résultats proviennent des sources configurées. Une information non disponible n’est pas automatiquement un défaut.</p>'+
-        '</div>';
+          mqStatsHtml()+
+           mqLatestHtml()+
+         '</div>';
       } else if(appView==='Studio'){
         const selected=appClients.find(c=>c.id===studioClientId)||appClients[0];
         const opts=appClients.map(c=>'<option value="'+escHtml(c.id)+'"'+(selected&&selected.id===c.id?' selected':'')+'>'+escHtml(c.name)+' — '+escHtml(c.city)+'</option>').join('');
