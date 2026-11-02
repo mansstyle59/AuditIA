@@ -4687,6 +4687,17 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
   }
 }
 </style>
+<style id="auditia-visibilite-dossier">
+/* Dossier d'audit, mode clair : chiffre du score lisible sur le disque sombre */
+@media (prefers-color-scheme: light){
+  html body .dx-ring b{color:#ffffff!important;opacity:1!important;-webkit-text-fill-color:#ffffff!important}
+  html body .dx-ring small{color:#D9D4F2!important;opacity:1!important}
+  html body .dx-ring::before{background:#1B1F3B!important}
+  html body .vis-ring span,html body .scan-ring-in{background:#1B1F3B!important;color:#ffffff!important}
+  html body .vis-ring span strong,html body .scan-ring-in strong{color:#ffffff!important}
+  html body .scan-score-label{color:#5F5A7E!important}
+}
+</style>
 </head>
 <body>
   <div class="status-safe" aria-hidden="true"></div>
