@@ -45,6 +45,7 @@ jobs:
                   js.write_text(body, encoding="utf-8")
                   subprocess.run(["node", "--check", str(js)], check=True)
           subprocess.run(["node", "--check", str(root / "oca.js")], check=True)
+          subprocess.run(["node", "--check", str(root / "oca-lavender.js")], check=True)
           json.loads((root / "manifest.webmanifest").read_text(encoding="utf-8"))
           sw = (root / "sw.js").read_text(encoding="utf-8")
           assets_block = re.search(r"const ASSETS\s*=\s*\[([\s\S]*?)\];", sw)
