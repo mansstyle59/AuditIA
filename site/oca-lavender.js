@@ -50,10 +50,25 @@
     return document.body.classList.contains('lv-on') && !!document.querySelector('.workspace-app');
   }
 
+  var done = new WeakSet();   // éléments déjà traités : on ne les relit pas
+  var pending = new Set();    // racines ajoutées au DOM depuis le dernier passage
+
+  function collect(root) {
+    var list = [];
+    if (root.nodeType === 1 && !done.has(root)) list.push(root);
+    var sub = root.querySelectorAll ? root.querySelectorAll('*') : [];
+    for (var k = 0; k < sub.length; k++) if (!done.has(sub[k])) list.push(sub[k]);
+    return list;
+  }
+
   function pass() {
-    if (!active()) return;
-    var root = document.querySelector('.workspace-app');
-    var all = root.querySelectorAll('*');
+    if (!active()) { pending.clear(); return; }
+    var roots = Array.from(pending);
+    pending.clear();
+    if (!roots.length) return;
+    var all = [];
+    roots.forEach(function (r) { if (r.isConnected) all.push.apply(all, collect(r)); });
+    if (!all.length) return;
     var i, el;
     // 1) Fonds très sombres -> fond clair
     for (i = 0; i < all.length; i++) {
@@ -79,6 +94,7 @@
       if (eff && eff.L < OWN_KEEP) continue; // bouton, bandeau ou fond sombre : texte clair voulu
       el.classList.add('lv-dark-text');
     }
+    for (i = 0; i < all.length; i++) done.add(all[i]);
   }
 
   var queued = false;
@@ -89,7 +105,13 @@
   }
   function start() {
     document.body.classList.add('lv-on');
-    new MutationObserver(schedule).observe(document.body, { childList: true, subtree: true });
+    new MutationObserver(function (records) {
+      records.forEach(function (rec) {
+        rec.addedNodes.forEach(function (n) { if (n.nodeType === 1) pending.add(n); });
+      });
+      if (pending.size) schedule();
+    }).observe(document.body, { childList: true, subtree: true });
+    pending.add(document.body);
     schedule();
   }
   if (document.readyState === 'loading') {
