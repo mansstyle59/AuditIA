@@ -462,7 +462,7 @@ body:has(.workspace-app) .schema-donut text{
 }
 
 /* ---- Classes posées par oca-lavender.js (fonds sombres et textes clairs de l'appli) ---- */
-body:has(.workspace-app) .workspace-app .workspace-app .lv-light-bg,
+body:has(.workspace-app) .workspace-app .lv-light-bg,
 body:has(.workspace-app) .workspace-app .lv-light-bg.app-btn,
 body:has(.workspace-app) .workspace-app .app-btn.lv-light-bg{
   background:rgba(255,255,255,.84)!important;
@@ -486,4 +486,23 @@ body:has(.workspace-app) .oca-btn svg{
 }
 body:has(.workspace-app) header.app-topbar svg{
   stroke:#5B4FD8!important;
+}
+
+/* ---- Bandeau d'accueil : fond clair, comme la maquette ---- */
+body:has(.workspace-app) .hx-hero,
+body:has(.workspace-app) .hx-hero-compact{
+  background:linear-gradient(135deg,#FFFFFF 0%,#F1EDFC 100%)!important;
+  border:1px solid #fff!important;
+  box-shadow:0 14px 36px rgba(92,74,180,.12)!important;
+  color:#23203D!important;
+}
+body:has(.workspace-app) .hx-hero h1,
+body:has(.workspace-app) .hx-hero h2{
+  color:#23203D!important;
+}
+body:has(.workspace-app) .hx-hero p{
+  color:var(--muted)!important;
+}
+body:has(.workspace-app) .hx-hero .hx-kicker{
+  color:#5B4FD8!important;
 }

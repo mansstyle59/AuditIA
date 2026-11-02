@@ -1,57 +1,83 @@
 /* AuditIA — thème « lavande » : passe de cohérence des couleurs.
-   L'application écrit beaucoup de couleurs en dur (fonds sombres, textes clairs) dans son HTML.
-   Ce script repère, dans l'espace de travail uniquement, les fonds très sombres et les textes
-   clairs, puis leur applique des classes du thème (fond clair, texte foncé). Les boutons et
-   pastilles saturés gardent leur texte blanc. Aucune donnée n'est modifiée. */
+   L'application écrit beaucoup de couleurs en dur (fonds sombres, dégradés, textes clairs)
+   dans son HTML. Ce script repère, dans l'espace de travail uniquement, les fonds très sombres
+   (couleur unie ou dégradé) et les textes clairs, puis leur applique des classes du thème :
+   fond clair et texte foncé. Un élément qui a lui-même un fond moyen ou saturé (bouton violet,
+   bandeau) garde son texte clair. Aucune donnée n'est modifiée. */
 (function () {
   if (window.__lavenderTheme) return;
   window.__lavenderTheme = true;
 
-  function parse(c) {
-    var m = c && c.match(/rgba?\(([^)]+)\)/);
-    if (!m) return null;
-    var p = m[1].split(/[\s,\/]+/).filter(Boolean).map(Number);
-    return { r: p[0], g: p[1], b: p[2], a: p.length > 3 ? p[3] : 1 };
-  }
-  function lum(c) {
+  var DARK_BG = 0.08;     // fond sombre à éclaircir
+  var LIGHT_TXT = 0.2;    // texte assez clair pour être foncé sur fond clair
+  var OWN_KEEP = 0.35;    // fond propre assez sombre/saturé : on garde le texte clair
+  var SKIP = '.mobile-tabbar, .app-topbar, .sidebar-nav, .workspace-sidebar, .sidebar-backdrop, .lv-skip';
+
+  function lumOf(r, g, b) {
     function f(v) { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }
-    return 0.2126 * f(c.r) + 0.7152 * f(c.g) + 0.0722 * f(c.b);
+    return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+  }
+  // Liste de couleurs rgb(a) trouvées dans une chaîne CSS (couleur ou dégradé)
+  function colorsIn(str) {
+    var out = [], re = /rgba?\(([^)]+)\)/g, m;
+    while ((m = re.exec(str))) {
+      var p = m[1].split(/[\s,\/]+/).filter(Boolean).map(Number);
+      out.push({ r: p[0], g: p[1], b: p[2], a: p.length > 3 ? p[3] : 1 });
+    }
+    return out;
+  }
+  // Luminance propre d'un élément : fond uni ou moyenne d'un dégradé. null si transparent.
+  function ownBg(el) {
+    var cs = getComputedStyle(el);
+    var img = cs.backgroundImage;
+    if (img && img !== 'none' && /gradient/.test(img)) {
+      var cols = colorsIn(img);
+      if (cols.length) {
+        var sum = 0, a = 0;
+        cols.forEach(function (c) { sum += lumOf(c.r, c.g, c.b) * c.a; a += c.a; });
+        return { L: sum / a, a: 1 };
+      }
+    }
+    var c = colorsIn(cs.backgroundColor)[0];
+    if (!c || c.a <= 0) return null;
+    return { L: lumOf(c.r, c.g, c.b), a: c.a };
+  }
+  function textColor(el) {
+    var c = colorsIn(getComputedStyle(el).color)[0];
+    return c && c.a >= 0.5 ? c : null;
   }
   function active() {
-    return !!document.querySelector('.workspace-app') && document.body.classList.contains('lv-on');
+    return document.body.classList.contains('lv-on') && !!document.querySelector('.workspace-app');
   }
-  function bgOf(el) { return parse(getComputedStyle(el).backgroundColor); }
-
-  var DARK_BG = 0.08;   // fond sombre à éclaircir
-  var LIGHT_TXT = 0.2;  // texte assez clair pour être foncé sur fond clair
-  var KEEP_TXT_ON = 0.3; // fond assez sombre : on garde le texte clair
 
   function pass() {
     if (!active()) return;
     var root = document.querySelector('.workspace-app');
     var all = root.querySelectorAll('*');
-    for (var i = 0; i < all.length; i++) {
-      var el = all[i];
-      if (el.closest('.mobile-tabbar, .app-topbar, .sidebar-nav, .workspace-sidebar, .sidebar-backdrop')) continue;
-      var bg = bgOf(el);
-      if (bg && bg.a > 0.3 && lum(bg) < DARK_BG && !el.classList.contains('lv-light-bg')) {
+    var i, el;
+    // 1) Fonds très sombres -> fond clair
+    for (i = 0; i < all.length; i++) {
+      el = all[i];
+      if (el.closest(SKIP)) continue;
+      var b = ownBg(el);
+      if (b && b.a > 0.3 && b.L < DARK_BG && !el.classList.contains('lv-light-bg')) {
         el.classList.add('lv-light-bg');
       }
     }
-    for (var j = 0; j < all.length; j++) {
-      var t = all[j];
-      if (t.closest('.mobile-tabbar, .app-topbar, .sidebar-nav, .workspace-sidebar')) continue;
-      var col = parse(getComputedStyle(t).color);
-      if (!col || col.a < 0.5 || lum(col) < LIGHT_TXT) continue;
-      // Fond effectif : premier ancêtre (ou l'élément) avec un fond opaque
-      var node = t, eff = null;
-      while (node && node !== document.body) {
-        var b = bgOf(node);
-        if (b && b.a > 0.5) { eff = b; break; }
+    // 2) Textes clairs : foncés seulement si le fond effectif est clair
+    for (i = 0; i < all.length; i++) {
+      el = all[i];
+      if (el.closest(SKIP)) continue;
+      var col = textColor(el);
+      if (!col || lumOf(col.r, col.g, col.b) < LIGHT_TXT) continue;
+      var own = ownBg(el), eff = own;
+      var node = el;
+      while (!eff && node.parentElement && node.parentElement !== document.body) {
         node = node.parentElement;
+        eff = ownBg(node);
       }
-      if (eff && lum(eff) < KEEP_TXT_ON) continue; // bouton ou bandeau sombre : texte clair voulu
-      t.classList.add('lv-dark-text');
+      if (eff && eff.L < OWN_KEEP) continue; // bouton, bandeau ou fond sombre : texte clair voulu
+      el.classList.add('lv-dark-text');
     }
   }
 
@@ -61,14 +87,11 @@
     queued = true;
     requestAnimationFrame(function () { queued = false; pass(); });
   }
-
   function start() {
     document.body.classList.add('lv-on');
-    new MutationObserver(function () { schedule(); })
-      .observe(document.body, { childList: true, subtree: true });
+    new MutationObserver(schedule).observe(document.body, { childList: true, subtree: true });
     schedule();
   }
-
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', start);
   } else {
