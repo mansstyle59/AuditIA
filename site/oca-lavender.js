@@ -11,7 +11,7 @@
   var DARK_BG = 0.08;     // fond sombre à éclaircir
   var LIGHT_TXT = 0.2;    // texte assez clair pour être foncé sur fond clair
   var OWN_KEEP = 0.35;    // fond propre assez sombre/saturé : on garde le texte clair
-  var SKIP = '.mobile-tabbar, .app-topbar, .sidebar-nav, .workspace-sidebar, .sidebar-backdrop, .lv-skip';
+  var SKIP = '.mobile-tabbar, .app-topbar, .sidebar-nav, .workspace-sidebar, .sidebar-backdrop, .lv-skip, .mq-top, .mq-menu, .mq-tabbar, .mq-banner, .mq-tiles, .ai-float-launcher, .ai-float-panel, .ai-float, .pg-cta, .app-btn.primary, .status-safe';
 
   function lumOf(r, g, b) {
     function f(v) { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }
