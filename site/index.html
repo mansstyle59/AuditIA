@@ -4634,6 +4634,24 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
 .hx-lex{margin:14px 0;border:1px solid #232749;border-radius:18px;background:linear-gradient(180deg,#191C39,#12142B);padding:0 16px}.hx-lex summary{list-style:none;cursor:pointer;display:flex;flex-direction:column;gap:4px;padding:16px 0;color:#F3F4FF}.hx-lex summary::-webkit-details-marker{display:none}.hx-lex-hint{font-size:13px;color:#ABB0CC}.hx-lex dl{margin:0 0 12px}.hx-lex-item{padding:10px 0;border-top:1px solid #232749}.hx-lex dt{font-weight:700;font-size:14px;color:#F3F4FF}.hx-lex dd{margin:4px 0 0;font-size:13px;line-height:1.5;color:#ABB0CC}
 </style>
 <link rel="stylesheet" href="./oca.css">
+<style id="auditia-affichage-clair">
+@media (prefers-color-scheme: light){
+/* Espace de travail clair : champs, libellés et onglets lisibles sur fond clair */
+.workspace-app .app-form input,.workspace-app .app-form select,.workspace-app .app-form textarea,
+.workspace-app .ac-input,.workspace-app .app-filter,.workspace-app .nl-search textarea{
+  background:#fff!important;color:#23203D!important;border:1px solid #DCD5F0!important;
+}
+.workspace-app .app-form input::placeholder,.workspace-app .app-form textarea::placeholder{color:#9A94B4!important}
+.workspace-app .app-form label,.workspace-app .app-form label b{color:#23203D!important}
+.workspace-app .set-jump a,.workspace-app .set-jump button,.workspace-app .settings-chip{
+  background:rgba(255,255,255,.9)!important;color:#5B4FD8!important;border:1px solid #DCD5F0!important;
+}
+.workspace-app .set-jump a.active,.workspace-app .set-jump button.active,.workspace-app .settings-chip.active{
+  background:linear-gradient(135deg,#8B7DFF,#6A5BE8)!important;color:#fff!important;border-color:transparent!important;
+}
+.workspace-app .app-panel,.workspace-app .app-stat{color:#2A2545}
+}
+</style>
 </head>
 <body>
   <div class="status-safe" aria-hidden="true"></div>
