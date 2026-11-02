@@ -440,3 +440,5 @@ html body:has(.workspace-app) .workspace-app .mq-logo{justify-self:start!importa
   .mq-wm-t em{font-size:10px}
 }
 .mq-wm-star *,.mq-wm-star{stroke:none!important}
+.mq-logo img{height:50px!important;width:auto!important}
+@media(max-width:760px){.mq-logo img{height:48px!important}}
