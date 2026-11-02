@@ -289,3 +289,18 @@ html body:is([data-view="Clients"],[data-view="Audits"],[data-view="Rapports"],[
   html body:is([data-view="Clients"],[data-view="Audits"],[data-view="Rapports"],[data-view="Studio"],[data-view="Prospection"]):has(.workspace-app) .workspace-app .workspace-main>.workspace-head{min-height:92px!important;padding:14px 104px 14px 16px!important;border-radius:20px!important}
   html body[data-view]:has(.workspace-app) .workspace-app .workspace-main>.workspace-head::after{width:50%;background-size:auto 80%}
 }
+
+/* ---------- Logo en haut à gauche ---------- */
+.mq-spacer{display:none!important}
+html body:has(.workspace-app) .workspace-app .mq-top{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;align-items:center}
+html body:has(.workspace-app) .workspace-app .mq-logo{justify-self:start!important}
+@media(min-width:761px){
+  html body:has(.workspace-app) .workspace-app .mq-top{max-width:1120px;margin:0 auto 6px;padding:10px 0 4px!important}
+  html body:has(.workspace-app) .workspace-app .mq-logo img{height:52px}
+  html body:has(.workspace-app) .workspace-app .mq-btn{width:42px;height:42px;border-radius:14px}
+}
+@media(min-width:761px){
+  html body:has(.workspace-app) .workspace-app .mq-btn{position:relative;display:grid;place-items:center;padding:0;border:1px solid #E4DFF3!important;background:#fff!important;color:#5B4FD8!important;box-shadow:0 6px 14px rgba(92,74,180,.10);cursor:pointer}
+  html body:has(.workspace-app) .workspace-app .mq-btn svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+  html body:has(.workspace-app) .workspace-app .mq-top-actions{display:flex;gap:8px}
+}
