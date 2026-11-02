@@ -264,3 +264,8 @@ html body:has(.workspace-app) .workspace-app .audit-step b{color:#241C4D!importa
 html body:has(.workspace-app) .workspace-app .audit-step small{color:#6B6590!important}
 html body:has(.workspace-app) .workspace-app .audit-source-badge{background:#E9F8F1!important;color:#12724E!important;border-color:#BFE8D3!important}
 @media(max-width:760px){html body:has(.workspace-app) .workspace-app .audit-insight-grid{grid-template-columns:minmax(0,1fr)!important}}
+html body:has(.workspace-app) .workspace-app .audit-source-actions{margin-top:14px!important;padding-top:12px!important;border-top:1px solid #E7E2FA!important}
+html body:has(.workspace-app) .workspace-app .audit-source-actions h4{color:#241C4D!important;font-size:13px!important;margin:0 0 8px!important}
+html body:has(.workspace-app) .workspace-app .audit-source-links{display:flex!important;flex-wrap:wrap!important;gap:8px!important}
+html body:has(.workspace-app) .workspace-app .audit-source-link{background:#F1EDFF!important;color:#4A3FB5!important;border:1px solid #DDD6F5!important;border-radius:999px!important;padding:8px 14px!important;font-weight:700!important;font-size:13px!important;text-decoration:none!important}
+html body:has(.workspace-app) .workspace-app .audit-disclaimer{font-size:12px!important;color:#6B6590!important;margin:10px 0 0!important}
