@@ -5450,7 +5450,8 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
         const seen=new Set();const items=[];
         pages.forEach(p=>(p&&p.results||[]).forEach(x=>{const it=nvParse(x);const key=it.owner+'|'+it.cp+'|'+it.start;if(seen.has(key))return;seen.add(key);if(NV_KW.test(it.activity)&&!NV_NOT.test(it.activity))items.push(it);}));
         items.sort((a,b)=>String(b.start).localeCompare(String(a.start)));
-        const cityNeedle=String(nvState.city||'').trim().toLocaleLowerCase('fr-FR').normalize('NFD').replace(/[\u0300-\u036f]/g,'');\n        nvState.items=cityNeedle?items.filter(it=>[it.city,it.cp,it.address].join(' ').toLocaleLowerCase('fr-FR').normalize('NFD').replace(/[\u0300-\u036f]/g,'').includes(cityNeedle)):items;nvState.loaded=true;nvState.asOf=new Date().toISOString().slice(0,10);
+        const cityNeedle=String(nvState.city||'').trim().toLocaleLowerCase('fr-FR').normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+        nvState.items=cityNeedle?items.filter(it=>[it.city,it.cp,it.address].join(' ').toLocaleLowerCase('fr-FR').normalize('NFD').replace(/[\u0300-\u036f]/g,'').includes(cityNeedle)):items;nvState.loaded=true;nvState.asOf=new Date().toISOString().slice(0,10);
       }catch(e){nvState.error='Impossible de charger les données pour le moment ('+((e&&e.message)||'erreur réseau')+'). Réessaie dans un instant.';nvState.loaded=true;}
       nvState.loading=false;renderApp();
     }
