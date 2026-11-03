@@ -61,4 +61,17 @@ html body:not(:has(.workspace-app)) :is(.login-card button[type=submit],.login-c
 html body:not(:has(.workspace-app)) .login-card a{color:var(--op-blue)!important}
 html body:not(:has(.workspace-app)) .login-wordmark,html body:not(:has(.workspace-app)) .login-ia{color:var(--op-ink)!important;background:none!important;-webkit-text-fill-color:initial}
 
+/* Accueil ordinateur : hero centré façon Operato (libellé, grand titre, sous-titre, action, visuel sur carte teintée) */
+html body[data-view="Accueil"]:has(.workspace-app) .workspace-app .workspace-main>.workspace-head{display:none!important}
+html body[data-view="Accueil"]:has(.workspace-app) .workspace-app .mq-banner{background:#fff!important;border:0!important;border-radius:0!important;box-shadow:none!important;text-align:center;display:flex!important;flex-direction:column!important;align-items:center!important;min-height:0!important;padding:72px 24px 0!important;overflow:visible!important}
+html body[data-view="Accueil"]:has(.workspace-app) .workspace-app .mq-banner-copy{align-items:center!important;min-height:0!important;max-width:900px;margin:0 auto}
+html body[data-view="Accueil"]:has(.workspace-app) .workspace-app .mq-banner .mq-tag{background:none!important;border:0!important;padding:0!important;color:var(--op-blue)!important;font-size:13px!important;font-weight:700!important;letter-spacing:.12em!important;text-transform:uppercase!important}
+html body[data-view="Accueil"]:has(.workspace-app) .workspace-app .mq-banner .mq-tag svg{display:none!important}
+html body[data-view="Accueil"]:has(.workspace-app) .workspace-app .mq-banner h1{font-size:60px!important;line-height:1.04!important;letter-spacing:-.035em!important;font-weight:800!important;margin:18px auto 16px!important;text-align:center}
+html body[data-view="Accueil"]:has(.workspace-app) .workspace-app .mq-banner p{font-size:18px!important;line-height:1.55!important;max-width:620px;margin:0 auto!important;text-align:center}
+html body[data-view="Accueil"]:has(.workspace-app) .workspace-app .mq-banner .mq-cta{margin:28px auto 0!important;min-height:48px!important;padding:0 26px!important}
+html body[data-view="Accueil"]:has(.workspace-app) .workspace-app .mq-banner-art{position:relative!important;right:auto!important;bottom:auto!important;top:auto!important;height:auto!important;width:min(880px,100%)!important;margin:48px auto 0!important;display:block!important;border-radius:20px!important;background:linear-gradient(160deg,#EEF1FE,#DCE3FD)!important;padding:24px!important;box-sizing:border-box;-webkit-mask-image:none!important;mask-image:none!important;box-shadow:0 30px 60px -30px rgba(45,76,245,.35)!important;object-fit:contain}
+html body[data-view="Accueil"]:has(.workspace-app) .workspace-app .nl-search{max-width:760px;margin:40px auto 0!important;text-align:left}
+html body[data-view="Accueil"]:has(.workspace-app) .workspace-app .mq-home{gap:0!important;padding-bottom:64px}
 }
+@media(min-width:761px){html body[data-view="Accueil"]:has(.workspace-app) .workspace-app .mq-banner-art{width:min(440px,100%)!important;padding:20px!important}}
