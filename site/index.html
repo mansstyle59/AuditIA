@@ -4736,7 +4736,7 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
 
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./maquette.css?v=30">
-<link rel="stylesheet" href="./desktop.css?v=8">
+<link rel="stylesheet" href="./desktop.css?v=9">
 
 <style id="auditia-ios-safe-area-no-blur-final">
 /* iPhone PWA : zone d'encoche totalement opaque, sans blur ni transparence */
@@ -7034,7 +7034,7 @@ function mqChromeHtml(active){
   return '<header class="mq-top"><span class="mq-spacer" aria-hidden="true"></span>'
    +'<a class="mq-logo" href="./" aria-label="AuditIA AffiAds — accueil"><picture><source media="(min-width:761px)" srcset="./auditia-logo-dark.svg?v=2"><img src="./auditia-logo.svg?v=2" alt="AuditIA by AffiAds" width="250" height="72"></picture></a>'
    +'<nav class="mq-web-nav" aria-label="Navigation principale">'+webNav+'</nav>'
-   +'<div class="mq-top-actions"><button type="button" class="mq-btn mq-bell" data-app-view="Audits" aria-label="Notifications"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10.3 20a1.9 1.9 0 0 0 3.4 0"/></svg><i aria-hidden="true"></i></button>'
+   +'<div class="mq-top-actions"><button type="button" class="mq-btn mq-bell" data-app-view="Nouveautés" aria-label="Nouveautés"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10.3 20a1.9 1.9 0 0 0 3.4 0"/></svg><i aria-hidden="true"></i></button>'
    +'<button type="button" class="mq-btn" data-app-view="Profil" aria-label="Profil">'+navIcon('profile')+'</button></div></header>'
    +'<div class="mq-menu" id="mqMenu" hidden><div class="mq-menu-back" data-mq-close></div><nav class="mq-menu-panel" aria-label="Menu">'
    +li('Accueil','home','Accueil')+li('Clients','search','Recherche de commerces')+li('Audits','reports','Audits')+li('Rapports','audits','Rapports')
@@ -7070,7 +7070,7 @@ function mqLatestHtml(){
     const bell='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10.3 20a1.9 1.9 0 0 0 3.4 0"/></svg>';
     return '<header class="dk-top"><a class="dk-brand" href="./" aria-label="AuditIA — accueil"><span class="dk-badge"><svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#fff" d="M24 5c1.7 11.5 5.5 15.3 17 17-11.5 1.7-15.3 5.5-17 17-1.7-11.5-5.5-15.3-17-17 11.5-1.7 15.3-5.5 17-17Z"/></svg></span><span class="dk-brand-t"><b>Audit<i>IA</i></b><small>Audit de visibilité commerciale</small></span></a>'
       +'<nav class="dk-nav" aria-label="Navigation principale">'+nav+'</nav>'
-      +'<div class="dk-actions"><button type="button" class="dk-tile dk-bell" data-app-view="Audits" aria-label="Notifications">'+bell+'<i aria-hidden="true"></i></button><button type="button" class="dk-tile" data-app-view="Profil" aria-label="Profil">'+navIcon('profile')+'</button></div></header>';
+      +'<div class="dk-actions"><button type="button" class="dk-tile dk-bell'+(active==='Nouveautés'?' is-on':'')+'" data-app-view="Nouveautés" aria-label="Nouveautés : nouvelles ouvertures" title="Nouvelles ouvertures près de chez vous">'+bell+(nvState&&nvState.items&&nvState.items.length?'<i aria-hidden="true"></i>':'')+'</button><button type="button" class="dk-tile" data-app-view="Profil" aria-label="Profil">'+navIcon('profile')+'</button></div></header>';
   }
   function dkHomeHtml(){
     const done=appAudits.filter(a=>auditHasAnalysis(a));
