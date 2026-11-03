@@ -135,3 +135,17 @@ html body[data-view="Accueil"]:has(.workspace-app) .workspace-app .mq-home{gap:0
   html body[data-view="Accueil"]:has(.workspace-app) .workspace-app .mq-banner p{font-size:17px!important;color:#6A7184!important}
   html body[data-view="Accueil"]:has(.workspace-app) .workspace-app .mq-banner-art{border:1px solid #E1E7FD!important}
 }
+
+/* ===== Nettoyage ordinateur : retire les dégradés, halos, reflets et ombres de l'ancien design ===== */
+@media(min-width:761px){
+  html body:has(.workspace-app) .workspace-app .workspace-main *:not(img):not(svg):not(svg *){background-image:none!important;text-shadow:none!important;box-shadow:none!important}
+  html body:has(.workspace-app) .workspace-app .workspace-main :is(.app-panel,.info-panel,.app-stat,.report-card,.audit-card,.schema-card,.nl-search,.card,[class*="card"]):not(.app-btn){background:#fff!important;border:1px solid #E6E9F4!important;border-radius:14px!important}
+  html body:has(.workspace-app) .workspace-app .workspace-main :is(.app-panel,.info-panel,.app-stat,.report-card,.audit-card,.schema-card,.nl-search) :is(*):not(.app-btn):not(.pg-cta):not(.mq-cta):not(.ap-cta):not(img):not(svg):not(svg *):not(.eyebrow):not(.nl-search-mark){background-color:transparent!important}
+  html body:has(.workspace-app) .workspace-app .workspace-main :is(.app-panel,.info-panel,.app-stat,.report-card,.audit-card,.schema-card,.nl-search)::before,
+  html body:has(.workspace-app) .workspace-app .workspace-main :is(.app-panel,.info-panel,.app-stat,.report-card,.audit-card,.schema-card,.nl-search)::after{display:none!important;content:none!important}
+  html body:has(.workspace-app) .workspace-app .workspace-main :is(.app-panel,.info-panel,.app-stat,.report-card,.audit-card,.schema-card,.nl-search) :is(span,div,small,b,strong,em,i):not(.app-btn):not(.pg-cta):not(.mq-cta):not(.eyebrow):not(.nl-search-mark){color:inherit}
+  html body:has(.workspace-app) .workspace-app .workspace-main :is(.app-panel,.info-panel,.app-stat,.report-card,.audit-card,.schema-card,.nl-search) .eyebrow{color:var(--op-blue)!important}
+}
+@media(min-width:761px){
+  html body[data-view]:has(.workspace-app) .workspace-app .workspace-head .workspace-actions .app-btn.primary{background:var(--op-blue)!important;color:#fff!important;border:0!important}
+}
