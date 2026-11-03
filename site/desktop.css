@@ -225,3 +225,44 @@ html body[data-view] .workspace-app .nv-actions .app-btn.primary{color:#fff!impo
   html body[data-view]:has(.dk-top) .workspace-app .audit-card{display:grid!important;grid-template-columns:48px minmax(0,1fr) auto auto!important;align-items:center;gap:16px!important;padding:14px 18px!important}
   html body[data-view]:has(.dk-top) .workspace-app .audit-card .app-btn{min-width:110px;justify-content:center}
 }
+
+/* =====================================================================
+   Cartes élégantes (ordinateur) : un seul langage — carte blanche, filets fins, rangées alignées
+   ===================================================================== */
+@media(min-width:761px){
+  :root{--ca-line:#ECE8FB;--ca-ink:#15103A;--ca-mute:#6B6790}
+  /* Carte « Derniers audits » : conteneur blanc, rangées séparées par un filet */
+  html body[data-view] .workspace-app .mq-latest{display:block!important;background:#fff!important;border:1px solid var(--ca-line)!important;border-radius:22px!important;padding:8px 8px 10px!important;box-shadow:0 24px 44px -34px rgba(40,20,120,.35)!important}
+  html body[data-view] .workspace-app .mq-latest-head{display:flex!important;align-items:center;justify-content:space-between;padding:16px 18px 12px!important;margin:0!important}
+  html body[data-view] .workspace-app .mq-latest-head h2{margin:0!important;font-size:20px!important;font-weight:800!important;color:var(--ca-ink)!important;letter-spacing:-.02em}
+  html body[data-view] .workspace-app .mq-latest-head button{color:#6B2EF0!important;font-weight:700!important;font-size:14px!important;background:transparent!important}
+  html body[data-view] .workspace-app .mq-audit-row{display:grid!important;grid-template-columns:48px minmax(0,1fr) 96px 110px!important;align-items:center!important;gap:16px!important;padding:14px 18px!important;margin:0!important;background:transparent!important;border:0!important;border-top:1px solid var(--ca-line)!important;border-radius:0!important;box-shadow:none!important}
+  html body[data-view] .workspace-app .mq-audit-row:first-of-type{border-top:1px solid var(--ca-line)!important}
+  html body[data-view] .workspace-app .mq-audit-row:hover{background:#FAF8FF!important}
+  html body[data-view] .workspace-app .mq-audit-av{width:48px!important;height:48px!important;border-radius:14px!important;background:linear-gradient(145deg,#8E5BFF,#5B2BE0)!important;box-shadow:none!important}
+  html body[data-view] .workspace-app .mq-audit-main b{font-size:16px!important;font-weight:700!important;color:var(--ca-ink)!important}
+  html body[data-view] .workspace-app .mq-audit-main small{font-size:13.5px!important;color:var(--ca-mute)!important;margin-top:3px!important}
+  html body[data-view] .workspace-app .mq-audit-score{justify-self:end;font-size:24px!important;font-weight:800!important;color:var(--ca-ink)!important;font-variant-numeric:tabular-nums}
+  html body[data-view] .workspace-app .mq-audit-score i{font-size:13px!important;color:var(--ca-mute)!important}
+  html body[data-view] .workspace-app .mq-audit-go{justify-self:end;min-width:100px;min-height:40px!important;border:1px solid #D9CFF7!important;border-radius:12px!important;background:#fff!important;color:#5B2BE0!important;font-weight:700!important}
+  html body[data-view] .workspace-app .mq-audit-go:hover{background:#6B2EF0!important;border-color:#6B2EF0!important;color:#fff!important}
+
+  /* Résumé (commerces / audits / à analyser) : trois cartes égales */
+  html body[data-view] .workspace-app .mq-stats{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:16px!important}
+  html body[data-view] .workspace-app .mq-stats button{display:grid!important;justify-items:start;gap:4px;padding:20px 24px!important;background:#fff!important;border:1px solid var(--ca-line)!important;border-radius:20px!important;box-shadow:0 24px 44px -34px rgba(40,20,120,.3)!important}
+  html body[data-view] .workspace-app .mq-stats b{font-size:34px!important;font-weight:800!important;color:var(--ca-ink)!important}
+  html body[data-view] .workspace-app .mq-stats span{font-size:13px!important;font-weight:600!important;color:var(--ca-mute)!important;text-transform:uppercase;letter-spacing:.06em}
+
+  /* Toutes les autres cartes de pages : même rayon, même filet, même ombre légère */
+  html body[data-view]:has(.dk-top) .workspace-app :is(.app-panel,.info-panel,.nl-search,.report-card,.schema-card,.client-card){border-radius:22px!important;border:1px solid var(--ca-line)!important;background:#fff!important;box-shadow:0 24px 44px -34px rgba(40,20,120,.3)!important;padding:22px 26px!important}
+  html body[data-view]:has(.dk-top) .workspace-app :is(.audit-card,.report-card .report-top){border-radius:18px!important}
+  html body[data-view]:has(.dk-top) .workspace-app .audit-card{background:#fff!important;border:1px solid var(--ca-line)!important;box-shadow:none!important;margin-bottom:10px}
+  html body[data-view]:has(.dk-top) .workspace-app .audit-card:hover{border-color:#CBB8FF!important;box-shadow:0 14px 28px -22px rgba(100,50,220,.5)!important}
+  html body[data-view]:has(.dk-top) .workspace-app .audit-mark,
+  html body[data-view]:has(.dk-top) .workspace-app .cc-avatar{background:linear-gradient(145deg,#8E5BFF,#5B2BE0)!important;color:#fff!important;border-radius:14px!important;box-shadow:none!important}
+  /* Pastilles d'icônes sombres des cartes (Rapports, Studio, stats) → lavande claire */
+  html body[data-view]:has(.dk-top) .workspace-app :is(.app-stat-ico,.stat-ico,.pg-ico,.sec-ico,.schema-ico,.studio-ico,.cta-ico){background:#F1ECFF!important;color:#6B2EF0!important;border-radius:14px!important;box-shadow:none!important}
+  html body[data-view]:has(.dk-top) .workspace-app :is(.app-stat-ico,.stat-ico,.pg-ico,.sec-ico,.schema-ico,.studio-ico,.cta-ico) svg{stroke:#6B2EF0!important}
+  /* Grandes barres d'action (Ajouter un client / Nouvel audit) : violet net, plus basses */
+  html body[data-view]:has(.dk-top) .workspace-app .add-toggle>summary.pg-cta{min-height:56px!important;border-radius:16px!important;font-size:17px!important}
+}
