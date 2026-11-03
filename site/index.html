@@ -5147,6 +5147,20 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
       page.querySelectorAll('[data-create-client]').forEach(form=>form.addEventListener('input',()=>{const g=n=>form.querySelector('[name="'+n+'"]');clientDraft={name:g('name').value,city:g('city').value,category:g('category').value,website:g('website').value};}));
       page.querySelectorAll('[data-nv-refresh]').forEach(b=>b.addEventListener('click',()=>{const d=page.querySelector('[data-nv-dept]');const n=page.querySelector('[data-nv-days]');const c=page.querySelector('[data-nv-city]');if(d)nvState.dept=String(d.value||'11').trim()||'11';if(n)nvState.days=Number(n.value)||60;if(c)nvState.city=String(c.value||'').trim();nvState.loaded=false;nvState.items=[];loadNewOpenings();}));
       page.querySelectorAll('[data-nv-days]').forEach(sel=>sel.addEventListener('change',()=>{nvState.days=Number(sel.value)||60;}));
+      page.querySelectorAll('[data-nv-city]').forEach(inp=>{
+        inp.addEventListener('input',()=>nvShowCitySuggestions(inp));
+        inp.addEventListener('focus',()=>nvShowCitySuggestions(inp));
+      });
+      const nvBox=page.querySelector('#nvCitySuggestions');
+      if(nvBox)nvBox.addEventListener('click',e=>{
+        const pick=e.target.closest('[data-nv-city-pick]');if(!pick)return;
+        const inp=page.querySelector('[data-nv-city]');if(inp){inp.value=pick.dataset.nvCityPick;nvState.city=inp.value;}
+        nvBox.hidden=true;
+      });
+      page.querySelectorAll('[data-nv-city-search]').forEach(b=>b.addEventListener('click',()=>{
+        const inp=page.querySelector('[data-nv-city]');if(inp)nvState.city=String(inp.value||'').trim();
+        nvState.loaded=false;nvState.items=[];loadNewOpenings();
+      }));
       page.querySelectorAll('[data-nv-add]').forEach(b=>b.addEventListener('click',()=>{const it=nvState.items[Number(b.dataset.nvAdd)];if(!it)return;clientDraft={name:it.name,city:it.city,category:'Restaurant',website:''};appView='Clients';appNotice='';renderApp();window.scrollTo(0,0);}));
       page.querySelectorAll('[data-clear-draft]').forEach(b=>b.addEventListener('click',()=>{clientDraft=null;pickedDetails=null;placeResults=[];placeMsg='';renderApp();}));
       page.querySelectorAll('[data-place-input]').forEach(inp=>inp.addEventListener('input',()=>{clearTimeout(acTimer);const v=inp.value;acTimer=setTimeout(()=>autocompletePlaces(v),300);}));
@@ -5423,6 +5437,15 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
     }
     /* Nouveautés : établissements de restauration créés récemment (source officielle BODACC, créations d'entreprises) */
     let nvState={loading:false,loaded:false,error:'',items:[],days:60,dept:'11',city:'',asOf:null};
+    const NV_CITIES=['Narbonne','Carcassonne','Lézignan-Corbières','Azille','Conques-sur-Orbiel','Gruissan','Port-la-Nouvelle','Limoux','Castelnaudary','Sigean','Coursan','Olonzac','Bram','Trèbes','Leucate','Moussoulens','Capendu','Cuxac-d’Aude','Saint-Marcel-sur-Aude','Canet-d’Aude','Montpellier','Béziers','Sète','Agde','Lunel','Frontignan','Mauguio','Castelnau-le-Lez','Lattes','Pézenas','Clermont-l’Hérault','Gignac','Perpignan','Argelès-sur-Mer','Canet-en-Roussillon','Saint-Cyprien','Prades','Céret','Thuir','Rivesaltes','Le Barcarès','Collioure','Foix','Pamiers','Saint-Girons','Lavelanet','Mirepoix','Tarascon-sur-Ariège'];
+    const nvNorm=x=>String(x||'').toLocaleLowerCase('fr-FR').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'');
+    function nvShowCitySuggestions(inp){
+      const box=document.getElementById('nvCitySuggestions');if(!box)return;
+      const q=nvNorm(inp.value).trim();
+      const matches=q.length?NV_CITIES.filter(n=>nvNorm(n).startsWith(q)).slice(0,6):[];
+      box.innerHTML=matches.map(n=>'<button type="button" role="option" data-nv-city-pick="'+escHtml(n)+'"><span aria-hidden="true">⌖</span>'+escHtml(n)+'</button>').join('');
+      box.hidden=!matches.length;
+    }
     const NV_KW=/restaur|pizz|snack|traiteur|brasserie|kebab|cr[eê]perie|caf[eé]|d[eé]bit de boissons?|glac|burger|tacos|sandwich|emporter|food ?truck|cuisine|bar\b/i;
     const NV_NOT=/immobili|acquisition,? la d[eé]tention|holding|gestion de participations/i;
     function nvParse(x){
@@ -5459,7 +5482,7 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
       const fr=d=>{const m=String(d||'').match(/^(\d{4})-(\d{2})-(\d{2})/);return m?m[3]+'/'+m[2]+'/'+m[1]:'';};
       const ago=d=>{const t=Date.parse(d);if(!t)return '';const n=Math.max(0,Math.round((Date.now()-t)/864e5));return n===0?'aujourd’hui':n===1?'hier':'il y a '+n+' jours';};
       const dayOpts=[30,60,90,180].map(n=>'<option value="'+n+'"'+(nvState.days===n?' selected':'')+'>'+n+' jours</option>').join('');
-      const bar='<section class="app-panel nv-filters"><label>Période<select data-nv-days>'+dayOpts+'</select></label><label>Département<select data-nv-dept><option value="11"'+(nvState.dept==='11'?' selected':'')+'>11</option><option value="34"'+(nvState.dept==='34'?' selected':'')+'>34</option><option value="66"'+(nvState.dept==='66'?' selected':'')+'>66</option><option value="09"'+(nvState.dept==='09'?' selected':'')+'>09</option><option value="autre"'+(!['11','34','66','09'].includes(nvState.dept)?' selected':'')+'>Autre</option></select></label><label class="nv-city-label">Ville / Village <span>(optionnel)</span><div class="nv-city-input"><span aria-hidden="true">⌖</span><input data-nv-city value="'+escHtml(nvState.city||'')+'" placeholder="Ex. : Narbonne, Azille, Conques-sur-Orbiel…" autocomplete="address-level2"><span aria-hidden="true">⌕</span></div></label><button type="button" class="app-btn primary" data-nv-refresh>Actualiser</button></section>';
+      const bar='<section class="app-panel nv-filters"><label>Période<select data-nv-days>'+dayOpts+'</select></label><label>Département<select data-nv-dept><option value="11"'+(nvState.dept==='11'?' selected':'')+'>11</option><option value="34"'+(nvState.dept==='34'?' selected':'')+'>34</option><option value="66"'+(nvState.dept==='66'?' selected':'')+'>66</option><option value="09"'+(nvState.dept==='09'?' selected':'')+'>09</option><option value="autre"'+(!['11','34','66','09'].includes(nvState.dept)?' selected':'')+'>Autre</option></select></label><label class="nv-city-label">Ville / Village <span>(optionnel)</span><div class="nv-city-input"><span aria-hidden="true">⌖</span><input data-nv-city value="'+escHtml(nvState.city||'')+'" placeholder="Commence à saisir une ville…" autocomplete="off" autocapitalize="words" aria-autocomplete="list" aria-controls="nvCitySuggestions"><button type="button" data-nv-city-search aria-label="Rechercher la ville">⌕</button><div class="nv-city-suggestions" id="nvCitySuggestions" role="listbox" hidden></div></div></label><button type="button" class="app-btn primary" data-nv-refresh>Actualiser</button></section>';
       let list='';
       if(nvState.loading) list='<section class="app-panel nv-empty">Recherche des nouveaux établissements…</section>';
       else if(nvState.error) list='<section class="app-panel nv-empty nv-error">'+escHtml(nvState.error)+'</section>';
