@@ -7,7 +7,7 @@ const ASSETS = [
   './', './index.html', './manifest.webmanifest',
   './auditia-icon.svg', './favicon-32.png',
   './apple-touch-icon.png', './icon-192.png', './icon-512.png',
-  './auditia-refonte-v2.css?v=1',
+  './auditia-refonte-v2.css',
   './vendor/html2canvas.min.js', './vendor/jspdf.umd.min.js',
   './vendor/supabase.js'
 ];
