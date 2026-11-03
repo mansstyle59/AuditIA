@@ -49,3 +49,37 @@
     background:transparent!important;border-radius:0!important;
   }
 }
+/* FINAL reset: the nested text input must not draw its own rectangle */
+@media(max-width:760px){
+  html body .nv-filters .nv-city-input > input[data-nv-city]{
+    all:unset!important;
+    display:block!important;
+    box-sizing:border-box!important;
+    flex:1 1 0!important;
+    width:0!important;
+    min-width:0!important;
+    max-width:none!important;
+    height:100%!important;
+    margin:0!important;
+    padding:0 2px!important;
+    border:0!important;
+    outline:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+    color:#211943!important;
+    font-family:inherit!important;
+    font-size:16px!important;
+    font-weight:500!important;
+    line-height:1.25!important;
+    appearance:none!important;
+    -webkit-appearance:none!important;
+  }
+  html body .nv-filters .nv-city-input > input[data-nv-city]:focus{
+    border:0!important;outline:0!important;box-shadow:none!important;background:transparent!important;
+  }
+  html body .nv-filters .nv-city-input{
+    display:flex!important;flex-flow:row nowrap!important;align-items:center!important;
+    gap:8px!important;overflow:visible!important;
+  }
+}
