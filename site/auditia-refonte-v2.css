@@ -151,3 +151,60 @@ body:has(.workspace-app) .analyse-panel[data-ap-root] .ap-meta b{font-size:28px!
  body:has(.workspace-app) .audits-page .audit-state{grid-column:2!important;grid-row:2!important;text-align:left!important}
  body:has(.workspace-app) .audits-page .audit-card .app-btn{grid-column:3!important;grid-row:1 / span 2!important;white-space:normal!important;min-width:70px!important;padding:0 10px!important}
 }
+
+/* Audit detail: stronger contrast for navigation and filter chips (desktop-inspired) */
+body:has(.workspace-app) .dx-toc button,
+body:has(.workspace-app) .dx-filters button,
+body:has(.workspace-app) .dx-actions .dx-tag,
+body:has(.workspace-app) .dx-actions .dx-gain{
+  opacity:1!important;
+  filter:none!important;
+  text-shadow:none!important;
+}
+body:has(.workspace-app) .dx-toc button{
+  background:#292344!important;
+  border:1px solid #7665c8!important;
+  color:#f7f4ff!important;
+  font-weight:700!important;
+  box-shadow:0 2px 0 rgba(18,12,44,.18)!important;
+}
+body:has(.workspace-app) .dx-toc button:active,
+body:has(.workspace-app) .dx-toc button:focus-visible{
+  background:#45357e!important;border-color:#a99aff!important;color:#fff!important;
+  outline:2px solid #bdb0ff!important;outline-offset:2px!important;
+}
+body:has(.workspace-app) .dx-filters button{
+  background:#28243f!important;
+  border:1px solid #665a9f!important;
+  color:#f1edff!important;
+  font-weight:750!important;
+  box-shadow:0 2px 0 rgba(18,12,44,.18)!important;
+}
+body:has(.workspace-app) .dx-filters button.is-on{
+  background:linear-gradient(135deg,#5b45d6,#7655ef)!important;
+  border:1px solid #9b88ff!important;color:#fff!important;
+  box-shadow:0 5px 14px rgba(93,68,210,.25)!important;
+}
+body:has(.workspace-app) .dx-actions .dx-tag{
+  background:#302b49!important;border:1px solid #51476f!important;color:#f1edff!important;
+}
+body:has(.workspace-app) .dx-actions .dx-gain{
+  background:#174b3b!important;border:1px solid #2e8c6b!important;color:#b8ffe1!important;
+}
+body:has(.workspace-app) .dx-actions .dx-imp-high{background:#542b37!important;border-color:#9e5363!important;color:#ffd6df!important}
+body:has(.workspace-app) .dx-actions .dx-imp-mid{background:#554020!important;border-color:#a77b3f!important;color:#ffe2b3!important}
+body:has(.workspace-app) .dx-quick{background:linear-gradient(120deg,#32265f,#26375d)!important;border:1px solid #7664cf!important}
+body:has(.workspace-app) .dx-quick span{color:#f5f2ff!important}
+body:has(.workspace-app) .dx-quick em{color:#8df0c1!important;font-weight:850!important}
+body:has(.workspace-app) .dx-act{background:#191a2b!important;border:1px solid #39364f!important}
+body:has(.workspace-app) .dx-act h4{color:#fff!important}
+body:has(.workspace-app) .dx-act p{color:#d8d6e8!important}
+body:has(.workspace-app) .dx-fix{background:#30264f!important;border:1px solid #8b75df!important;color:#fff!important}
+@media(max-width:640px){
+ body:has(.workspace-app) .dx-toc{gap:7px!important;padding:2px 2px 8px!important}
+ body:has(.workspace-app) .dx-toc button{min-height:42px!important;padding:0 14px!important;font-size:13px!important}
+ body:has(.workspace-app) .dx-filters{display:flex!important;flex-wrap:wrap!important;gap:8px!important}
+ body:has(.workspace-app) .dx-filters button{min-height:42px!important;padding:0 14px!important;font-size:13px!important}
+ body:has(.workspace-app) .dx-act-top{gap:7px!important}
+ body:has(.workspace-app) .dx-actions .dx-tag,body:has(.workspace-app) .dx-actions .dx-gain{font-size:12px!important;padding:5px 9px!important}
+}
