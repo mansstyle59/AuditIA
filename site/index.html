@@ -4738,7 +4738,7 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
 <link rel="stylesheet" href="./maquette.css?v=30">
 <link rel="stylesheet" href="./desktop.css?v=11">
 <link rel="stylesheet" href="./mobile.css?v=2">
-<link rel="stylesheet" href="./auditia-refonte-v2.css?v=6">
+<link rel="stylesheet" href="./auditia-refonte-v2.css?v=7">
 
 <style id="auditia-ios-safe-area-no-blur-final">
 /* iPhone PWA : zone d'encoche totalement opaque, sans blur ni transparence */
@@ -4864,7 +4864,7 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
       ['Informations locales','Ville, zone desservie et services sont clairs']
     ];
     let appClient = null, appUser = null, appClients = [], appAudits = [], appSettings = null, appView = 'Accueil', activeAudit = null, activeClient = null, appNotice = '', studioClientId = '', studioOutputText = '';
-    let placeResults = [], placeSearching = false, placeMsg = '', pickedDetails = null, clientDraft = null, keyAlerts = [], auditFilter = '', clientFilter = '', clientTier = '', clientSort = 'urgence', noticeTimer = null, acTimer = null, filterTimer = null, lastPaintedView = '';
+    let placeResults = [], placeSearching = false, placeMsg = '', pickedDetails = null, clientDraft = null, keyAlerts = [], auditFilter = '', auditCategoryFilter = '', clientFilter = '', clientTier = '', clientSort = 'urgence', noticeTimer = null, acTimer = null, filterTimer = null, lastPaintedView = '';
     const KEY_NAMES = { logo_dev:'Logo.dev', places:'Google Places', maps:'Google Maps', pagespeed:'PageSpeed' };
     function recomputeKeyAlerts(){ const a=[]; ['logo_dev','places','maps','pagespeed'].forEach(k=>{ const field=API_FIELD[k]; const val=String((appSettings&&appSettings[field])||'').trim(); if(!val) return; const rec=keyStore()[k]; if(rec&&rec.h===keyHash(val)&&rec.ok===false) a.push(KEY_NAMES[k]); }); keyAlerts=a; }
     async function checkKeysHealth(){
