@@ -178,3 +178,22 @@ html body[data-view] .workspace-app .nv-badge{color:#fff!important}
 html body[data-view] .workspace-app .nv-card h3{color:#15103A!important}
 html body[data-view] .workspace-app .nv-actions .app-btn:not(.primary){color:#15103A!important;background:#fff!important}
 html body[data-view] .workspace-app .nv-actions .app-btn.primary{color:#fff!important}
+
+/* --- Accueil plus compact : les 4 cartes remontent et restent visibles sans défiler --- */
+@media(min-width:761px){
+  .dk-hero-in{padding:26px 24px 92px!important}
+  html body[data-view] .workspace-app .dk-hero h1{font-size:54px!important;margin:16px 0 12px!important;line-height:1.05!important}
+  html body[data-view] .workspace-app .dk-hero p{font-size:17px!important;line-height:1.5!important}
+  .dk-chip{padding:8px 18px 8px 12px;font-size:16px}
+  .dk-cta{margin-top:20px!important}
+  .dk-btn,.dk-btn-ghost{height:52px!important;font-size:17px!important}
+  .dk-checks{margin-top:16px!important;gap:22px!important}
+  .dk-hero-art{width:104%!important;max-width:560px!important}
+  .dk-feats{margin-top:-92px!important;margin-bottom:18px!important}
+}
+@media(min-width:761px){
+  .dk-checks{flex-wrap:nowrap!important;width:max-content;gap:16px!important}
+  .dk-check{font-size:14px!important;white-space:nowrap}
+  .dk-check i{width:24px!important;height:24px!important}
+  .dk-check-go{padding:4px 12px 4px 5px!important}
+}
