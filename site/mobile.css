@@ -1,0 +1,46 @@
+/* Mobile (≤ 760 px) : boutons et pages adaptés à l'écran du téléphone. Le desktop n'est pas touché. */
+@media(max-width:760px){
+  /* Place pour la barre flottante du bas : le dernier bouton n'est jamais caché */
+  html body:has(.workspace-app) .workspace-main{padding-bottom:calc(120px + env(safe-area-inset-bottom))!important}
+
+  /* Formulaires : champs et boutons pleine largeur, boutons empilés, zone tactile ≥ 48 px */
+  html body:has(.workspace-app) .workspace-app .app-form{display:grid!important;gap:12px!important}
+  html body:has(.workspace-app) .workspace-app .app-form :is(input,select,textarea){width:100%!important;min-height:48px!important;font-size:16px!important;border-radius:14px!important}
+  html body:has(.workspace-app) .workspace-app .app-form .app-btn,
+  html body:has(.workspace-app) .workspace-app .detail-actions .app-btn,
+  html body:has(.workspace-app) .workspace-app .nv-actions .app-btn{width:100%!important;min-height:48px!important;justify-content:center;border-radius:14px!important;font-size:15px!important}
+  html body:has(.workspace-app) .workspace-app .detail-actions{display:grid!important;gap:10px!important}
+  html body:has(.workspace-app) .workspace-app .app-btn.primary[type=submit]{background:linear-gradient(90deg,#7A3CFF,#9A4DFF)!important;color:#fff!important}
+
+  /* Page Nouveautés */
+  .nv-page{gap:12px}
+  .nv-filters{display:grid!important;grid-template-columns:1fr 1fr;gap:10px!important}
+  .nv-filters label{min-width:0}
+  .nv-filters select,.nv-filters input{width:100%;min-width:0!important;min-height:46px;font-size:16px}
+  .nv-filters .app-btn{grid-column:1/-1;width:100%;min-height:48px}
+  .nv-list{grid-template-columns:1fr!important}
+  .nv-card{padding:16px!important;border-radius:18px!important}
+  .nv-card h3{font-size:17px!important}
+  .nv-top{flex-wrap:wrap}
+  .nv-actions{display:grid!important;grid-template-columns:1fr;gap:8px}
+  .nv-meta{font-size:12.5px}
+
+  /* Lignes d'audit et boutons d'action : tenir sur une ligne, bouton compact */
+  html body:has(.workspace-app) .workspace-app .audit-card .app-btn{min-height:40px!important;padding:0 14px!important;font-size:14px!important}
+  html body:has(.workspace-app) .workspace-app .client-cards{display:grid!important;grid-template-columns:1fr!important;gap:10px!important}
+  html body:has(.workspace-app) .workspace-app .pf-bar{display:flex!important;flex-wrap:wrap;gap:10px!important}
+  html body:has(.workspace-app) .workspace-app .pf-tiers{display:flex!important;gap:8px;flex-wrap:wrap}
+  html body:has(.workspace-app) .workspace-app .pf-sort{width:100%;display:grid!important;gap:6px}
+  html body:has(.workspace-app) .workspace-app .pf-sort select{width:100%!important;min-height:46px!important}
+
+  /* Grandes barres d'action (Ajouter un client / Nouvel audit) */
+  html body:has(.workspace-app) .workspace-app .add-toggle>summary.pg-cta{min-height:54px!important;border-radius:16px!important;font-size:16px!important}
+  /* Onglets internes (O.C.A., filtres) défilables au doigt, jamais coupés */
+  html body:has(.workspace-app) .workspace-app :is(.oca-tabs,.pg-chips,.dx-filters,.set-jump){display:flex!important;overflow-x:auto;gap:8px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  html body:has(.workspace-app) .workspace-app :is(.oca-tabs,.pg-chips,.dx-filters,.set-jump)>*{flex:0 0 auto}
+}
+@media(max-width:760px){
+  html body:has(.workspace-app) .workspace-app .app-form :is(input,select,textarea),
+  html body:has(.workspace-app) .workspace-app .nv-filters :is(input,select){background:#fff!important;color:#15103A!important;border:1px solid #D9CFF7!important}
+  html body:has(.workspace-app) .workspace-app .app-form label{color:#4A4470!important;font-weight:600}
+}
