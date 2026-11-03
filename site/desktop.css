@@ -140,3 +140,41 @@
   html body[data-view]:has(.dk-top) .mq-top,
   html body[data-view]:has(.dk-top) .mobile-tabbar{display:none!important;visibility:hidden!important;height:0!important;min-height:0!important;padding:0!important;margin:0!important;border:0!important;overflow:hidden!important}
 }
+
+/* =====================================================================
+   Page « Nouveautés » (toutes tailles) + harmonisation des couleurs
+   ===================================================================== */
+.nv-page{display:grid;gap:16px}
+.nv-filters{display:flex!important;gap:16px;align-items:flex-end;flex-wrap:wrap}
+.nv-filters label{display:grid;gap:6px;font-size:13px;font-weight:600;color:#6B6790}
+.nv-filters select,.nv-filters input{min-width:180px;padding:10px 12px;border:1px solid #D9CFF7;border-radius:12px;background:#fff;color:#15103A;font:inherit}
+.nv-meta{margin:0;font-size:13px;color:#6B6790;line-height:1.5}
+.nv-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px}
+.nv-card{background:#fff;border:1px solid #E6E1FA;border-radius:20px;padding:20px;display:grid;gap:10px;box-shadow:0 22px 40px -34px rgba(40,20,120,.4)}
+.nv-card h3{margin:0;font-size:19px;color:#15103A;letter-spacing:-.02em}
+.nv-top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.nv-badge{background:linear-gradient(90deg,#7A3CFF,#9A4DFF);color:#fff;border-radius:999px;padding:4px 12px;font-size:12px;font-weight:800;letter-spacing:.04em;text-transform:uppercase}
+.nv-date{font-size:13px;color:#6B6790}
+.nv-place{margin:0;font-size:14px;color:#3A3560;font-weight:600}
+.nv-act{margin:0;font-size:13.5px;color:#6B6790;line-height:1.5}
+.nv-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.nv-actions .app-btn{min-height:40px;padding:0 14px;display:inline-flex;align-items:center;text-decoration:none;font-size:13.5px}
+.nv-empty{text-align:center;color:#6B6790}
+.nv-error{color:#A12A2A}
+.dk-check-go{background:rgba(255,255,255,.1)!important;border:1px solid rgba(190,160,255,.6)!important;border-radius:999px;padding:5px 14px 5px 6px;font:inherit;font-size:15px;cursor:pointer;transition:background .15s}
+.dk-check-go:hover{background:rgba(255,255,255,.22)!important}
+
+@media(min-width:761px){
+  /* Palette unique pour toutes les pages ordinateur : les variables de l'ancien thème sombre passent en clair/violet */
+  html body:has(.dk-top){color-scheme:light;--bg:#F5F3FF;--panel:#FFFFFF;--panel2:#F1ECFF;--text:#15103A;--muted:#6B6790;--purple:#6B2EF0;--line:#E6E1FA;--ai-accent:#6B2EF0;--ai-violet:#6B2EF0;--ai-surface:#FFFFFF;--ai-surface-raised:#F1ECFF;--ui-focus:rgba(107,46,240,.35)}
+  html body[data-view]:has(.dk-top) .workspace-main :is(.oca-tabs button.is-on,.pf-t.is-on,.app-filter .is-on,.dx-filters .is-on,.set-jump a.active,.pg-chips .is-on,[aria-current="page"]){background:#EFE9FF!important;color:#5B2BE0!important;border-color:#CFC0FF!important}
+  html body[data-view]:has(.dk-top) .workspace-main a:not(.app-btn):not(.pg-cta){color:#6B2EF0}
+  html body[data-view]:has(.dk-top) .workspace-main :is(p,span,small,label,li,td,th){color:inherit}
+  html body[data-view]:has(.dk-top) .workspace-main :is(.app-panel,.info-panel) :is(p,small,li){color:#6B6790}
+  html body[data-view]:has(.dk-top) .workspace-main :is(.app-panel,.info-panel) :is(h1,h2,h3,h4,b,strong){color:#15103A}
+  html body[data-view]:has(.dk-top) .workspace-main :is(.report-meter i,.progress i,[class*="meter"] > i,[class*="bar"] > i){background:linear-gradient(90deg,#7A3CFF,#9A4DFF)!important}
+}
+html body[data-view] .workspace-app .nv-badge{color:#fff!important}
+html body[data-view] .workspace-app .nv-card h3{color:#15103A!important}
+html body[data-view] .workspace-app .nv-actions .app-btn:not(.primary){color:#15103A!important;background:#fff!important}
+html body[data-view] .workspace-app .nv-actions .app-btn.primary{color:#fff!important}
