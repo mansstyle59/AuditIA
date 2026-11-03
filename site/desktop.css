@@ -129,4 +129,14 @@
   html body[data-view] .workspace-app .dk-feat small{color:#6B6790!important}
   html body[data-view] .workspace-app .dk-band,html body[data-view] .workspace-app .dk-stat b,html body[data-view] .workspace-app .dk-stat span{color:#fff!important}
   html body[data-view] .workspace-app .dk-feat-ico{color:#6B2EF0!important}
+
+  /* --- Anciens éléments : masqués avec la priorité la plus haute (plus aucun doublon de barre) --- */
+  html body[data-view]:has(.dk-top) .workspace-app .mq-top,
+  html body[data-view]:has(.dk-top) .workspace-app .mq-menu,
+  html body[data-view]:has(.dk-top) .workspace-app .mq-tabbar,
+  html body[data-view]:has(.dk-top) .workspace-app .desktop-nav,
+  html body[data-view]:has(.dk-top) .workspace-app .app-topbar,
+  html body[data-view]:has(.dk-top) .status-safe,
+  html body[data-view]:has(.dk-top) .mq-top,
+  html body[data-view]:has(.dk-top) .mobile-tabbar{display:none!important;visibility:hidden!important;height:0!important;min-height:0!important;padding:0!important;margin:0!important;border:0!important;overflow:hidden!important}
 }
