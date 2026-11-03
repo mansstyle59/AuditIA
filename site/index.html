@@ -4730,14 +4730,14 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
 }
 </style>
 
-<link rel="stylesheet" href="./theme-clair.css?v=2">
+<link rel="stylesheet" href="./theme-clair.css?v=3">
 
 
 
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./maquette.css?v=30">
 <link rel="stylesheet" href="./desktop.css?v=11">
-<link rel="stylesheet" href="./mobile.css?v=2">
+<link rel="stylesheet" href="./mobile.css?v=3">
 <link rel="stylesheet" href="./auditia-refonte-v2.css?v=7">
 
 <style id="auditia-ios-safe-area-no-blur-final">
@@ -6978,14 +6978,34 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
     function progressChartHtml(rows, opts){
       opts=opts||{};
       const done=(rows||[]).filter(a=>a&&(a.site||a.scan||auditHasAnalysis(a)));
-      if(!done.length) return opts.quiet?'':'<section class="app-panel prog-card"><div class="eyebrow">PROGRESSION</div><h3>Évolution par commerce</h3><p class="app-muted">Aucune analyse pour le moment. L’évolution apparaîtra après la première analyse d’un commerce.</p></section>';
-      const fmt=t=>new Date(t).toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
+      const fmt=t=>t>0?new Date(t).toLocaleDateString('fr-FR',{day:'numeric',month:'short'}):'date inconnue';
       const byClient={};
-      done.forEach(a=>{const t=new Date(a.updated_at||a.created_at||0).getTime()||0;(byClient[a.client_id]=byClient[a.client_id]||[]).push({t,score:Math.max(0,Math.min(100,Number(a.score)||0))});});
-      const lines=Object.entries(byClient).map(([id,list])=>{list.sort((x,y)=>x.t-y.t);const c=appClients.find(x=>String(x.id)===String(id))||{};const first=list[0],last=list[list.length-1];return {name:c.name||'Commerce',n:list.length,first,last,delta:list.length>1?last.score-first.score:null};}).sort((x,y)=>(y.delta==null?-999:y.delta)-(x.delta==null?-999:x.delta));
-      const row=l=>'<div class="pg-row"><div class="pg-name"><b>'+escHtml(l.name)+'</b><small>'+(l.n>1?l.n+' analyses'+(l.first.t>0&&l.last.t>0?' · du '+fmt(l.first.t)+' au '+fmt(l.last.t):''):'1 analyse'+(l.last.t>0?' · le '+fmt(l.last.t):'')+' — relance plus tard pour voir l’évolution')+'</small></div><div class="pg-val">'+(l.delta==null?'<b>'+l.last.score+'</b><small>/100</small>':'<span>'+l.first.score+' → <b>'+l.last.score+'</b></span><em class="sc-delta '+(l.delta>=0?'up':'down')+'">'+(l.delta>0?'▲ +':l.delta<0?'▼ ':'= ')+l.delta+'</em>')+'</div></div>';
-      return '<section class="app-panel prog-card"><div class="eyebrow">PROGRESSION</div><h3>Évolution par commerce</h3><p class="app-muted pg-help">Score de la première analyse → score de la dernière, pour chaque commerce.</p><div class="pg-list">'+lines.map(row).join('')+'</div></section>';
+      done.forEach(a=>{
+        const raw=a.score;
+        if(raw===null||raw===undefined||String(raw).trim()===''||!Number.isFinite(Number(raw)))return;
+        const t=new Date(a.updated_at||a.created_at||0).getTime()||0;
+        (byClient[String(a.client_id)]=byClient[String(a.client_id)]||[]).push({t,score:Math.max(0,Math.min(100,Number(raw)))});
+      });
+      const lines=Object.entries(byClient).map(([id,list])=>{
+        list.sort((x,y)=>x.t-y.t);
+        const c=appClients.find(x=>String(x.id)===String(id))||{};
+        const first=list[0],last=list[list.length-1],delta=list.length>1?last.score-first.score:null;
+        const pts=list.map((p,i)=>{
+          const x=list.length===1?50:8+i*84/(list.length-1);
+          const y=32-(p.score/100)*26;
+          return {x,y,score:p.score};
+        });
+        const path=pts.map((p,i)=>(i?'L':'M')+p.x.toFixed(1)+' '+p.y.toFixed(1)).join(' ');
+        const dots=pts.map(p=>'<circle class="pg-spark-dot" cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="3.2"><title>'+p.score+'/100</title></circle>').join('');
+        const spark='<svg class="pg-sparkline" viewBox="0 0 100 36" preserveAspectRatio="none" role="img" aria-label="Évolution du score de '+escHtml(c.name||'Commerce')+'">'+
+          '<path class="pg-spark-grid" d="M0 6H100 M0 19H100 M0 32H100"/><path class="pg-spark-path" d="'+path+'"/>'+dots+'</svg>';
+        return {name:c.name||'Commerce',n:list.length,first,last,delta,spark};
+      }).sort((x,y)=>(y.delta==null?-999:y.delta)-(x.delta==null?-999:x.delta));
+      if(!lines.length) return opts.quiet?'':'<section class="app-panel prog-card"><div class="eyebrow">PROGRESSION</div><h3>Évolution par commerce</h3><p class="app-muted">Les graphiques apparaîtront dès que des scores chiffrés seront enregistrés. Aucun score n’est remplacé par zéro.</p></section>';
+      const row=l=>'<article class="pg-chart-row"><div class="pg-chart-title"><b>'+escHtml(l.name)+'</b><small>'+(l.n>1?l.n+' analyses · '+fmt(l.first.t)+' → '+fmt(l.last.t):'1 analyse · '+fmt(l.last.t))+'</small></div><strong class="pg-chart-score">'+l.last.score+'/100</strong>'+l.spark+'<div class="pg-val">'+(l.delta==null?'<small>Point de départ enregistré</small>':'<span>'+l.first.score+' → '+l.last.score+'</span><em class="sc-delta '+(l.delta>=0?'up':'down')+'">'+(l.delta>0?'▲ +':l.delta<0?'▼ ':'= ')+l.delta+'</em>')+'</div></article>';
+      return '<section class="app-panel prog-card"><div class="eyebrow">PROGRESSION</div><h3>Évolution par commerce</h3><p class="app-muted pg-help">Courbe chronologique des scores enregistrés. Les audits sans score sont exclus, jamais affichés comme 0.</p><div class="pg-chart-list">'+lines.map(row).join('')+'</div></section>';
     }
+
     function reportBoardHtml(source){
       const rows=source||appAudits;
       const isDone=a=>a&&(a.site||a.scan||auditHasAnalysis(a));
