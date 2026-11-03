@@ -1,0 +1,89 @@
+/* AuditIA — finition mobile selon la référence iPhone (Nouveautés) */
+@media (max-width:760px){
+  :root{
+    --ai-lavender:#F2EEFC;
+    --ai-ink:#211943;
+    --ai-muted:#625B82;
+    --ai-purple:#7041F2;
+    --ai-border:#E4DDF5;
+  }
+  html,body,html body:has(.workspace-app){
+    background:var(--ai-lavender)!important;
+    color:var(--ai-ink)!important;
+  }
+  html body:has(.workspace-app) .workspace-app{
+    width:100%!important;max-width:none!important;margin:0!important;
+    padding:0 0 calc(130px + env(safe-area-inset-bottom,0px))!important;
+    background:transparent!important;
+  }
+  .mq-top{
+    grid-template-columns:minmax(0,1fr) auto!important;
+    gap:12px!important;
+    padding:calc(env(safe-area-inset-top,0px) + 12px) 20px 8px!important;
+    min-height:104px;box-sizing:border-box;
+    background:var(--ai-lavender)!important;
+  }
+  .mq-top .mq-spacer{display:none!important}
+  .mq-logo{justify-self:start!important}
+  .mq-logo img{height:76px!important;max-width:min(58vw,250px)!important;object-fit:contain}
+  .mq-top-actions{gap:10px!important}
+  .mq-btn{width:52px!important;height:52px!important;border-radius:18px!important;
+    background:#fff!important;border:1px solid #E9E2F7!important;
+    color:#6438E8!important;box-shadow:0 7px 18px rgba(82,54,160,.08)!important}
+  .mq-btn svg{width:25px!important;height:25px!important}
+  .workspace-main{padding:0 20px calc(125px + env(safe-area-inset-bottom,0px))!important}
+  .workspace-head{display:none!important}
+  .nv-page{display:grid!important;gap:16px!important}
+  .nv-page:before{content:"Restaurants et commerces de bouche qui viennent de s’ouvrir près de chez vous.";
+    display:block;color:var(--ai-muted);font-size:17px;line-height:1.45;margin:0 0 0}
+  .nv-filters{
+    display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+    gap:16px 14px!important;padding:22px!important;
+    background:#fff!important;border:1px solid #EAE4F7!important;
+    border-radius:26px!important;box-shadow:0 10px 25px rgba(90,65,160,.07)!important;
+  }
+  .nv-filters label{display:grid!important;gap:8px!important;min-width:0;color:var(--ai-ink)!important;font-size:15px!important;font-weight:750!important}
+  .nv-filters select{width:100%!important;height:56px!important;min-height:56px!important;
+    border:1.5px solid #DDD5F2!important;border-radius:17px!important;background:#fff!important;
+    color:var(--ai-ink)!important;padding:0 15px!important;font-size:16px!important;font-weight:650!important}
+  .nv-city-label{grid-column:1/-1!important}
+  .nv-city-label>span{font-weight:500!important;color:var(--ai-muted)!important}
+  .nv-city-input{display:flex!important;align-items:center!important;gap:12px!important;height:64px!important;
+    padding:0 15px!important;border:1.5px solid #DDD5F2!important;border-radius:18px!important;
+    background:#fff!important;box-shadow:0 5px 12px rgba(90,65,160,.08)!important;color:var(--ai-purple)!important}
+  .nv-city-input>span{font-size:24px!important;flex:0 0 auto}
+  .nv-city-input input{width:100%!important;min-width:0!important;height:100%!important;border:0!important;
+    outline:0!important;background:transparent!important;color:var(--ai-ink)!important;
+    font-size:15px!important;padding:0!important;box-shadow:none!important}
+  .nv-city-input input::placeholder{color:#71698E!important;opacity:1}
+  .nv-filters>[data-nv-refresh]{grid-column:1/-1!important;width:100%!important;height:58px!important;
+    min-height:58px!important;border:0!important;border-radius:999px!important;
+    background:linear-gradient(100deg,#7950F5,#5E35E8)!important;color:#fff!important;
+    font-size:17px!important;font-weight:800!important;box-shadow:0 8px 18px rgba(100,55,220,.2)!important}
+  .nv-meta{margin:0 2px!important;color:var(--ai-muted)!important;font-size:15px!important;line-height:1.55!important}
+  .nv-list{display:grid!important;grid-template-columns:1fr!important;gap:14px!important}
+  .nv-card{padding:22px!important;border:1px solid #EAE4F7!important;border-radius:24px!important;
+    background:#fff!important;box-shadow:0 9px 24px rgba(90,65,160,.07)!important;color:var(--ai-ink)!important}
+  .nv-top{display:flex!important;align-items:center!important;gap:12px!important;flex-wrap:wrap!important;margin-bottom:18px!important}
+  .nv-badge{border-radius:999px!important;padding:9px 18px!important;background:linear-gradient(100deg,#7A3FF0,#6230E7)!important;color:#fff!important;font-size:13px!important;font-weight:850!important;letter-spacing:.06em!important}
+  .nv-date{font-size:14px!important;color:var(--ai-muted)!important}
+  .nv-card h3{font-size:21px!important;line-height:1.3!important;letter-spacing:-.4px!important;color:#211943!important;margin:0 0 12px!important}
+  .nv-place{font-size:15px!important;line-height:1.5!important;color:#4C426F!important;font-weight:700!important}
+  .nv-card>p:not(.nv-place){font-size:15px!important;line-height:1.55!important;color:#5E567C!important}
+  .nv-actions{display:grid!important;grid-template-columns:1fr!important;gap:10px!important;margin-top:16px!important}
+  .nv-actions .app-btn{min-height:50px!important;display:flex!important;align-items:center!important;justify-content:center!important;
+    border-radius:16px!important;background:#fff!important;color:#30205D!important;border:1px solid #D9CFF3!important;font-size:15px!important}
+  .nv-actions .app-btn.primary{background:linear-gradient(100deg,#7950F5,#5E35E8)!important;color:#fff!important;border:0!important}
+  .mq-tabbar{left:12px!important;right:12px!important;bottom:calc(8px + env(safe-area-inset-bottom,0px))!important;
+    transform:none!important;width:auto!important;max-width:none!important;height:86px!important;
+    padding:7px!important;border-radius:30px!important;background:#fff!important;
+    border:1px solid #E9E2F7!important;box-shadow:0 12px 30px rgba(60,40,140,.16)!important}
+  .mq-tab{gap:5px!important;border-radius:22px!important;font-size:12px!important;color:#51466F!important}
+  .mq-tab svg{width:26px!important;height:26px!important}
+  .mq-tab.is-on{background:#F0EAFE!important;color:#6339E9!important;box-shadow:none!important}
+}
+@media(max-width:390px){
+  .nv-filters{padding:16px!important;gap:12px!important}
+  .nv-card{padding:17px!important}
+  .nv-date{font-size:12px!important}
+}
