@@ -22,3 +22,30 @@
   .nv-filters>[data-nv-refresh]{grid-column:1/-1!important;height:50px!important;min-height:50px!important;font-size:16px!important}
   .mq-tabbar{bottom:calc(5px + env(safe-area-inset-bottom,0px))!important}
 }
+
+/* Fix double outline: one outer field only, no native/app input frame */
+@media(max-width:760px){
+  body .nv-filters .nv-city-input{
+    border:1.5px solid #d9d0ee!important;
+    border-radius:16px!important;
+    background:#fff!important;
+    box-shadow:0 3px 10px rgba(82,55,145,.06)!important;
+    padding:0 12px!important;
+  }
+  body .nv-filters .nv-city-input input[data-nv-city],
+  body .nv-filters .nv-city-input input[data-nv-city]:focus,
+  body .nv-filters .nv-city-input input[data-nv-city]:active{
+    appearance:none!important;-webkit-appearance:none!important;
+    border:0!important;border-radius:0!important;outline:0!important;
+    box-shadow:none!important;background:transparent!important;
+    background-image:none!important;
+  }
+  body .nv-filters .nv-city-input input[data-nv-city]{
+    flex:1 1 0!important;min-width:0!important;width:1px!important;
+    height:100%!important;padding:0!important;margin:0!important;
+  }
+  body .nv-filters .nv-city-input button[data-nv-city-search]{
+    border:0!important;outline:0!important;box-shadow:none!important;
+    background:transparent!important;border-radius:0!important;
+  }
+}
