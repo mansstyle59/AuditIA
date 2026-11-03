@@ -197,3 +197,4 @@ html body[data-view] .workspace-app .nv-actions .app-btn.primary{color:#fff!impo
   .dk-check i{width:24px!important;height:24px!important}
   .dk-check-go{padding:4px 12px 4px 5px!important}
 }
+.dk-bell.is-on{background:linear-gradient(135deg,#8344FF,#5B2BE0)!important;border-color:transparent!important;box-shadow:0 12px 24px -12px rgba(140,80,255,.9)}
