@@ -4735,8 +4735,8 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
 
 
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./maquette.css?v=29">
-<link rel="stylesheet" href="./operato.css?v=12">
+<link rel="stylesheet" href="./maquette.css?v=30">
+<link rel="stylesheet" href="./desktop.css?v=3">
 
 <style id="auditia-ios-safe-area-no-blur-final">
 /* iPhone PWA : zone d'encoche totalement opaque, sans blur ni transparence */
@@ -5054,7 +5054,7 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
       const headTitle = appView==='Accueil'?'Accueil':appView==='Assistant'?'Audit Chat IA':appView==='Paramètres'?'Réglages':appView==='Profil'?'Mon profil':appView==='ClientDétail'?'Fiche client':appView==='Détail'?'Dossier d’audit':appView;
       const headLead = appView==='Assistant'?'Conseils et actions à partir des données réellement disponibles.':appView==='Clients'?(appClients.length?appClients.length+' commerce'+(appClients.length>1?'s':'')+' suivi'+(appClients.length>1?'s':'')+'.':'Ajoute un commerce pour commencer.'):appView==='Audits'?'Un dossier par commerce. Le score n’apparaît qu’après une analyse.':appView==='Rapports'?'Schémas et PDF, uniquement à partir des audits analysés.':appView==='Studio'?'Contenus et argumentaire à partir des dossiers.':appView==='Prospection'?'Cible, offres, prospects et suivi commercial AffiAds.':appView==='Paramètres'?'Identité, signature et connexions des rapports.':appView==='Profil'?'Ton nom et ton accès. L’e-mail ne se change pas ici.':appView==='ClientDétail'?(function(){const c=appClients.find(x=>x.id===activeClient);return c?[c.name,c.city].filter(Boolean).join(' · '):'Fiche d’un commerce.';})():appView==='Détail'?(function(){const a=appAudits.find(x=>x.id===activeAudit);const c=a&&appClients.find(x=>x.id===a.client_id);return c?[c.name,c.city].filter(Boolean).join(' · '):'Le score n’apparaît qu’après l’analyse.';})():'';
       const showEyebrow = sectionLabel.trim().toLowerCase()!==headTitle.trim().toLowerCase();
-      page.innerHTML = '<div class="workspace-app">'+(pdfBusy?'<div class="pdf-overlay"><div class="pdf-spin"></div><b>Génération du PDF…</b><span>Quelques secondes… l’écran « rapport prêt » s’affichera ensuite.</span><button type="button" class="pdf-cancel" data-pdf-cancel>Annuler</button></div>':'')+''+mqChromeHtml(navActive)+'<div class="sidebar-backdrop" data-close-menu></div><aside class="workspace-sidebar" id="workspaceSidebar"><div class="sidebar-brand"><span class="sb-mark">'+(appSettings&&appSettings.logo_data_url?'<img src="'+escHtml(appSettings.logo_data_url)+'" alt="">':'<svg viewBox="0 0 32 32" aria-hidden="true"><path fill="#C9B6FF" d="M19 1Q20.6 11.4 31 13Q20.6 14.6 19 25Q17.4 14.6 7 13Q17.4 11.4 19 1Z"/><path fill="#8B6CFF" d="M7 18.5Q7.9 24.1 13.5 25Q7.9 25.9 7 31.5Q6.1 25.9 .5 25Q6.1 24.1 7 18.5Z"/></svg>')+'</span><div><b>'+((appSettings?.app_name||'AuditIA')==='AuditIA'?'Audit<em>IA</em>':escHtml(appSettings.app_name))+'</b><small>BY AFFIADS</small></div></div><nav class="sidebar-nav" aria-label="Navigation principale">'+navItems.map(([v,ico,target])=>'<button type="button" class="'+(navActive===(target||v)?'active':'')+'" data-app-view="'+(target||v)+'"><span class="nav-icon">'+navIcon(ico)+'</span><span>'+v+'</span>'+(v==='Clients'?'<span class="nav-count">'+appClients.length+'</span>':v==='Audits'?'<span class="nav-count">'+appAudits.length+'</span>':'')+'</button>').join('')+'</nav><div class="sidebar-bottom">Auditer mieux.<br>Décider plus clairement.</div></aside><div class="workspace-layout"><main class="workspace-main"><div class="workspace-head"><div>'+(showEyebrow?'<div class="eyebrow">'+escHtml(sectionLabel)+'</div>':'')+(appView==='Accueil'?'<p class="page-title">'+escHtml(headTitle)+'</p>':'<h1>'+escHtml(headTitle)+'</h1>')+'<p>'+escHtml(headLead)+'</p></div><div class="workspace-actions desktop-account-actions"><button class="app-btn'+(appView==='Profil'?' is-active':'')+'" type="button" data-app-view="Profil">'+navIcon('profile')+'<span>Profil</span></button><button class="app-btn" type="button" data-app-action="logout">'+navIcon('logout')+'<span>Déconnecter</span></button></div></div><nav class="desktop-nav" aria-label="Navigation principale">'+navItems.map(([v,ico,target])=>'<button type="button" class="'+(navActive===(target||v)?'active':'')+'" data-app-view="'+(target||v)+'">'+navIcon(ico)+'<span>'+v+'</span></button>').join('')+'</nav>'+keyAlertHtml()+appNoticeHtml()+body+'</main></div>'+mqTabbarHtml(navActive)+'</div>';
+      page.innerHTML = '<div class="workspace-app">'+(pdfBusy?'<div class="pdf-overlay"><div class="pdf-spin"></div><b>Génération du PDF…</b><span>Quelques secondes… l’écran « rapport prêt » s’affichera ensuite.</span><button type="button" class="pdf-cancel" data-pdf-cancel>Annuler</button></div>':'')+''+mqChromeHtml(navActive)+dkTopHtml(navActive)+'<div class="sidebar-backdrop" data-close-menu></div><aside class="workspace-sidebar" id="workspaceSidebar"><div class="sidebar-brand"><span class="sb-mark">'+(appSettings&&appSettings.logo_data_url?'<img src="'+escHtml(appSettings.logo_data_url)+'" alt="">':'<svg viewBox="0 0 32 32" aria-hidden="true"><path fill="#C9B6FF" d="M19 1Q20.6 11.4 31 13Q20.6 14.6 19 25Q17.4 14.6 7 13Q17.4 11.4 19 1Z"/><path fill="#8B6CFF" d="M7 18.5Q7.9 24.1 13.5 25Q7.9 25.9 7 31.5Q6.1 25.9 .5 25Q6.1 24.1 7 18.5Z"/></svg>')+'</span><div><b>'+((appSettings?.app_name||'AuditIA')==='AuditIA'?'Audit<em>IA</em>':escHtml(appSettings.app_name))+'</b><small>BY AFFIADS</small></div></div><nav class="sidebar-nav" aria-label="Navigation principale">'+navItems.map(([v,ico,target])=>'<button type="button" class="'+(navActive===(target||v)?'active':'')+'" data-app-view="'+(target||v)+'"><span class="nav-icon">'+navIcon(ico)+'</span><span>'+v+'</span>'+(v==='Clients'?'<span class="nav-count">'+appClients.length+'</span>':v==='Audits'?'<span class="nav-count">'+appAudits.length+'</span>':'')+'</button>').join('')+'</nav><div class="sidebar-bottom">Auditer mieux.<br>Décider plus clairement.</div></aside><div class="workspace-layout"><main class="workspace-main"><div class="workspace-head"><div>'+(showEyebrow?'<div class="eyebrow">'+escHtml(sectionLabel)+'</div>':'')+(appView==='Accueil'?'<p class="page-title">'+escHtml(headTitle)+'</p>':'<h1>'+escHtml(headTitle)+'</h1>')+'<p>'+escHtml(headLead)+'</p></div><div class="workspace-actions desktop-account-actions"><button class="app-btn'+(appView==='Profil'?' is-active':'')+'" type="button" data-app-view="Profil">'+navIcon('profile')+'<span>Profil</span></button><button class="app-btn" type="button" data-app-action="logout">'+navIcon('logout')+'<span>Déconnecter</span></button></div></div><nav class="desktop-nav" aria-label="Navigation principale">'+navItems.map(([v,ico,target])=>'<button type="button" class="'+(navActive===(target||v)?'active':'')+'" data-app-view="'+(target||v)+'">'+navIcon(ico)+'<span>'+v+'</span></button>').join('')+'</nav>'+keyAlertHtml()+appNoticeHtml()+body+'</main></div>'+mqTabbarHtml(navActive)+'</div>';
 
       window.bindOCAEvents(page,{userId:appUser?.id,clients:appClients,audits:appAudits,supabase:appClient,render:()=>renderApp(),setNotice:message=>{appNotice=message;}});
       if(!window.__ocaAuditLinkListener){window.__ocaAuditLinkListener=true;window.addEventListener('auditia:oca-open-audit',event=>{const id=String(event.detail?.auditId||'');if(!id||!appAudits.some(a=>String(a.id)===id))return;activeAudit=id;appView='Détail';appNotice='Dossier ouvert depuis O.C.A.';renderApp();window.scrollTo(0,0);});}
@@ -7013,17 +7013,43 @@ function mqLatestHtml(){
      +'<span class="mq-audit-score">'+(done?score+'<i>/100</i>':'—')+'</span><button type="button" class="mq-audit-go" data-open-audit="'+escHtml(a.id)+'">Ouvrir</button></article>';
   }).join('')+'</section>';
 }
-  function mqFeatsHtml(){
-    const ic={
-      trend:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 16l5-5 4 4 7-8"/><path d="M15 7h5v5"/></svg>',
+  function dkTopHtml(active){
+    const items=[['Accueil','Accueil','home'],['Recherche','Clients','search'],['Audits','Audits','reports'],['Rapports','Rapports','audits'],['Studio','Studio','sparkles'],['O.C.A.','Prospection','trend'],['Réglages','Paramètres','settings']];
+    const nav=items.map(([l,v,ic])=>'<button type="button" class="dk-link'+(active===v?' is-on':'')+'" data-app-view="'+v+'"'+(active===v?' aria-current="page"':'')+'>'+navIcon(ic)+'<span>'+l+'</span></button>').join('');
+    const bell='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10.3 20a1.9 1.9 0 0 0 3.4 0"/></svg>';
+    return '<header class="dk-top"><a class="dk-brand" href="./" aria-label="AuditIA — accueil"><span class="dk-badge"><svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#fff" d="M24 5c1.7 11.5 5.5 15.3 17 17-11.5 1.7-15.3 5.5-17 17-1.7-11.5-5.5-15.3-17-17 11.5-1.7 15.3-5.5 17-17Z"/></svg></span><span class="dk-brand-t"><b>Audit<i>IA</i></b><small>Audit de visibilité commerciale</small></span></a>'
+      +'<nav class="dk-nav" aria-label="Navigation principale">'+nav+'</nav>'
+      +'<div class="dk-actions"><button type="button" class="dk-tile dk-bell" data-app-view="Audits" aria-label="Notifications">'+bell+'<i aria-hidden="true"></i></button><button type="button" class="dk-tile" data-app-view="Profil" aria-label="Profil">'+navIcon('profile')+'</button></div></header>';
+  }
+  function dkHomeHtml(){
+    const done=appAudits.filter(a=>auditHasAnalysis(a));
+    const scores=done.map(a=>Number(a.score)).filter(n=>Number.isFinite(n)&&n>0);
+    const avg=scores.length?Math.round(scores.reduce((t,n)=>t+n,0)/scores.length):null;
+    const I={
+      bolt:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>',
+      search:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>',
+      arrow:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
+      play:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>',
+      check:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>',
+      bars:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20v-7M12 20V5M19 20v-10"/></svg>',
       pin:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.4"/></svg>',
-      gauge:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 15a8 8 0 1 1 16 0"/><path d="M12 15l4-4"/></svg>',
-      target:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.5"/></svg>'
+      gauge:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 16a8 8 0 1 1 16 0"/><path d="M12 16l4-5"/></svg>',
+      target:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1"/></svg>',
+      store:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9l1.5-5h13L20 9"/><path d="M4 9a2.6 2.6 0 0 0 5.3 0 2.6 2.6 0 0 0 5.4 0 2.6 2.6 0 0 0 5.3 0"/><path d="M5.5 12v8h13v-8"/><path d="M10 20v-4.5h4V20"/></svg>',
+      star:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3.5 2.6 5.4 5.9.8-4.3 4.1 1 5.9L12 16.9l-5.2 2.8 1-5.9-4.3-4.1 5.9-.8z"/></svg>'
     };
-    const card=(k,t,d)=>'<article class="mq-feat"><span class="mq-feat-ico">'+ic[k]+'</span><div><b>'+t+'</b><small>'+d+'</small></div></article>';
-    const band=(k,t)=>'<div class="mq-band-item">'+navIcon(k)+'<span>'+t+'</span></div>';
-    return '<div class="mq-feats">'+card('trend','Analyse de visibilité','Google, avis, référencement')+card('pin','Positionnement local','Présence et classement')+card('gauge','Performances','Points forts et axes d’amélioration')+card('target','Plan d’actions IA','Recommandations concrètes')+'</div>'
-      +'<div class="mq-band">'+band('search','Recherche Google Places')+band('reports','Rapports PDF')+band('sparkles','Recommandations IA')+'</div>';
+    const feat=(k,t,d)=>'<article class="dk-feat"><span class="dk-feat-ico">'+I[k]+'</span><div><b>'+t+'</b><small>'+d+'</small></div></article>';
+    const stat=(k,v,l)=>'<div class="dk-stat">'+I[k]+'<div><b>'+v+'</b><span>'+l+'</span></div></div>';
+    const chk=t=>'<span class="dk-check"><i>'+I.check+'</i>'+t+'</span>';
+    return '<section class="dk-hero" aria-labelledby="dk-title"><div class="dk-hero-in"><div class="dk-hero-copy">'
+      +'<span class="dk-chip">'+I.bolt+'Audit commercial IA</span>'
+      +'<h1 id="dk-title">Boostez la visibilité de votre <em>commerce</em></h1>'
+      +'<p>Analysez la présence en ligne de votre établissement, identifiez vos opportunités et recevez des recommandations concrètes pour attirer plus de clients.</p>'
+      +'<div class="dk-cta"><button type="button" class="dk-btn dk-btn-main" data-app-view="Clients">'+I.search+'Lancer un audit'+I.arrow+'</button><button type="button" class="dk-btn dk-btn-ghost" data-app-view="Rapports">'+I.play+'Voir les rapports</button></div>'
+      +'<div class="dk-checks">'+chk('Rapide')+chk('Complet')+chk('Recommandations IA')+'</div></div>'
+      +'<img class="dk-hero-art" src="./hero-shop.png?v=2" alt="" aria-hidden="true"></div></section>'
+      +'<div class="dk-feats">'+feat('bars','Analyse de visibilité','Google, avis, référencement…')+feat('pin','Positionnement local','Présence et classement')+feat('gauge','Performances','Points forts et axes d’amélioration')+feat('target','Plan d’actions IA','Recommandations concrètes')+'</div>'
+      +'<div class="dk-band">'+stat('store',appClients.length,appClients.length>1?'Commerces suivis':'Commerce suivi')+stat('bars',done.length,done.length>1?'Audits analysés':'Audit analysé')+stat('star',avg!=null?avg+'/100':'—','Score moyen')+'</div>';
   }
     function renderApp(){
       const completed=appAudits.filter(a=>auditHasAnalysis(a)).length;
@@ -7031,10 +7057,9 @@ function mqLatestHtml(){
       if(appView==='Accueil'){
         const latest=appAudits.filter(a=>auditHasAnalysis(a)).sort((a,b)=>String(b.updated_at||b.created_at||'').localeCompare(String(a.updated_at||a.created_at||'')))[0];
         const waiting=appAudits.filter(a=>!auditHasAnalysis(a)).length;
-        body='<div class="hx hx-compact mq-home">'+
+        body='<div class="hx hx-compact mq-home">'+dkHomeHtml()+
           '<section class="mq-banner" aria-labelledby="mq-title"><div class="mq-banner-copy"><span class="mq-tag"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>Audit commercial IA</span><h1 id="mq-title">Boostez la visibilité de votre <em>commerce</em></h1><p>Trouvez un commerce, analysez sa présence en ligne et générez un rapport client professionnel.</p><button type="button" class="mq-cta" data-app-view="Clients"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12-7.5z"/></svg>Lancer un audit</button></div><img class="mq-banner-art" src="./home-banner.png" alt="" aria-hidden="true"></section>'+
-           mqFeatsHtml()+
-          naturalLanguageSearchHtml()+
+           naturalLanguageSearchHtml()+
           mqStatsHtml()+
            mqLatestHtml()+
          '</div>';
@@ -7106,7 +7131,7 @@ function mqLatestHtml(){
     /* ----- écrans de connexion (rendus dans #authRoot) ----- */
     const authRoot = document.getElementById('authRoot');
     const EYE = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
-    const BRAND = '<a class="login-brand" href="./" aria-label="AuditIA by AffiAds — accueil"><picture><source media="(min-width:761px)" srcset="./auditia-logo-blue.svg?v=1"><img class="login-logo-img" src="./auditia-logo-dark.svg?v=2" alt="AuditIA by AffiAds" width="250" height="72"></picture></a>';
+    const BRAND = '<a class="login-brand" href="./" aria-label="AuditIA by AffiAds — accueil"><picture><img class="login-logo-img" src="./auditia-logo-dark.svg?v=2" alt="AuditIA by AffiAds" width="250" height="72"></picture></a>';
     const FOOT = '<p class="login-foot">AuditIA · Auditer mieux, décider plus clairement</p><p class="login-status">Connexion à votre espace privé</p>';
     const pwdField = (id,label,ac) => '<label class="login-field" for="'+id+'"><span>'+label+'</span><span class="password-wrap"><input class="login-control" id="'+id+'" type="password" autocomplete="'+ac+'" required minlength="8"><button class="toggle-password" type="button" data-showpwd="'+id+'" aria-label="Afficher le mot de passe" title="Afficher le mot de passe">'+EYE+'</button></span></label>';
     const validEmail = e => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e);
@@ -7233,7 +7258,7 @@ function mqLatestHtml(){
   </script>
   <footer class="wrap foot"><span>© <span id="year"></span> AuditIA · AffiAds</span><span>Espace privé AuditIA · Vos paramètres sont synchronisés.</span></footer>
   <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
-<script src="./oca-lavender.js?v=4" defer></script>
+<script src="./oca-lavender.js?v=5" defer></script>
 
 </body>
 </html>
