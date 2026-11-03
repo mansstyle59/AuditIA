@@ -44,3 +44,26 @@
   html body:has(.workspace-app) .workspace-app .nv-filters :is(input,select){background:#fff!important;color:#15103A!important;border:1px solid #D9CFF7!important}
   html body:has(.workspace-app) .workspace-app .app-form label{color:#4A4470!important;font-weight:600}
 }
+
+
+/* AuditIA — rapports : lisibilité renforcée et graphique de répartition */
+.reports-page .rp-distribution{margin-top:14px!important}
+.reports-page .rp-chart-note{margin:0 0 16px!important;color:#5D5878!important;font-size:14px!important;line-height:1.5!important}
+.reports-page .rp-band{display:grid;gap:8px;margin:0 0 15px}
+.reports-page .rp-band-label{display:flex;align-items:center;justify-content:space-between;gap:12px;color:#282344!important;font-size:14px!important;font-weight:700}
+.reports-page .rp-band-label span{min-width:0;overflow-wrap:anywhere}
+.reports-page .rp-band-label b{flex:0 0 auto;color:#282344!important;font-size:15px!important;font-weight:800}
+.reports-page .rp-band-label small{color:#6B6683!important;font-size:12px!important;font-weight:600}
+.reports-page .rp-band-track{height:12px!important;border-radius:99px!important;background:#E9E5F5!important;overflow:hidden}
+.reports-page .rp-band-track i{display:block;height:100%;min-width:0;border-radius:99px}
+@media(max-width:760px){
+ .reports-page .schema-grid{grid-template-columns:minmax(0,1fr)!important;gap:14px!important}
+ .reports-page .schema-card{min-width:0!important;padding:18px!important;border-radius:20px!important}
+ .reports-page .schema-card h3{font-size:19px!important;line-height:1.3!important;margin-right:52px!important;color:#282344!important}
+ .reports-page .schema-card .eyebrow{color:#5B43C5!important;background:#EEE9FF!important;letter-spacing:1.2px!important}
+ .reports-page .schema-legend b{color:#282344!important}
+ .reports-page .schema-legend span,.reports-page .schema-bar span,.reports-page .schema-bar em{color:#5D5878!important;font-size:13px!important}
+ .reports-page .schema-bar i{background:#E9E5F5!important;height:10px!important}
+ .reports-page .schema-bar em{font-weight:800!important;color:#282344!important}
+ .reports-page .rp-band-label{font-size:14px!important}
+}
