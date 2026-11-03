@@ -458,3 +458,33 @@ body:not(:has(.workspace-app)) .status-safe{background:#0A0B1A!important}
 body:not(:has(.workspace-app)) header.wrap.top{display:none!important}
 body:not(:has(.workspace-app)) .login-status{display:none!important}
 body:not(:has(.workspace-app)) .login-foot{margin-top:18px!important;font-size:12px!important;opacity:.75}
+
+/* ===== Accueil ordinateur façon maquette : nav à icônes, hero sombre, cartes et bandeau ===== */
+.mq-feats,.mq-band{display:none}
+@media(min-width:900px){
+  html body:has(.workspace-app) .workspace-app .mq-top{background:linear-gradient(90deg,#0C0A2E,#1A1260)!important;height:84px!important;padding:0 36px!important}
+  html body:has(.workspace-app) .workspace-app .mq-web-nav{gap:6px!important}
+  html body:has(.workspace-app) .workspace-app .mq-web-link{display:flex!important;flex-direction:column!important;align-items:center!important;gap:4px!important;padding:8px 14px!important;min-width:76px}
+  html body:has(.workspace-app) .workspace-app .mq-web-link svg{width:20px!important;height:20px!important;stroke:currentColor!important;fill:none!important}
+  html body:has(.workspace-app) .workspace-app .mq-web-link span{font-size:13px!important}
+  html body:has(.workspace-app) .workspace-app .mq-web-link.is-on{background:linear-gradient(135deg,#7A3CFF,#5B2BE0)!important;color:#fff!important;border-radius:14px!important;box-shadow:0 10px 22px -10px rgba(122,60,255,.8)!important}
+  html body:has(.workspace-app) .workspace-app .mq-web-link.is-on::after{display:none!important}
+  html body:has(.workspace-app) .workspace-app .mq-btn{width:46px!important;height:46px!important;border-radius:14px!important;background:rgba(255,255,255,.06)!important;border:1px solid rgba(255,255,255,.18)!important}
+  html body[data-view="Accueil"]:has(.workspace-app) .workspace-app .mq-banner{background:radial-gradient(60% 80% at 75% 40%,rgba(140,70,255,.55),transparent 60%),linear-gradient(110deg,#0B0A2B 0%,#1A1262 60%,#261A7A 100%)!important;border-radius:0 0 28px 28px!important;padding:44px 56px 120px!important;margin:0 -24px!important;min-height:520px!important}
+  html body[data-view="Accueil"]:has(.workspace-app) .workspace-app .mq-banner h1 em{font-style:normal!important;background:linear-gradient(90deg,#B98CFF,#8B5CFF);-webkit-background-clip:text;background-clip:text;color:transparent!important}
+  html body[data-view="Accueil"]:has(.workspace-app) .workspace-app .mq-banner .mq-tag{background:linear-gradient(90deg,rgba(255,200,40,.15),rgba(140,70,255,.2))!important;border:1px solid rgba(255,220,120,.55)!important;color:#fff!important}
+  html body[data-view="Accueil"]:has(.workspace-app) .workspace-app .mq-banner .mq-cta{background:linear-gradient(90deg,#8E4DFF,#B05CFF)!important;color:#fff!important;box-shadow:0 18px 34px -14px rgba(160,80,255,.9)!important}
+  html body[data-view="Accueil"]:has(.workspace-app) .workspace-app .mq-banner .mq-cta svg{fill:#fff!important}
+  html body[data-view="Accueil"]:has(.workspace-app) .workspace-app .mq-banner-art{filter:drop-shadow(0 40px 50px rgba(120,60,255,.55))!important}
+  .mq-feats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin:-72px 0 18px;position:relative;z-index:2}
+  .mq-feat{display:flex;gap:14px;align-items:center;background:#fff;border-radius:18px;padding:20px 20px;box-shadow:0 18px 36px -22px rgba(30,20,90,.35);border:1px solid #ECE8FA}
+  .mq-feat-ico{flex:0 0 56px;width:56px;height:56px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#F3EEFF,#E6DCFF);color:#6B2EF0}
+  .mq-feat-ico svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+  .mq-feat b{display:block;font-size:16px;font-weight:800;color:#15103A;margin-bottom:3px}
+  .mq-feat small{display:block;font-size:13px;color:#6B6790;line-height:1.4}
+  .mq-band{display:flex;justify-content:space-between;align-items:center;gap:0;background:linear-gradient(90deg,#5B2BE0,#3E1FB0);border-radius:18px;padding:18px 28px;color:#fff;margin-bottom:24px}
+  .mq-band-item{display:flex;align-items:center;gap:14px;font-size:16px;font-weight:700;flex:1;justify-content:center;position:relative}
+  .mq-band-item+.mq-band-item::before{content:"";position:absolute;left:0;top:10%;bottom:10%;width:1px;background:rgba(255,255,255,.22)}
+  .mq-band-item svg{width:28px;height:28px;stroke:#fff!important;fill:none!important;flex:0 0 28px}
+  .mq-band{display:flex}
+}

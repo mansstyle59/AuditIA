@@ -4735,8 +4735,8 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
 
 
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./maquette.css?v=28">
-<link rel="stylesheet" href="./operato.css?v=8">
+<link rel="stylesheet" href="./maquette.css?v=29">
+<link rel="stylesheet" href="./operato.css?v=10">
 
 <style id="auditia-ios-safe-area-no-blur-final">
 /* iPhone PWA : zone d'encoche totalement opaque, sans blur ni transparence */
@@ -6978,7 +6978,7 @@ function bizIconSvg(c){
   return '<svg class="biz-ic" viewBox="0 0 24 24" aria-hidden="true">'+path+'</svg>';
 }
 function mqChromeHtml(active){
-  const webNav=[['Accueil','Accueil'],['Recherche','Clients'],['Audits','Audits'],['Rapports','Rapports'],['Studio','Studio'],['O.C.A.','Prospection'],['Réglages','Paramètres']].map(([l,v])=>'<button type="button" class="mq-web-link'+(active===v?' is-on':'')+'" data-app-view="'+v+'"'+(active===v?' aria-current="page"':'')+'>'+l+'</button>').join('');
+  const webNav=[['Accueil','Accueil','home'],['Recherche','Clients','search'],['Audits','Audits','reports'],['Rapports','Rapports','audits'],['Studio','Studio','sparkles'],['O.C.A.','Prospection','trend'],['Réglages','Paramètres','settings']].map(([l,v,ic])=>'<button type="button" class="mq-web-link'+(active===v?' is-on':'')+'" data-app-view="'+v+'"'+(active===v?' aria-current="page"':'')+'>'+navIcon(ic)+'<span>'+l+'</span></button>').join('');
   const li=(v,ico,label)=>'<button type="button" class="mq-menu-item" data-app-view="'+v+'">'+navIcon(ico)+'<span>'+label+'</span></button>';
   return '<header class="mq-top"><span class="mq-spacer" aria-hidden="true"></span>'
    +'<a class="mq-logo" href="./" aria-label="AuditIA AffiAds — accueil"><picture><source media="(min-width:761px)" srcset="./auditia-logo-dark.svg?v=2"><img src="./auditia-logo.svg?v=2" alt="AuditIA by AffiAds" width="250" height="72"></picture></a>'
@@ -7013,15 +7013,28 @@ function mqLatestHtml(){
      +'<span class="mq-audit-score">'+(done?score+'<i>/100</i>':'—')+'</span><button type="button" class="mq-audit-go" data-open-audit="'+escHtml(a.id)+'">Ouvrir</button></article>';
   }).join('')+'</section>';
 }
-function renderApp(){
+  function mqFeatsHtml(){
+    const ic={
+      trend:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 16l5-5 4 4 7-8"/><path d="M15 7h5v5"/></svg>',
+      pin:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.4"/></svg>',
+      gauge:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 15a8 8 0 1 1 16 0"/><path d="M12 15l4-4"/></svg>',
+      target:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.5"/></svg>'
+    };
+    const card=(k,t,d)=>'<article class="mq-feat"><span class="mq-feat-ico">'+ic[k]+'</span><div><b>'+t+'</b><small>'+d+'</small></div></article>';
+    const band=(k,t)=>'<div class="mq-band-item">'+navIcon(k)+'<span>'+t+'</span></div>';
+    return '<div class="mq-feats">'+card('trend','Analyse de visibilité','Google, avis, référencement')+card('pin','Positionnement local','Présence et classement')+card('gauge','Performances','Points forts et axes d’amélioration')+card('target','Plan d’actions IA','Recommandations concrètes')+'</div>'
+      +'<div class="mq-band">'+band('search','Recherche Google Places')+band('reports','Rapports PDF')+band('sparkles','Recommandations IA')+'</div>';
+  }
+    function renderApp(){
       const completed=appAudits.filter(a=>auditHasAnalysis(a)).length;
       let body='';
       if(appView==='Accueil'){
         const latest=appAudits.filter(a=>auditHasAnalysis(a)).sort((a,b)=>String(b.updated_at||b.created_at||'').localeCompare(String(a.updated_at||a.created_at||'')))[0];
         const waiting=appAudits.filter(a=>!auditHasAnalysis(a)).length;
         body='<div class="hx hx-compact mq-home">'+
-          '<section class="mq-banner" aria-labelledby="mq-title"><div class="mq-banner-copy"><span class="mq-tag"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>Audit commercial IA</span><h1 id="mq-title">Boostez la visibilité de votre commerce</h1><p>Trouvez un commerce, analysez sa présence en ligne et générez un rapport client professionnel.</p><button type="button" class="mq-cta" data-app-view="Clients"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12-7.5z"/></svg>Lancer un audit</button></div><img class="mq-banner-art" src="./home-banner.png" alt="" aria-hidden="true"></section>'+
-           naturalLanguageSearchHtml()+
+          '<section class="mq-banner" aria-labelledby="mq-title"><div class="mq-banner-copy"><span class="mq-tag"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>Audit commercial IA</span><h1 id="mq-title">Boostez la visibilité de votre <em>commerce</em></h1><p>Trouvez un commerce, analysez sa présence en ligne et générez un rapport client professionnel.</p><button type="button" class="mq-cta" data-app-view="Clients"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12-7.5z"/></svg>Lancer un audit</button></div><img class="mq-banner-art" src="./home-banner.png" alt="" aria-hidden="true"></section>'+
+           mqFeatsHtml()+
+          naturalLanguageSearchHtml()+
           mqStatsHtml()+
            mqLatestHtml()+
          '</div>';
