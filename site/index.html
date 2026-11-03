@@ -7012,12 +7012,13 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
         const sc=scanned.scan.scores, c=appClients.find(x=>x.id===scanned.client_id);
         light=[['Performance',sc.performance],['Accessibilité',sc.accessibility],['Bonnes pratiques',sc.bestPractices],['SEO technique',sc.seo]].filter(([,v])=>v!=null).map(([k,v])=>{const n=Math.max(0,Math.min(100,Number(v)||0));return '<div class="schema-bar"><span>'+k+'</span><i><b style="width:'+n+'%"></b></i><em>'+n+'</em></div>';}).join('')+'<p class="app-muted">Google Lighthouse · '+escHtml((c&&c.name)||'Commerce')+'</p>';
       }
+      const scoreData=done.filter(a=>a.score!==null&&a.score!==undefined&&String(a.score).trim()!==''&&Number.isFinite(Number(a.score)));
       const scoreBands=[{label:'0–39 · Faible',min:0,max:39,color:'#F07878'},{label:'40–59 · À renforcer',min:40,max:59,color:'#F2A65A'},{label:'60–79 · Correct',min:60,max:79,color:'#7B6CFF'},{label:'80–100 · Solide',min:80,max:100,color:'#39B98A'}];
-      const scoreDistribution=done.length?scoreBands.map(b=>{
-        const count=done.filter(a=>{const n=Math.max(0,Math.min(100,Number(a.score)||0));return n>=b.min&&n<=b.max;}).length;
-        const share=Math.round(count/done.length*100);
+      const scoreDistribution=scoreData.length?scoreBands.map(b=>{
+        const count=scoreData.filter(a=>{const n=Math.max(0,Math.min(100,Number(a.score)));return n>=b.min&&n<=b.max;}).length;
+        const share=Math.round(count/scoreData.length*100);
         return '<div class="rp-band"><div class="rp-band-label"><span>'+b.label+'</span><b>'+count+' <small>('+share+' %)</small></b></div><div class="rp-band-track"><i style="width:'+share+'%;background:'+b.color+'"></i></div></div>';
-      }).join(''):'<p class="app-muted">Les répartitions apparaîtront après les premières analyses.</p>';
+      }).join(''):'<p class="app-muted">Les répartitions apparaîtront dès que des scores chiffrés seront disponibles.</p>';
       return '<div class="schema-grid">'+progressChartHtml(rows)+'<section class="app-panel schema-card"><div class="eyebrow">RÉPARTITION</div><h3>Dossiers analysés</h3><div class="schema-split">'+donut+'<div class="schema-legend"><p><b>'+done.length+'</b><span>analysés</span></p><p><b>'+wait+'</b><span>en attente</span></p></div></div></section><section class="app-panel schema-card"><div class="eyebrow">COMPARAISON</div><h3>Dernier score par commerce</h3>'+bars+'</section>'+(axes?'<section class="app-panel schema-card"><div class="eyebrow">AXES</div><h3>SEO et GEO</h3>'+axes+'</section>':'')+(light?'<section class="app-panel schema-card"><div class="eyebrow">PERFORMANCE</div><h3>Site mesuré</h3>'+light+'</section>':'')+'<section class="app-panel schema-card rp-distribution"><div class="eyebrow">RÉPARTITION DES SCORES</div><h3>Où se situent les commerces ?</h3><p class="rp-chart-note">Répartition des audits analysés par tranche de score, sur les données enregistrées.</p>'+scoreDistribution+'</section>'+'</div>';
     }
 
