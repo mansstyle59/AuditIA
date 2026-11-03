@@ -222,3 +222,21 @@ html body[data-view="Accueil"]:has(.workspace-app) .workspace-app .mq-home{gap:0
   html body[data-view="Accueil"]:has(.workspace-app) .workspace-app .mq-band span{color:#fff!important;font-weight:700!important}
   html body[data-view="Accueil"]:has(.workspace-app) .workspace-app .mq-web-link span{color:#fff!important}
 }
+
+/* ===== Accueil ordinateur : finition (sans en-tête en double, hero sombre, illustration nette) ===== */
+@media(min-width:900px){
+  html body:has(.mq-home) .workspace-app .workspace-main>.workspace-head{display:none!important}
+  html body:has(.mq-home) .workspace-app .workspace-main{padding-top:0!important}
+  html body:has(.mq-home) .workspace-app .mq-home{padding-top:24px!important}
+  html body:has(.mq-home) .workspace-app .mq-banner{background:radial-gradient(60% 90% at 78% 40%,rgba(150,80,255,.5),rgba(150,80,255,0) 62%),linear-gradient(110deg,#0B0A2B 0%,#1A1262 60%,#261A7A 100%)!important;background-color:#15107A!important;background-image:radial-gradient(60% 90% at 78% 40%,rgba(150,80,255,.5),rgba(150,80,255,0) 62%),linear-gradient(110deg,#0B0A2B 0%,#1A1262 60%,#261A7A 100%)!important;border-radius:28px!important;margin:0 0 -64px!important;padding:56px 56px 110px!important;min-height:480px!important;display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,.9fr)!important;align-items:center!important;color:#fff!important}
+  html body:has(.mq-home) .workspace-app .mq-banner h1{font-size:50px!important;line-height:1.06!important;color:#fff!important;letter-spacing:-.03em!important;margin:18px 0 14px!important}
+  html body:has(.mq-home) .workspace-app .mq-banner p{color:rgba(255,255,255,.86)!important;font-size:16px!important;max-width:500px!important}
+  html body:has(.mq-home) .workspace-app .mq-banner-art{background:transparent!important;background-image:none!important;border:0!important;border-radius:0!important;padding:0!important;box-shadow:none!important;width:100%!important;max-width:440px!important;height:auto!important;margin:0 0 0 auto!important;filter:drop-shadow(0 30px 40px rgba(120,60,255,.5))!important;-webkit-mask-image:none!important;mask-image:none!important;position:relative!important;right:auto!important;bottom:auto!important;top:auto!important;object-fit:contain!important}
+  html body:has(.mq-home) .workspace-app .mq-feats{margin-top:0!important}
+}
+@media(min-width:900px){
+  html body:has(.mq-home) .workspace-app .mq-home{max-width:1120px!important;margin:0 auto!important;width:100%!important}
+  html body:has(.mq-home) .workspace-app .mq-banner{width:100%!important;max-width:1120px!important;box-sizing:border-box!important;margin:0 auto -64px!important;position:relative!important;left:auto!important;right:auto!important}
+  html body:has(.mq-home) .workspace-app .mq-feats{width:100%!important;max-width:1120px!important;margin:0 auto 18px!important;position:relative!important;z-index:2!important}
+  html body:has(.mq-home) .workspace-app .mq-band{width:100%!important;max-width:1120px!important;margin:0 auto 24px!important;box-sizing:border-box!important}
+}
