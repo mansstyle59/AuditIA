@@ -453,3 +453,8 @@ body:not(:has(.workspace-app)) .status-safe{background:#0A0B1A!important}
   html body:has(.workspace-app) .workspace-app{padding-top:calc(max(var(--safe-top,0px),env(safe-area-inset-top,0px)) + 26px)!important}
   html body:has(.workspace-app) .status-safe{opacity:1!important;filter:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;background:#EEEAF8!important}
 }
+
+/* ---------- Connexion simplifiée : un seul logo, une seule ligne de pied ---------- */
+body:not(:has(.workspace-app)) header.wrap.top{display:none!important}
+body:not(:has(.workspace-app)) .login-status{display:none!important}
+body:not(:has(.workspace-app)) .login-foot{margin-top:18px!important;font-size:12px!important;opacity:.75}
