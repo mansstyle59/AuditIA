@@ -15,8 +15,8 @@
   /* Page Nouveautés */
   .nv-page{gap:12px}
   .nv-filters{display:grid!important;grid-template-columns:1fr 1fr;gap:10px!important}
-  .nv-filters label{min-width:0}
-  .nv-filters select,.nv-filters input{width:100%;min-width:0!important;min-height:46px;font-size:16px}
+  .nv-filters label{min-width:0;display:grid;gap:6px;align-content:start;font-size:13px;font-weight:750}
+  .nv-filters select,.nv-filters input{width:100%;min-width:0!important;box-sizing:border-box;height:52px;min-height:52px;margin:0;font-size:16px}
   .nv-filters .app-btn{grid-column:1/-1;width:100%;min-height:48px}
   .nv-list{grid-template-columns:1fr!important}
   .nv-card{padding:16px!important;border-radius:18px!important}
