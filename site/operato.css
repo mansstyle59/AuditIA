@@ -1,0 +1,61 @@
+/* ===== Refonte « Operato » : fond blanc, Plus Jakarta Sans, bleu #2D4CF5, boutons 8px, cartes sobres ===== */
+:root{--op-blue:#2D4CF5;--op-blue-2:#1863DC;--op-tint:#EEF1FE;--op-ink:#0B0B09;--op-mute:#5B6275;--op-line:#E4E7F2;--op-line-2:#C9D4FB}
+
+html body:has(.workspace-app),html body:has(.workspace-app) .workspace-app{background:#fff!important;font-family:"Plus Jakarta Sans",system-ui,-apple-system,sans-serif!important;color:var(--op-ink)!important}
+html body:has(.workspace-app) .status-safe{background:#fff!important}
+html body:has(.workspace-app) .workspace-app *{font-family:inherit}
+html body:has(.workspace-app) .workspace-app :is(h1,h2,h3,h4,b,strong){color:var(--op-ink)!important;letter-spacing:-.02em}
+html body:has(.workspace-app) .workspace-app :is(p,small,span,label){color:var(--op-mute)}
+
+/* Barre du haut (ordinateur) : blanche, séparée par un filet */
+@media(min-width:900px){
+  html body:has(.workspace-app) .workspace-app .mq-top{background:#fff!important;border-bottom:1px solid var(--op-line)!important;box-shadow:none!important;backdrop-filter:none!important}
+  html body:has(.workspace-app) .workspace-app .mq-web-link{color:#2A2F3D!important;font-weight:600!important;border-radius:8px!important}
+  html body:has(.workspace-app) .workspace-app .mq-web-link:hover{background:var(--op-tint)!important;color:var(--op-blue)!important}
+  html body:has(.workspace-app) .workspace-app .mq-web-link.is-on{background:transparent!important;color:var(--op-blue)!important}
+  html body:has(.workspace-app) .workspace-app .mq-web-link.is-on::after{background:var(--op-blue)!important;height:2px!important}
+  html body:has(.workspace-app) .workspace-app .mq-btn{border-color:var(--op-line-2)!important;border-radius:8px!important;box-shadow:none!important;color:var(--op-ink)!important}
+}
+
+/* Boutons : bleu plein 8px, secondaires blancs à bordure */
+html body:has(.workspace-app) .workspace-app :is(.app-btn.primary,.pg-cta,.mq-cta,.ap-cta,.add-toggle>summary.pg-cta,.nl-search [type=submit]){background:var(--op-blue)!important;background-image:none!important;color:#fff!important;border:0!important;border-radius:8px!important;box-shadow:none!important;font-weight:700!important}
+html body:has(.workspace-app) .workspace-app :is(.app-btn:not(.primary),.add-toggle>summary.app-btn){background:#fff!important;color:var(--op-ink)!important;border:1px solid var(--op-line-2)!important;border-radius:8px!important;box-shadow:none!important;font-weight:600!important}
+html body:has(.workspace-app) .workspace-app :is(.app-btn,.pg-cta,.mq-cta) *{color:inherit}
+
+/* Cartes sobres */
+html body:has(.workspace-app) .workspace-app :is(.app-panel,.info-panel,.app-stat,.report-card,.audit-card,.schema-card,.nl-search,.nl-result-card,.mq-latest,.mq-stat,.audit-profile-data,.audit-reputation,.audit-step,.dx-act,.dx-pil){background:#fff!important;border:1px solid var(--op-line)!important;border-radius:12px!important;box-shadow:none!important;background-image:none!important}
+html body:has(.workspace-app) .workspace-app :is(.app-stat strong,.app-stat b){color:var(--op-ink)!important;font-weight:800!important}
+html body:has(.workspace-app) .workspace-app .eyebrow{color:var(--op-blue)!important;font-weight:700!important;letter-spacing:.08em!important}
+
+/* Champs : bordure bleu pâle */
+html body:has(.workspace-app) .workspace-app :is(input,textarea,select){background:#fff!important;color:var(--op-ink)!important;border:1px solid var(--op-line-2)!important;border-radius:8px!important;box-shadow:none!important}
+html body:has(.workspace-app) .workspace-app :is(input,textarea)::placeholder{color:#8A90A3!important}
+
+/* Accueil : hero clair, titre fort, illustration sur carte teintée */
+html body:has(.workspace-app) .workspace-app .mq-banner{background:var(--op-tint)!important;background-image:none!important;color:var(--op-ink)!important;box-shadow:none!important;border:1px solid var(--op-line)!important;border-radius:16px!important}
+html body:has(.workspace-app) .workspace-app .mq-home .mq-banner h1{color:var(--op-ink)!important;letter-spacing:-.03em!important}
+html body:has(.workspace-app) .workspace-app .mq-home .mq-banner p{color:var(--op-mute)!important}
+html body:has(.workspace-app) .workspace-app .mq-home .mq-tag{background:#fff!important;border:1px solid var(--op-line-2)!important;color:var(--op-blue)!important;border-radius:999px!important}
+html body:has(.workspace-app) .workspace-app .mq-home .mq-tag *{color:var(--op-blue)!important;fill:var(--op-blue)!important}
+
+/* En-têtes de page : teinte claire, titre noir */
+html body[data-view]:has(.workspace-app) .workspace-app .workspace-main>.workspace-head{background:var(--op-tint)!important;background-image:none!important;border:1px solid var(--op-line)!important;border-radius:16px!important;box-shadow:none!important}
+html body[data-view]:has(.workspace-app) .workspace-app .workspace-main>.workspace-head :is(h1,h2){color:var(--op-ink)!important}
+html body[data-view]:has(.workspace-app) .workspace-app .workspace-main>.workspace-head :is(p,small,span,.eyebrow){color:var(--op-mute)!important}
+html body[data-view]:has(.workspace-app) .workspace-app .workspace-main>.workspace-head .eyebrow{color:var(--op-blue)!important}
+html body[data-view]:has(.workspace-app) .workspace-app .workspace-head .workspace-actions .app-btn{background:#fff!important;color:var(--op-ink)!important}
+
+/* Barre basse mobile : blanche, filet, onglet actif bleu pâle */
+.mq-tabbar{background:#fff!important;border:1px solid var(--op-line)!important;box-shadow:none!important}
+html body:has(.workspace-app) .workspace-app .mq-tab{color:var(--op-mute)!important;border-radius:8px!important}
+html body:has(.workspace-app) .workspace-app .mq-tab.is-on,html body:has(.workspace-app) .workspace-app .mq-tab.active{background:var(--op-tint)!important;color:var(--op-blue)!important}
+
+/* Connexion : fond blanc, carte sobre, bouton bleu */
+html body:not(:has(.workspace-app)){background:#fff!important}
+html body:not(:has(.workspace-app)) .login-card,html body:not(:has(.workspace-app)) #authRoot .login-card{background:#fff!important;border:1px solid var(--op-line)!important;border-radius:16px!important;box-shadow:none!important}
+html body:not(:has(.workspace-app)) :is(.login-card h1,.login-card h2,.login-card label,.login-card strong){color:var(--op-ink)!important}
+html body:not(:has(.workspace-app)) :is(.login-card p,.login-foot,.login-status){color:var(--op-mute)!important}
+html body:not(:has(.workspace-app)) :is(.login-card input){background:#fff!important;color:var(--op-ink)!important;border:1px solid var(--op-line-2)!important;border-radius:8px!important}
+html body:not(:has(.workspace-app)) :is(.login-card button[type=submit],.login-card .app-btn.primary,.login-card .pg-cta){background:var(--op-blue)!important;color:#fff!important;border-radius:8px!important;box-shadow:none!important}
+html body:not(:has(.workspace-app)) .login-card a{color:var(--op-blue)!important}
+html body:not(:has(.workspace-app)) .login-wordmark,html body:not(:has(.workspace-app)) .login-ia{color:var(--op-ink)!important;background:none!important;-webkit-text-fill-color:initial}
