@@ -1,0 +1,132 @@
+/* =====================================================================
+   AuditIA — version ordinateur (refonte de zéro, d'après la maquette)
+   Tout est limité aux écrans ≥ 761 px. Le mobile n'est pas touché.
+   Les nouveaux éléments utilisent uniquement des classes dk-* (aucun ancien style).
+   ===================================================================== */
+.dk-top,.dk-hero,.dk-feats,.dk-band{display:none}
+
+@media(min-width:761px){
+  :root{--dk-ink:#15103A;--dk-mute:#6B6790;--dk-line:#E6E1FA;--dk-bg:#F5F3FF;--dk-violet:#6B2EF0;--dk-violet-2:#8E3DFF}
+
+  /* --- Anciens éléments de navigation masqués sur ordinateur --- */
+  .mq-top,.mq-menu,.mq-tabbar,.desktop-nav,.app-topbar,.mq-banner,.mq-feats,.mq-band,.status-safe{display:none!important}
+
+  html body:has(.dk-top),html body:has(.dk-top) .workspace-app{background:var(--dk-bg)!important;font-family:"Plus Jakarta Sans",system-ui,-apple-system,sans-serif!important;color:var(--dk-ink)}
+  html:has(.dk-top){overflow-x:clip;background:var(--dk-bg)!important}
+  html body:has(.dk-top) .workspace-app{padding:100px 0 0!important;max-width:none!important;width:100%!important;margin:0!important;overflow:visible!important;contain:none!important}
+  html body:has(.dk-top) .workspace-layout{overflow:visible!important;max-width:none!important}
+  html body[data-view]:has(.dk-top) .workspace-app .workspace-main{max-width:1180px!important;margin:0 auto!important;padding:0 24px 64px!important;width:100%;box-sizing:border-box}
+
+  /* --- Barre du haut --- */
+  .dk-top{display:flex;position:fixed;top:0;left:0;right:0;height:84px;z-index:300;align-items:center;gap:26px;padding:0 36px;background:linear-gradient(90deg,#08072A,#110D45 55%,#1A1262);border-bottom:1px solid rgba(255,255,255,.08)}
+  .dk-brand{display:flex;align-items:center;gap:14px;text-decoration:none;flex:0 0 auto}
+  .dk-badge{width:56px;height:56px;border-radius:16px;display:grid;place-items:center;background:linear-gradient(145deg,#9A5BFF,#5B2BE0);box-shadow:0 12px 28px -10px rgba(140,80,255,.9),inset 0 1px 0 rgba(255,255,255,.35)}
+  .dk-badge svg{width:30px;height:30px}
+  .dk-brand-t{display:flex;flex-direction:column;line-height:1.1}
+  .dk-brand-t b{font-size:30px;font-weight:800;letter-spacing:-.03em;color:#fff}
+  .dk-brand-t b i{font-style:normal;color:#A66BFF}
+  .dk-brand-t small{font-size:13px;color:#D7D1F7;margin-top:3px;font-weight:500}
+  .dk-nav{display:flex;gap:4px;align-items:center;margin-left:8px}
+  .dk-link{display:flex;flex-direction:column;align-items:center;gap:5px;min-width:78px;padding:9px 14px;border:0;border-radius:14px;background:transparent;color:#ECE9FF;font:inherit;font-size:14px;font-weight:600;cursor:pointer;transition:background .15s,color .15s}
+  .dk-link svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+  .dk-link span{color:inherit}
+  .dk-link:hover{background:rgba(255,255,255,.09)}
+  .dk-link.is-on{background:linear-gradient(135deg,#8344FF,#5B2BE0);color:#fff;box-shadow:0 14px 26px -12px rgba(140,80,255,.9)}
+  .dk-actions{margin-left:auto;display:flex;gap:12px}
+  .dk-tile{position:relative;width:50px;height:50px;border-radius:15px;display:grid;place-items:center;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.22);color:#fff;cursor:pointer;padding:0}
+  .dk-tile svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .dk-tile:hover{background:rgba(255,255,255,.12)}
+  .dk-bell i{position:absolute;top:11px;right:12px;width:8px;height:8px;border-radius:50%;background:#FF4D6A}
+
+  /* --- Hero Accueil (pleine largeur, sous la barre) --- */
+  html body[data-view]:has(.dk-hero) .workspace-app .workspace-main>.workspace-head{display:none!important}
+  html body[data-view]:has(.dk-hero) .workspace-app .workspace-main{max-width:none!important;padding:0 0 64px!important}
+  .dk-hero{display:block;position:relative;overflow:hidden;margin-top:-100px;padding-top:84px;color:#fff;background:radial-gradient(55% 90% at 78% 45%,rgba(150,80,255,.55),rgba(150,80,255,0) 65%),radial-gradient(40% 60% at 8% 100%,rgba(90,60,255,.35),rgba(90,60,255,0) 70%),linear-gradient(110deg,#07062A 0%,#120C55 55%,#1D1478 100%)}
+  .dk-hero-in{max-width:1180px;margin:0 auto;padding:54px 24px 128px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.95fr);gap:12px;align-items:center}
+  .dk-chip{display:inline-flex;align-items:center;gap:10px;padding:10px 20px 10px 14px;border-radius:999px;border:1.5px solid rgba(170,120,255,.7);background:linear-gradient(90deg,rgba(80,40,200,.45),rgba(130,70,255,.25));font-size:17px;font-weight:700;color:#fff}
+  .dk-chip svg{width:22px;height:22px;fill:#FFC93C}
+  .dk-hero h1{margin:22px 0 18px;color:#fff;font-size:62px;line-height:1.04;font-weight:800;letter-spacing:-.035em}
+  .dk-hero h1 em{font-style:normal;background:linear-gradient(90deg,#D3A8FF,#9B5CFF);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .dk-hero p{margin:0;max-width:560px;font-size:18px;line-height:1.55;color:rgba(255,255,255,.88)}
+  .dk-cta{display:flex;gap:16px;margin-top:30px;flex-wrap:wrap}
+  .dk-btn{display:inline-flex;align-items:center;gap:12px;height:58px;padding:0 28px;border-radius:15px;font:inherit;font-size:18px;font-weight:700;cursor:pointer;border:0;transition:transform .15s,box-shadow .15s}
+  .dk-btn svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .dk-btn-main{color:#fff;background:linear-gradient(90deg,#8E3DFF,#C05CFF);box-shadow:0 20px 36px -16px rgba(170,90,255,.95),inset 0 1px 0 rgba(255,255,255,.35)}
+  .dk-btn-main:hover{transform:translateY(-1px)}
+  .dk-btn-ghost{color:#fff;background:rgba(10,8,50,.35);border:2px solid rgba(255,255,255,.75);height:58px;padding:0 26px}
+  .dk-btn-ghost svg{fill:#fff;stroke:none}
+  .dk-btn-ghost:hover{background:rgba(255,255,255,.1)}
+  .dk-checks{display:flex;gap:30px;margin-top:26px;flex-wrap:wrap}
+  .dk-check{display:inline-flex;align-items:center;gap:10px;font-size:15px;color:#F1EEFF}
+  .dk-check i{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:rgba(120,70,255,.35);border:1px solid rgba(190,160,255,.6)}
+  .dk-check svg{width:16px;height:16px;fill:none;stroke:#fff;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+  .dk-hero-art{justify-self:end;width:112%;max-width:660px;margin-right:-36px;display:block;pointer-events:none;user-select:none}
+
+  /* --- Quatre cartes chevauchant le hero --- */
+  .dk-feats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;max-width:1180px;margin:-78px auto 22px;padding:0 24px;position:relative;z-index:2;box-sizing:border-box}
+  .dk-feat{display:flex;align-items:center;gap:16px;padding:22px;background:#fff;border:1px solid #EEEAFB;border-radius:22px;box-shadow:0 26px 44px -30px rgba(40,20,120,.45)}
+  .dk-feat-ico{flex:0 0 62px;width:62px;height:62px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(145deg,#F6F1FF,#E4D9FF);color:var(--dk-violet);box-shadow:inset 0 -6px 12px rgba(120,70,255,.12)}
+  .dk-feat-ico svg{width:28px;height:28px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+  .dk-feat b{display:block;font-size:17px;font-weight:800;color:var(--dk-ink);margin-bottom:4px;letter-spacing:-.01em}
+  .dk-feat small{display:block;font-size:13.5px;line-height:1.4;color:var(--dk-mute)}
+
+  /* --- Bandeau violet avec chiffres réels du compte --- */
+  .dk-band{display:flex;align-items:center;max-width:1180px;margin:0 auto 32px;padding:24px 8px;box-sizing:border-box;border-radius:22px;color:#fff;background:linear-gradient(90deg,#4720C9,#5E2BE6 55%,#7B3CF5);box-shadow:0 30px 50px -34px rgba(80,40,220,.8);width:calc(100% - 48px)}
+  .dk-stat{flex:1;display:flex;align-items:center;justify-content:center;gap:18px;position:relative}
+  .dk-stat+.dk-stat::before{content:"";position:absolute;left:0;top:6%;bottom:6%;width:1px;background:rgba(255,255,255,.25)}
+  .dk-stat svg{width:42px;height:42px;fill:none;stroke:#fff;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+  .dk-stat b{display:block;font-size:30px;font-weight:800;line-height:1.1;letter-spacing:-.02em;color:#fff}
+  .dk-stat span{display:block;font-size:15px;color:rgba(255,255,255,.88)}
+
+  /* --- Le reste de l'accueil (recherche, résumé, derniers audits) --- */
+  html body[data-view]:has(.dk-hero) .workspace-app .mq-home{max-width:1180px;margin:0 auto;padding:0 24px;box-sizing:border-box;display:block!important}
+  html body[data-view]:has(.dk-hero) .workspace-app .mq-home>.dk-hero{margin-left:calc(50% - 50vw);margin-right:calc(50% - 50vw);width:100vw;max-width:none}
+  html body[data-view]:has(.dk-hero) .workspace-app .mq-home>.dk-feats,html body[data-view]:has(.dk-hero) .workspace-app .mq-home>.dk-band{padding-left:0;padding-right:0}
+  html body[data-view]:has(.dk-hero) .workspace-app .mq-home>.dk-feats{margin-left:0;margin-right:0;width:100%;max-width:none}
+  html body[data-view]:has(.dk-hero) .workspace-app .mq-home>.dk-band{width:100%;max-width:none}
+  html body[data-view]:has(.dk-hero) .workspace-app .mq-home>.nl-search,html body[data-view]:has(.dk-hero) .workspace-app .mq-home>.mq-stats,html body[data-view]:has(.dk-hero) .workspace-app .mq-home>.mq-latest{margin-bottom:20px!important}
+
+  /* --- Gabarit des autres pages --- */
+  html body[data-view]:has(.dk-top) .workspace-app .workspace-main>.workspace-head{display:flex!important;align-items:center;justify-content:space-between;gap:24px;margin:26px 0 22px!important;padding:24px 30px!important;background:#fff!important;background-image:none!important;border:1px solid var(--dk-line)!important;border-radius:22px!important;box-shadow:0 22px 40px -32px rgba(40,20,120,.4)!important;min-height:0!important;overflow:visible!important}
+  html body[data-view]:has(.dk-top) .workspace-app .workspace-main>.workspace-head::before,html body[data-view]:has(.dk-top) .workspace-app .workspace-main>.workspace-head::after{display:none!important;content:none!important}
+  html body[data-view]:has(.dk-top) .workspace-app .workspace-main>.workspace-head h1{font-size:34px!important;font-weight:800!important;letter-spacing:-.03em!important;color:var(--dk-ink)!important;margin:0 0 4px!important}
+  html body[data-view]:has(.dk-top) .workspace-app .workspace-main>.workspace-head p{font-size:15px!important;color:var(--dk-mute)!important;margin:0!important}
+  html body[data-view]:has(.dk-top) .workspace-app .workspace-main>.workspace-head .eyebrow{color:var(--dk-violet)!important;font-weight:700!important;letter-spacing:.1em!important;font-size:11px!important}
+  html body[data-view]:has(.dk-top) .workspace-app .workspace-head .workspace-actions{display:flex;gap:8px}
+
+  /* Cartes */
+  html body[data-view]:has(.dk-top) .workspace-app .workspace-main :is(.app-panel,.info-panel,.app-stat,.client-card,.report-card,.audit-card,.schema-card,.nl-search,.mq-latest,.mq-stats>button){background:#fff!important;background-image:none!important;border:1px solid var(--dk-line)!important;border-radius:20px!important;box-shadow:0 22px 40px -34px rgba(40,20,120,.4)!important;color:var(--dk-ink)!important}
+  html body[data-view]:has(.dk-top) .workspace-app .workspace-main :is(h2,h3,h4){color:var(--dk-ink)!important;letter-spacing:-.02em}
+  html body[data-view]:has(.dk-top) .workspace-app .workspace-main :is(.app-panel,.info-panel,.nl-search) p{color:var(--dk-mute)!important}
+  html body[data-view]:has(.dk-top) .workspace-app .workspace-main .eyebrow{color:var(--dk-violet)!important;font-weight:700!important}
+  html body[data-view]:has(.dk-top) .workspace-app .workspace-main .app-stats{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(180px,1fr))!important;gap:16px!important}
+  html body[data-view]:has(.dk-top) .workspace-app .workspace-main .app-stat{padding:20px 22px!important}
+  html body[data-view]:has(.dk-top) .workspace-app .workspace-main .app-stat strong{font-size:32px!important;font-weight:800!important;color:var(--dk-ink)!important}
+  html body[data-view]:has(.dk-top) .workspace-app .workspace-main .app-stat span{color:var(--dk-mute)!important}
+
+  /* Boutons et champs */
+  html body[data-view]:has(.dk-top) .workspace-app .workspace-main :is(.app-btn.primary,.pg-cta,.ap-cta,.add-toggle>summary.pg-cta,[type=submit].app-btn){background:linear-gradient(90deg,#7A3CFF,#9A4DFF)!important;background-image:linear-gradient(90deg,#7A3CFF,#9A4DFF)!important;color:#fff!important;border:0!important;border-radius:14px!important;box-shadow:0 16px 28px -16px rgba(120,60,255,.9)!important;font-weight:700!important}
+  html body[data-view]:has(.dk-top) .workspace-app .workspace-main .app-btn:not(.primary){background:#fff!important;color:var(--dk-ink)!important;border:1px solid #D9CFF7!important;border-radius:14px!important;box-shadow:none!important;font-weight:600!important}
+  html body[data-view]:has(.dk-top) .workspace-app .workspace-main :is(input,textarea,select){background:#fff!important;color:var(--dk-ink)!important;border:1px solid #D9CFF7!important;border-radius:12px!important;box-shadow:none!important}
+  html body[data-view]:has(.dk-top) .workspace-app .workspace-main :is(input,textarea):focus{outline:none;border-color:var(--dk-violet-2)!important;box-shadow:0 0 0 3px rgba(142,61,255,.18)!important}
+  html body[data-view]:has(.dk-top) .workspace-app .workspace-main .client-cards{display:grid!important;grid-template-columns:repeat(auto-fill,minmax(300px,1fr))!important;gap:16px!important}
+
+  /* --- Priorité maximale : couleurs, alignements et masquages des blocs dk-* --- */
+  html body[data-view]:has(.dk-hero) .workspace-app .workspace-main>.workspace-head{display:none!important}
+  html body[data-view] .workspace-app .mq-home>.dk-hero{margin-left:calc(50% - 50vw)!important;margin-right:calc(50% - 50vw)!important;width:100vw!important;max-width:none!important;margin-top:-100px!important}
+  html body[data-view] .workspace-app .dk-top{background:linear-gradient(90deg,#08072A,#110D45 55%,#1A1262)!important}
+  html body[data-view] .workspace-app .dk-brand-t b{color:#fff!important}
+  html body[data-view] .workspace-app .dk-brand-t b i{color:#A66BFF!important}
+  html body[data-view] .workspace-app .dk-brand-t small{color:#D7D1F7!important}
+  html body[data-view] .workspace-app .dk-link,html body[data-view] .workspace-app .dk-link span{color:#ECE9FF!important}
+  html body[data-view] .workspace-app .dk-link.is-on,html body[data-view] .workspace-app .dk-link.is-on span{color:#fff!important}
+  html body[data-view] .workspace-app .dk-tile{color:#fff!important}
+  html body[data-view] .workspace-app .dk-hero h1{color:#fff!important;font-size:62px!important;margin:22px 0 18px!important}
+  html body[data-view] .workspace-app .dk-hero h1 em{color:transparent!important}
+  html body[data-view] .workspace-app .dk-hero p{color:rgba(255,255,255,.88)!important}
+  html body[data-view] .workspace-app .dk-chip,html body[data-view] .workspace-app .dk-check,html body[data-view] .workspace-app .dk-btn{color:#fff!important}
+  html body[data-view] .workspace-app .dk-feat b{color:#15103A!important}
+  html body[data-view] .workspace-app .dk-feat small{color:#6B6790!important}
+  html body[data-view] .workspace-app .dk-band,html body[data-view] .workspace-app .dk-stat b,html body[data-view] .workspace-app .dk-stat span{color:#fff!important}
+  html body[data-view] .workspace-app .dk-feat-ico{color:#6B2EF0!important}
+}
