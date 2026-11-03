@@ -19,7 +19,7 @@
   .nv-filters select,.nv-filters input{width:100%;min-width:0!important;box-sizing:border-box;height:52px;min-height:52px;margin:0;font-size:16px}
   .nv-filters .app-btn{grid-column:1/-1;width:100%;min-height:48px}
   .nv-list{grid-template-columns:1fr!important}
-  .nv-card{padding:16px!important;border-radius:18px!important}
+  .nv-card{padding:16px!important;border-radius:20px!important;border:1px solid #E4DFF3!important;box-shadow:0 8px 22px rgba(92,74,180,.07)!important}
   .nv-card h3{font-size:17px!important}
   .nv-top{flex-wrap:wrap}
   .nv-actions{display:grid!important;grid-template-columns:1fr;gap:8px}
