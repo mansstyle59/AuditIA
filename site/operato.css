@@ -75,3 +75,21 @@ html body[data-view="Accueil"]:has(.workspace-app) .workspace-app .nl-search{max
 html body[data-view="Accueil"]:has(.workspace-app) .workspace-app .mq-home{gap:0!important;padding-bottom:64px}
 }
 @media(min-width:761px){html body[data-view="Accueil"]:has(.workspace-app) .workspace-app .mq-banner-art{width:min(440px,100%)!important;padding:20px!important}}
+
+/* ===== Gabarit de page unique (ordinateur) : même en-tête, même place pour le visuel, mêmes cartes ===== */
+@media(min-width:761px){
+  html body[data-view]:has(.workspace-app) .workspace-app .workspace-main{padding-top:0!important}
+  html body[data-view]:has(.workspace-app) .workspace-app .workspace-main>.workspace-head{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:24px!important;position:relative!important;overflow:visible!important;isolation:auto!important;min-height:0!important;margin:12px 0 24px!important;padding:4px 0 22px!important;background:transparent!important;background-image:none!important;border:0!important;border-bottom:1px solid var(--op-line)!important;border-radius:0!important;box-shadow:none!important}
+  html body[data-view]:has(.workspace-app) .workspace-app .workspace-main>.workspace-head>div:first-child{min-width:0;position:relative;z-index:2}
+  html body[data-view]:has(.workspace-app) .workspace-app .workspace-main>.workspace-head h1{font-size:36px!important;font-weight:800!important;letter-spacing:-.03em!important;line-height:1.1!important;color:var(--op-ink)!important;margin:2px 0 6px!important}
+  html body[data-view]:has(.workspace-app) .workspace-app .workspace-main>.workspace-head p{font-size:15px!important;color:var(--op-mute)!important;margin:0!important}
+  html body[data-view]:has(.workspace-app) .workspace-app .workspace-main>.workspace-head .eyebrow{font-size:12px!important;margin:0 0 6px!important}
+  /* Illustration : vignette teintée à droite, toujours au même endroit */
+  html body[data-view]:has(.workspace-app) .workspace-app .workspace-main>.workspace-head::after{content:""!important;display:block!important;position:relative!important;top:auto!important;right:auto!important;bottom:auto!important;left:auto!important;width:96px!important;height:88px!important;flex:0 0 96px;border-radius:16px!important;background:var(--op-tint) var(--hd-img) no-repeat center/contain!important;-webkit-mask-image:none!important;mask-image:none!important;transform:none!important;order:2}
+  html body[data-view]:has(.workspace-app) .workspace-app .workspace-head .workspace-actions{order:3;margin-left:0!important;display:flex!important;gap:8px!important}
+  html body[data-view]:has(.workspace-app) .workspace-app .workspace-head .workspace-actions .app-btn{min-height:40px!important;padding:0 14px!important}
+  /* Contenu : marges et largeur identiques partout */
+  html body:has(.workspace-app) .workspace-app .workspace-main>*:not(.workspace-head){max-width:none!important;width:100%}
+  html body:has(.workspace-app) .workspace-app .app-stats{grid-template-columns:repeat(auto-fit,minmax(170px,1fr))!important}
+  html body:has(.workspace-app) .workspace-app .app-panel{margin-bottom:16px}
+}
