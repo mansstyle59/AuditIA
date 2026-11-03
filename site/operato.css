@@ -208,3 +208,17 @@ html body[data-view="Accueil"]:has(.workspace-app) .workspace-app .mq-home{gap:0
   html body:has(.workspace-app) .workspace-app .eyebrow{color:#5413C0!important}
 }
 @media(min-width:761px){html body[data-view="Accueil"]:has(.workspace-app) .workspace-app .mq-banner-art{max-width:400px!important}}
+@media(min-width:900px){
+  html body:has(.workspace-app) .workspace-app .mq-web-link.is-on{background:linear-gradient(135deg,#7A3CFF,#5B2BE0)!important;color:#fff!important;border-radius:14px!important}
+  html body:has(.workspace-app) .workspace-app .mq-band{background-color:#4A22C8!important;background-image:none!important;color:#fff!important}
+  html body:has(.workspace-app) .workspace-app .mq-band-item,html body:has(.workspace-app) .workspace-app .mq-band-item span{color:#fff!important}
+  html body:has(.workspace-app) .workspace-app .mq-feat-ico{background-color:#F1ECFF!important;background-image:none!important;color:#6B2EF0!important}
+  html body:has(.workspace-app) .workspace-app .mq-feat{background-color:#fff!important}
+  html body:has(.workspace-app) .workspace-app .mq-feat b{color:#15103A!important}
+  html body:has(.workspace-app) .workspace-app .mq-feat small{color:#6B6790!important}
+}
+@media(min-width:900px){
+  html body[data-view="Accueil"]:has(.workspace-app) .workspace-app .mq-band{background:linear-gradient(90deg,#5B2BE0,#3E1FB0)!important;color:#fff!important;border:0!important}
+  html body[data-view="Accueil"]:has(.workspace-app) .workspace-app .mq-band span{color:#fff!important;font-weight:700!important}
+  html body[data-view="Accueil"]:has(.workspace-app) .workspace-app .mq-web-link span{color:#fff!important}
+}
