@@ -65,3 +65,29 @@
   html body:has(.workspace-app) .workspace-app .dx-ring b{color:#fff!important}
   html body:has(.workspace-app) .workspace-app .dx-ring small{color:#D9D4F2!important}
 }
+
+
+/* AuditIA — correctifs contraste clair + navigation iPhone opaque */
+@media all{
+  html body:has(.workspace-app) .workspace-app .home-stats .home-stat,
+  html body:has(.workspace-app) .workspace-app .app-stats .app-stat{
+    background:#fff!important;border:1px solid #E4DFF3!important;color:#2A2545!important;
+  }
+  html body:has(.workspace-app) .workspace-app .home-stat>strong,
+  html body:has(.workspace-app) .workspace-app .app-stat>strong{
+    color:#2A2545!important;opacity:1!important;text-shadow:none!important;filter:none!important;
+  }
+  html body:has(.workspace-app) .workspace-app .home-stat>span,
+  html body:has(.workspace-app) .workspace-app .app-stat>span,
+  html body:has(.workspace-app) .workspace-app .home-stat>small,
+  html body:has(.workspace-app) .workspace-app .app-stat>small{
+    color:#5F5A7E!important;opacity:1!important;
+  }
+  html body:has(.workspace-app) .workspace-app .home-stat-icon{opacity:1!important;filter:none!important}
+  html body:has(.workspace-app) .workspace-app .mobile-tabbar{
+    background:#fff!important;background-image:none!important;opacity:1!important;
+    border-top:1px solid #E4DFF3!important;box-shadow:0 -8px 24px rgba(60,45,120,.10)!important;
+    backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+  }
+  html body:has(.workspace-app) .workspace-app .mobile-tabbar button{opacity:1!important}
+}
