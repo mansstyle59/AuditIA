@@ -4734,7 +4734,9 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
 
 
 
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./maquette.css?v=27">
+<link rel="stylesheet" href="./operato.css?v=1">
 
 <style id="auditia-ios-safe-area-no-blur-final">
 /* iPhone PWA : zone d'encoche totalement opaque, sans blur ni transparence */
@@ -7091,7 +7093,7 @@ function renderApp(){
     /* ----- écrans de connexion (rendus dans #authRoot) ----- */
     const authRoot = document.getElementById('authRoot');
     const EYE = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
-    const BRAND = '<a class="login-brand" href="./" aria-label="AuditIA by AffiAds — accueil"><img class="login-logo-img" src="./auditia-logo-dark.svg?v=2" alt="AuditIA by AffiAds" width="250" height="72"></a>';
+    const BRAND = '<a class="login-brand" href="./" aria-label="AuditIA by AffiAds — accueil"><img class="login-logo-img" src="./auditia-logo.svg?v=3" alt="AuditIA by AffiAds" width="250" height="72"></a>';
     const FOOT = '<p class="login-foot">AuditIA · Auditer mieux, décider plus clairement</p><p class="login-status">Connexion à votre espace privé</p>';
     const pwdField = (id,label,ac) => '<label class="login-field" for="'+id+'"><span>'+label+'</span><span class="password-wrap"><input class="login-control" id="'+id+'" type="password" autocomplete="'+ac+'" required minlength="8"><button class="toggle-password" type="button" data-showpwd="'+id+'" aria-label="Afficher le mot de passe" title="Afficher le mot de passe">'+EYE+'</button></span></label>';
     const validEmail = e => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e);
