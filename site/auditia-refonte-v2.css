@@ -208,3 +208,17 @@ body:has(.workspace-app) .dx-fix{background:#30264f!important;border:1px solid #
  body:has(.workspace-app) .dx-act-top{gap:7px!important}
  body:has(.workspace-app) .dx-actions .dx-tag,body:has(.workspace-app) .dx-actions .dx-gain{font-size:12px!important;padding:5px 9px!important}
 }
+
+/* Dossiers regroupés par catégorie */
+body:has(.workspace-app) .audit-category-filter{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 18px}
+body:has(.workspace-app) .audit-category-filter button{display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:8px 13px;border:1px solid #d8d1f2;border-radius:999px;background:#fff;color:#34285d;font-size:13px;font-weight:750;box-shadow:0 2px 7px rgba(49,35,100,.06)}
+body:has(.workspace-app) .audit-category-filter button span{display:inline-grid;place-items:center;min-width:21px;height:21px;padding:0 5px;border-radius:999px;background:#eee9ff;color:#5d45ce;font-size:11px}
+body:has(.workspace-app) .audit-category-filter button.is-on{background:linear-gradient(135deg,#6548e8,#8061f4);border-color:#7458ec;color:#fff;box-shadow:0 4px 12px rgba(103,72,232,.2)}
+body:has(.workspace-app) .audit-category-filter button.is-on span{background:rgba(255,255,255,.22);color:#fff}
+body:has(.workspace-app) .audit-category-group{margin:14px 0 20px;padding:14px;border:1px solid #e2dcf5;border-radius:20px;background:rgba(255,255,255,.72)}
+body:has(.workspace-app) .audit-category-group>header{display:flex;align-items:center;gap:10px;margin:0 0 12px;padding:2px 2px 10px;border-bottom:1px solid #e8e2f6}
+body:has(.workspace-app) .audit-category-group>header h3{margin:0;color:#2e2452;font-size:16px;font-weight:800}
+body:has(.workspace-app) .audit-category-group>header small{display:block;margin-top:3px;color:#716987;font-size:12px}
+body:has(.workspace-app) .audit-category-icon{display:grid;place-items:center;width:36px;height:36px;border-radius:12px;background:#eee8ff;color:#6548df;font-size:20px}
+body:has(.workspace-app) .audit-category-group .audit-list{gap:10px}
+@media(max-width:640px){body:has(.workspace-app) .audit-category-filter{gap:7px}body:has(.workspace-app) .audit-category-filter button{min-height:40px;padding:7px 11px;font-size:12px}body:has(.workspace-app) .audit-category-group{padding:10px;border-radius:16px}}
