@@ -4736,7 +4736,7 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
 
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./maquette.css?v=30">
-<link rel="stylesheet" href="./desktop.css?v=4">
+<link rel="stylesheet" href="./desktop.css?v=6">
 
 <style id="auditia-ios-safe-area-no-blur-final">
 /* iPhone PWA : zone d'encoche totalement opaque, sans blur ni transparence */
@@ -5052,7 +5052,7 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
       const navActive = appView==='ClientDétail'?'Clients':appView==='Détail'?'Audits':appView;
       try{document.body.setAttribute('data-view',appView);}catch(_){}
       const headTitle = appView==='Accueil'?'Accueil':appView==='Assistant'?'Audit Chat IA':appView==='Paramètres'?'Réglages':appView==='Profil'?'Mon profil':appView==='ClientDétail'?'Fiche client':appView==='Détail'?'Dossier d’audit':appView;
-      const headLead = appView==='Assistant'?'Conseils et actions à partir des données réellement disponibles.':appView==='Clients'?(appClients.length?appClients.length+' commerce'+(appClients.length>1?'s':'')+' suivi'+(appClients.length>1?'s':'')+'.':'Ajoute un commerce pour commencer.'):appView==='Audits'?'Un dossier par commerce. Le score n’apparaît qu’après une analyse.':appView==='Rapports'?'Schémas et PDF, uniquement à partir des audits analysés.':appView==='Studio'?'Contenus et argumentaire à partir des dossiers.':appView==='Prospection'?'Cible, offres, prospects et suivi commercial AffiAds.':appView==='Paramètres'?'Identité, signature et connexions des rapports.':appView==='Profil'?'Ton nom et ton accès. L’e-mail ne se change pas ici.':appView==='ClientDétail'?(function(){const c=appClients.find(x=>x.id===activeClient);return c?[c.name,c.city].filter(Boolean).join(' · '):'Fiche d’un commerce.';})():appView==='Détail'?(function(){const a=appAudits.find(x=>x.id===activeAudit);const c=a&&appClients.find(x=>x.id===a.client_id);return c?[c.name,c.city].filter(Boolean).join(' · '):'Le score n’apparaît qu’après l’analyse.';})():'';
+      const headLead = appView==='Assistant'?'Conseils et actions à partir des données réellement disponibles.':appView==='Clients'?(appClients.length?appClients.length+' commerce'+(appClients.length>1?'s':'')+' suivi'+(appClients.length>1?'s':'')+'.':'Ajoute un commerce pour commencer.'):appView==='Audits'?'Un dossier par commerce. Le score n’apparaît qu’après une analyse.':appView==='Nouveautés'?'Restaurants et commerces de bouche qui viennent de s’ouvrir près de chez vous.':appView==='Rapports'?'Schémas et PDF, uniquement à partir des audits analysés.':appView==='Studio'?'Contenus et argumentaire à partir des dossiers.':appView==='Prospection'?'Cible, offres, prospects et suivi commercial AffiAds.':appView==='Paramètres'?'Identité, signature et connexions des rapports.':appView==='Profil'?'Ton nom et ton accès. L’e-mail ne se change pas ici.':appView==='ClientDétail'?(function(){const c=appClients.find(x=>x.id===activeClient);return c?[c.name,c.city].filter(Boolean).join(' · '):'Fiche d’un commerce.';})():appView==='Détail'?(function(){const a=appAudits.find(x=>x.id===activeAudit);const c=a&&appClients.find(x=>x.id===a.client_id);return c?[c.name,c.city].filter(Boolean).join(' · '):'Le score n’apparaît qu’après l’analyse.';})():'';
       const showEyebrow = sectionLabel.trim().toLowerCase()!==headTitle.trim().toLowerCase();
       page.innerHTML = '<div class="workspace-app">'+(pdfBusy?'<div class="pdf-overlay"><div class="pdf-spin"></div><b>Génération du PDF…</b><span>Quelques secondes… l’écran « rapport prêt » s’affichera ensuite.</span><button type="button" class="pdf-cancel" data-pdf-cancel>Annuler</button></div>':'')+''+mqChromeHtml(navActive)+dkTopHtml(navActive)+'<div class="sidebar-backdrop" data-close-menu></div><aside class="workspace-sidebar" id="workspaceSidebar"><div class="sidebar-brand"><span class="sb-mark">'+(appSettings&&appSettings.logo_data_url?'<img src="'+escHtml(appSettings.logo_data_url)+'" alt="">':'<svg viewBox="0 0 32 32" aria-hidden="true"><path fill="#C9B6FF" d="M19 1Q20.6 11.4 31 13Q20.6 14.6 19 25Q17.4 14.6 7 13Q17.4 11.4 19 1Z"/><path fill="#8B6CFF" d="M7 18.5Q7.9 24.1 13.5 25Q7.9 25.9 7 31.5Q6.1 25.9 .5 25Q6.1 24.1 7 18.5Z"/></svg>')+'</span><div><b>'+((appSettings?.app_name||'AuditIA')==='AuditIA'?'Audit<em>IA</em>':escHtml(appSettings.app_name))+'</b><small>BY AFFIADS</small></div></div><nav class="sidebar-nav" aria-label="Navigation principale">'+navItems.map(([v,ico,target])=>'<button type="button" class="'+(navActive===(target||v)?'active':'')+'" data-app-view="'+(target||v)+'"><span class="nav-icon">'+navIcon(ico)+'</span><span>'+v+'</span>'+(v==='Clients'?'<span class="nav-count">'+appClients.length+'</span>':v==='Audits'?'<span class="nav-count">'+appAudits.length+'</span>':'')+'</button>').join('')+'</nav><div class="sidebar-bottom">Auditer mieux.<br>Décider plus clairement.</div></aside><div class="workspace-layout"><main class="workspace-main"><div class="workspace-head"><div>'+(showEyebrow?'<div class="eyebrow">'+escHtml(sectionLabel)+'</div>':'')+(appView==='Accueil'?'<p class="page-title">'+escHtml(headTitle)+'</p>':'<h1>'+escHtml(headTitle)+'</h1>')+'<p>'+escHtml(headLead)+'</p></div><div class="workspace-actions desktop-account-actions"><button class="app-btn'+(appView==='Profil'?' is-active':'')+'" type="button" data-app-view="Profil">'+navIcon('profile')+'<span>Profil</span></button><button class="app-btn" type="button" data-app-action="logout">'+navIcon('logout')+'<span>Déconnecter</span></button></div></div><nav class="desktop-nav" aria-label="Navigation principale">'+navItems.map(([v,ico,target])=>'<button type="button" class="'+(navActive===(target||v)?'active':'')+'" data-app-view="'+(target||v)+'">'+navIcon(ico)+'<span>'+v+'</span></button>').join('')+'</nav>'+keyAlertHtml()+appNoticeHtml()+body+'</main></div>'+mqTabbarHtml(navActive)+'</div>';
 
@@ -5143,6 +5143,9 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
       page.querySelectorAll('[data-settings-form]').forEach(form=>form.addEventListener('input',()=>{const data=Object.fromEntries(new FormData(form).entries());const card=page.querySelector('.signature-card');if(card){const vals=[data.signature_name||data.company_name||'Denis Dewulf',data.signature_role||'',data.company_name||'AffiAds',data.app_name||'AuditIA',data.contact_email||'',data.phone||'',data.website||'',data.signature_text||''];const strong=card.querySelector('strong');if(strong){strong.textContent=vals[0];strong.style.color=safeColor(brandColor(data.primary_color),'#5B5FEF')}const ps=card.querySelectorAll('p');ps.forEach((p,i)=>{p.textContent=vals[i+1]||'';p.hidden=!vals[i+1]});const rule=card.querySelector('.sig-rule');if(rule)rule.style.background=safeColor(brandColor(data.primary_color),'#5B5FEF')}document.documentElement.style.setProperty('--orange',safeColor(data.accent_color,'#ffad72'))}));
       page.querySelectorAll('[data-create-client]').forEach(form=>form.addEventListener('submit',async e=>{e.preventDefault();const fd=new FormData(form);const row={user_id:appUser.id,name:String(fd.get('name')||'').trim(),city:String(fd.get('city')||'').trim(),category:String(fd.get('category')||'Autre').trim(),website:String(fd.get('website')||'').trim()||null};if(row.website&&!/^https?:\/\//i.test(row.website))row.website='https://'+row.website;if(pickedDetails){row.details=pickedDetails;if(pickedDetails.phone)row.phone=pickedDetails.phone;if(!row.website&&pickedDetails.website)row.website=pickedDetails.website;}const {error}=await appClient.from('clients').insert(row);if(error){appNotice='Erreur : '+error.message}else{appNotice='Client enregistré.';pickedDetails=null;clientDraft=null;placeResults=[];placeMsg='';appView='Clients';await refreshData()}renderApp()}));
       page.querySelectorAll('[data-create-client]').forEach(form=>form.addEventListener('input',()=>{const g=n=>form.querySelector('[name="'+n+'"]');clientDraft={name:g('name').value,city:g('city').value,category:g('category').value,website:g('website').value};}));
+      page.querySelectorAll('[data-nv-refresh]').forEach(b=>b.addEventListener('click',()=>{const d=page.querySelector('[data-nv-dept]');const n=page.querySelector('[data-nv-days]');if(d)nvState.dept=String(d.value||'11').trim()||'11';if(n)nvState.days=Number(n.value)||60;nvState.loaded=false;nvState.items=[];loadNewOpenings();}));
+      page.querySelectorAll('[data-nv-days]').forEach(sel=>sel.addEventListener('change',()=>{nvState.days=Number(sel.value)||60;}));
+      page.querySelectorAll('[data-nv-add]').forEach(b=>b.addEventListener('click',()=>{const it=nvState.items[Number(b.dataset.nvAdd)];if(!it)return;clientDraft={name:it.name,city:it.city,category:'Restaurant',website:''};appView='Clients';appNotice='';renderApp();window.scrollTo(0,0);}));
       page.querySelectorAll('[data-clear-draft]').forEach(b=>b.addEventListener('click',()=>{clientDraft=null;pickedDetails=null;placeResults=[];placeMsg='';renderApp();}));
       page.querySelectorAll('[data-place-input]').forEach(inp=>inp.addEventListener('input',()=>{clearTimeout(acTimer);const v=inp.value;acTimer=setTimeout(()=>autocompletePlaces(v),300);}));
       const acBox=page.querySelector('#acList'); if(acBox) acBox.addEventListener('click',e=>{const b=e.target.closest('[data-ac-pick]');if(b)pickSuggestion(b.dataset.acPick);});
@@ -5396,6 +5399,54 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
     let nlSearchStatus='';
     let nlSearchError=false;
     let nlSearchBusy=false;
+    /* Nouveautés : établissements de restauration créés récemment (source officielle BODACC, créations d'entreprises) */
+    let nvState={loading:false,loaded:false,error:'',items:[],days:60,dept:'11',asOf:null};
+    const NV_KW=/restaur|pizz|snack|traiteur|brasserie|kebab|cr[eê]perie|caf[eé]|d[eé]bit de boissons?|glac|burger|tacos|sandwich|emporter|food ?truck|cuisine|bar\b/i;
+    const NV_NOT=/immobili|acquisition,? la d[eé]tention|holding|gestion de participations/i;
+    function nvParse(x){
+      let et={},ac={};
+      try{et=(JSON.parse(x.listeetablissements||'{}')||{}).etablissement||{};}catch(_){}
+      try{ac=JSON.parse(x.acte||'{}')||{};}catch(_){}
+      const activity=String(et.activite||'').trim();
+      const ad=et.adresse||{};
+      const address=[ad.numeroVoie,ad.typeVoie,ad.nomVoie].filter(Boolean).join(' ');
+      const start=ac.dateCommencementActivite||ac.dateImmatriculation||x.dateparution||'';
+      const name=String(et.enseigne||et.nomCommercial||x.commercant||'').replace(/\s+/g,' ').trim();
+      return {name:name,owner:String(x.commercant||'').trim(),city:String(x.ville||ad.ville||'').trim(),cp:String(x.cp||ad.codePostal||'').trim(),address:address,activity:activity,start:String(start).slice(0,10),url:x.url_complete||''};
+    }
+    async function loadNewOpenings(){
+      if(nvState.loading) return;
+      nvState.loading=true;nvState.error='';renderApp();
+      try{
+        const since=new Date(Date.now()-nvState.days*864e5).toISOString().slice(0,10);
+        const dept=String(nvState.dept||'11').replace(/[^0-9AB]/gi,'').slice(0,3)||'11';
+        const base='https://bodacc-datadila.opendatasoft.com/api/explore/v2.1/catalog/datasets/annonces-commerciales/records';
+        const where='familleavis="creation" and numerodepartement="'+dept+'" and dateparution>=date\''+since+'\'';
+        const sel='commercant,ville,cp,dateparution,listeetablissements,acte,url_complete';
+        const get=o=>withTimeout(fetch(base+'?select='+encodeURIComponent(sel)+'&where='+encodeURIComponent(where)+'&order_by='+encodeURIComponent('dateparution desc')+'&limit=100&offset='+o).then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}),20000);
+        const pages=await Promise.all([0,100,200,300].map(get));
+        const seen=new Set();const items=[];
+        pages.forEach(p=>(p&&p.results||[]).forEach(x=>{const it=nvParse(x);const key=it.owner+'|'+it.cp+'|'+it.start;if(seen.has(key))return;seen.add(key);if(NV_KW.test(it.activity)&&!NV_NOT.test(it.activity))items.push(it);}));
+        items.sort((a,b)=>String(b.start).localeCompare(String(a.start)));
+        nvState.items=items;nvState.loaded=true;nvState.asOf=new Date().toISOString().slice(0,10);
+      }catch(e){nvState.error='Impossible de charger les données pour le moment ('+((e&&e.message)||'erreur réseau')+'). Réessaie dans un instant.';nvState.loaded=true;}
+      nvState.loading=false;renderApp();
+    }
+    function nouveautesHtml(){
+      const fr=d=>{const m=String(d||'').match(/^(\d{4})-(\d{2})-(\d{2})/);return m?m[3]+'/'+m[2]+'/'+m[1]:'';};
+      const ago=d=>{const t=Date.parse(d);if(!t)return '';const n=Math.max(0,Math.round((Date.now()-t)/864e5));return n===0?'aujourd’hui':n===1?'hier':'il y a '+n+' jours';};
+      const dayOpts=[30,60,90,180].map(n=>'<option value="'+n+'"'+(nvState.days===n?' selected':'')+'>'+n+' derniers jours</option>').join('');
+      const bar='<section class="app-panel nv-filters"><label>Période<select data-nv-days>'+dayOpts+'</select></label><label>Département<input data-nv-dept value="'+escHtml(nvState.dept)+'" maxlength="3" inputmode="numeric" placeholder="11"></label><button type="button" class="app-btn primary" data-nv-refresh>Actualiser</button></section>';
+      let list='';
+      if(nvState.loading) list='<section class="app-panel nv-empty">Recherche des nouveaux établissements…</section>';
+      else if(nvState.error) list='<section class="app-panel nv-empty nv-error">'+escHtml(nvState.error)+'</section>';
+      else if(!nvState.items.length) list='<section class="app-panel nv-empty">Aucune nouvelle ouverture de restauration trouvée sur cette période. Essaie une période plus longue.</section>';
+      else list='<div class="nv-list">'+nvState.items.map((it,i)=>{
+        const q=encodeURIComponent([it.name,it.address,it.cp,it.city].filter(Boolean).join(' '));
+        return '<article class="nv-card"><div class="nv-top"><span class="nv-badge">Nouveau</span><span class="nv-date">Ouvert le '+escHtml(fr(it.start))+' · '+escHtml(ago(it.start))+'</span></div><h3>'+escHtml(it.name||'Établissement')+'</h3><p class="nv-place">'+escHtml([it.address,[it.cp,it.city].filter(Boolean).join(' ')].filter(Boolean).join(', '))+'</p><p class="nv-act">'+escHtml(it.activity.length>220?it.activity.slice(0,217)+'…':it.activity)+'</p><div class="nv-actions"><button type="button" class="app-btn primary" data-nv-add="'+i+'">Préparer l’audit</button><a class="app-btn" href="https://www.google.com/maps/search/?api=1&query='+q+'" target="_blank" rel="noopener noreferrer">Voir sur Google Maps</a>'+(it.url?'<a class="app-btn" href="'+escHtml(it.url)+'" target="_blank" rel="noopener noreferrer">Annonce officielle</a>':'')+'</div></article>';}).join('')+'</div>';
+      const meta=nvState.loaded&&!nvState.loading&&!nvState.error?'<p class="nv-meta">'+nvState.items.length+' ouverture'+(nvState.items.length>1?'s':'')+' repérée'+(nvState.items.length>1?'s':'')+' · source : BODACC (annonces légales officielles de créations d’entreprises), département '+escHtml(nvState.dept)+'. Le nom d’enseigne peut différer du nom légal.</p>':'';
+      return '<div class="nv-page">'+bar+meta+list+'</div>';
+    }
     let nlSearchResults=[];
     function parseNaturalLanguageTarget(raw){
       const text=String(raw||'').trim();
@@ -7041,12 +7092,13 @@ function mqLatestHtml(){
     const feat=(k,t,d)=>'<article class="dk-feat"><span class="dk-feat-ico">'+I[k]+'</span><div><b>'+t+'</b><small>'+d+'</small></div></article>';
     const stat=(k,v,l)=>'<div class="dk-stat">'+I[k]+'<div><b>'+v+'</b><span>'+l+'</span></div></div>';
     const chk=t=>'<span class="dk-check"><i>'+I.check+'</i>'+t+'</span>';
+    const chkGo=(t,v)=>'<button type="button" class="dk-check dk-check-go" data-app-view="'+v+'" title="Voir les nouvelles ouvertures"><i>'+I.check+'</i>'+t+'</button>';
     return '<section class="dk-hero" aria-labelledby="dk-title"><div class="dk-hero-in"><div class="dk-hero-copy">'
       +'<span class="dk-chip">'+I.bolt+'Audit commercial IA</span>'
       +'<h1 id="dk-title">Boostez la visibilité de votre <em>commerce</em></h1>'
       +'<p>Analysez la présence en ligne de votre établissement, identifiez vos opportunités et recevez des recommandations concrètes pour attirer plus de clients.</p>'
       +'<div class="dk-cta"><button type="button" class="dk-btn dk-btn-main" data-app-view="Clients">'+I.search+'Lancer un audit'+I.arrow+'</button><button type="button" class="dk-btn dk-btn-ghost" data-app-view="Rapports">'+I.play+'Voir les rapports</button></div>'
-      +'<div class="dk-checks">'+chk('Rapide')+chk('Complet')+chk('Recommandations IA')+'</div></div>'
+      +'<div class="dk-checks">'+chk('Rapide')+chk('Complet')+chk('Recommandations IA')+chkGo('Nouveaux restaurants','Nouveautés')+'</div></div>'
       +'<img class="dk-hero-art" src="./hero-shop.png?v=2" alt="" aria-hidden="true"></div></section>'
       +'<div class="dk-feats">'+feat('bars','Analyse de visibilité','Google, avis, référencement…')+feat('pin','Positionnement local','Présence et classement')+feat('gauge','Performances','Points forts et axes d’amélioration')+feat('target','Plan d’actions IA','Recommandations concrètes')+'</div>'
       +'<div class="dk-band">'+stat('store',appClients.length,appClients.length>1?'Commerces suivis':'Commerce suivi')+stat('bars',done.length,done.length>1?'Audits analysés':'Audit analysé')+stat('star',avg!=null?avg+'/100':'—','Score moyen')+'</div>';
@@ -7074,6 +7126,9 @@ function mqLatestHtml(){
           '<article class="app-panel studio-tool-card set-anchor" id="studio-tool-pitch"><span class="studio-tool-icon hx-ico hx-green" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/><path d="M8.5 10.5h.01M12 10.5h.01M15.5 10.5h.01"/></svg></span><div class="eyebrow">PROSPECTION</div><h3>Argumentaire</h3><p>Un message professionnel de prise de contact, sans promesse inventée.</p><button class="app-btn primary" type="button" data-studio-generate="pitch" '+(selected?'':'disabled')+'>Préparer le message <span aria-hidden="true">→</span></button></article>'+
           '<article class="app-panel studio-tool-card set-anchor" id="studio-tool-review"><span class="studio-tool-icon hx-ico hx-orange" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.6 5.6 6.1.7-4.5 4.2 1.2 6-5.4-3.1-5.4 3.1 1.2-6-4.5-4.2 6.1-.7z"/></svg></span><div class="eyebrow">AVIS CLIENTS</div><h3>Demande d’avis</h3><p>Un message court à envoyer après la visite, avec le lien direct pour laisser un avis Google, sans contrepartie.</p><button class="app-btn primary" type="button" data-studio-generate="review" '+(selected?'':'disabled')+'>Préparer la demande <span aria-hidden="true">→</span></button></article></div></section>'+
           '<section class="app-panel studio-output-panel"><div class="studio-output-head"><div><div class="eyebrow">3 · VOTRE BROUILLON</div><h2>Contenu à relire et personnaliser</h2></div><span class="studio-draft-badge">Modifiable</span></div><div id="studioOutput" class="app-empty">Choisis un outil ci-dessus. Les informations manquantes seront signalées plutôt qu’inventées.</div><button type="button" class="app-btn primary" id="studioCopy" style="margin-top:12px" disabled>Copier le texte</button>'+'<button type="button" class="app-btn" id="studioAi"'+(studioOutputText?'':' disabled')+'>Affiner avec Claude</button><p class="studio-output-note">Avant publication : vérifie les faits, les prix, les coordonnées et les droits sur les visuels.</p></section>';
+      } else if(appView==='Nouveautés'){
+        if(!nvState.loaded&&!nvState.loading) setTimeout(loadNewOpenings,0);
+        body=nouveautesHtml();
       } else if(appView==='Prospection'){
          body=window.renderOCAView({userId:appUser?.id,clients:appClients,audits:appAudits,supabase:appClient});
        } else if(appView==='Clients'){
