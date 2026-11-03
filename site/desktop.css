@@ -198,3 +198,30 @@ html body[data-view] .workspace-app .nv-actions .app-btn.primary{color:#fff!impo
   .dk-check-go{padding:4px 12px 4px 5px!important}
 }
 .dk-bell.is-on{background:linear-gradient(135deg,#8344FF,#5B2BE0)!important;border-color:transparent!important;box-shadow:0 12px 24px -12px rgba(140,80,255,.9)}
+
+/* =====================================================================
+   Ordinateur : assistant chat supprimé, en-têtes de page nettoyés, page Clients plus lisible
+   ===================================================================== */
+@media(min-width:761px){
+  .ai-float-launcher,.ai-float-panel,.ai-float,[class*="ai-float"],#aiFloat,.ai-chat-fab{display:none!important}
+  /* Profil est déjà dans la barre du haut : on garde seulement « Déconnecter », lisible */
+  html body[data-view]:has(.dk-top) .workspace-app .workspace-head .workspace-actions [data-app-view="Profil"]{display:none!important}
+  html body[data-view]:has(.dk-top) .workspace-app .workspace-head .workspace-actions .app-btn{background:#fff!important;color:#15103A!important;border:1px solid #D9CFF7!important;display:inline-flex!important;align-items:center;gap:8px}
+  html body[data-view]:has(.dk-top) .workspace-app .workspace-head .workspace-actions .app-btn *{color:#15103A!important;stroke:#15103A!important}
+  /* Page Clients : barre de synthèse sur une ligne propre */
+  html body[data-view]:has(.dk-top) .workspace-app .pf-bar{display:flex!important;flex-wrap:wrap;align-items:center;gap:16px 28px;padding:18px 22px!important;background:#fff!important;border:1px solid #E6E1FA!important;border-radius:20px!important}
+  html body[data-view]:has(.dk-top) .workspace-app .pf-avg{display:grid;gap:2px;padding-right:24px;border-right:1px solid #E6E1FA}
+  html body[data-view]:has(.dk-top) .workspace-app .pf-avg b{font-size:34px!important;font-weight:800!important;color:#15103A!important;line-height:1}
+  html body[data-view]:has(.dk-top) .workspace-app .pf-avg small{color:#6B6790!important}
+  html body[data-view]:has(.dk-top) .workspace-app .pf-tiers{display:flex!important;gap:10px;flex-wrap:wrap}
+  html body[data-view]:has(.dk-top) .workspace-app .pf-t{display:flex!important;align-items:center;gap:8px;position:static!important;height:auto!important;min-height:0!important;padding:8px 14px!important;border-radius:999px!important}
+  html body[data-view]:has(.dk-top) .workspace-app .pf-t b{font-size:16px!important;color:#15103A!important}
+  html body[data-view]:has(.dk-top) .workspace-app .pf-t span{font-size:13px!important;color:#6B6790!important}
+  html body[data-view]:has(.dk-top) .workspace-app .pf-sort{display:flex!important;align-items:center;gap:10px;margin-left:auto;color:#6B6790!important;font-weight:600;position:static!important}
+  html body[data-view]:has(.dk-top) .workspace-app .pf-sort select{min-width:200px;padding:8px 12px!important}
+  /* Cartes de statistiques des Audits / Rapports alignées */
+  html body[data-view]:has(.dk-top) .workspace-app .app-stat{display:grid!important;align-content:center;gap:4px}
+  /* Lignes d'audit : bouton d'action toujours visible et aligné */
+  html body[data-view]:has(.dk-top) .workspace-app .audit-card{display:grid!important;grid-template-columns:48px minmax(0,1fr) auto auto!important;align-items:center;gap:16px!important;padding:14px 18px!important}
+  html body[data-view]:has(.dk-top) .workspace-app .audit-card .app-btn{min-width:110px;justify-content:center}
+}
