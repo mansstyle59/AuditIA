@@ -168,3 +168,43 @@ html body[data-view="Accueil"]:has(.workspace-app) .workspace-app .mq-home{gap:0
   html body:has(.workspace-app) .workspace-app .pf-t.is-on{background:var(--op-tint)!important;color:var(--op-blue)!important;border-color:#C9D4FB!important}
   html body:has(.workspace-app) .workspace-app .add-toggle>summary.pg-cta{background:var(--op-blue)!important;color:#fff!important;border-radius:8px!important;min-height:44px!important;font-size:15px!important;font-weight:700!important}
 }
+
+/* ===== Template FormIA (ordinateur) : barre et hero en bleu profond, texte blanc, visuel à droite ===== */
+@media(min-width:761px){
+  :root{--op-blue:#3B1CA8;--op-blue-2:#5413C0;--op-tint:#EFE9FE;--op-ink:#1B1450;--op-mute:#5B5680;--op-line:#E4DEF6;--op-line-2:#CFC4F0}
+  html body:has(.workspace-app),html body:has(.workspace-app) .workspace-app{background:#F7F5FD!important}
+
+  /* Barre du haut : bleu nuit, liens clairs */
+  html body:has(.workspace-app) .workspace-app .mq-top{background:linear-gradient(90deg,#1B1450,#2A1A86)!important;border-bottom:0!important;height:72px!important}
+  html body:has(.workspace-app) .workspace-app .mq-web-link{color:rgba(255,255,255,.82)!important}
+  html body:has(.workspace-app) .workspace-app .mq-web-link:hover{background:rgba(255,255,255,.1)!important;color:#fff!important}
+  html body:has(.workspace-app) .workspace-app .mq-web-link.is-on{color:#fff!important}
+  html body:has(.workspace-app) .workspace-app .mq-web-link.is-on::after{background:#fff!important}
+  html body:has(.workspace-app) .workspace-app .mq-btn{background:rgba(255,255,255,.1)!important;border-color:rgba(255,255,255,.22)!important;color:#fff!important}
+  html body:has(.workspace-app) .workspace-app .mq-btn svg{stroke:#fff!important}
+
+  /* Hero Accueil : gauche texte, droite visuel, fond bleu profond */
+  html body[data-view="Accueil"]:has(.workspace-app) .workspace-app .mq-banner{display:grid!important;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr)!important;align-items:center!important;text-align:left!important;background:linear-gradient(120deg,#2B2BD9 0%,#3B1CA8 55%,#1B1450 100%)!important;border:0!important;border-radius:28px!important;padding:56px 56px 56px!important;min-height:420px!important;overflow:hidden!important;position:relative!important;color:#fff!important}
+  html body[data-view="Accueil"]:has(.workspace-app) .workspace-app .mq-banner-copy{align-items:flex-start!important;margin:0!important;max-width:none!important}
+  html body[data-view="Accueil"]:has(.workspace-app) .workspace-app .mq-banner .mq-tag{background:rgba(255,255,255,.14)!important;border:1px solid rgba(255,255,255,.35)!important;color:#fff!important;border-radius:999px!important;text-transform:none!important;letter-spacing:0!important;font-size:14px!important;font-weight:600!important;padding:8px 16px!important}
+  html body[data-view="Accueil"]:has(.workspace-app) .workspace-app .mq-banner h1{color:#fff!important;font-size:58px!important;line-height:1.02!important;letter-spacing:-.035em!important;text-align:left!important;margin:22px 0 18px!important;font-weight:800!important}
+  html body[data-view="Accueil"]:has(.workspace-app) .workspace-app .mq-banner p{color:rgba(255,255,255,.88)!important;text-align:left!important;margin:0!important;max-width:520px!important}
+  html body[data-view="Accueil"]:has(.workspace-app) .workspace-app .mq-banner .mq-cta{background:#fff!important;color:#3B1CA8!important;border-radius:14px!important;margin:30px 0 0!important;min-height:52px!important;padding:0 26px!important;box-shadow:0 14px 28px -14px rgba(10,5,60,.55)!important}
+  html body[data-view="Accueil"]:has(.workspace-app) .workspace-app .mq-banner .mq-cta svg{fill:#3B1CA8!important}
+  html body[data-view="Accueil"]:has(.workspace-app) .workspace-app .mq-banner-art{position:relative!important;right:auto!important;bottom:auto!important;top:auto!important;width:100%!important;max-width:460px!important;height:auto!important;margin:0 auto!important;display:block!important;background:none!important;border:0!important;border-radius:0!important;padding:0!important;box-shadow:none!important;filter:drop-shadow(0 30px 40px rgba(10,5,60,.45))!important;-webkit-mask-image:none!important;mask-image:none!important}
+  html body[data-view="Accueil"]:has(.workspace-app) .workspace-app .mq-home{padding-top:20px!important}
+  html body[data-view="Accueil"]:has(.workspace-app) .workspace-app .nl-search{border-radius:20px!important}
+
+  /* Boutons : bleu FormIA, angles 14px */
+  html body:has(.workspace-app) .workspace-app :is(.app-btn.primary,.pg-cta,.ap-cta,.add-toggle>summary.pg-cta){background:#3B1CA8!important;color:#fff!important;border-radius:14px!important}
+  html body:has(.workspace-app) .workspace-app :is(.app-btn.primary,.pg-cta,.ap-cta):hover{background:#2E1485!important}
+  html body:has(.workspace-app) .workspace-app .app-btn:not(.primary){border-radius:14px!important;border-color:#CFC4F0!important;color:#1B1450!important}
+
+  /* En-têtes de page et cartes : teinte lavande FormIA */
+  html body[data-view]:has(.workspace-app) .workspace-app .workspace-main>.workspace-head{background:#fff!important;border:1px solid #E4DEF6!important;border-radius:18px!important;padding:20px 26px!important;margin:0 0 22px!important;border-bottom:1px solid #E4DEF6!important}
+  html body[data-view]:has(.workspace-app) .workspace-app .workspace-main>.workspace-head h1{color:#1B1450!important}
+  html body:has(.workspace-app) .workspace-app :is(.app-panel,.info-panel,.app-stat,.client-card){border-radius:18px!important;border-color:#E4DEF6!important}
+  html body:has(.workspace-app) .workspace-app .app-stat strong{color:#1B1450!important}
+  html body:has(.workspace-app) .workspace-app .eyebrow{color:#5413C0!important}
+}
+@media(min-width:761px){html body[data-view="Accueil"]:has(.workspace-app) .workspace-app .mq-banner-art{max-width:400px!important}}
