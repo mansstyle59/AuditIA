@@ -1,3 +1,4 @@
+@media(min-width:761px){
 /* ===== Refonte « Operato » : fond blanc, Plus Jakarta Sans, bleu #2D4CF5, boutons 8px, cartes sobres ===== */
 :root{--op-blue:#2D4CF5;--op-blue-2:#1863DC;--op-tint:#EEF1FE;--op-ink:#0B0B09;--op-mute:#5B6275;--op-line:#E4E7F2;--op-line-2:#C9D4FB}
 
@@ -59,3 +60,5 @@ html body:not(:has(.workspace-app)) :is(.login-card input){background:#fff!impor
 html body:not(:has(.workspace-app)) :is(.login-card button[type=submit],.login-card .app-btn.primary,.login-card .pg-cta){background:var(--op-blue)!important;color:#fff!important;border-radius:8px!important;box-shadow:none!important}
 html body:not(:has(.workspace-app)) .login-card a{color:var(--op-blue)!important}
 html body:not(:has(.workspace-app)) .login-wordmark,html body:not(:has(.workspace-app)) .login-ia{color:var(--op-ink)!important;background:none!important;-webkit-text-fill-color:initial}
+
+}
