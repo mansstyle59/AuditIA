@@ -93,3 +93,45 @@ html body[data-view="Accueil"]:has(.workspace-app) .workspace-app .mq-home{gap:0
   html body:has(.workspace-app) .workspace-app .app-stats{grid-template-columns:repeat(auto-fit,minmax(170px,1fr))!important}
   html body:has(.workspace-app) .workspace-app .app-panel{margin-bottom:16px}
 }
+
+/* ===== Finition élégante (ordinateur) : typographie fine, air, bordures douces, états discrets ===== */
+@media(min-width:761px){
+  html body:has(.workspace-app) .workspace-app{font-size:15px!important;line-height:1.6!important;-webkit-font-smoothing:antialiased}
+  html body:has(.workspace-app) .workspace-app :is(h2){font-size:22px!important;font-weight:700!important;letter-spacing:-.02em!important}
+  html body:has(.workspace-app) .workspace-app :is(h3){font-size:17px!important;font-weight:700!important;letter-spacing:-.01em!important}
+  html body:has(.workspace-app) .workspace-app .eyebrow{font-size:11px!important;letter-spacing:.1em!important}
+
+  /* Top bar plus aérée */
+  html body:has(.workspace-app) .workspace-app .mq-top{height:68px!important;padding:0 32px!important}
+  html body:has(.workspace-app) .workspace-app .mq-logo img{height:40px!important}
+  html body:has(.workspace-app) .workspace-app .mq-web-link{font-size:14px!important;padding:8px 13px!important;transition:background .15s,color .15s}
+  html body:has(.workspace-app) .workspace-app .mq-web-link.is-on::after{bottom:-19px!important;left:13px!important;right:13px!important}
+
+  /* Boutons : hauteur constante, transitions douces, anneau de focus */
+  html body:has(.workspace-app) .workspace-app :is(.app-btn,.pg-cta,.mq-cta,.ap-cta){min-height:42px!important;transition:background .15s,border-color .15s,color .15s,transform .15s!important;letter-spacing:0!important}
+  html body:has(.workspace-app) .workspace-app :is(.app-btn.primary,.pg-cta,.mq-cta,.ap-cta):hover{background:#2440E0!important}
+  html body:has(.workspace-app) .workspace-app :is(.app-btn:not(.primary)):hover{border-color:var(--op-blue)!important;color:var(--op-blue)!important}
+  html body:has(.workspace-app) .workspace-app :is(button,a,input,textarea):focus-visible{outline:none!important;box-shadow:0 0 0 3px rgba(45,76,245,.18)!important}
+
+  /* Cartes : bordures douces, respiration, survol discret */
+  html body:has(.workspace-app) .workspace-app :is(.app-panel,.info-panel){padding:26px 28px!important;border-radius:14px!important;border-color:#E6E9F4!important;transition:border-color .2s!important}
+  html body:has(.workspace-app) .workspace-app :is(.app-panel,.info-panel):hover{border-color:#D3DBFB!important}
+  html body:has(.workspace-app) .workspace-app .app-stat{padding:20px 22px!important;border-radius:14px!important;border-color:#E6E9F4!important}
+  html body:has(.workspace-app) .workspace-app .app-stat span{font-size:11px!important;text-transform:uppercase!important;letter-spacing:.08em!important;font-weight:600!important;color:var(--op-mute)!important}
+  html body:has(.workspace-app) .workspace-app .app-stat strong{font-size:30px!important;font-weight:800!important;font-variant-numeric:tabular-nums;letter-spacing:-.02em!important;line-height:1.15!important;display:block;margin-bottom:6px}
+  html body:has(.workspace-app) .workspace-app .app-stats{gap:16px!important;margin-bottom:20px!important}
+
+  /* En-tête de page : vignette plus fine */
+  html body[data-view]:has(.workspace-app) .workspace-app .workspace-main>.workspace-head{padding:6px 0 24px!important;margin:16px 0 28px!important}
+  html body[data-view]:has(.workspace-app) .workspace-app .workspace-main>.workspace-head::after{width:84px!important;height:76px!important;flex-basis:84px!important;border-radius:14px!important;border:1px solid #E6E9F4!important}
+  html body[data-view]:has(.workspace-app) .workspace-app .workspace-main>.workspace-head h1{font-size:34px!important}
+
+  /* Champs : focus bleu, texte aéré */
+  html body:has(.workspace-app) .workspace-app :is(input,textarea,select){padding:10px 14px!important;transition:border-color .15s,box-shadow .15s!important}
+  html body:has(.workspace-app) .workspace-app :is(input,textarea):focus{border-color:var(--op-blue)!important}
+
+  /* Accueil : titre plus fin, sous-titre plus léger */
+  html body[data-view="Accueil"]:has(.workspace-app) .workspace-app .mq-banner h1{font-weight:750!important;letter-spacing:-.03em!important}
+  html body[data-view="Accueil"]:has(.workspace-app) .workspace-app .mq-banner p{font-size:17px!important;color:#6A7184!important}
+  html body[data-view="Accueil"]:has(.workspace-app) .workspace-app .mq-banner-art{border:1px solid #E1E7FD!important}
+}
