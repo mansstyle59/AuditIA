@@ -40,7 +40,7 @@ export function clientsResultsHtml(data, ui) {
   const cats = p.categories.length ? chips({ items: p.categories, current: ui.q, attr: 'data-client-chip', ariaLabel: 'Filtrer par catégorie' }) : '';
   const list = p.rows.length
     ? `<ul class="ds-list ds-clients">${p.rows.map(({ client: c, stat }) => linkRow({
-        title: c.name || 'Commerce', meta: clientMeta(c, stat), right: clientRight(stat), lead: avatar(c.name),
+        title: c.name || 'Commerce', meta: clientMeta(c, stat), right: clientRight(stat), lead: avatar(c.name, clientCategory(c)),
         attrs: `data-open-client="${escHtml(c.id)}"`,
       })).join('')}</ul>`
     : emptyState({ title: 'Aucun résultat', text: ui.q ? `Aucun commerce pour « ${ui.q} ».` : 'Aucun commerce dans ce niveau.' });
