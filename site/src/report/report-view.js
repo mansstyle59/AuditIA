@@ -3,6 +3,8 @@
 import { escHtml } from '../core/utils.js';
 import { chartData, gaugeSvg, barsSvg, lineSvg } from './report-charts.js';
 import { toneOf } from './report-model.js';
+import { defaultBrand } from '../settings/brand.js';
+import { COLORS } from './report-charts.js';
 
 const plural = (n, a, b) => (n > 1 ? b : a);
 const frNum = n => String(n).replace('.', ',');
@@ -35,9 +37,10 @@ export function reportPreviewHtml(m) {
   if (!m || !m.ok) return `<p class="rp-note" role="alert">${escHtml((m && m.reason) || 'Rapport indisponible.')}</p>`;
   const cd = chartData(m);
   let n = 0;
+  const B = m.brand || defaultBrand();
   const out = [];
 
-  out.push(`<header class="rp-cover"><span class="rp-brand">AuditIA</span><span class="rp-kicker">${escHtml(m.meta.title)}</span>
+  out.push(`<header class="rp-cover">${B.logo ? `<img class="rp-logo" src="${escHtml(B.logo)}" alt="">` : ''}<span class="rp-brand">${escHtml(B.appName)}${B.company ? `<small class="rp-co"> · ${escHtml(B.company)}</small>` : ''}</span><span class="rp-kicker">${escHtml(m.meta.title)}</span>
     <h2 class="rp-biz">${escHtml(m.meta.business)}</h2>
     ${[m.meta.sector, m.meta.city].filter(Boolean).length ? `<p class="rp-sub">${escHtml([m.meta.sector, m.meta.city].filter(Boolean).join(' · '))}</p>` : ''}
     ${m.meta.auditDateLabel ? `<p class="rp-date">Audit réalisé le ${escHtml(m.meta.auditDateLabel)}</p>` : ''}</header>
@@ -103,7 +106,15 @@ export function reportPreviewHtml(m) {
     ${m.competitors ? '<li>Le rang parmi les concurrents est établi sur le nombre d’avis publics ; ce n’est pas le classement de Google Maps.</li>' : ''}
     <li>Les gains de score indiqués sont des estimations. Relancer un audit comparable après correction permet de mesurer l’évolution réelle.</li>
     ${m.infoNotes.map(x => `<li>${escHtml(x.label)} : ${escHtml(x.why)}.</li>`).join('')}
-    <li>Rapport généré le ${escHtml(m.meta.generatedLabel)} par AuditIA à partir du dossier d’audit${m.meta.auditDateLabel ? ' du ' + escHtml(m.meta.auditDateLabel) : ''}.</li></ul>`, 'notes'));
+    <li>Rapport généré le ${escHtml(m.meta.generatedLabel)} par ${escHtml(B.appName)} à partir du dossier d’audit${m.meta.auditDateLabel ? ' du ' + escHtml(m.meta.auditDateLabel) : ''}.</li></ul>`, 'notes'));
 
-  return `<article class="rp-paper" aria-label="Aperçu du rapport">${out.join('')}</article>`;
+  const ct = B.contact || {}, sg = B.signature || {};
+  const lines = [ct.address, ct.email, ct.phone, ct.website].filter(Boolean);
+  if (sg.name || sg.role || B.company || lines.length || sg.text) {
+    n++; out.push(sec(n, 'Votre contact', `${sg.name ? `<p><strong>${escHtml(sg.name)}</strong></p>` : ''}${sg.role ? `<p>${escHtml(sg.role)}</p>` : ''}${B.company ? `<p><strong>${escHtml(B.company)}</strong></p>` : ''}${lines.map(l => `<p>${escHtml(l)}</p>`).join('')}${sg.text ? `<p class="rp-muted">${escHtml(sg.text)}</p>` : ''}`, 'contact'));
+  }
+  const html = out.join('');
+  const style = B.custom ? ` style="--rp-primary:${B.primary};--rp-deep:${B.deep}"` : '';
+  // Les graphiques sont des SVG dont la couleur est écrite en dur : on y reporte la couleur de marque.
+  return `<article class="rp-paper" aria-label="Aperçu du rapport"${style}>${B.custom ? html.split(COLORS.primary).join(B.primary) : html}</article>`;
 }

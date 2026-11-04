@@ -1,6 +1,7 @@
 // AuditIA — LOT 6 : lecture et écriture des réglages (table app_settings existante, aucune nouvelle table).
 // Les clés API sont masquées dès la lecture : la valeur brute ne quitte jamais ce module et n'est jamais réécrite.
 import { EDITABLE_KEYS, KEY_COLUMNS, maskAll, valuesFrom, validate, isAdminUser } from '../settings/settings-model.js';
+import { brandFrom, defaultBrand } from '../settings/brand.js';
 
 const READ_COLUMNS = ['user_id', 'updated_at', ...EDITABLE_KEYS, ...KEY_COLUMNS].join(',');
 
@@ -30,4 +31,15 @@ export function settingsErrorMessage(err) {
   if (code === '42501' || code === 'PGRST301' || /permission|jwt|row-level/i.test(String(err && err.message))) return 'Accès refusé aux réglages. Reconnectez-vous puis réessayez.';
   if (err && /Failed to fetch|NetworkError|timeout/i.test(String(err.message))) return 'Réseau indisponible. Vos modifications sont conservées à l’écran : réessayez.';
   return 'Les réglages n’ont pas pu être traités. Réessayez dans un instant.';
+}
+
+// Marque (nom, couleurs, logo, signature) : colonnes de marque UNIQUEMENT, jamais les clés API. Ne lève jamais d'erreur :
+// en cas d'échec ou de réglages absents, la marque par défaut est utilisée.
+const BRAND_COLUMNS = [...EDITABLE_KEYS, 'logo_data_url'].join(',');
+export async function loadBrand(client, userId) {
+  try {
+    const r = await client.from('app_settings').select(BRAND_COLUMNS).eq('user_id', userId).maybeSingle();
+    if (r.error || !r.data) return defaultBrand();
+    return brandFrom(r.data);
+  } catch (e) { return defaultBrand(); }
 }

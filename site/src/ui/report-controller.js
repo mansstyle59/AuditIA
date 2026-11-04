@@ -44,7 +44,9 @@ export function createReportController(ctx) {
     const audit = d.audits.find(a => String(a.id) === String(auditId));
     const client = audit ? d.clients.find(c => String(c.id) === String(audit.client_id)) || null : null;
     if (audit && String(ctx.runningId && ctx.runningId()) === String(audit.id)) return { ok: false, reason: 'Une analyse est en cours sur ce dossier : le rapport sera disponible à sa fin.' };
-    return buildReport(audit, client, d.audits, new Date());
+    const r = buildReport(audit, client, d.audits, new Date());
+    if (r && r.ok) r.brand = ctx.getBrand ? ctx.getBrand() : null; // marque enregistrée (nom, couleurs, logo, signature) ; null = marque par défaut
+    return r;
   };
 
   function actionsHtml() {

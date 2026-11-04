@@ -116,3 +116,10 @@ Score /100, SEO/GEO, plan d'action (`actionPlan`/`auditActions`), recommandation
 5. Supabase : protection contre les mots de passe compromis désactivée (réglage à activer dans Supabase).
 
 **Limites connues** : les PDF de la nouvelle interface n'utilisent pas encore les réglages de marque enregistrés ; logo et clés API restent gérés par l'ancienne interface.
+
+## LOT 7 — Harmonisation finale et identité visuelle
+
+**Marque enregistrée** (`src/settings/brand.js`, `loadBrand` dans `src/data/settings.js`) : nom, société, couleurs, logo PNG/JPEG (≤ ~330 Ko), signature et contact, lus en lecture seule dans `app_settings` (colonnes de marque uniquement, jamais les clés). Appliquée à l'en-tête mobile, à la barre latérale, à l'aperçu du rapport et aux PDF. Repli complet : marque par défaut si les réglages sont absents, en erreur ou invalides (logo SVG ou trop lourd ignoré ; couleur trop claire pour l'impression ignorée).
+**PDF** : nom/couleur/logo sur la couverture, en-têtes et pieds, bloc « Votre contact » ; aucune clé ni donnée technique.
+**Harmonisation** : jetons `--ds-ok/warn/err-*` (plus de couleurs d'état en dur), doublons CSS retirés, bouton retour non étiré sur ordinateur, espacements des cartes, carte « À analyser » lisible.
+**Limites connues** : un logo très large reste petit dans la pastille de la barre latérale ; deux boutons « Lancer l'analyse » coexistent dans un dossier non analysé (conservés) ; `sw.js` v124.

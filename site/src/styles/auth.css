@@ -49,8 +49,8 @@
 /* Messages : fonds opaques, texte clair */
 .ds-msg { font-size: var(--ds-fs-sm); line-height: 1.4; }
 .ds-msg--error, .ds-msg--ok { padding: var(--ds-s-3) var(--ds-s-4); border-radius: var(--ds-r-sm); border: 1px solid; }
-.ds-msg--error { background: #4A1230; border-color: var(--ds-danger); color: #FFE1E6; }
-.ds-msg--ok { background: #0F3B2E; border-color: var(--ds-good); color: #D7FBEA; }
+.ds-msg--error { background: var(--ds-err-bg); border-color: var(--ds-danger); color: var(--ds-err-fg); }
+.ds-msg--ok { background: var(--ds-ok-bg); border-color: var(--ds-good); color: var(--ds-ok-fg); }
 
 .ds-link {
   min-height: var(--ds-touch); padding: var(--ds-s-2) var(--ds-s-3);

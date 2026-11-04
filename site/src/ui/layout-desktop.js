@@ -1,8 +1,9 @@
 // AuditIA — coquille ordinateur : barre latérale fixe, en-tête de page, contenu en colonnes.
 import { NAV, icon } from './components/ui.js';
 import { escHtml } from '../core/utils.js';
+import { brandMarkHtml, brandNameHtml } from './components/brand.js';
 
-export function desktopShell({ title, active, body, account = null }) {
+export function desktopShell({ title, active, body, account = null, brand = null }) {
   const items = NAV.map(item => {
     const current = item.id === active;
     return `<button type="button" class="ds-d-nav__item${current ? ' is-active' : ''}" data-nav="${item.id}"${current ? ' aria-current="page"' : ''}>
@@ -12,7 +13,7 @@ export function desktopShell({ title, active, body, account = null }) {
 
   return `<div class="ds-desktop">
     <aside class="ds-d-sidebar">
-      <div class="ds-d-brand"><span class="ds-d-brand__mark" aria-hidden="true">AI</span><span>AuditIA</span></div>
+      <div class="ds-d-brand"><span class="ds-d-brand__mark" aria-hidden="true" data-brand-mark>${brandMarkHtml(brand)}</span><span class="ds-d-brand__name" data-brand-name>${brandNameHtml(brand)}</span></div>
       <nav class="ds-d-nav" aria-label="Navigation principale">${items}</nav>
       ${account ? `<div class="ds-d-account"><span class="ds-d-account__mail">${escHtml(account.email)}</span><button type="button" class="ds-btn ds-btn--block" data-logout>Se déconnecter</button></div>` : ''}
     </aside>

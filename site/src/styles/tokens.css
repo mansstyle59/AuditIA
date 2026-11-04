@@ -35,6 +35,12 @@
   --ds-warn: #FBBF24;
   --ds-danger: #FB7185;
 
+  /* Surfaces et textes des messages d'état (Lot 7 : une seule source, plus de couleurs en dur) */
+  --ds-ok-bg: #0F3B2E;   --ds-ok-fg: #D7FBEA;   --ds-ok-fg-2: #BFF5DD;
+  --ds-warn-bg: #3A2A0B; --ds-warn-fg: #FFE9B8;  --ds-warn-fg-2: #FFD7A0;
+  --ds-err-bg: #4A1230;  --ds-err-fg: #FFE1E6;   --ds-err-fg-2: #FFC2CB;
+  --ds-on-good: #04210F; --ds-on-warn: #2B1C00;  --ds-on-danger: #3A0712;
+
   /* Dégradés */
   --ds-grad-bg: linear-gradient(180deg, var(--ds-bg-1) 0%, var(--ds-bg-0) 100%);
   --ds-grad-hero: linear-gradient(135deg, #3A1B7E 0%, #2A1260 45%, #1A0838 100%);

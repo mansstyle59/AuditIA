@@ -15,7 +15,7 @@ html.rp-lock, html.rp-lock body { overflow: hidden; }
 /* Feuille */
 .rp-paper { max-width: 860px; margin: 0 auto; background: #FFFFFF; color: #1E1536; border-radius: var(--ds-r-md); padding: var(--ds-s-4); font-size: 1rem; line-height: 1.55; overflow-wrap: anywhere; }
 .rp-paper p { margin: 0 0 var(--ds-s-2); }
-.rp-cover { background: #2A1260; color: #FFFFFF; border-radius: var(--ds-r-md); padding: var(--ds-s-6) var(--ds-s-5); display: grid; gap: var(--ds-s-2); }
+.rp-cover { background: var(--rp-deep, #2A1260); color: #FFFFFF; border-radius: var(--ds-r-md); padding: var(--ds-s-6) var(--ds-s-5); display: grid; gap: var(--ds-s-2); }
 .rp-brand { font-weight: 800; font-size: 1.25rem; }
 .rp-kicker { color: #C4B5FD; font-weight: 700; font-size: .8125rem; letter-spacing: .06em; text-transform: uppercase; }
 .rp-biz { margin: var(--ds-s-3) 0 0; font-size: clamp(1.5rem, 1.1rem + 2vw, 2.25rem); line-height: 1.15; color: #FFFFFF; }
@@ -27,8 +27,8 @@ html.rp-lock, html.rp-lock body { overflow: hidden; }
 .rp-gauge { max-width: 170px; }
 .rp-note { color: #5B5173; font-size: .875rem; line-height: 1.5; }
 .rp-sec { margin-top: var(--ds-s-6); }
-.rp-h { display: flex; align-items: center; gap: var(--ds-s-3); margin: 0 0 var(--ds-s-3); padding-bottom: var(--ds-s-2); border-bottom: 1px solid #D9D2EE; font-size: 1.25rem; color: #2A1260; }
-.rp-n { flex: none; display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 8px; background: #6D3FE0; color: #FFFFFF; font-size: .9375rem; font-weight: 800; }
+.rp-h { display: flex; align-items: center; gap: var(--ds-s-3); margin: 0 0 var(--ds-s-3); padding-bottom: var(--ds-s-2); border-bottom: 1px solid #D9D2EE; font-size: 1.25rem; color: var(--rp-deep, #2A1260); }
+.rp-n { flex: none; display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 8px; background: var(--rp-primary, #6D3FE0); color: #FFFFFF; font-size: .9375rem; font-weight: 800; }
 .rp-h4 { margin: var(--ds-s-4) 0 var(--ds-s-2); font-size: 1rem; color: #4B2BB0; }
 .rp-lead { font-weight: 700; font-size: 1.0625rem; }
 .rp-tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--ds-s-3); margin: var(--ds-s-4) 0; }
@@ -48,12 +48,12 @@ html.rp-lock, html.rp-lock body { overflow: hidden; }
 .rp-src { display: block; color: #5B5173; font-size: .8125rem; margin-top: 2px; }
 .rp-rows li.is-good { border-left: 4px solid #15803D; padding-left: var(--ds-s-3); } .rp-rows li.is-bad { border-left: 4px solid #B91C1C; padding-left: var(--ds-s-3); }
 .rp-det { border: 1px solid #D9D2EE; border-radius: var(--ds-r-sm); margin-bottom: var(--ds-s-3); background: #FFFFFF; }
-.rp-det > summary { display: flex; justify-content: space-between; align-items: center; gap: var(--ds-s-3); flex-wrap: wrap; min-height: 44px; padding: var(--ds-s-2) var(--ds-s-4); cursor: pointer; font-weight: 700; color: #2A1260; }
+.rp-det > summary { display: flex; justify-content: space-between; align-items: center; gap: var(--ds-s-3); flex-wrap: wrap; min-height: 44px; padding: var(--ds-s-2) var(--ds-s-4); cursor: pointer; font-weight: 700; color: var(--rp-deep, #2A1260); }
 .rp-sum { font-weight: 600; font-size: .875rem; color: #5B5173; }
 .rp-det > .rp-rows { padding: 0 var(--ds-s-4); }
 .rp-list { display: grid; gap: var(--ds-s-2); }
 .rp-list li { position: relative; padding-left: var(--ds-s-4); font-size: .9375rem; }
-.rp-list li::before { content: ""; position: absolute; left: 0; top: .6em; width: 7px; height: 7px; border-radius: 50%; background: #6D3FE0; }
+.rp-list li::before { content: ""; position: absolute; left: 0; top: .6em; width: 7px; height: 7px; border-radius: 50%; background: var(--rp-primary, #6D3FE0); }
 .rp-rows--cp li { display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 2px var(--ds-s-2); }
 .rp-rows--cp li.is-self { background: #E6DEFB; border-radius: var(--ds-r-sm); padding-left: var(--ds-s-2); padding-right: var(--ds-s-2); }
 .rp-cp__rank { grid-row: span 2; font-weight: 800; color: #4B2BB0; }
@@ -62,7 +62,7 @@ html.rp-lock, html.rp-lock body { overflow: hidden; }
 .rp-plan { display: grid; gap: var(--ds-s-3); }
 .rp-plan li { display: flex; gap: var(--ds-s-3); padding-bottom: var(--ds-s-3); border-bottom: 1px solid #E6DEFB; }
 .rp-plan li > div { min-width: 0; flex: 1; }
-.rp-plan__n { flex: none; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: #6D3FE0; color: #FFFFFF; font-weight: 800; }
+.rp-plan__n { flex: none; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--rp-primary, #6D3FE0); color: #FFFFFF; font-weight: 800; }
 .rp-reco { padding: var(--ds-s-3) 0; border-bottom: 1px solid #E6DEFB; } .rp-reco:last-child { border-bottom: 0; }
 .rp-dl { margin: var(--ds-s-3) 0 0; display: grid; gap: var(--ds-s-2); }
 .rp-dl div { display: flex; justify-content: space-between; gap: var(--ds-s-3); padding: var(--ds-s-2) 0; border-bottom: 1px solid #E6DEFB; }
@@ -83,3 +83,8 @@ html.rp-lock, html.rp-lock body { overflow: hidden; }
   .rp-tiles { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .rp-rows--cp li { grid-template-columns: 30px minmax(0, 1fr) auto; } .rp-cp__rank { grid-row: auto; }
 }
+
+/* Lot 7 : logo et société sur la couverture */
+.rp-logo { max-width: 160px; max-height: 56px; width: auto; height: auto; object-fit: contain; background: #FFFFFF; border-radius: 8px; padding: 6px 8px; justify-self: start; }
+.rp-co { font-weight: 600; font-size: .9375rem; color: #DDD3FF; }
+.rp-muted { color: #5B5173; }

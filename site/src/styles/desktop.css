@@ -17,8 +17,9 @@
   .ds-d-brand { display: flex; align-items: center; gap: var(--ds-s-3); font-size: var(--ds-fs-h3); font-weight: 800; }
   .ds-d-brand__mark {
     display: grid; place-items: center; width: 40px; height: 40px; border-radius: var(--ds-r-sm);
-    background: var(--ds-grad-cta); font-size: var(--ds-fs-sm); font-weight: 800;
+    background: var(--ds-brand-grad, var(--ds-grad-cta)); font-size: var(--ds-fs-sm); font-weight: 800; overflow: hidden;
   }
+  .ds-d-brand__name { min-width: 0; overflow-wrap: anywhere; line-height: 1.15; }
   .ds-d-nav { display: grid; gap: var(--ds-s-2); }
   .ds-d-nav__item {
     display: flex; align-items: center; gap: var(--ds-s-3);
@@ -76,4 +77,12 @@
   .ds-live { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; }
   .ds-live > .ds-live__top, .ds-live > .ds-prog, .ds-live > .ds-prog__row, .ds-live > .ds-live__counts, .ds-live > .ds-msg, .ds-live > p, .ds-live > .ds-facts { grid-column: 1 / -1; }
   .ds-live > .ds-srcs { grid-column: 1 / -1; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* Lot 7 : ordinateur — bouton retour à sa taille (pas étiré), carte latérale lisible */
+@media (min-width: 900px) {
+  .ds-d-inner > .ds-btn, .ds-d-inner > .ds-backrow { justify-self: start; width: auto; }
+  .ds-d-inner > .ds-btn { margin-bottom: calc(var(--ds-s-2) * -1); }
+  .ds-d-split > .ds-d-stack + .ds-d-stack .ds-row--btn { flex-wrap: wrap; row-gap: var(--ds-s-1); }
+  .ds-d-split > .ds-d-stack + .ds-d-stack .ds-row__main { flex: 1 1 9rem; min-width: 0; }
 }

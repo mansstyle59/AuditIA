@@ -1,6 +1,6 @@
 // AuditIA — LOT 6 : contrôleur de l'écran Réglages.
 // Aucun secret n'est conservé : seuls des indices masqués sont gardés en mémoire (jamais de localStorage).
-import { loadSettings, saveSettings, settingsErrorMessage } from '../data/settings.js';
+import { loadSettings, saveSettings, settingsErrorMessage, loadBrand } from '../data/settings.js';
 import { isAdminUser, validate, isDirty, EDITABLE_KEYS } from '../settings/settings-model.js';
 import { settingsView } from './views/settings.js';
 
@@ -41,6 +41,7 @@ export function createSettingsController(ctx) {
       const r = await saveSettings(await ctx.getSupabase(), user, s.draft);
       if (gen !== s.gen || !ctx.getUser()) return;
       Object.assign(s, { saved: { ...r.values }, draft: { ...r.values }, exists: true, status: 'ready', updatedAt: r.updatedAt, notice: { kind: 'ok', text: 'Réglages enregistrés.' } });
+      if (ctx.onSaved) ctx.onSaved(await loadBrand(await ctx.getSupabase(), user.id)); // nouvelle marque (logo inclus) lue depuis les réglages enregistrés
     } catch (err) {
       if (gen !== s.gen || !ctx.getUser()) return;
       s.notice = { kind: 'error', text: settingsErrorMessage(err) };

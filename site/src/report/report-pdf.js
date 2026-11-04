@@ -4,9 +4,11 @@
 // Mise en page : A4 portrait, marges 18 mm, tableaux sans ligne coupée (en-tête répété), titres jamais isolés en bas de page.
 import { COLORS, hexToRgb, toneColor, chartData } from './report-charts.js';
 import { REPORT_TITLE, toneOf } from './report-model.js';
+import { defaultBrand, logoFormat } from '../settings/brand.js';
 
 const PW = 210, PH = 297, M = 18, CW = PW - 2 * M, TOP = 24, BOT = PH - 19, PT = 0.3528;
-const C = Object.fromEntries(Object.entries(COLORS).map(([k, v]) => [k, hexToRgb(v)]));
+const BASE_C = Object.fromEntries(Object.entries(COLORS).map(([k, v]) => [k, hexToRgb(v)]));
+const mix = (a, b, t) => a.map((v, i) => Math.round(v + (b[i] - v) * t));
 
 /* Les polices PDF standard ne couvrent que le latin (WinAnsi) : on remplace ou retire le reste au lieu d'afficher des « ? ». */
 const UNSUPPORTED = /[^ -~¡-ÿŒœ‘’“”–—•…€]/g;
@@ -19,8 +21,11 @@ const frNum = n => String(n).replace('.', ',');
 const plural = (n, a, b) => (n > 1 ? b : a);
 
 export function buildReportPdf(JsPDF, m) {
+  const B = m.brand || defaultBrand();           // marque enregistrée ; marque par défaut si absente (jamais de clé ni de donnée technique)
+  const C = { ...BASE_C, primary: hexToRgb(B.primary), deep: hexToRgb(B.deep) };
+  const APP = pdfSafe(B.appName) || 'AuditIA';
   const pdf = new JsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait', compress: true });
-  pdf.setProperties({ title: pdfSafe(m.meta.business + ' - ' + REPORT_TITLE), subject: REPORT_TITLE, author: 'AuditIA', creator: 'AuditIA', keywords: 'audit, visibilité, SEO, GEO' });
+  pdf.setProperties({ title: pdfSafe(m.meta.business + ' - ' + REPORT_TITLE), subject: REPORT_TITLE, author: pdfSafe(B.company || APP), creator: APP, keywords: 'audit, visibilité, SEO, GEO' });
   const T = pdfSafe;
   const data = chartData(m);
   let y = TOP, secNo = 0;
@@ -42,9 +47,9 @@ export function buildReportPdf(JsPDF, m) {
 
   const chrome = () => {
     fill(C.deep); pdf.rect(0, 0, PW, 3.2, 'F');
-    font('bold', 8.5, C.primary); pdf.text('AuditIA', M, 10.5);
-    font('normal', 8.5, C.muted); pdf.text(T(REPORT_TITLE), M + 15, 10.5);
-    pdf.text(fit(m.meta.business, 70, 8.5), PW - M, 10.5, { align: 'right' });
+    font('bold', 8.5, C.primary); pdf.text(fit(APP, 40, 8.5, 'bold'), M, 10.5);
+    const hx = M + Math.min(40, textW(APP, 8.5, 'bold')) + 3; font('normal', 8.5, C.muted); pdf.text(fit(REPORT_TITLE, 70, 8.5), hx, 10.5);
+    pdf.text(fit(m.meta.business, 60, 8.5), PW - M, 10.5, { align: 'right' });
     stroke(C.line, 0.25); pdf.line(M, 13.5, PW - M, 13.5);
   };
   const newPage = () => { pdf.addPage(); chrome(); y = TOP; };
@@ -180,11 +185,19 @@ export function buildReportPdf(JsPDF, m) {
 
   /* =============== PAGE 1 : COUVERTURE =============== */
   fill(C.deep); pdf.rect(0, 0, PW, 150, 'F');
-  fill([58, 27, 126]); pdf.circle(PW - 18, 22, 58, 'F'); fill([71, 36, 150]); pdf.circle(PW - 8, 14, 30, 'F');
-  font('bold', 22, C.paper); pdf.text('AuditIA', M, 30);
-  font('normal', 9.5, C.lavender); pdf.text('Audit de visibilité numérique locale', M, 36.5);
+  fill(mix(C.deep, [255, 255, 255], 0.14)); pdf.circle(PW - 18, 22, 58, 'F'); fill(mix(C.deep, [255, 255, 255], 0.24)); pdf.circle(PW - 8, 14, 30, 'F');
+  let nameX = M;
+  if (B.logo) {   // logo enregistré : sur pastille blanche, proportions conservées ; en cas d'échec, simple absence de logo
+    try {
+      const ip = pdf.getImageProperties(B.logo), k = Math.min(36 / ip.width, 14 / ip.height), lw = ip.width * k, lh2 = ip.height * k;
+      fill(C.paper); pdf.roundedRect(M, 12, lw + 5, lh2 + 5, 2, 2, 'F'); pdf.addImage(B.logo, logoFormat(B.logo), M + 2.5, 14.5, lw, lh2);
+      nameX = M + lw + 11;
+    } catch (e) { nameX = M; }
+  }
+  font('bold', 22, C.paper); pdf.text(fit(APP, PW - M - nameX, 22, 'bold'), nameX, 30);
+  font('normal', 9.5, C.lavender); pdf.text(fit((B.company ? B.company + '  ·  ' : '') + 'Audit de visibilité numérique locale', CW, 9.5), M, 38);
   font('bold', 10, C.lavender); pdf.text(T(REPORT_TITLE.toUpperCase()), M, 86);
-  stroke(C.lavender, 0.6); pdf.line(M, 90, M + 26, 90);
+  stroke(B.accent ? hexToRgb(B.accent) : C.lavender, 0.6); pdf.line(M, 90, M + 26, 90);
   const nameLines = wrap(m.meta.business, CW - 6, 30, 'bold').slice(0, 3);
   font('bold', 30, C.paper); nameLines.forEach((l, i) => pdf.text(l, M, 106 + i * 12.4));
   let ty = 106 + nameLines.length * 12.4 + 3;
@@ -346,17 +359,29 @@ export function buildReportPdf(JsPDF, m) {
     m.competitors ? 'Le rang parmi les concurrents est établi sur le nombre d’avis publics ; ce n’est pas le classement de Google Maps.' : '',
     'Les gains de score indiqués sont des estimations. Relancer un audit comparable après correction permet de mesurer l’évolution réelle.',
     ...m.infoNotes.map(x => `${x.label} : ${x.why}.`),
-    `Rapport généré le ${m.meta.generatedLabel} par AuditIA à partir du dossier d’audit du ${m.meta.auditDateLabel || 'commerce'}.`,
+    `Rapport généré le ${m.meta.generatedLabel} par ${APP} à partir du dossier d’audit du ${m.meta.auditDateLabel || 'commerce'}.`,
   ].filter(Boolean);
   notes.forEach(n => bullet(n));
+
+  /* =============== CONTACT (marque enregistrée) =============== */
+  const ct = B.contact || {}, sg = B.signature || {};
+  const contactLines = [ct.address, ct.email, ct.phone, ct.website].filter(Boolean);
+  if (sg.name || sg.role || B.company || contactLines.length || sg.text) {
+    section('Votre contact', 40);
+    if (sg.name) para(sg.name, { size: 11, style: 'bold', color: C.deep, gap: 0.4 });
+    if (sg.role) para(sg.role, { size: 9.5, color: C.muted, gap: 0.8 });
+    if (B.company) para(B.company, { size: 9.5, style: 'bold', gap: 0.8 });
+    contactLines.forEach(l => para(l, { size: 9.5, gap: 0.2 }));
+    if (sg.text) para(sg.text, { size: 9.5, color: C.muted, gap: 0 });
+  }
 
   /* =============== PIED DE PAGE (pagination) =============== */
   const N = pdf.internal.getNumberOfPages();
   for (let i = 1; i <= N; i++) {
     pdf.setPage(i);
     stroke(C.line, 0.25); pdf.line(M, PH - 13.5, PW - M, PH - 13.5);
-    font('bold', 8.5, C.primary); pdf.text('AuditIA', M, PH - 8.4);
-    font('normal', 8.5, C.muted); pdf.text(fit(REPORT_TITLE + ' · ' + m.meta.business, 120, 8.5), M + 15, PH - 8.4);
+    font('bold', 8.5, C.primary); pdf.text(fit(APP, 40, 8.5, 'bold'), M, PH - 8.4);
+    const fx = M + Math.min(40, textW(APP, 8.5, 'bold')) + 3; font('normal', 8.5, C.muted); pdf.text(fit(REPORT_TITLE + ' · ' + m.meta.business, 125 - (fx - M), 8.5), fx, PH - 8.4);
     pdf.text(`Page ${i} / ${N}`, PW - M, PH - 8.4, { align: 'right' });
   }
   return pdf;

@@ -17,6 +17,9 @@ import { auditsView, auditDossierView } from './views/audits.js';
 import { createSettingsController } from './settings-controller.js';
 import { authScreen, authLoading, authError } from './screens/auth.js';
 import { loadWorkspaceData, dataErrorMessage } from '../data/queries.js';
+import { loadBrand } from '../data/settings.js';
+import { defaultBrand } from '../settings/brand.js';
+import { paintBrand } from './components/brand.js';
 import { getAuthClient } from '../auth/client.js';
 import { NOT_ALLOWED, createAuthService, parseAuthLink } from '../auth/service.js';
 
@@ -28,6 +31,7 @@ const state = {
   auditId: null,
   data: { status: 'idle', clients: [], audits: [], error: '' },
   ui: { q: '', tier: '', sort: 'urgence' }, // filtres de la liste des clients
+  brand: defaultBrand(), // marque enregistrée (réglages) ; marque par défaut si absente
   gen: 0, // numéro de chargement : un résultat périmé (déconnexion, nouveau chargement) est ignoré
 };
 const LIVE_VIEWS = ['home', 'clients', 'client', 'prospects', 'audits', 'audit'];
@@ -62,13 +66,14 @@ const audits = createAuditController({
   open: id => { state.view = 'audit'; state.auditId = id; window.scrollTo(0, 0); },
 });
 // Rapports PDF (lot 5) : aperçu, téléchargement, partage. Lecture seule : aucune écriture, aucun nouvel audit.
-const report = createReportController({ getData: () => state.data, runningId: () => audits.runningId() });
+const report = createReportController({ getBrand: () => state.brand, getData: () => state.data, runningId: () => audits.runningId() });
 document.addEventListener('click', event => { report.onClick(event.target); });
 // Réglages (lot 6) : profil, marque, état des services. Écriture réservée à l'administrateur, clés jamais affichées ni réécrites.
 const settings = createSettingsController({
   getUser: () => state.user,
   getSupabase: () => getAuthClient(),
   rerender: () => { if (state.user && state.view === 'settings') renderWorkspace(); },
+  onSaved: brand => { state.brand = brand; paintBrand(brand); }, // marque mise à jour sans recomposer l'écran
 });
 const auth = createAuthService({ getClient: getAuthClient, redirectUrl: REDIRECT_URL });
 
@@ -134,11 +139,12 @@ function renderWorkspace() {
   const body = bodyFor(isWide);
   const active = state.view === 'client' ? 'clients' : state.view === 'audit' ? 'audits' : state.view;
   const title = state.view === 'client' ? 'Fiche client' : state.view === 'audit' ? 'Dossier d’audit' : TITLES[state.view];
-  const params = { title, active, body };
+  const params = { title, active, body, brand: state.brand };
   root.innerHTML = isWide
     ? desktopShell({ ...params, account: { email: state.user.email || '' } })
     : mobileShell(params);
   document.documentElement.dataset.layout = isWide ? 'desktop' : 'mobile';
+  paintBrand(state.brand, root);
   if (state.view === 'prospects' && state.data.status === 'ready') search.mounted();
 }
 
@@ -159,6 +165,15 @@ async function loadData() {
   renderWorkspace();
 }
 
+// Marque enregistrée : chargée en arrière-plan ; l'écran reste utilisable avec la marque par défaut en attendant ou en cas d'échec.
+async function loadBrandNow(user) {
+  const client = await getAuthClient();
+  if (state.user !== user) return; // déconnecté avant l'envoi : aucune requête
+  const b = await loadBrand(client, user.id);
+  if (state.user !== user) return; // déconnexion ou autre session entre-temps : résultat ignoré
+  state.brand = b; paintBrand(b, root);
+}
+
 function enter(user) {
   state.user = user;
   state.view = 'home';
@@ -168,6 +183,7 @@ function enter(user) {
   report.close(); audits.reset(); settings.reset();
   window.scrollTo(0, 0);
   loadData();
+  loadBrandNow(user);
 }
 
 function refreshClientResults() {
@@ -183,6 +199,7 @@ async function logout() {
   search.reset(); // vide les résultats, la clé et les recherches en cours
   report.close(); audits.reset(); settings.reset();
   state.data = { status: 'idle', clients: [], audits: [], error: '' };
+  state.brand = defaultBrand(); paintBrand(state.brand, root); // la marque d'un compte ne reste pas affichée après déconnexion
   await auth.signOut();
   showAuth('signin');
 }
