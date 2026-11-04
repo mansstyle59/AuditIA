@@ -1,0 +1,55 @@
+/* AuditIA — coquille mobile (iPhone et Android, < 900 px).
+   Navigation fixe en bas, en-tête opaque, zones de sécurité iOS gérées une seule fois. */
+@media (max-width: 899.98px) {
+  .ds-mobile {
+    display: flex; flex-direction: column;
+    min-height: 100vh; min-height: 100dvh;
+    max-width: 100%; overflow-x: clip;
+  }
+
+  /* En-tête : opaque, collé en haut, la zone de l'heure est gérée par --ds-safe-top */
+  .ds-m-header {
+    position: sticky; top: 0; z-index: 40;
+    display: flex; flex-direction: column; justify-content: flex-end; gap: 2px;
+    padding: calc(var(--ds-safe-top) + var(--ds-s-3)) var(--ds-s-4) var(--ds-s-3);
+    min-height: var(--ds-header-h);
+    background: var(--ds-bg-1);
+    border-bottom: 1px solid var(--ds-line-soft);
+  }
+  .ds-m-brand { font-size: var(--ds-fs-xs); font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--ds-lavender); }
+  .ds-m-title { font-size: var(--ds-fs-h2); font-weight: 800; }
+
+  /* Contenu : réserve la place de la barre du bas + zone de sécurité */
+  .ds-m-main {
+    flex: 1 1 auto; min-width: 0;
+    padding: var(--ds-s-4) var(--ds-s-4) calc(var(--ds-tabbar-h) + var(--ds-safe-bottom) + var(--ds-s-8));
+  }
+  .ds-m-main > * + * { margin-top: var(--ds-s-4); }
+  .ds-m-main .ds-section-title { margin-top: var(--ds-s-6); }
+  .ds-m-main .ds-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ds-m-main .ds-stat__value { font-size: 1.5rem; }
+
+  /* Barre de navigation fixe en bas : opaque, zone de sécurité inférieure incluse */
+  .ds-m-tabbar {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 50;
+    display: grid; grid-template-columns: repeat(5, minmax(0, 1fr));
+    height: calc(var(--ds-tabbar-h) + var(--ds-safe-bottom));
+    padding: 0 var(--ds-safe-right) var(--ds-safe-bottom) var(--ds-safe-left);
+    background: var(--ds-bg-2);
+    border-top: 1px solid var(--ds-line);
+    box-shadow: var(--ds-shadow-nav);
+  }
+  .ds-m-tab {
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+    min-height: var(--ds-touch); padding: var(--ds-s-2) 2px;
+    border: 0; background: transparent; color: var(--ds-muted);
+    font-size: var(--ds-fs-xs); font-weight: 600; line-height: 1.1;
+  }
+  .ds-m-tab.is-active { color: var(--ds-text); }
+  .ds-m-tab.is-active .ds-icon { color: var(--ds-lavender); }
+  .ds-m-tab:active { background: var(--ds-surface); }
+
+  /* Stat-cards compactes sur petit écran */
+  .ds-m-main .ds-card { padding: var(--ds-s-4); }
+  .ds-m-main .ds-row { min-height: 56px; }
+}

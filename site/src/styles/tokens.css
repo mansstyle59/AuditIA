@@ -1,0 +1,79 @@
+/* AuditIA — design system v3 : tokens (couleurs, espacements, rayons, tailles, ombres).
+   Tout est préfixé --ds- pour ne jamais entrer en conflit avec l'ancien CSS. */
+:root {
+  /* Violets profonds (fonds) */
+  --ds-bg-0: #12052B;
+  --ds-bg-1: #1A0838;
+  --ds-bg-2: #241048;
+  --ds-bg-3: #2F1760;
+
+  /* Surfaces de cartes (opaques, sans transparence ni flou) */
+  --ds-surface: #2A1458;
+  --ds-surface-2: #341A6B;
+  --ds-surface-hi: #3F2280;
+  --ds-line: #5B35A8;
+  --ds-line-soft: #432487;
+
+  /* Violet / lavande (accents) */
+  --ds-primary: #8B5CF6;
+  --ds-primary-2: #A855F7;
+  --ds-primary-deep: #6D3FE0;
+  --ds-lavender: #C4B5FD;
+  --ds-lavender-2: #DDD3FF;
+  --ds-glow: #A78BFA;
+
+  /* Texte */
+  --ds-text: #FFFFFF;
+  --ds-text-2: #E6DEFF;
+  --ds-muted: #CFC3F2;
+  --ds-on-light: #24104D;
+  --ds-on-light-2: #4B3A7A;
+
+  /* États */
+  --ds-good: #34D399;
+  --ds-good-2: #22C55E;
+  --ds-warn: #FBBF24;
+  --ds-danger: #FB7185;
+
+  /* Dégradés */
+  --ds-grad-bg: linear-gradient(180deg, var(--ds-bg-1) 0%, var(--ds-bg-0) 100%);
+  --ds-grad-hero: linear-gradient(135deg, #3A1B7E 0%, #2A1260 45%, #1A0838 100%);
+  --ds-grad-cta: linear-gradient(135deg, var(--ds-primary-2) 0%, var(--ds-primary) 55%, var(--ds-primary-deep) 100%);
+  --ds-grad-text: linear-gradient(90deg, #C9A8FF 0%, #E0B8FF 100%);
+  --ds-grad-banner: linear-gradient(120deg, #4B2399 0%, #6B35C8 55%, #5A2DB3 100%);
+
+  /* Espacements (échelle 4 px) */
+  --ds-s-1: 4px;  --ds-s-2: 8px;  --ds-s-3: 12px; --ds-s-4: 16px;
+  --ds-s-5: 20px; --ds-s-6: 24px; --ds-s-8: 32px; --ds-s-10: 40px;
+  --ds-s-12: 48px; --ds-s-16: 64px;
+
+  /* Rayons */
+  --ds-r-sm: 12px; --ds-r-md: 18px; --ds-r-lg: 24px; --ds-r-xl: 32px; --ds-r-pill: 999px;
+
+  /* Typographie */
+  --ds-font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Inter, "Helvetica Neue", Arial, sans-serif;
+  --ds-fs-xs: 0.8125rem;   /* 13 px : plancher absolu */
+  --ds-fs-sm: 0.9375rem;   /* 15 px */
+  --ds-fs-md: 1rem;        /* 16 px */
+  --ds-fs-lg: 1.125rem;
+  --ds-fs-h3: 1.25rem;
+  --ds-fs-h2: clamp(1.5rem, 1.1rem + 1.8vw, 2.125rem);
+  --ds-fs-h1: clamp(2rem, 1.4rem + 3vw, 3.75rem);
+
+  /* Ombres */
+  --ds-shadow-card: 0 10px 28px rgba(8, 2, 24, 0.45);
+  --ds-shadow-glow: 0 10px 30px rgba(139, 92, 246, 0.45);
+  --ds-shadow-nav: 0 12px 32px rgba(8, 2, 24, 0.6);
+
+  /* Tailles d'interface */
+  --ds-touch: 48px;           /* cible tactile minimale */
+  --ds-header-h: 64px;
+  --ds-tabbar-h: 68px;
+  --ds-container: 1240px;
+
+  /* Zones de sécurité iOS (0 hors iPhone) */
+  --ds-safe-top: env(safe-area-inset-top, 0px);
+  --ds-safe-right: env(safe-area-inset-right, 0px);
+  --ds-safe-bottom: env(safe-area-inset-bottom, 0px);
+  --ds-safe-left: env(safe-area-inset-left, 0px);
+}

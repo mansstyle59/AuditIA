@@ -1,0 +1,44 @@
+/* AuditIA — coquille ordinateur et tablette (>= 900 px).
+   Barre latérale fixe, composition en colonnes : ce n'est pas une version agrandie du mobile. */
+@media (min-width: 900px) {
+  .ds-desktop {
+    display: grid;
+    grid-template-columns: 264px minmax(0, 1fr);
+    min-height: 100vh; min-height: 100dvh;
+  }
+
+  .ds-d-sidebar {
+    position: sticky; top: 0; height: 100vh; height: 100dvh;
+    display: flex; flex-direction: column; gap: var(--ds-s-8);
+    padding: var(--ds-s-8) var(--ds-s-5);
+    background: var(--ds-bg-1);
+    border-right: 1px solid var(--ds-line-soft);
+  }
+  .ds-d-brand { display: flex; align-items: center; gap: var(--ds-s-3); font-size: var(--ds-fs-h3); font-weight: 800; }
+  .ds-d-brand__mark {
+    display: grid; place-items: center; width: 40px; height: 40px; border-radius: var(--ds-r-sm);
+    background: var(--ds-grad-cta); font-size: var(--ds-fs-sm); font-weight: 800;
+  }
+  .ds-d-nav { display: grid; gap: var(--ds-s-2); }
+  .ds-d-nav__item {
+    display: flex; align-items: center; gap: var(--ds-s-3);
+    min-height: var(--ds-touch); padding: var(--ds-s-3) var(--ds-s-4);
+    border: 0; border-radius: var(--ds-r-sm);
+    background: transparent; color: var(--ds-muted);
+    font-size: var(--ds-fs-sm); font-weight: 600; text-align: left;
+  }
+  .ds-d-nav__item:hover { background: var(--ds-surface); color: var(--ds-text); }
+  .ds-d-nav__item.is-active { background: var(--ds-surface-2); color: var(--ds-text); box-shadow: inset 3px 0 0 var(--ds-primary-2); }
+  .ds-d-nav__item.is-active .ds-icon { color: var(--ds-lavender); }
+
+  .ds-d-main { min-width: 0; padding: var(--ds-s-8) clamp(24px, 3vw, 48px) var(--ds-s-16); }
+  .ds-d-inner { max-width: var(--ds-container); margin: 0 auto; display: grid; gap: var(--ds-s-6); }
+  .ds-d-header { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--ds-s-4); flex-wrap: wrap; }
+  .ds-d-toolbar { display: flex; align-items: center; justify-content: space-between; gap: var(--ds-s-4); flex-wrap: wrap; }
+  .ds-d-actions { display: flex; align-items: center; gap: var(--ds-s-3); flex-wrap: wrap; }
+  .ds-d-title { font-size: var(--ds-fs-h1); font-weight: 800; }
+  .ds-d-kpis { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .ds-d-split { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(280px, 1fr); gap: var(--ds-s-6); align-items: start; }
+  .ds-d-main .ds-card { padding: var(--ds-s-6); }
+  .ds-d-main .ds-stat__value { font-size: 2.125rem; }
+}

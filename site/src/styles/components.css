@@ -1,0 +1,115 @@
+/* AuditIA — design system v3 : composants partagés (mobile et ordinateur). */
+
+/* Boutons : cible tactile 48 px minimum, états hover / focus / active */
+.ds-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--ds-s-2);
+  min-height: var(--ds-touch); padding: var(--ds-s-3) var(--ds-s-5);
+  border: 1px solid var(--ds-line); border-radius: var(--ds-r-pill);
+  background: var(--ds-surface); color: var(--ds-text);
+  font-size: var(--ds-fs-sm); font-weight: 700; line-height: 1.2; text-align: center;
+  transition: background-color .15s ease, border-color .15s ease;
+}
+.ds-btn:hover { background: var(--ds-surface-hi); border-color: var(--ds-lavender); }
+.ds-btn:active { background: var(--ds-surface-2); }
+.ds-btn--primary {
+  border-color: transparent; background: var(--ds-grad-cta);
+  box-shadow: var(--ds-shadow-glow);
+}
+.ds-btn--primary:hover { background: var(--ds-grad-cta); filter: brightness(1.08); }
+.ds-btn--block { width: 100%; }
+
+/* Cartes : surfaces opaques, sans flou */
+.ds-card {
+  background: var(--ds-surface);
+  border: 1px solid var(--ds-line-soft);
+  border-radius: var(--ds-r-md);
+  padding: var(--ds-s-5);
+  box-shadow: var(--ds-shadow-card);
+  min-width: 0;
+}
+.ds-card__head {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--ds-s-3);
+  margin-bottom: var(--ds-s-4);
+}
+.ds-card__title { font-size: var(--ds-fs-h3); font-weight: 700; }
+
+/* Titres de section */
+.ds-section-title {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--ds-s-3);
+  margin: var(--ds-s-8) 0 var(--ds-s-4);
+  font-size: var(--ds-fs-h3); font-weight: 700;
+}
+.ds-section-title:first-child { margin-top: 0; }
+
+/* Indicateurs chiffrés */
+.ds-stat { display: flex; flex-direction: column; gap: var(--ds-s-1); min-width: 0; }
+.ds-stat__label { font-size: var(--ds-fs-xs); color: var(--ds-muted); font-weight: 600; }
+.ds-stat__value {
+  font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2rem); font-weight: 800;
+  font-variant-numeric: tabular-nums; overflow-wrap: anywhere;
+}
+.ds-stat__hint { font-size: var(--ds-fs-xs); color: var(--ds-lavender); }
+
+/* Badges de score et d'état */
+.ds-badge {
+  display: inline-flex; align-items: center; gap: var(--ds-s-1);
+  padding: 4px var(--ds-s-3); border-radius: var(--ds-r-pill);
+  font-size: var(--ds-fs-xs); font-weight: 700; line-height: 1.4; white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  background: var(--ds-surface-2); color: var(--ds-text-2);
+}
+.ds-badge--good { background: var(--ds-good-2); color: #04210F; }
+.ds-badge--warn { background: var(--ds-warn); color: #2B1C00; }
+.ds-badge--danger { background: var(--ds-danger); color: #3A0712; }
+.ds-badge--demo { background: var(--ds-lavender); color: var(--ds-on-light); }
+
+/* Barres de progression (la largeur vient de --pct) */
+.ds-bar { display: grid; gap: var(--ds-s-2); }
+.ds-bar__top { display: flex; justify-content: space-between; gap: var(--ds-s-3); font-size: var(--ds-fs-sm); }
+.ds-bar__track { height: 10px; border-radius: var(--ds-r-pill); background: var(--ds-bg-3); overflow: hidden; }
+.ds-bar__fill {
+  display: block; height: 100%; width: var(--pct, 0%);
+  border-radius: inherit; background: var(--ds-grad-cta);
+}
+
+/* Lignes de liste */
+.ds-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--ds-s-3); }
+.ds-row {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--ds-s-3);
+  min-height: var(--ds-touch); padding: var(--ds-s-3) var(--ds-s-4);
+  background: var(--ds-surface-2); border-radius: var(--ds-r-sm);
+}
+.ds-row__main { min-width: 0; display: grid; gap: 2px; }
+.ds-row__title { font-weight: 700; overflow-wrap: anywhere; }
+.ds-row__meta { font-size: var(--ds-fs-xs); color: var(--ds-muted); }
+
+/* Icônes */
+.ds-icon { width: 22px; height: 22px; flex: 0 0 auto; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+/* Bandeau « données de démonstration » (toujours visible sur la page de démo) */
+.ds-demo-banner {
+  display: flex; align-items: center; gap: var(--ds-s-3); flex-wrap: wrap;
+  padding: var(--ds-s-3) var(--ds-s-4); margin-bottom: var(--ds-s-5);
+  background: var(--ds-grad-banner); border: 1px solid var(--ds-line);
+  border-radius: var(--ds-r-sm); font-size: var(--ds-fs-sm); color: var(--ds-text);
+}
+
+/* Tableaux : défilement horizontal confiné au conteneur, jamais sur la page */
+.ds-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; max-width: 100%; }
+.ds-table { width: 100%; border-collapse: collapse; font-size: var(--ds-fs-sm); }
+.ds-table th, .ds-table td { padding: var(--ds-s-3); text-align: left; border-bottom: 1px solid var(--ds-line-soft); white-space: nowrap; }
+.ds-table th { font-size: var(--ds-fs-xs); color: var(--ds-muted); font-weight: 700; }
+.ds-table td.num, .ds-table th.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+/* État vide */
+.ds-empty { text-align: center; padding: var(--ds-s-8) var(--ds-s-4); display: grid; gap: var(--ds-s-3); justify-items: center; }
+.ds-empty__text { color: var(--ds-muted); max-width: 44ch; }
+
+/* Grilles génériques : s'adaptent à la largeur disponible */
+.ds-grid { display: grid; gap: var(--ds-s-4); grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); }
+
+/* Pile verticale d'éléments (mobile et ordinateur) */
+.ds-d-stack { display: grid; gap: var(--ds-s-4); min-width: 0; }
+
+/* Focus clavier visible sur tous les éléments interactifs */
+.ds-btn:focus-visible, .ds-m-tab:focus-visible, .ds-d-nav__item:focus-visible { outline: 3px solid var(--ds-lavender); outline-offset: 3px; }
