@@ -676,3 +676,27 @@ html body:has(.workspace-app) .ai-float-launcher{
   html body[data-view="Accueil"]:has(.workspace-app) .workspace-app .dk-feat b{font-size:12px!important}
   html body:has(.workspace-app) .workspace-main>.workspace-head{padding-right:98px!important}
 }
+
+/* AuditIA mobile correction v107 — remove duplicate empty home header and constrain artwork */
+@media(max-width:760px){
+  html body[data-view="Accueil"]:has(.workspace-app) .workspace-main>.workspace-head{
+    display:none!important;
+  }
+  html body:has(.workspace-app) .workspace-main>.workspace-head::after{
+    display:none!important;content:none!important;background:none!important;
+    -webkit-mask-image:none!important;mask-image:none!important;
+  }
+  html body[data-view="Accueil"]:has(.workspace-app) .workspace-app .dk-hero-art{
+    display:block!important;position:relative!important;
+    width:100%!important;max-width:160px!important;
+    height:112px!important;max-height:112px!important;
+    margin:10px auto 0!important;object-fit:contain!important;
+    transform:none!important;right:auto!important;left:auto!important;top:auto!important;bottom:auto!important;
+  }
+  html body[data-view="Accueil"]:has(.workspace-app) .workspace-app .dk-hero-in{
+    padding:22px 17px 16px!important;
+  }
+  html body[data-view="Accueil"]:has(.workspace-app) .workspace-app .dk-hero{
+    min-height:0!important;height:auto!important;
+  }
+}
