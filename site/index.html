@@ -4863,6 +4863,7 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
       html body:has(.workspace-app) .workspace-main > .workspace-head .workspace-actions{display:none!important}
     }
   </style>
+  <link rel="stylesheet" href="./home-compact.css?v=1">
 </head>
 <body>
   <div class="status-safe" aria-hidden="true"></div>
@@ -7250,7 +7251,6 @@ function mqLatestHtml(){
         const latest=appAudits.filter(a=>auditHasAnalysis(a)).sort((a,b)=>String(b.updated_at||b.created_at||'').localeCompare(String(a.updated_at||a.created_at||'')))[0];
         const waiting=appAudits.filter(a=>!auditHasAnalysis(a)).length;
         body='<div class="hx hx-compact mq-home">'+dkHomeHtml()+
-          '<section class="mq-banner" aria-labelledby="mq-title"><div class="mq-banner-copy"><span class="mq-tag"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>Audit commercial IA</span><h1 id="mq-title">Boostez la visibilité de votre <em>commerce</em></h1><p>Trouvez un commerce, analysez sa présence en ligne et générez un rapport client professionnel.</p><button type="button" class="mq-cta" data-app-view="Clients"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12-7.5z"/></svg>Lancer un audit</button></div><img class="mq-banner-art" src="./home-banner.png" alt="" aria-hidden="true"></section>'+
            naturalLanguageSearchHtml()+
           mqStatsHtml()+
            mqLatestHtml()+
