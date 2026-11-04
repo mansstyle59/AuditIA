@@ -148,3 +148,62 @@ html body:has(.workspace-app) .ai-float-launcher{
     animation-iteration-count:1!important;transition-duration:.01ms!important;
   }
 }
+
+
+/* AuditIA — mobile dashboard contrast and fixed-control collision patch */
+@media(max-width:760px){
+  /* Dashboard counters: never let the numbers inherit a pale/disabled color. */
+  html body:has(.workspace-app) .workspace-app .app-stat strong{
+    color:#30264F!important;
+    opacity:1!important;
+    font-weight:850!important;
+    -webkit-text-fill-color:#30264F!important;
+  }
+  html body:has(.workspace-app) .workspace-app .app-stat span{
+    color:#655D7D!important;opacity:1!important;
+  }
+  html body:has(.workspace-app) .workspace-app .app-stat{
+    background:#fff!important;border:1px solid #E1DBF2!important;
+    box-shadow:0 8px 24px rgba(53,38,112,.07)!important;
+  }
+  html body:has(.workspace-app) .workspace-app .audit-overview{
+    color:#30264F!important;
+  }
+  html body:has(.workspace-app) .workspace-app .audit-overview :is(h2,h3,b){
+    color:#30264F!important;opacity:1!important;
+  }
+  html body:has(.workspace-app) .workspace-app .audit-overview :is(p,span,small){
+    color:#655D7D!important;opacity:1!important;
+  }
+  html body:has(.workspace-app) .workspace-app .audit-overview .audit-overview-progress b{
+    color:#30264F!important;font-weight:850!important;
+  }
+  html body:has(.workspace-app) .workspace-app .audit-overview .audit-overview-bar>div>b{
+    color:#30264F!important;font-weight:850!important;
+  }
+  /* Give the page room for the bottom tab bar and Safari's lower chrome. */
+  html body:has(.workspace-app) .workspace-main{
+    padding-bottom:calc(220px + env(safe-area-inset-bottom))!important;
+  }
+  html body:has(.workspace-app) .workspace-app .mobile-tabbar{
+    left:12px!important;right:12px!important;bottom:calc(12px + env(safe-area-inset-bottom))!important;
+    width:auto!important;min-height:76px!important;
+    padding:7px!important;border-radius:24px!important;
+    background:#fff!important;border:1px solid #E2DDF1!important;
+    box-shadow:0 10px 34px rgba(48,38,79,.15)!important;
+    z-index:160!important;
+  }
+  html body:has(.workspace-app) .workspace-app .mobile-tabbar button{
+    min-height:58px!important;border-radius:18px!important;
+  }
+  /* The floating assistant sits above the tab bar, not on top of dashboard scores. */
+  html body:has(.workspace-app) .ai-float-launcher{
+    right:16px!important;
+    bottom:calc(108px + env(safe-area-inset-bottom))!important;
+    width:54px!important;height:54px!important;z-index:170!important;
+  }
+  html body:has(.workspace-app) .ai-float-panel{
+    bottom:calc(174px + env(safe-area-inset-bottom))!important;
+    max-height:calc(100dvh - 230px)!important;
+  }
+}
