@@ -31,6 +31,8 @@
   .ds-d-nav__item.is-active { background: var(--ds-surface-2); color: var(--ds-text); box-shadow: inset 3px 0 0 var(--ds-primary-2); }
   .ds-d-nav__item.is-active .ds-icon { color: var(--ds-lavender); }
 
+  .ds-d-account { margin-top: auto; display: grid; gap: var(--ds-s-3); }
+  .ds-d-account__mail { font-size: var(--ds-fs-xs); color: var(--ds-muted); overflow-wrap: anywhere; }
   .ds-d-main { min-width: 0; padding: var(--ds-s-8) clamp(24px, 3vw, 48px) var(--ds-s-16); }
   .ds-d-inner { max-width: var(--ds-container); margin: 0 auto; display: grid; gap: var(--ds-s-6); }
   .ds-d-header { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--ds-s-4); flex-wrap: wrap; }

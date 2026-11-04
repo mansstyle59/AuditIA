@@ -19,7 +19,7 @@ Créés :
 - `site/src/ui/layout-mobile.js`, `site/src/ui/layout-desktop.js` : coquilles.
 - `site/src/ui/views/home.js` : accueil, deux compositions (`homeMobile`, `homeDesktop`).
 - `site/src/ui/demo-data.js` : données de démonstration, identifiées comme telles.
-- `site/src/ui/app-demo.js` : point d'entrée ; choisit la coquille selon la largeur, gère la navigation.
+- `site/src/ui/app-demo.js` (devenu `app.js` au lot 1) : point d’entrée ; choisit la coquille selon la largeur, gère la navigation.
 
 Modifiés :
 - `site/sw.js` : cache `auditia-v117`, précache des nouveaux fichiers.
