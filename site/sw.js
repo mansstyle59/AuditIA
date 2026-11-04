@@ -10,7 +10,11 @@ const ASSETS = [
   './auditia-refonte-v2.css', './frost-experience.css', './home-compact.css', './app-polish.css',
   './vendor/html2canvas.min.js', './vendor/jspdf.umd.min.js',
   './vendor/supabase.js',
-  './src/core/auth-helpers.js', './src/core/config.js', './src/core/utils.js'
+  './src/audit/scoring.js',
+  './src/audit/site-analysis.js',
+  './src/core/auth-helpers.js',
+  './src/core/config.js',
+  './src/core/utils.js'
 ];
 
 self.addEventListener('install', e => {
