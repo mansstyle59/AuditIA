@@ -16,6 +16,7 @@ import { createReportController } from './report-controller.js';
 import { auditsView, auditDossierView } from './views/audits.js';
 import { createSettingsController } from './settings-controller.js';
 import { authScreen, authLoading, authError } from './screens/auth.js';
+import { landingClick } from './screens/landing.js';
 import { loadWorkspaceData, dataErrorMessage } from '../data/queries.js';
 import { loadBrand } from '../data/settings.js';
 import { defaultBrand } from '../settings/brand.js';
@@ -82,6 +83,13 @@ function showAuth(mode, msg = '', kind = 'error') {
   root.innerHTML = authScreen(mode, msg, kind);
   document.documentElement.dataset.layout = 'auth';
   window.scrollTo(0, 0);
+  if (mode === 'signin') {
+    // Page d'accueil publique : pas de focus automatique (le clavier iPhone masquerait la page) ;
+    // un message (session terminée, accès refusé…) ramène directement à la carte de connexion.
+    const card = msg && document.getElementById('connexion');
+    if (card) card.scrollIntoView({ block: 'center' });
+    return;
+  }
   const first = root.querySelector('input');
   if (first) setTimeout(() => first.focus(), 60);
 }
@@ -241,6 +249,7 @@ async function onReset(e) {
 /* ---------- Événements (délégation sur la racine) ---------- */
 root.addEventListener('click', event => {
   const t = event.target;
+  if (landingClick(t, root)) return; // page d'accueil publique : défilement et menu
   const go = t.closest('[data-go]');
   if (go) { showAuth(go.dataset.go); return; }
   const sp = t.closest('[data-showpwd]');

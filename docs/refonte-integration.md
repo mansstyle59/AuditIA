@@ -123,3 +123,12 @@ Score /100, SEO/GEO, plan d'action (`actionPlan`/`auditActions`), recommandation
 **PDF** : nom/couleur/logo sur la couverture, en-têtes et pieds, bloc « Votre contact » ; aucune clé ni donnée technique.
 **Harmonisation** : jetons `--ds-ok/warn/err-*` (plus de couleurs d'état en dur), doublons CSS retirés, bouton retour non étiré sur ordinateur, espacements des cartes, carte « À analyser » lisible.
 **Limites connues** : un logo très large reste petit dans la pastille de la barre latérale ; deux boutons « Lancer l'analyse » coexistent dans un dossier non analysé (conservés) ; `sw.js` v124.
+
+## Reprise visuelle (d'après les captures de référence)
+
+- **Page d'accueil publique** (`src/ui/screens/landing.js`, `src/styles/landing.css`) : affichée avant connexion ; la carte de connexion (mêmes champs `siEmail`, `siPwd`, `fSignin`) est en bas de page. Ordinateur : en-tête avec navigation horizontale, hero texte + laptop, « Pourquoi choisir AuditIA ? » en 4 cartes, aperçu de rapport, bandeau d'action. Mobile : menu hamburger, hero vertical + smartphone, cartes 2×2, « Pour qui ? », barre de navigation fixe en bas (zones de sécurité iOS).
+- **Bandeau illustré de l'espace connecté** (`src/ui/views/hero.js`) au-dessus des cartes réelles de l'accueil.
+- **Illustrations** (`src/ui/illustrations.js`) : laptop, smartphone, anneau de score, aperçu de rapport, icônes — SVG originaux, en ligne, sans ressource externe. Les rapports montrés sont des **exemples fictifs**, étiquetés comme tels.
+- **Images** : `assets/shop-wide.webp` et `assets/shop-card.webp`, versions optimisées de `hero-shop.png` (déjà présent dans le dépôt). `hero-shop.png` reste en place (ancienne interface).
+- Aucune statistique commerciale : seuls des faits du produit sont affichés (SEO + GEO, score /100, rapport PDF). Pas de « Tarifs » : aucun tarif n'existe.
+- Service worker : `auditia-v125`.

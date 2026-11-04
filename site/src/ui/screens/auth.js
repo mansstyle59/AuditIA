@@ -1,6 +1,7 @@
 // AuditIA — écrans de connexion (affichage uniquement, aucune logique d'accès).
 // Les identifiants d'éléments (siEmail, siPwd, foEmail, rPwd, rPwd2, authMsg…) sont ceux de l'ancienne interface.
 import { escHtml } from '../../core/utils.js';
+import { landingScreen } from './landing.js';
 
 const TAGLINE = 'Auditer mieux, décider plus clairement';
 
@@ -66,9 +67,10 @@ export function authScreen(mode, msg = '', kind = 'error') {
       <button class="ds-btn ds-btn--primary ds-btn--block" type="button" data-go="forgot">Recevoir un nouveau lien</button>
       <button class="ds-link" type="button" data-go="signin">Retour à la connexion</button></section>`);
   }
-  return frame(`<section class="ds-auth__card"><h1>Connexion</h1>
+  // Connexion : page d'accueil publique, la carte de connexion (mêmes champs et mêmes identifiants) est en bas de page.
+  return landingScreen({ loginCard: `<section class="ds-auth__card"><h2 class="ds-auth__title">Connexion</h2>
     <p class="ds-auth__lead">Retrouvez vos audits et votre espace de travail.</p>
     <form id="fSignin" novalidate>${emailField('siEmail')}${pwdField('siPwd', 'Mot de passe', 'current-password')}
       <button class="ds-btn ds-btn--primary ds-btn--block" type="submit">Se connecter</button>${message(msg, kind)}</form>
-    <button class="ds-link" type="button" data-go="forgot">Mot de passe oublié ?</button></section>`);
+    <button class="ds-link" type="button" data-go="forgot">Mot de passe oublié ?</button></section>` });
 }

@@ -3,6 +3,7 @@
 import { btn, stat, card, badge, scoreBadge, bar, sectionTitle, emptyState, linkBtn, linkRow, avatar } from '../components/ui.js';
 import { auditHasAnalysis } from '../../audit/scoring.js';
 import { homeStats, portfolio } from '../../data/portfolio.js';
+import { heroBand } from './hero.js';
 
 function auditRows(audits, clients, empty) {
   if (!audits.length) return `<p class="ds-row__meta">${empty}</p>`;
@@ -38,7 +39,7 @@ function kpis(s) {
 }
 
 function welcome() {
-  return emptyState({
+  return heroBand() + emptyState({
     title: 'Bienvenue sur AuditIA',
     text: "Aucun commerce n'est encore enregistré. Recherchez un commerce pour l'ajouter à votre portefeuille.",
   }) + `<div class="ds-d-actions">${btn({ label: 'Trouver des commerces', variant: 'primary', attrs: 'data-nav="prospects"' })}</div>`;
@@ -47,7 +48,7 @@ function welcome() {
 export function homeMobile(data) {
   const s = homeStats(data.clients, data.audits);
   if (!s.clientCount && !s.auditCount) return welcome();
-  return `
+  return `${heroBand()}
     <div class="ds-grid">${kpis(s)}</div>
     ${sectionTitle('Derniers audits', btn({ label: 'Voir les commerces', attrs: 'data-nav="clients"' }))}
     ${card({ body: auditRows(s.latest.slice(0, 3), data.clients, 'Aucun audit pour le moment.') })}
@@ -59,7 +60,7 @@ export function homeMobile(data) {
 export function homeDesktop(data) {
   const s = homeStats(data.clients, data.audits);
   if (!s.clientCount && !s.auditCount) return welcome();
-  return `
+  return `${heroBand()}
     <div class="ds-d-toolbar">
       <p class="ds-row__meta">Vue d'ensemble de votre activité</p>
       <div class="ds-d-actions">${btn({ label: 'Actualiser', attrs: 'data-reload' })}${btn({ label: 'Voir les commerces', variant: 'primary', attrs: 'data-nav="clients"' })}</div>

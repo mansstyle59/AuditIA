@@ -2,7 +2,7 @@
    Stratégie « cache d'abord, mise à jour en arrière-plan » (stale-while-revalidate) :
    l'app s'affiche tout de suite depuis le cache, et la dernière version est
    récupérée en arrière-plan pour la prochaine ouverture. */
-const CACHE = 'auditia-v124';
+const CACHE = 'auditia-v125';
 const ASSETS = [
   './', './index.html', './manifest.webmanifest', './theme-clair.css', './mobile.css',
   './auditia-icon.svg', './favicon-32.png',
@@ -62,6 +62,12 @@ const ASSETS = [
   './src/styles/auth.css',
   './src/styles/report.css',
   './src/styles/settings.css',
+  './src/styles/landing.css',
+  './src/ui/screens/landing.js',
+  './src/ui/illustrations.js',
+  './src/ui/views/hero.js',
+  './assets/shop-card.webp',
+  './assets/shop-wide.webp',
   './nouvelle-interface.html'
 ];
 
