@@ -12,6 +12,7 @@ import { clientsView, clientsResultsHtml } from './views/clients.js';
 import { clientDetailView } from './views/client-detail.js';
 import { createSearchController } from './search-controller.js';
 import { createAuditController } from './audit-controller.js';
+import { createReportController } from './report-controller.js';
 import { auditsView, auditDossierView } from './views/audits.js';
 import { accountView } from './views/account.js';
 import { authScreen, authLoading, authError } from './screens/auth.js';
@@ -60,6 +61,9 @@ const audits = createAuditController({
   reload: silentReload,
   open: id => { state.view = 'audit'; state.auditId = id; window.scrollTo(0, 0); },
 });
+// Rapports PDF (lot 5) : aperçu, téléchargement, partage. Lecture seule : aucune écriture, aucun nouvel audit.
+const report = createReportController({ getData: () => state.data, runningId: () => audits.runningId() });
+document.addEventListener('click', event => { report.onClick(event.target); });
 const auth = createAuthService({ getClient: getAuthClient, redirectUrl: REDIRECT_URL });
 
 /* ---------- Écrans de connexion ---------- */
@@ -155,7 +159,7 @@ function enter(user) {
   state.clientId = null;
   state.ui = { q: '', tier: '', sort: 'urgence' };
   search.reset();
-  audits.reset();
+  report.close(); audits.reset();
   window.scrollTo(0, 0);
   loadData();
 }
@@ -171,7 +175,7 @@ async function logout() {
   state.user = null;
   state.gen++; // annule un chargement en cours
   search.reset(); // vide les résultats, la clé et les recherches en cours
-  audits.reset();
+  report.close(); audits.reset();
   state.data = { status: 'idle', clients: [], audits: [], error: '' };
   await auth.signOut();
   showAuth('signin');

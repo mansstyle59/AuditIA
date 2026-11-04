@@ -82,3 +82,22 @@ Score /100, SEO/GEO, plan d'action (`actionPlan`/`auditActions`), recommandation
 
 ### Sécurité
 Écritures identiques à l'ancien moteur : insertion `audits`, mise à jour `clients.details` et `audits`. Clés lues en lecture seule dans `app_settings`, jamais affichées. Tables, RLS, Edge Functions inchangées. Rapports PDF et graphiques : lot 5.
+
+## Lot 5 — PDF professionnels et graphiques
+
+### Fichiers
+- `site/src/report/report-model.js` : modèle pur du rapport (lecture seule). Statut de chaque source déduit du dossier : mesuré / non mesuré / sans objet. Historique uniquement avec ≥ 2 audits réellement analysés du même client.
+- `site/src/report/report-charts.js` : données des graphiques (`chartData`) et graphiques SVG (jauge, barres, courbe) pour l'aperçu.
+- `site/src/report/report-pdf.js` : PDF A4 vectoriel (jsPDF embarqué `vendor/jspdf.umd.min.js`) : couverture, synthèse, indicateurs SEO/GEO, sources et fiabilité, performance, concurrents, mots-clés, points forts/faibles, plan d'action, recommandations, évolution, notes ; pied de page paginé AuditIA ; tableaux sans ligne coupée (en-tête répété).
+- `site/src/report/report-view.js` : aperçu HTML (même modèle, même données que le PDF).
+- `site/src/ui/report-controller.js` : aperçu plein écran, téléchargement, partage (si le navigateur le permet), « Ouvrir pour imprimer » (ouvre le PDF, l'impression se fait depuis le lecteur PDF).
+- `site/src/styles/report.css`, `sw.js` (cache v122), boutons dans `views/audits.js` (dossier + liste), `desktop.css` (en-tête du dossier).
+
+### Règles
+- Aucune écriture, aucun nouvel audit, aucun appel réseau pendant la génération ; le dossier n'est pas modifié.
+- Aucune valeur inventée : une donnée absente est « non mesurée » ; un site absent est « sans objet » ; le score reste celui du moteur existant (scoring inchangé).
+- Aucune clé, identifiant technique ni message d'erreur interne dans le rapport.
+- Concurrents : 10 lignes maximum, le commerce audité est toujours conservé.
+
+### Tests
+`lot5_new.py` (53 scénarios, données simulées) : complet, sources indisponibles, sans site, longues recommandations, 40 concurrents, sans historique, mobile et bureau, géométrie du PDF (marges, pages vides, pied de page), cohérence graphiques/dossier, lecture seule, erreur de génération.

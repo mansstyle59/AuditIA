@@ -25,7 +25,7 @@ export function auditsResultsHtml(d, f, runningId) {
     const date = fmtDate(auditDate(a));
     const right = busy ? badge('En cours', 'warn') : done ? scoreBadge(score) : badge('À analyser');
     const action = busy ? `<button type="button" class="ds-btn ds-btn--primary" data-open-audit="${escHtml(a.id)}">Suivre</button>`
-      : done ? `<button type="button" class="ds-btn" data-open-audit="${escHtml(a.id)}">Ouvrir</button>`
+      : done ? `<button type="button" class="ds-btn" data-open-audit="${escHtml(a.id)}">Ouvrir</button><button type="button" class="ds-btn" data-report-pdf="${escHtml(a.id)}" aria-label="Télécharger le rapport PDF de ${escHtml((c && c.name) || 'ce commerce')}">PDF</button>`
         : `<button type="button" class="ds-btn ds-btn--primary" data-audit-run="${escHtml(a.id)}" ${runningId ? 'disabled' : ''}>Analyser</button>`;
     return `<li class="ds-audit-row">
       <button type="button" class="ds-audit-row__main" data-open-audit="${escHtml(a.id)}">${avatar(c && c.name)}
@@ -205,7 +205,8 @@ export function auditDossierView(a, c, d, ctl) {
       <p class="ds-row__meta">${escHtml([c && c.city, a.title].filter(Boolean).join(' · '))}</p>
       <p class="ds-row__meta">${an.done ? 'Analysé le ' + escHtml(date) : 'Pas encore analysé'}</p></div></div>
     <div class="ds-d-actions">
-      ${canRun ? btn({ label: an.done ? 'Relancer l’analyse' : 'Lancer l’analyse', variant: 'primary', attrs: `data-audit-run="${escHtml(a.id)}"` }) : ''}
+      ${an.done && canRun ? btn({ label: 'Télécharger le rapport PDF', variant: 'primary', attrs: `data-report-pdf="${escHtml(a.id)}"` }) + btn({ label: 'Prévisualiser le rapport', attrs: `data-report-preview="${escHtml(a.id)}"` }) : ''}
+      ${canRun ? btn({ label: an.done ? 'Relancer l’analyse' : 'Lancer l’analyse', variant: an.done ? 'default' : 'primary', attrs: `data-audit-run="${escHtml(a.id)}"` }) : ''}
       ${c ? btn({ label: 'Fiche client', attrs: `data-open-client="${escHtml(c.id)}"` }) : ''}</div></section>`;
   const back = `<div class="ds-backrow">${btn({ label: '← Audits', attrs: 'data-nav="audits"' })}</div>`;
   const common = `${back}${bannerSlot(busyElsewhere ? snap : null, a.id)}${noticeBlock(ctl.notice())}`;
