@@ -476,3 +476,179 @@ html body:has(.workspace-app) .ai-float-launcher{
     html body:has(.workspace-app) .workspace-main .mq-stats span{font-size:10px!important}
   }
 }
+ 
+
+/* AuditIA — responsive parity layer: desktop is the design source of truth.
+   Mobile changes only layout/scale; color, surfaces, typography and active states
+   retain the same desktop design language. */
+:root{
+  --auditia-brand:#6B2EF0;
+  --auditia-brand-dark:#5B2BE0;
+  --auditia-brand-soft:#F1ECFF;
+  --auditia-ink:#15103A;
+  --auditia-muted:#6B6790;
+  --auditia-line:#ECE8FB;
+}
+html body:has(.workspace-app) .workspace-app{
+  color:var(--auditia-ink)!important;
+}
+html body:has(.workspace-app) .workspace-app :is(.app-panel,.info-panel,.nl-search,.report-card,.schema-card,.client-card,.audit-overview,.mq-latest){
+  background:#fff!important;
+  border:1px solid var(--auditia-line)!important;
+  border-radius:22px!important;
+  box-shadow:0 24px 44px -34px rgba(40,20,120,.30)!important;
+}
+html body:has(.workspace-app) .workspace-app :is(h1,h2,h3,.mq-audit-main b,.mq-audit-score,.mq-stats b){
+  color:var(--auditia-ink)!important;
+}
+html body:has(.workspace-app) .workspace-app :is(p,small,.mq-audit-main small,.mq-stats span){
+  color:var(--auditia-muted);
+}
+html body:has(.workspace-app) .workspace-app :is(.app-stat-ico,.stat-ico,.pg-ico,.sec-ico,.schema-ico,.studio-ico,.cta-ico,.mq-audit-av){
+  background:var(--auditia-brand-soft)!important;color:var(--auditia-brand)!important;
+  box-shadow:none!important;
+}
+html body:has(.workspace-app) .workspace-app :is(.app-stat-ico,.stat-ico,.pg-ico,.sec-ico,.schema-ico,.studio-ico,.cta-ico,.mq-audit-av) svg{
+  stroke:var(--auditia-brand)!important;
+}
+html body:has(.workspace-app) .workspace-app :is(.app-btn.primary,.mq-tab.is-on,.mobile-tabbar button.active){
+  background:linear-gradient(135deg,#8344FF,#5B2BE0)!important;color:#fff!important;
+}
+@media(max-width:760px){
+  html body:has(.workspace-app) .workspace-app{
+    width:100%!important;max-width:100%!important;min-width:0!important;
+    padding-left:12px!important;padding-right:12px!important;
+    box-sizing:border-box!important;
+    background:#F7F5FC!important;
+  }
+  html body:has(.workspace-app) .workspace-main{
+    width:100%!important;max-width:100%!important;min-width:0!important;
+    padding-bottom:calc(158px + env(safe-area-inset-bottom))!important;
+    box-sizing:border-box!important;
+  }
+  /* Same desktop stats cards, scaled to phone width */
+  html body:has(.workspace-app) .workspace-main .mq-stats{
+    display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    gap:8px!important;width:100%!important;min-width:0!important;
+  }
+  html body:has(.workspace-app) .workspace-main .mq-stats button{
+    min-width:0!important;min-height:122px!important;
+    display:flex!important;flex-direction:column!important;align-items:flex-start!important;
+    justify-content:center!important;gap:6px!important;
+    padding:12px 10px!important;border:1px solid var(--auditia-line)!important;
+    border-radius:18px!important;background:#fff!important;
+    box-shadow:0 12px 28px -22px rgba(40,20,120,.30)!important;
+  }
+  html body:has(.workspace-app) .workspace-main .mq-stats b{
+    color:var(--auditia-ink)!important;opacity:1!important;
+    font-size:clamp(23px,6vw,30px)!important;line-height:1!important;
+    font-weight:850!important;-webkit-text-fill-color:var(--auditia-ink)!important;
+  }
+  html body:has(.workspace-app) .workspace-main .mq-stats span{
+    display:block!important;min-width:0!important;max-width:100%!important;
+    color:var(--auditia-muted)!important;opacity:1!important;
+    font-size:clamp(10px,2.8vw,12px)!important;line-height:1.25!important;
+    letter-spacing:.025em!important;text-transform:none!important;
+    overflow-wrap:anywhere!important;
+  }
+  /* Dashboard overview and report cards retain desktop white/purple surfaces */
+  html body:has(.workspace-app) .workspace-main :is(.app-panel,.info-panel,.nl-search,.report-card,.schema-card,.client-card,.audit-overview,.mq-latest){
+    width:100%!important;min-width:0!important;max-width:100%!important;
+    box-sizing:border-box!important;padding:18px!important;border-radius:20px!important;
+  }
+  html body:has(.workspace-app) .workspace-main .audit-overview{
+    color:var(--auditia-ink)!important;background:#fff!important;
+  }
+  html body:has(.workspace-app) .workspace-main .audit-overview :is(h2,h3,b,strong){
+    color:var(--auditia-ink)!important;opacity:1!important;
+  }
+  html body:has(.workspace-app) .workspace-main .audit-overview :is(p,span,small){
+    color:var(--auditia-muted)!important;opacity:1!important;
+  }
+  html body:has(.workspace-app) .workspace-main .audit-overview :is(.audit-overview-progress b,.audit-overview-bar>div>b){
+    color:var(--auditia-ink)!important;font-weight:850!important;
+  }
+  html body:has(.workspace-app) .workspace-main :is(.mq-latest,.mq-audit-row){
+    min-width:0!important;box-sizing:border-box!important;
+  }
+  html body:has(.workspace-app) .workspace-main .mq-audit-row{
+    grid-template-columns:38px minmax(0,1fr) auto!important;
+    gap:10px!important;padding:12px 10px!important;
+  }
+  html body:has(.workspace-app) .workspace-main .mq-audit-av{
+    width:38px!important;height:38px!important;border-radius:12px!important;
+    background:linear-gradient(145deg,#8E5BFF,#5B2BE0)!important;color:#fff!important;
+  }
+  html body:has(.workspace-app) .workspace-main .mq-audit-main{min-width:0!important}
+  html body:has(.workspace-app) .workspace-main .mq-audit-main b{
+    font-size:14px!important;overflow-wrap:anywhere!important;
+  }
+  html body:has(.workspace-app) .workspace-main .mq-audit-main small{
+    font-size:12px!important;overflow-wrap:anywhere!important;
+  }
+  html body:has(.workspace-app) .workspace-main .mq-audit-score{
+    font-size:18px!important;white-space:nowrap!important;
+  }
+  html body:has(.workspace-app) .workspace-main .mq-audit-go{
+    grid-column:2/-1!important;justify-self:stretch!important;width:100%!important;
+    min-height:40px!important;border-radius:12px!important;
+    background:#fff!important;color:var(--auditia-brand-dark)!important;
+    border:1px solid #D9CFF7!important;
+  }
+  /* Responsive columns: desktop layout collapses, without changing card styling */
+  html body:has(.workspace-app) .workspace-main :is(.schema-grid,.client-cards,.report-grid,.cards-grid){
+    grid-template-columns:minmax(0,1fr)!important;
+  }
+  html body:has(.workspace-app) .workspace-main :is(.schema-card,.client-card,.report-card){
+    min-width:0!important;overflow-wrap:anywhere!important;
+  }
+  html body:has(.workspace-app) .workspace-main :is(input,select,textarea){
+    max-width:100%!important;min-width:0!important;box-sizing:border-box!important;
+    font-size:16px!important;
+  }
+  /* Bottom tabs: fixed like the desktop tabs, using the exact same purple active state */
+  html body:has(.workspace-app) .workspace-app :is(.mq-tabbar,.mobile-tabbar){
+    position:fixed!important;left:12px!important;right:12px!important;
+    bottom:calc(10px + env(safe-area-inset-bottom))!important;
+    transform:none!important;width:auto!important;max-width:none!important;
+    height:72px!important;min-height:72px!important;
+    padding:6px!important;box-sizing:border-box!important;
+    display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;
+    gap:4px!important;background:#fff!important;background-image:none!important;
+    border:1px solid #E6E1FA!important;border-radius:22px!important;
+    box-shadow:0 14px 34px rgba(40,20,120,.18)!important;
+    backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+    z-index:160!important;
+  }
+  html body:has(.workspace-app) .workspace-app :is(.mq-tab,.mobile-tabbar button){
+    min-width:0!important;min-height:58px!important;padding:4px 2px!important;
+    display:flex!important;align-items:center!important;justify-content:center!important;
+    flex-direction:column!important;gap:3px!important;
+    border:0!important;border-radius:16px!important;
+    background:transparent!important;color:#6B6790!important;
+    font-size:clamp(9px,2.5vw,11px)!important;font-weight:750!important;
+    line-height:1.1!important;white-space:normal!important;
+  }
+  html body:has(.workspace-app) .workspace-app :is(.mq-tab.is-on,.mobile-tabbar button.active){
+    background:linear-gradient(135deg,#8344FF,#5B2BE0)!important;color:#fff!important;
+    box-shadow:0 10px 22px rgba(140,80,255,.28)!important;
+  }
+  html body:has(.workspace-app) .workspace-app :is(.mq-tab,.mobile-tabbar button) svg{
+    stroke:currentColor!important;flex:0 0 auto!important;
+  }
+  /* Floating AI never obscures scores or tabs */
+  html body:has(.workspace-app) .ai-float-launcher{
+    right:16px!important;bottom:calc(94px + env(safe-area-inset-bottom))!important;
+    width:52px!important;height:52px!important;z-index:170!important;
+  }
+  html body:has(.workspace-app) .ai-float-panel{
+    bottom:calc(158px + env(safe-area-inset-bottom))!important;
+    max-height:calc(100dvh - 210px)!important;
+  }
+}
+@media(max-width:380px){
+  html body:has(.workspace-app) .workspace-main .mq-stats{gap:6px!important}
+  html body:has(.workspace-app) .workspace-main .mq-stats button{padding:10px 8px!important;min-height:112px!important}
+  html body:has(.workspace-app) .workspace-main .mq-stats b{font-size:22px!important}
+  html body:has(.workspace-app) .workspace-main .mq-stats span{font-size:10px!important}
+}
