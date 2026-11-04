@@ -4898,11 +4898,12 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
   <script defer src="./vendor/supabase.js"></script>
   <script defer src="./oca.js?v=5"></script>
   <script type="module">
+    /* Moteur extrait (étape 2) : modules natifs dans ./src, voir docs/refonte-moteur.md */
+    import { ADMIN_EMAIL, API_FIELD, API_MODE, KEY_NAMES, SUPABASE_PUBLISHABLE_KEY, SUPABASE_URL, checklistTemplate, defaultSettings } from './src/core/config.js';
+    import { brandColor, escHtml, hexToRgb, keyHash, norm, safeColor, safeHttpUrl, siteHost, withTimeout } from './src/core/utils.js';
+    import { authError, pwdIssue, validEmail } from './src/core/auth-helpers.js';
 
     /* ===== AuditIA — connexion (expérience FormIA, accès réservé à l'administrateur) ===== */
-    const SUPABASE_URL = 'https://vkerjefkaxcohwhdwccq.supabase.co';
-    const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_J9FosHeYMdbYdbwOFfrUDw_WKhI7dXI';
-    const ADMIN_EMAIL = 'dewulf.denis@gmail.com';
     const REDIRECT_URL = location.origin + location.pathname;
     let sb = null;
     function loadScriptOnce(src){ return new Promise((res,rej)=>{ const s=document.createElement('script'); s.src=src; s.onload=()=>res(); s.onerror=()=>rej(new Error('load '+src)); document.head.appendChild(s); }); }
@@ -4923,19 +4924,8 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
       return sb;
     }
 
-    const checklistTemplate = [
-      ['Présence en ligne','Le commerce est facilement trouvable sur le web'],
-      ['Fiche établissement','Coordonnées, horaires et catégorie sont cohérents'],
-      ['Avis clients','Les avis récents sont suivis et reçoivent une réponse'],
-      ['Site web','Le site est accessible et adapté au mobile'],
-      ['Contact','Téléphone, adresse et liens fonctionnent'],
-      ['Réseaux sociaux','Les profils sont actifs et à jour'],
-      ['Identité visuelle','Logo, photos et informations sont cohérents'],
-      ['Informations locales','Ville, zone desservie et services sont clairs']
-    ];
     let appClient = null, appUser = null, appClients = [], appAudits = [], appSettings = null, appView = 'Accueil', activeAudit = null, activeClient = null, appNotice = '', studioClientId = '', studioOutputText = '';
     let placeResults = [], placeSearching = false, placeMsg = '', pickedDetails = null, clientDraft = null, keyAlerts = [], auditFilter = '', auditCategoryFilter = '', clientFilter = '', clientTier = '', clientSort = 'urgence', noticeTimer = null, acTimer = null, filterTimer = null, lastPaintedView = '';
-    const KEY_NAMES = { logo_dev:'Logo.dev', places:'Google Places', maps:'Google Maps', pagespeed:'PageSpeed' };
     function recomputeKeyAlerts(){ const a=[]; ['logo_dev','places','maps','pagespeed'].forEach(k=>{ const field=API_FIELD[k]; const val=String((appSettings&&appSettings[field])||'').trim(); if(!val) return; const rec=keyStore()[k]; if(rec&&rec.h===keyHash(val)&&rec.ok===false) a.push(KEY_NAMES[k]); }); keyAlerts=a; }
     async function checkKeysHealth(){
       try{
@@ -4948,7 +4938,6 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
       recomputeKeyAlerts(); renderApp();
     }
     function keyAlertHtml(){ if(!keyAlerts.length) return ''; return '<div class="key-alert"><span class="key-alert-ic">⚠️</span><div><b>'+(keyAlerts.length>1?'Clés à vérifier':'Clé à vérifier')+' : '+escHtml(keyAlerts.join(', '))+'</b><p>Une clé semble expirée ou invalide. Ouvre les Réglages pour la renouveler.</p></div><button type="button" class="app-btn" data-app-view="Paramètres">Réglages</button></div>'; }
-    const defaultSettings = () => ({company_name:'AffiAds',app_name:'AuditIA',tagline:'Auditer mieux, décider plus clairement',contact_email:'Dewulf.denis@gmail.com',phone:'',website:'',address:'',signature_name:'Denis Dewulf',signature_role:'Audit & conseil en visibilité numérique',signature_text:'Merci pour votre confiance.',logo_data_url:'',primary_color:'#5B5FEF',accent_color:'#ffad72',google_places_api_key:'',google_maps_api_key:'',pagespeed_api_key:'',search_console_property:'',google_business_profile_url:'',bing_webmaster_api_key:'',openai_api_key:'',logo_dev_publishable_key:'',integrations_notes:''});
     function siteShotHtml(a){
       const shot=a&&a.site&&a.site.screenshot; if(!shot) return '';
       const url=(a.site&&a.site.finalUrl)||'';
@@ -5021,30 +5010,12 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
     }
     function currentLogo(){ const v=String(appSettings?.logo_data_url||''); return /^data:image\/(?:png|jpeg|jpg|webp);base64,[a-z0-9+/=\s]+$/i.test(v)&&v.length<500000?v:'./auditia-icon.svg'; }
     /* Couleur de marque : l'ancien violet par défaut compte comme « non personnalisé ». L'interface suit la palette ; la marque sert aux PDF et à la signature. */
-    function brandColor(v){const x=String(v||'').trim().toLowerCase();return (!x||x==='#7657ed')?'#5B5FEF':v}
-    function safeColor(value,fallback){ return /^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(String(value||'').trim())?String(value).trim():fallback; }
     function updateBrandColors(){document.documentElement.style.setProperty('--orange',safeColor(appSettings?.accent_color,'#ffad72'))}
-    const escHtml = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-    function safeHttpUrl(value){
-      const raw=String(value||'').trim();
-      if(!/^https?:\/\//i.test(raw)) return '';
-      let u;
-      try{ u=new URL(raw); }catch(e){ return ''; }
-      if(u.username||u.password||(u.protocol!=='https:'&&u.protocol!=='http:')) return '';
-      const h=u.hostname.toLowerCase().replace(/^\[|\]$/g,'');
-      if(!h||h==='localhost'||h.endsWith('.localhost')||h.endsWith('.local')||h==='0.0.0.0'||h==='::1'||h==='metadata.google.internal') return '';
-      if(/^(127\.|10\.|192\.168\.|169\.254\.|172\.(1[6-9]|2\d|3[0-1])\.|0\.)/.test(h)) return '';
-      return u.href;
-    }
     /* ----- Test & validation des clés API (côté navigateur, sans secret serveur) ----- */
-    const API_FIELD = { logo_dev:'logo_dev_publishable_key', places:'google_places_api_key', maps:'google_maps_api_key', pagespeed:'pagespeed_api_key', bing:'bing_webmaster_api_key', openai:'openai_api_key', search_console:'search_console_property', business:'google_business_profile_url' };
-    const API_MODE = { logo_dev:'net', places:'net', maps:'net', pagespeed:'net', bing:'format', openai:'format', search_console:'format', business:'format' };
-    function keyHash(v){let h=5381;const s=String(v||'');for(let i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))>>>0;return h.toString(36);}
     function keyStore(){try{return JSON.parse(localStorage.getItem('auditia.keystatus')||'{}');}catch(e){return {};}}
     function keyStoreSet(kind,ok,value){const s=keyStore();s[kind]={ok:!!ok,h:keyHash(value),at:Date.now()};try{localStorage.setItem('auditia.keystatus',JSON.stringify(s));}catch(e){}}
     function keyValidated(kind){const field=API_FIELD[kind];const cur=String((appSettings&&appSettings[field])||'').trim();if(!cur)return false;const rec=keyStore()[kind];return !!(rec&&rec.ok&&rec.h===keyHash(cur));}
     function keyBadge(kind,defaultLabel){ if(!keyValidated(kind)) return '<span class="integration-status">'+defaultLabel+'</span>'; return '<span class="integration-status ready">'+(API_MODE[kind]==='net'?'✓ Clé validée · active':'✓ Format reconnu')+'</span>'; }
-    const withTimeout = (p,ms) => Promise.race([p, new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),ms))]);
     async function testLogoDev(key){ if(!key) return {ok:false,msg:'Saisissez la clé Logo.dev.'}; try{ const u='https://img.logo.dev/google.com?token='+encodeURIComponent(key)+'&size=64&format=png&cb='+Date.now(); const r=await withTimeout(fetch(u,{cache:'no-store'}),12000); if(r.ok) return {ok:true,msg:'Logo chargé : la clé Logo.dev fonctionne.'}; if(r.status===401||r.status===403) return {ok:false,msg:'Clé refusée ('+r.status+'). Vérifiez la clé publishable ; si vous avez activé des restrictions de domaine sur Logo.dev, autorisez mansstyle59.github.io.'}; if(r.status===429) return {ok:false,msg:'Quota atteint (429). La clé est reconnue mais momentanément limitée.'}; return {ok:false,msg:'Réponse '+r.status+'. Réessayez.'}; }catch(e){ return {ok:false,msg:/timeout/.test(e.message)?'Délai dépassé. Réessayez.':'Test bloqué par le navigateur (bloqueur de contenu ou réseau). Si les logos s’affichent déjà dans l’app, la clé fonctionne.'}; } }
     async function testPagespeed(key){ if(!key) return {ok:false,msg:'Saisissez une clé PageSpeed.'}; try{ const u=new URL('https://www.googleapis.com/pagespeedonline/v5/runPagespeed'); u.searchParams.set('url','https://example.com'); u.searchParams.set('key',key); const r=await withTimeout(fetch(u.toString()),30000); if(r.ok) return {ok:true,msg:'Clé PageSpeed acceptée par Google.'}; const d=await r.json().catch(()=>null); const m=(d&&d.error&&d.error.message)||''; if(r.status===400&&/api key not valid|invalid/i.test(m)) return {ok:false,msg:'Clé refusée : « API key not valid ».'}; if(r.status===403) return {ok:false,msg:'Accès refusé (403) : activez PageSpeed Insights API et vérifiez les restrictions de la clé.'}; if(r.status===429) return {ok:false,msg:'Quota atteint (429). La clé est reconnue mais momentanément limitée.'}; return {ok:false,msg:'Réponse '+r.status+(m?' : '+m:'')}; }catch(e){ return {ok:false,msg:/timeout/.test(e.message)?'Délai dépassé (analyse lente). Réessayez.':'Appel impossible : '+(e.message||'réseau').slice(0,80)}; } }
     async function testPlaces(key){ if(!key) return {ok:false,msg:'Saisissez une clé Google Places.'}; try{ const r=await withTimeout(fetch('https://places.googleapis.com/v1/places:searchText',{method:'POST',headers:{'Content-Type':'application/json','X-Goog-Api-Key':key,'X-Goog-FieldMask':'places.id'},body:JSON.stringify({textQuery:'boulangerie Narbonne',maxResultCount:1})}),15000); if(r.ok) return {ok:true,msg:'Clé Google Places acceptée (Places API New).'}; const d=await r.json().catch(()=>null); const m=(d&&d.error&&d.error.message)||''; if(r.status===400&&/api key not valid|expired/i.test(m)) return {ok:false,msg:'Clé refusée : « API key not valid ».'}; if(r.status===403) return {ok:false,msg:'Refusé (403) : activez « Places API (New) » et autorisez le référent de l’app dans les restrictions de la clé.'}; return {ok:false,msg:'Réponse '+r.status+(m?' : '+m.slice(0,90):'')}; }catch(e){ return {ok:false,msg:/timeout/.test(e.message)?'Délai dépassé.':'Test bloqué par le navigateur (CORS/restriction de clé). Si l’app affiche bien les commerces, la clé fonctionne.'}; } }
@@ -5999,7 +5970,6 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
         return {query,total:all.length,selfRank:self?self.rank:null,selfFound:!!self,leader:all[0]||null,nextAhead,averageRating:rated.length?rated.reduce((n,x)=>n+x.rating,0)/rated.length:null,averageReviews:all.length?Math.round(all.reduce((n,x)=>n+x.reviews,0)/all.length):0,list:top};
       }catch(e){ return null; }
     }
-    const norm=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
     const GENERIC_NAME=new Set(['boulangerie','restaurant','cafe','coiffure','garage','hotel','pizzeria','boucherie','pharmacie','centre','salon','auto','pizza','bar','maison','atelier','studio','institut','commerce','shop','store','food','snack','kebab','sushi','traiteur','fleuriste','opticien','tabac','presse']);
     function businessInUrl(url,name){
       const blob=norm(url), full=norm(name);
@@ -6008,7 +5978,6 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
       const tokens=full.split(' ').filter(w=>w.length>3&&!GENERIC_NAME.has(w));
       return tokens.length>0&&tokens.every(tok=>blob.includes(tok));
     }
-    function siteHost(c){ const w=String((c&&c.website)||'').trim(); if(!w) return ''; try{ return new URL(/^https?:\/\//i.test(w)?w:'https://'+w).hostname.replace(/^www\./,''); }catch(e){ return ''; } }
     /* Classement : pour chaque mot-clé client, à quelle position apparaît le commerce (recherche web réelle) */
     async function checkRankings(c){
       const nameRaw=String((c&&c.name)||'').trim(); const cityRaw=String((c&&c.city)||'').trim(); const kws=[...new Set([(nameRaw+' '+cityRaw).trim(),...targetKeywords(c).seo].filter(Boolean))].slice(0,6);
@@ -6735,7 +6704,6 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
       if(!ok()){ await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'); }
       if(!ok()) throw new Error('jsPDF introuvable');
     }
-    function hexToRgb(h){ h=String(h||'#5B5FEF').replace('#',''); if(h.length===3)h=h.split('').map(x=>x+x).join(''); const n=parseInt(h,16); const v=isNaN(n)?0x5B5FEF:n; return [(v>>16)&255,(v>>8)&255,v&255]; }
     function pdfScoreCol(v){ return v>=75?[31,157,87]:v>=50?[201,138,0]:[192,57,43]; }
     function pdfKit(pdf,st){
       const W=210,H=297,M=18,CW=W-2*M,PT=0.3528; let y=M;
@@ -7358,18 +7326,6 @@ function mqLatestHtml(){
     const BRAND = '<a class="login-brand" href="./" aria-label="AuditIA by AffiAds — accueil"><picture><img class="login-logo-img" src="./auditia-logo-dark.svg?v=2" alt="AuditIA by AffiAds" width="250" height="72"></picture></a>';
     const FOOT = '<p class="login-foot">AuditIA · Auditer mieux, décider plus clairement</p><p class="login-status">Connexion à votre espace privé</p>';
     const pwdField = (id,label,ac) => '<label class="login-field" for="'+id+'"><span>'+label+'</span><span class="password-wrap"><input class="login-control" id="'+id+'" type="password" autocomplete="'+ac+'" required minlength="8"><button class="toggle-password" type="button" data-showpwd="'+id+'" aria-label="Afficher le mot de passe" title="Afficher le mot de passe">'+EYE+'</button></span></label>';
-    const validEmail = e => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e);
-    const pwdIssue = p => p.length<8 ? '8 caractères minimum.' : (!/[A-Za-zÀ-ÿ]/.test(p)||!/\d/.test(p)) ? 'au moins une lettre et un chiffre.' : p.length>72 ? '72 caractères maximum.' : '';
-    function authError(e){
-      const m=((e&&(e.message||e.error_description))||'').toLowerCase(), st=e&&e.status;
-      if(st===429||m.includes('rate limit')||m.includes('too many')) return 'Trop de tentatives. Patientez quelques minutes avant de réessayer.';
-      if(m.includes('invalid login')) return 'E-mail ou mot de passe incorrect.';
-      if(m.includes('email not confirmed')) return 'Votre adresse e-mail n’est pas encore confirmée. Ouvrez le lien reçu par e-mail.';
-      if(m.includes('same password')||m.includes('different from the old')) return 'Choisissez un mot de passe différent de l’ancien.';
-      if(m.includes('password')&&(m.includes('weak')||m.includes('at least')||m.includes('should'))) return 'Mot de passe trop faible : 8 caractères minimum, avec au moins une lettre et un chiffre.';
-      if(m.includes('fetch')||m.includes('network')) return 'Connexion impossible. Vérifiez votre réseau internet.';
-      return 'Une erreur est survenue. Réessayez.';
-    }
     function setMsg(txt,kind){const el=document.getElementById('authMsg');if(!el)return;el.textContent=txt||'';el.className='login-message'+(txt?(kind==='ok'?' success':' error'):'');}
     function busy(btn,on,label){if(!btn)return;btn.disabled=on;if(on){btn.dataset.l=btn.textContent;btn.textContent=label||'Veuillez patienter…';}else if(btn.dataset.l){btn.textContent=btn.dataset.l;}}
     const val = id => (document.getElementById(id)?.value||'').trim();

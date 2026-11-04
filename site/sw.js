@@ -9,7 +9,8 @@ const ASSETS = [
   './apple-touch-icon.png', './icon-192.png', './icon-512.png',
   './auditia-refonte-v2.css', './frost-experience.css', './home-compact.css', './app-polish.css',
   './vendor/html2canvas.min.js', './vendor/jspdf.umd.min.js',
-  './vendor/supabase.js'
+  './vendor/supabase.js',
+  './src/core/auth-helpers.js', './src/core/config.js', './src/core/utils.js'
 ];
 
 self.addEventListener('install', e => {

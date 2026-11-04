@@ -40,10 +40,25 @@ jobs:
           if not inline:
               raise SystemExit("No inline JavaScript found in site/index.html")
           with tempfile.TemporaryDirectory() as tmp:
-              for i, (_, body) in enumerate(inline, 1):
-                  js = Path(tmp) / f"inline-{i}.js"
+              for i, (attrs, body) in enumerate(inline, 1):
+                  # Un <script type="module"> (avec import) se vérifie en .mjs ; les scripts classiques en .js.
+                  is_module = re.search(r"""type\s*=\s*["']module["']""", attrs, re.I)
+                  js = Path(tmp) / (f"inline-{i}.mjs" if is_module else f"inline-{i}.js")
                   js.write_text(body, encoding="utf-8")
                   subprocess.run(["node", "--check", str(js)], check=True)
+          # Modules du moteur (site/src) : syntaxe + imports relatifs qui doivent pointer vers un fichier existant.
+          src_dir = root / "src"
+          src_files = sorted(src_dir.rglob("*.js")) if src_dir.is_dir() else []
+          with tempfile.TemporaryDirectory() as tmp:
+              for f in src_files:
+                  copy = Path(tmp) / (f.stem + ".mjs")
+                  copy.write_text(f.read_text(encoding="utf-8"), encoding="utf-8")
+                  subprocess.run(["node", "--check", str(copy)], check=True)
+          rel_import = re.compile(r"""(?:import|export)\s[^;]*?from\s*['"](\.{1,2}/[^'"?]+)""")
+          for owner, text in [(html_path, "\n".join(body for _, body in inline))] + [(f, f.read_text(encoding="utf-8")) for f in src_files]:
+              for target in rel_import.findall(text):
+                  if not (owner.parent / target).resolve().is_file():
+                      raise SystemExit(f"Import introuvable : {target} (depuis {owner})")
           subprocess.run(["node", "--check", str(root / "oca.js")], check=True)
           subprocess.run(["node", "--check", str(root / "oca-lavender.js")], check=True)
           json.loads((root / "manifest.webmanifest").read_text(encoding="utf-8"))
@@ -55,7 +70,7 @@ jobs:
           missing = [asset for asset in assets if asset not in ("./",) and not (root / asset.removeprefix("./")).is_file()]
           if missing:
               raise SystemExit("Missing service-worker assets: " + ", ".join(missing))
-          print(f"Validation OK: {len(inline)} inline scripts, manifest JSON and {len(assets)} service-worker assets.")
+          print(f"Validation OK: {len(inline)} inline scripts, {len(src_files)} src modules, manifest JSON and {len(assets)} service-worker assets.")
           PY
       - name: Upload site artifact
         uses: actions/upload-pages-artifact@v3
