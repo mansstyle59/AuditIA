@@ -31,3 +31,40 @@
   .ds-fgrid .ds-field:has(textarea), .ds-fgrid .ds-field:first-child:nth-last-child(3) { grid-column: 1 / -1; }
 }
 .ds-savebar [hidden] { display: none !important; }
+
+
+/* Centre des intégrations API — cartes claires, hiérarchie lisible, mobile-first */
+.ds-api-intro { margin: 0 0 var(--ds-s-4); max-width: 72ch; color: var(--ds-text-2); font-size: var(--ds-fs-sm); line-height: 1.5; }
+.ds-api-group { min-width: 0; margin: 0 0 var(--ds-s-5); padding: 0; border: 0; }
+.ds-api-group legend { margin-bottom: var(--ds-s-3); padding: 0; color: var(--ds-lavender); font-size: var(--ds-fs-xs); font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
+.ds-api-grid { display: grid; grid-template-columns: minmax(0,1fr); gap: var(--ds-s-3); }
+.ds-api-service { display: grid; align-content: start; gap: 9px; min-width: 0; padding: var(--ds-s-4); border: 1px solid var(--ds-line-soft); border-radius: var(--ds-r-md); background: linear-gradient(155deg,var(--ds-surface-2),var(--ds-surface)); }
+.ds-api-service__top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.ds-api-service__top h4 { margin: 0; color: var(--ds-text); font-size: var(--ds-fs-md); font-weight: 850; }
+.ds-api-service__top p { margin: 4px 0 0; color: var(--ds-muted); font-size: var(--ds-fs-xs); line-height: 1.4; }
+.ds-api-service .ds-badge, .ds-api-service .ds-pill { white-space: nowrap; }
+.ds-api-use { justify-self: start; padding: 3px 8px; border: 1px solid var(--ds-line); border-radius: 999px; color: var(--ds-muted); font-size: 10px; font-weight: 750; }
+.ds-api-use--active { color: #BDF7D8; border-color: #1E8658; background: #0F3B2E; }
+.ds-api-keyline { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 7px; align-items: center; }
+.ds-api-keyline .ds-input { min-width: 0; width: 100%; min-height: 46px; font-size: 16px; }
+.ds-api-action { min-height: 44px; padding-inline: 12px; font-size: var(--ds-fs-xs); }
+.ds-api-hint { color: var(--ds-lavender-2); font-size: 11px; overflow-wrap: anywhere; }
+.ds-api-service__actions { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+.ds-api-link { color: var(--ds-lavender-2); font-size: var(--ds-fs-xs); font-weight: 750; text-decoration: none; }
+.ds-api-link:hover { text-decoration: underline; text-underline-offset: 3px; }
+.ds-api-clear { padding: 5px 0; border: 0; background: transparent; color: #FFB9C4; font: inherit; font-size: 11px; font-weight: 700; cursor: pointer; }
+.ds-api-clear:disabled { opacity: .65; cursor: default; }
+.ds-api-savebar { align-items: center; justify-content: space-between; }
+.ds-api-savehint { color: var(--ds-muted); font-size: var(--ds-fs-xs); }
+.ds-api-savebar .ds-btn { min-height: 48px; }
+.ds-api-group .ds-fgrid { display: grid; gap: var(--ds-s-4); }
+.ds-api-group .ds-field { min-width: 0; }
+.ds-api-group .ds-textarea { min-height: 92px; }
+@media (min-width: 600px) {
+  .ds-api-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+}
+@media (max-width: 899.98px) {
+  .ds-api-savebar { position: sticky; bottom: calc(var(--ds-tabbar-h) + var(--ds-safe-bottom) + var(--ds-s-2)); z-index: 4; display: flex; flex-wrap: wrap; background: var(--ds-bg-2); }
+  .ds-api-savebar .ds-api-savehint { flex: 1 1 100%; }
+  .ds-api-savebar .ds-btn { width: 100%; }
+}
