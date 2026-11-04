@@ -3,7 +3,7 @@
 // Lot 2 : accueil, liste des clients et fiche client alimentés par les données réelles.
 // Lot 3 : section Prospects (recherche de commerces, commerces proches, ajout manuel avec contrôle des doublons).
 // Lot 4 : audits complets (lancement, progression réelle, dossier d'audit avec score, plan d'action et recommandations).
-// Les rapports PDF, les graphiques de rapport et les réglages restent à brancher aux lots suivants.
+// Lot 5 : rapports PDF et graphiques. Lot 6 : réglages (profil, marque, état des services).
 import { NAV, emptyState, spinnerCard, errorCard } from './components/ui.js';
 import { mobileShell } from './layout-mobile.js';
 import { desktopShell } from './layout-desktop.js';
@@ -14,7 +14,7 @@ import { createSearchController } from './search-controller.js';
 import { createAuditController } from './audit-controller.js';
 import { createReportController } from './report-controller.js';
 import { auditsView, auditDossierView } from './views/audits.js';
-import { accountView } from './views/account.js';
+import { createSettingsController } from './settings-controller.js';
 import { authScreen, authLoading, authError } from './screens/auth.js';
 import { loadWorkspaceData, dataErrorMessage } from '../data/queries.js';
 import { getAuthClient } from '../auth/client.js';
@@ -64,6 +64,12 @@ const audits = createAuditController({
 // Rapports PDF (lot 5) : aperçu, téléchargement, partage. Lecture seule : aucune écriture, aucun nouvel audit.
 const report = createReportController({ getData: () => state.data, runningId: () => audits.runningId() });
 document.addEventListener('click', event => { report.onClick(event.target); });
+// Réglages (lot 6) : profil, marque, état des services. Écriture réservée à l'administrateur, clés jamais affichées ni réécrites.
+const settings = createSettingsController({
+  getUser: () => state.user,
+  getSupabase: () => getAuthClient(),
+  rerender: () => { if (state.user && state.view === 'settings') renderWorkspace(); },
+});
 const auth = createAuthService({ getClient: getAuthClient, redirectUrl: REDIRECT_URL });
 
 /* ---------- Écrans de connexion ---------- */
@@ -100,7 +106,7 @@ function placeholder() {
 }
 
 function bodyFor(isWide) {
-  if (state.view === 'settings') return accountView(state.user);
+  if (state.view === 'settings') return settings.html();
   if (!LIVE_VIEWS.includes(state.view)) return placeholder();
   const d = state.data;
   if (d.status === 'idle' || d.status === 'loading') return spinnerCard('Chargement de vos données…');
@@ -159,7 +165,7 @@ function enter(user) {
   state.clientId = null;
   state.ui = { q: '', tier: '', sort: 'urgence' };
   search.reset();
-  report.close(); audits.reset();
+  report.close(); audits.reset(); settings.reset();
   window.scrollTo(0, 0);
   loadData();
 }
@@ -175,7 +181,7 @@ async function logout() {
   state.user = null;
   state.gen++; // annule un chargement en cours
   search.reset(); // vide les résultats, la clé et les recherches en cours
-  report.close(); audits.reset();
+  report.close(); audits.reset(); settings.reset();
   state.data = { status: 'idle', clients: [], audits: [], error: '' };
   await auth.signOut();
   showAuth('signin');
@@ -236,6 +242,7 @@ root.addEventListener('click', event => {
   if (!state.user) return;
   if (audits.onClick(t)) return;
   if (search.onClick(t)) return;
+  if (settings.onClick(t)) return;
   const oa = t.closest('[data-open-audit]');
   if (oa) { state.view = 'audit'; state.auditId = oa.dataset.openAudit; renderWorkspace(); window.scrollTo(0, 0); return; }
   const open = t.closest('[data-open-client]');
@@ -246,7 +253,7 @@ root.addEventListener('click', event => {
   const chip = t.closest('[data-client-chip]');
   if (chip) { state.ui.q = chip.dataset.clientChip; refreshClientResults(); return; }
   const nav = t.closest('[data-nav]');
-  if (nav) { state.view = nav.dataset.nav; renderWorkspace(); window.scrollTo(0, 0); }
+  if (nav) { state.view = nav.dataset.nav; if (state.view === 'settings') settings.open(); renderWorkspace(); window.scrollTo(0, 0); }
 });
 
 // Recherche et tri des clients : seuls les résultats sont recomposés, le champ garde le focus
@@ -254,6 +261,7 @@ root.addEventListener('input', event => {
   if (!state.user) return;
   if (event.target.matches('[data-client-filter]')) { state.ui.q = event.target.value; refreshClientResults(); return; }
   if (audits.onInput(event.target)) return;
+  if (settings.onInput(event.target)) return;
   search.onInput(event.target);
 });
 root.addEventListener('change', event => {
@@ -263,6 +271,7 @@ root.addEventListener('change', event => {
 root.addEventListener('submit', event => {
   const id = event.target.id;
   if (state.user && search.onSubmit(event.target)) { event.preventDefault(); return; }
+  if (state.user && settings.onSubmit(event.target)) { event.preventDefault(); return; }
   if (id === 'fSignin') onSignin(event);
   else if (id === 'fForgot') onForgot(event);
   else if (id === 'fReset') onReset(event);

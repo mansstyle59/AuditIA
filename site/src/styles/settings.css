@@ -1,0 +1,33 @@
+/* AuditIA — LOT 6 : écran Réglages. Fonds opaques, aucun flou. Mobile : une colonne ; ordinateur : deux colonnes. */
+.ds-settings { display: grid; gap: var(--ds-s-4); min-width: 0; }
+.ds-settings__side, .ds-settings__main { display: grid; gap: var(--ds-s-4); min-width: 0; align-content: start; }
+.ds-hint { margin: var(--ds-s-3) 0; font-size: var(--ds-fs-xs); line-height: 1.45; color: var(--ds-muted); overflow-wrap: anywhere; }
+.ds-fset { border: 0; padding: 0; margin: 0 0 var(--ds-s-5); min-width: 0; }
+.ds-fset legend { padding: 0; margin-bottom: var(--ds-s-3); font-size: var(--ds-fs-xs); font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--ds-lavender); }
+.ds-fgrid { display: grid; gap: var(--ds-s-4); min-width: 0; }
+.ds-settings .ds-input { width: 100%; min-width: 0; min-height: 48px; font-size: 16px; }
+.ds-textarea { min-height: 96px; resize: vertical; font-family: inherit; }
+.ds-color { padding: 4px; height: 48px; cursor: pointer; }
+.ds-input[disabled] { opacity: .75; cursor: not-allowed; }
+.ds-input[aria-invalid="true"] { border-color: var(--ds-danger); }
+.ds-field__err { margin: 0; font-size: var(--ds-fs-xs); color: #FFC2CB; }
+.ds-svcs { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--ds-s-3); }
+.ds-svc { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--ds-s-3); align-items: start; padding: var(--ds-s-3); border: 1px solid var(--ds-line-soft); border-radius: var(--ds-r-sm); background: var(--ds-surface-2); }
+.ds-svc__main { display: grid; gap: 2px; min-width: 0; }
+.ds-svc__main span, .ds-svc__main small { font-size: var(--ds-fs-xs); color: var(--ds-muted); overflow-wrap: anywhere; }
+.ds-savebar { display: flex; gap: var(--ds-s-3); justify-content: flex-end; flex-wrap: wrap; }
+.ds-savebar .ds-btn { min-height: 48px; }
+.ds-savebar .ds-btn[disabled] { opacity: .55; cursor: not-allowed; }
+.ds-settings .ds-msg { margin-bottom: var(--ds-s-4); }
+
+@media (max-width: 899.98px) {
+  /* iPhone : barre d'enregistrement collée au-dessus de la barre d'onglets, fond opaque */
+  .ds-savebar { position: sticky; bottom: calc(var(--ds-tabbar-h) + var(--ds-safe-bottom) + var(--ds-s-2)); background: var(--ds-surface); padding: var(--ds-s-3); margin: var(--ds-s-4) calc(var(--ds-s-2) * -1) 0; border-radius: var(--ds-r-md); border: 1px solid var(--ds-line-soft); z-index: 3; }
+  .ds-savebar .ds-btn { flex: 1 1 0; }
+}
+@media (min-width: 900px) {
+  .ds-settings { grid-template-columns: minmax(280px, 360px) minmax(0, 1fr); align-items: start; gap: var(--ds-s-6); }
+  .ds-fgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ds-fgrid .ds-field:has(textarea), .ds-fgrid .ds-field:first-child:nth-last-child(3) { grid-column: 1 / -1; }
+}
+.ds-savebar [hidden] { display: none !important; }

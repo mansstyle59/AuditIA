@@ -101,3 +101,18 @@ Score /100, SEO/GEO, plan d'action (`actionPlan`/`auditActions`), recommandation
 
 ### Tests
 `lot5_new.py` (53 scénarios, données simulées) : complet, sources indisponibles, sans site, longues recommandations, 40 concurrents, sans historique, mobile et bureau, géométrie du PDF (marges, pages vides, pied de page), cohérence graphiques/dossier, lecture seule, erreur de génération.
+
+## LOT 6 — Paramètres et configuration
+
+**Intégré** : écran Réglages (profil et rôle, marque et signature, couleurs, état des services). Lecture et écriture de la table `app_settings` existante, limitées aux champs de marque ; les clés API ne sont jamais écrites ni affichées en entier (indice `••••` + 4 derniers caractères). Écriture réservée à l'administrateur, vérifiée avant tout envoi (en plus de la RLS). Aucun test réel de service, aucun statut « opérationnel ».
+
+**Fichiers** : `src/settings/settings-model.js`, `src/data/settings.js`, `src/ui/settings-controller.js`, `src/ui/views/settings.js`, `src/ui/views/account.js` (carte Compte), `src/styles/settings.css`, câblage `app.js`, `sw.js` v123.
+
+**Points de sécurité (documentés, NON corrigés)** :
+1. Clés API en clair dans `app_settings`, lisibles par le navigateur (pré-existant). Correctif proposé à part : déplacer vers des secrets serveur / Edge Function.
+2. Clé OpenAI stockée dans `app_settings` côté navigateur : à supprimer ou déplacer côté serveur.
+3. Ancienne interface : tests réseau de clés (quota) et hash de clé dans `localStorage['auditia.keystatus']`.
+4. Administrateur = e-mail codé en dur (compte unique).
+5. Supabase : protection contre les mots de passe compromis désactivée (réglage à activer dans Supabase).
+
+**Limites connues** : les PDF de la nouvelle interface n'utilisent pas encore les réglages de marque enregistrés ; logo et clés API restent gérés par l'ancienne interface.
