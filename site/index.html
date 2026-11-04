@@ -6914,3 +6914,76 @@ function mqLatestHtml(){
 
 </body>
 </html>
+
+
+<!-- AuditIA iPhone : correction nette de la zone de sécurité et du titre d'accueil -->
+<style id="auditia-iphone-safe-area-crisp-v1">
+  @supports (-webkit-touch-callout: none) {
+    @media (max-width: 760px) {
+      html:has(.workspace-app),
+      body:has(.workspace-app) {
+        background: #16052B !important;
+        background-color: #16052B !important;
+        -webkit-filter: none !important;
+        filter: none !important;
+      }
+
+      body:has(.workspace-app) .status-safe,
+      body:has(.workspace-app) .status-safe::before,
+      body:has(.workspace-app) .status-safe::after {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        width: 100% !important;
+        height: env(safe-area-inset-top, 0px) !important;
+        min-height: env(safe-area-inset-top, 0px) !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #16052B !important;
+        background-color: #16052B !important;
+        background-image: none !important;
+        opacity: 1 !important;
+        filter: none !important;
+        -webkit-filter: none !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        transform: none !important;
+        mix-blend-mode: normal !important;
+        box-shadow: none !important;
+        border: 0 !important;
+        z-index: 100000 !important;
+        pointer-events: none !important;
+      }
+
+      body:has(.workspace-app) .app-topbar,
+      body:has(.workspace-app) .workspace-head,
+      body:has(.workspace-app) .workspace-head *,
+      body:has(.workspace-app) .workspace-head .eyebrow {
+        filter: none !important;
+        -webkit-filter: none !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        opacity: 1 !important;
+        text-shadow: none !important;
+        mix-blend-mode: normal !important;
+        transform: none !important;
+      }
+
+      body:has(.workspace-app) .app-topbar {
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 10001 !important;
+        background: #16052B !important;
+        background-image: none !important;
+        padding-top: calc(env(safe-area-inset-top, 0px) + 12px) !important;
+      }
+
+      body:has(.workspace-app) .workspace-head .eyebrow {
+        color: #C9B6FF !important;
+        -webkit-font-smoothing: antialiased !important;
+        text-rendering: geometricPrecision !important;
+      }
+    }
+  }
+</style>
