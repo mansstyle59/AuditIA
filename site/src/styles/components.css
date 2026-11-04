@@ -306,3 +306,24 @@ button.ds-tier { cursor: pointer; }
 
 /* Lot 7 : espacements homogènes */
 .ds-card .ds-list + .ds-d-actions { margin-top: var(--ds-s-4); }
+
+
+/* Diagnostic par catégories : scores et couverture, sans pénaliser les données absentes */
+.ds-cat-intro { margin: 0 0 var(--ds-s-3); line-height: 1.5; }
+.ds-cat-overview { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: var(--ds-s-3); padding: var(--ds-s-3) var(--ds-s-4); border: 1px solid var(--ds-line); border-radius: var(--ds-r-sm); background: var(--ds-surface); }
+.ds-cat-overview strong { color: var(--ds-text); font-size: var(--ds-fs-sm); }
+.ds-cat-overview span { color: var(--ds-muted); font-size: var(--ds-fs-xs); }
+.ds-cat-group { overflow: hidden; }
+.ds-cat-summary { align-items: flex-start !important; }
+.ds-cat-summary__main { display: grid; gap: 3px; min-width: 0; flex: 1 1 auto; }
+.ds-cat-summary__main b { color: var(--ds-text); font-size: var(--ds-fs-md); line-height: 1.3; }
+.ds-cat-summary__main small { color: var(--ds-muted); font-size: var(--ds-fs-xs); line-height: 1.4; font-weight: 500; }
+.ds-cat-summary__state { color: var(--ds-lavender-2); font-size: 11px; font-weight: 600; }
+.ds-cat-summary__score { display: grid; justify-items: end; gap: 4px; flex: 0 0 auto; }
+.ds-cat-summary__score small { color: var(--ds-muted); font-size: 10px; white-space: nowrap; }
+.ds-cat-meter { height: 6px; margin: 0 var(--ds-s-3); overflow: hidden; border-radius: 999px; background: var(--ds-bg-3); }
+.ds-cat-meter__fill { display: block; height: 100%; border-radius: inherit; background: var(--ds-primary); }
+.ds-cat-meter__fill--good { background: var(--ds-good); }
+.ds-cat-meter__fill--warn { background: var(--ds-warn); }
+.ds-cat-meter__fill--danger { background: var(--ds-danger); }
+.ds-cat-foot { margin: var(--ds-s-2) var(--ds-s-3) var(--ds-s-3); color: var(--ds-muted); font-size: 11px; line-height: 1.4; }
