@@ -154,7 +154,7 @@ function manualHead(s) {
 export function noticeHtml(n) {
   if (!n) return '';
   const cls = n.kind === 'ok' ? 'ds-msg ds-msg--ok' : n.kind === 'dup' ? 'ds-msg ds-msg--warn' : 'ds-msg ds-msg--error';
-  const link = n.clientId ? ` <button type="button" class="ds-linkbtn" data-open-client="${escHtml(n.clientId)}">Voir la fiche</button>` : '';
+  const link = n.clientId ? ` <button type="button" class="ds-linkbtn" data-open-client="${escHtml(n.clientId)}">Voir la fiche</button> <button type="button" class="ds-linkbtn" data-audit-launch="${escHtml(n.clientId)}">Lancer l’audit</button>` : '';
   return `<div class="${cls}" role="${n.kind === 'error' ? 'alert' : 'status'}">${escHtml(n.text)}${link}</div>`;
 }
 

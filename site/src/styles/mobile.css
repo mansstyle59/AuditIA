@@ -65,3 +65,15 @@
   .ds-place__actions .ds-btn, .ds-psearch .ds-d-actions .ds-btn { flex: 1 1 100%; }
   .ds-seg__btn { font-size: var(--ds-fs-xs); }
 }
+
+/* Lot 4 : audits — iPhone et petits écrans */
+@media (max-width: 899.98px) {
+  .ds-live__name { font-size: var(--ds-fs-lg); }
+  .ds-src { grid-template-columns: 28px minmax(0, 1fr); }
+  .ds-src__state { grid-column: 2; }
+  .ds-ring { width: 112px; height: 112px; }
+  .ds-gauges { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ds-banner .ds-btn { min-height: var(--ds-touch); }
+  .ds-dossier-head .ds-d-actions .ds-btn { flex: 1 1 100%; }
+  .ds-audit-row__act .ds-btn { min-height: 44px; }
+}

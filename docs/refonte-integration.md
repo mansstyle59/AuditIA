@@ -63,3 +63,22 @@ Création et lancement d'un audit à l'ajout (lot 4), recherche de la date du do
 
 ### Sécurité
 Seule écriture : insertion dans `clients`. Tables, RLS, Edge Functions et clés inchangées.
+
+## LOT 4 — Audits complets
+
+### Fichiers
+- `site/src/audit/engine.js` : orchestration reprise de `runFullAudit` (10 sources en parallèle, délais maximum identiques, une source en échec ne bloque pas l'audit, un seul audit à la fois, mêmes écritures). L'état vit dans le moteur : on peut quitter l'écran et y revenir.
+- `site/src/api/audit-sources.js` : `fetchSerp`, `findWebPresence`, `fetchPlacePhotos`, `fetchCompetitors`, `checkRankings`, `fetchPagespeed` copiés de l'ancienne interface (mêmes adresses, corps, délais) ; seules les variables globales sont remplacées par des dépendances injectées. Les 4 autres sources (site, SIRENE, domaine, capture, robots.txt/llms.txt) viennent de `web-read.js` (étape 2).
+- `site/src/data/audits.js`, `ui/audit-controller.js`, `ui/views/audits.js`, `ui/views/audit-live.js` ; `client-detail.js`, `prospects.js`, `app.js`, CSS, `sw.js` (v121), `queries.js` (lecture des clés, insertion d'un dossier).
+
+### Lancement
+Fiche client (Nouvel audit / Lancer l'analyse), onglet Audits (Analyser), notice Prospects après ajout (Lancer l'audit). Règle conservée : le dossier non analysé d'un client est réutilisé, sinon un dossier est créé. La liste des clients n'avait pas de lancement dans l'ancienne interface : rien n'y est ajouté.
+
+### Progression
+Réelle : une ligne par source (en attente, en cours, analysée, indisponible, sans objet), compteurs, barre = part de sources terminées (pas d'animation simulée), valeurs reçues, temps écoulé. Bandeau « audit en cours » sur les autres écrans.
+
+### Résultats
+Score /100, SEO/GEO, plan d'action (`actionPlan`/`auditActions`), recommandations (`improvementPlan`), critères mesurés/non mesurés, sources indisponibles (`auditUnmeasured` + limites de la dernière analyse), Lighthouse, concurrents, mots-clés, présence, historique, liens vers la fiche client.
+
+### Sécurité
+Écritures identiques à l'ancien moteur : insertion `audits`, mise à jour `clients.details` et `audits`. Clés lues en lecture seule dans `app_settings`, jamais affichées. Tables, RLS, Edge Functions inchangées. Rapports PDF et graphiques : lot 5.

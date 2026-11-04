@@ -36,3 +36,19 @@ export async function insertClient(client, row) {
   if (r.error) throw r.error;
   return r.data;
 }
+
+// Clés lues pour l'analyse complète (lecture seule, jamais affichées ni réécrites) :
+// même source que l'ancienne interface (table app_settings, colonnes google_places_api_key et pagespeed_api_key).
+export async function loadAuditKeys(client, userId) {
+  const r = await client.from('app_settings').select('google_places_api_key,pagespeed_api_key').eq('user_id', userId).maybeSingle();
+  if (r.error) throw r.error;
+  const d = r.data || {};
+  return { places: String(d.google_places_api_key || '').trim(), pagespeed: String(d.pagespeed_api_key || '').trim() };
+}
+
+// Crée le dossier d'audit d'un client (même insertion que l'ancienne interface : startAuditFor).
+export async function insertAudit(client, row) {
+  const r = await client.from('audits').insert(row).select().single();
+  if (r.error) throw r.error;
+  return r.data;
+}

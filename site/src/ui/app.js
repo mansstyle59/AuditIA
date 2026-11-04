@@ -2,7 +2,8 @@
 // Lot 1 : authentification réelle (Supabase) et protection de la coquille.
 // Lot 2 : accueil, liste des clients et fiche client alimentés par les données réelles.
 // Lot 3 : section Prospects (recherche de commerces, commerces proches, ajout manuel avec contrôle des doublons).
-// Les audits, les rapports et les réglages restent à brancher aux lots suivants.
+// Lot 4 : audits complets (lancement, progression réelle, dossier d'audit avec score, plan d'action et recommandations).
+// Les rapports PDF, les graphiques de rapport et les réglages restent à brancher aux lots suivants.
 import { NAV, emptyState, spinnerCard, errorCard } from './components/ui.js';
 import { mobileShell } from './layout-mobile.js';
 import { desktopShell } from './layout-desktop.js';
@@ -10,6 +11,8 @@ import { homeMobile, homeDesktop } from './views/home.js';
 import { clientsView, clientsResultsHtml } from './views/clients.js';
 import { clientDetailView } from './views/client-detail.js';
 import { createSearchController } from './search-controller.js';
+import { createAuditController } from './audit-controller.js';
+import { auditsView, auditDossierView } from './views/audits.js';
 import { accountView } from './views/account.js';
 import { authScreen, authLoading, authError } from './screens/auth.js';
 import { loadWorkspaceData, dataErrorMessage } from '../data/queries.js';
@@ -21,28 +24,41 @@ const wide = window.matchMedia('(min-width: 900px)');
 const TITLES = Object.fromEntries(NAV.map(n => [n.id, n.label]));
 const state = {
   user: null, view: 'home', clientId: null, recoveryShown: false,
+  auditId: null,
   data: { status: 'idle', clients: [], audits: [], error: '' },
   ui: { q: '', tier: '', sort: 'urgence' }, // filtres de la liste des clients
   gen: 0, // numéro de chargement : un résultat périmé (déconnexion, nouveau chargement) est ignoré
 };
-const LIVE_VIEWS = ['home', 'clients', 'client', 'prospects'];
+const LIVE_VIEWS = ['home', 'clients', 'client', 'prospects', 'audits', 'audit'];
 
 // Les e-mails de réinitialisation renvoient vers la racine du site (ancienne interface incluse).
 // Pour qu'ils reviennent sur cette page, l'URL devrait être autorisée dans Supabase (réglage distant, non modifié ici).
 const REDIRECT_URL = location.origin + location.pathname.replace(/[^/]*$/, '');
+// Rechargement silencieux (sans écran de chargement) : sert à vérifier les doublons et à mettre les listes à jour
+async function silentReload() {
+  const loaded = await loadWorkspaceData(await getAuthClient());
+  if (!state.user) throw new Error('session terminée');
+  state.data = { status: 'ready', ...loaded, error: '' };
+  return loaded;
+}
 // Section Prospects : le contrôleur garde son propre état ; il lit les clients pour repérer les doublons
 const search = createSearchController({
   getUser: () => state.user,
   getClients: () => state.data.clients,
   getSupabase: () => getAuthClient(),
   rerender: () => { if (state.user && state.view === 'prospects') renderWorkspace(); },
-  // Rechargement silencieux (sans écran de chargement) : sert à vérifier les doublons et à mettre les listes à jour
-  reload: async () => {
-    const loaded = await loadWorkspaceData(await getAuthClient());
-    if (!state.user) throw new Error('session terminée');
-    state.data = { status: 'ready', ...loaded, error: '' };
-    return loaded;
-  },
+  reload: silentReload,
+});
+// Audits complets : le moteur garde l'état de l'analyse, l'écran peut être quitté et rouvert pendant qu'elle tourne.
+// On ne recompose pas Prospects (formulaires en cours de saisie) ; les autres écrans se mettent à jour.
+const audits = createAuditController({
+  getUser: () => state.user,
+  getData: () => state.data,
+  setData: d => { if (state.user) state.data = d; },
+  getSupabase: () => getAuthClient(),
+  rerender: () => { if (state.user && state.data.status === 'ready' && state.view !== 'prospects') renderWorkspace(); },
+  reload: silentReload,
+  open: id => { state.view = 'audit'; state.auditId = id; window.scrollTo(0, 0); },
 });
 const auth = createAuthService({ getClient: getAuthClient, redirectUrl: REDIRECT_URL });
 
@@ -87,11 +103,18 @@ function bodyFor(isWide) {
   if (d.status === 'error') return errorCard({ title: 'Chargement impossible', text: d.error });
   if (state.view === 'client') {
     const c = d.clients.find(x => String(x.id) === String(state.clientId));
-    if (c) return clientDetailView(c, d.audits);
+    if (c) return clientDetailView(c, d.audits, audits);
     state.view = 'clients'; // client introuvable (supprimé ?) : retour à la liste
   }
   if (state.view === 'clients') return clientsView(d, state.ui);
   if (state.view === 'prospects') return search.html();
+  if (state.view === 'audits') return auditsView(d, audits.filter(), audits.notice(), audits.snapshot());
+  if (state.view === 'audit') {
+    const a = d.audits.find(x => String(x.id) === String(state.auditId));
+    if (a) return auditDossierView(a, d.clients.find(x => String(x.id) === String(a.client_id)) || null, d, audits);
+    state.view = 'audits'; // dossier introuvable (supprimé ?) : retour à la liste
+    return auditsView(d, audits.filter(), audits.notice(), audits.snapshot());
+  }
   return isWide ? homeDesktop(d) : homeMobile(d);
 }
 
@@ -99,8 +122,8 @@ function renderWorkspace() {
   if (!state.user) { showAuth('signin'); return; } // protection : jamais de contenu sans session valide
   const isWide = wide.matches;
   const body = bodyFor(isWide);
-  const active = state.view === 'client' ? 'clients' : state.view;
-  const title = state.view === 'client' ? 'Fiche client' : TITLES[state.view];
+  const active = state.view === 'client' ? 'clients' : state.view === 'audit' ? 'audits' : state.view;
+  const title = state.view === 'client' ? 'Fiche client' : state.view === 'audit' ? 'Dossier d’audit' : TITLES[state.view];
   const params = { title, active, body };
   root.innerHTML = isWide
     ? desktopShell({ ...params, account: { email: state.user.email || '' } })
@@ -132,6 +155,7 @@ function enter(user) {
   state.clientId = null;
   state.ui = { q: '', tier: '', sort: 'urgence' };
   search.reset();
+  audits.reset();
   window.scrollTo(0, 0);
   loadData();
 }
@@ -147,6 +171,7 @@ async function logout() {
   state.user = null;
   state.gen++; // annule un chargement en cours
   search.reset(); // vide les résultats, la clé et les recherches en cours
+  audits.reset();
   state.data = { status: 'idle', clients: [], audits: [], error: '' };
   await auth.signOut();
   showAuth('signin');
@@ -205,7 +230,10 @@ root.addEventListener('click', event => {
   if (t.closest('[data-retry]')) { boot(); return; }
   if (t.closest('[data-logout]')) { logout(); return; }
   if (!state.user) return;
+  if (audits.onClick(t)) return;
   if (search.onClick(t)) return;
+  const oa = t.closest('[data-open-audit]');
+  if (oa) { state.view = 'audit'; state.auditId = oa.dataset.openAudit; renderWorkspace(); window.scrollTo(0, 0); return; }
   const open = t.closest('[data-open-client]');
   if (open) { state.view = 'client'; state.clientId = open.dataset.openClient; renderWorkspace(); window.scrollTo(0, 0); return; }
   if (t.closest('[data-reload]')) { loadData(); return; }
@@ -221,6 +249,7 @@ root.addEventListener('click', event => {
 root.addEventListener('input', event => {
   if (!state.user) return;
   if (event.target.matches('[data-client-filter]')) { state.ui.q = event.target.value; refreshClientResults(); return; }
+  if (audits.onInput(event.target)) return;
   search.onInput(event.target);
 });
 root.addEventListener('change', event => {
