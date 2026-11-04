@@ -4902,11 +4902,13 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
     import { ADMIN_EMAIL, API_FIELD, API_MODE, KEY_NAMES, SUPABASE_PUBLISHABLE_KEY, SUPABASE_URL, checklistTemplate, defaultSettings } from './src/core/config.js';
     import { brandColor, escHtml, hexToRgb, keyHash, norm, safeColor, safeHttpUrl, siteHost, withTimeout } from './src/core/utils.js';
     import { actionPlan, auditActions, auditHasAnalysis, auditUnmeasured, businessAge, improvementPlan, rankBadge, socialVisibility, targetKeywords, visibilityAudit, visibilityLabel, visibilityVerdict } from './src/audit/scoring.js';
+    import { fetchDomainDate, fetchGeoFiles, fetchScreenshot, fetchSirene, readSiteHtml, readSiteText } from './src/api/web-read.js';
     import { nvNorm, nvParse } from './src/api/bodacc.js';
     import { nearbyOpportunity, normalizePlace, parseNaturalLanguageTarget } from './src/api/places-model.js';
-    import { AI_BOTS, SOCIAL_RX, analyzeSite, businessInUrl, geoFromHtml, parseRobotsForAI } from './src/audit/site-analysis.js';
+    import { SOCIAL_RX, analyzeSite, businessInUrl, geoFromHtml } from './src/audit/site-analysis.js';
     import { pdfClientVerdict, pdfEvidenceQuality, pdfExecutiveSummary, pdfFooter, pdfHeadBand, pdfKit, pdfScoreCol } from './src/report/pdf-helpers.js';
     import { authError, pwdIssue, validEmail } from './src/core/auth-helpers.js';
+    import { claudeAssistWith } from './src/api/claude.js';
 
     /* ===== AuditIA — connexion (expérience FormIA, accès réservé à l'administrateur) ===== */
     const REDIRECT_URL = location.origin + location.pathname;
@@ -5320,39 +5322,8 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
     }
     /* ----- Recherche automatique de commerces (Google Places API New) ----- */
     function placesKey(){ return String((appSettings&&appSettings.google_places_api_key)||'').trim(); }
-    async function fetchDomainDate(website){
-      try{
-        const host=new URL(/^https?:\/\//i.test(website)?website:'https://'+website).hostname.replace(/^www\./,'');
-        const r=await withTimeout(fetch('https://rdap.org/domain/'+encodeURIComponent(host)),9000);
-        if(!r.ok) return null;
-        const d=await r.json();
-        const ev=(d.events||[]).find(e=>/registration/i.test(e.eventAction||''));
-        return ev?ev.eventDate:null;
-      }catch(e){ return null; }
-    }
     /* Informations légales officielles via l'API publique Recherche d'entreprises (base SIRENE / INSEE).
        Donne : SIREN/SIRET, raison sociale, date de création réelle, activité (NAF), dirigeant. */
-    async function fetchSirene(c){
-      const name=String((c&&c.name)||'').trim(); if(!name) return {matched:false};
-      const city=String((c&&c.city)||'').trim();
-      const url='https://recherche-entreprises.api.gouv.fr/search?q='+encodeURIComponent((name+' '+city).trim())+'&page=1&per_page=1';
-      let data=null;
-      try{ const r=await withTimeout(fetch(url),12000); if(r.ok) data=await r.json(); }catch(e){}
-      if(!data){ try{ const r2=await withTimeout(fetch('https://api.allorigins.win/raw?url='+encodeURIComponent(url)),15000); if(r2.ok) data=await r2.json(); }catch(e){} }
-      const res=data&&data.results&&data.results[0]; if(!res) return {matched:false};
-      const siege=res.siege||{};
-      const dir=(res.dirigeants&&res.dirigeants[0])||null;
-      const dirName=dir?((dir.nom||dir.nom_patronymique)?((dir.prenoms||dir.prenom||'')+' '+(dir.nom||dir.nom_patronymique)).replace(/\s+/g,' ').trim():(dir.denomination||'')):'';
-      return { matched:true, siren:res.siren||'', siret:siege.siret||'',
-        denomination:res.nom_complet||res.nom_raison_sociale||'',
-        dateCreation:siege.date_creation||res.date_creation||'',
-        naf:res.activite_principale||siege.activite_principale||'',
-        nafSection:res.section_activite_principale||'',
-        formeJuridique:res.nature_juridique||'',
-        dirigeant:dirName, etablissements:res.nombre_etablissements||null,
-        ville:siege.libelle_commune||'', codePostal:siege.code_postal||'',
-        fetchedAt:new Date().toISOString() };
-    }
     /* Mots-clés & requêtes cibles (SEO local + questions types posées aux IA = GEO) */
     async function applyPlace(p){
       const website=p.website||'';
@@ -5689,23 +5660,7 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
        Lit la page d'accueil du commerce via Jina Reader (contourne le CORS), AllOrigins en secours,
        puis extrait les liens vers les réseaux sociaux et quelques signaux (réservation, suivi, CMS). */
     let siteScanningId=null; const siteAutoTried=new Set();
-    async function readSiteText(url,opts,timeout){const ctl=new AbortController();const t=setTimeout(()=>ctl.abort(),timeout||40000);try{const r=await fetch(url,{...(opts||{}),signal:ctl.signal});if(!r.ok){const e=new Error('HTTP '+r.status);e.status=r.status;throw e;}return await r.text();}finally{clearTimeout(t);}}
     /* Barème GEO local (inspiré des audits GEO publiés) : fichiers lus pour les IA + signaux de la page */
-    async function fetchGeoFiles(site){
-      let origin;try{origin=new URL(site).origin;}catch(e){return null;}
-      const get=async path=>{try{const t=await readSiteText('https://api.allorigins.win/raw?url='+encodeURIComponent(origin+path),{},12000);return typeof t==='string'?t:null;}catch(e){return null;}};
-      const [rb,ll]=await Promise.all([get('/robots.txt'),get('/llms.txt')]);
-      const looksHtml=t=>/^\s*</.test(t||'')||/<html|<body/i.test(t||'');
-      const robots=rb==null?null:(looksHtml(rb)||!/user-agent/i.test(rb)?{read:true,blocked:[],total:AI_BOTS.length,missing:true}:parseRobotsForAI(rb));
-      const llms=ll==null?null:(!looksHtml(ll)&&ll.trim().length>40);
-      return {robots,llms};
-    }
-    async function readSiteHtml(url){
-      url=safeHttpUrl(url); if(!url) throw new Error('adresse non autorisée');
-      const tries=[()=>readSiteText('https://r.jina.ai/'+url,{headers:{'X-Return-Format':'html','X-Timeout':'25'}},45000),()=>readSiteText('https://api.allorigins.win/raw?url='+encodeURIComponent(url),{},30000)];
-      let last;for(const f of tries){try{const t=await f();if(t&&t.length>200&&/<(html|head|body)[\s>]/i.test(t))return t;last=new Error('page vide ou illisible');}catch(e){last=e;}}
-      throw last||new Error('page illisible');
-    }
     /* Recherche web (SERP) fiable côté navigateur : DuckDuckGo HTML via proxy, résultats ordonnés */
     const DIRECTORY_RX=[['Pages Jaunes',/pagesjaunes\.fr/],['Google Maps',/(maps\.google\.|goo\.gl\/maps|g\.page)/],['TripAdvisor',/tripadvisor\./],['TheFork',/(thefork\.|lafourchette\.)/],['Yelp',/yelp\./],['Mappy',/mappy\./],['Petit Futé',/petitfute\./],['Justacôté',/justacote\./],['Cylex',/cylex/],['Foursquare',/foursquare\./],['Booking',/booking\.com/],['Uber Eats',/ubereats\./],['Deliveroo',/deliveroo\./],['Planity',/planity\./],['Doctolib',/doctolib\./],['Treatwell',/treatwell\./],['Resy',/resy\./]];
     async function fetchSerp(query){
@@ -5847,18 +5802,6 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
       return '<section class="app-panel cp-panel"><div class="eyebrow">BENCHMARK CONCURRENTIEL</div><h3 style="margin:4px 0 4px">Comparer les commerces du secteur</h3><p class="cp-insight">'+insight+'</p>'+kpis+'<div class="cp-list">'+rows+'</div><p class="scan-note">Échantillon Google Places pour « '+escHtml(cp.query||((c&&c.category)||'activité')+' '+((c&&c.city)||''))+' », trié par volume d’avis puis note. Ce n’est pas le classement exact de Google Maps. Les liens et sites sont des données publiques lorsqu’ils sont disponibles.</p></section>';
     }
     /* Capture d'écran du site via WordPress mShots, récupérée en data-URL (pour l'afficher et l'inclure au PDF sans souci de CORS) */
-    async function fetchScreenshot(site){
-      site=safeHttpUrl(site); if(!site) return null;
-      const svc='https://s.wordpress.com/mshots/v1/'+encodeURIComponent(site)+'?w=1000&h=750';
-      for(let i=0;i<3;i++){
-        try{
-          const r=await withTimeout(fetch('https://api.allorigins.win/raw?url='+encodeURIComponent(svc)),22000);
-          if(r.ok){ const blob=await r.blob(); if(blob && blob.size>9000 && /image\//.test(blob.type||'image/jpeg')){ const d=await new Promise(res=>{const fr=new FileReader();fr.onload=()=>res(fr.result);fr.onerror=()=>res(null);fr.readAsDataURL(blob);}); if(d) return d; } }
-        }catch(e){}
-        await new Promise(r=>setTimeout(r,4000));
-      }
-      return null;
-    }
     /* Conseils concrets pour améliorer la fiche Google et les réseaux, adaptés à ce qui manque */
     async function runSiteScan(auditId){
       const a=appAudits.find(x=>x.id===auditId); if(!a) return;
@@ -6631,23 +6574,7 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
       return '<article class="report-card"><div class="report-top"><span class="audit-mark">'+initial+'</span><div class="audit-copy"><b>'+escHtml((c&&c.name)||'Commerce')+'</b><small>'+escHtml([c&&c.city,a.title].filter(Boolean).join(' · '))+'</small><span class="report-meter" aria-hidden="true"><i style="width:'+score+'%"></i></span></div><span class="audit-state"><b>'+score+'</b><small>/100</small>'+(function(){const prev=appAudits.filter(x=>x.id!==a.id&&x.client_id===a.client_id&&(x.site||x.scan||auditHasAnalysis(x))&&String(x.updated_at||x.created_at||'')<String(a.updated_at||a.created_at||'')).sort((x,y)=>String(y.updated_at||y.created_at||'').localeCompare(String(x.updated_at||x.created_at||'')))[0];if(!prev)return '';const dlt=score-(Number(prev.score)||0);return '<em class="sc-delta '+(dlt>=0?'up':'down')+'">'+(dlt>=0?'▲ +':'▼ ')+dlt+' depuis le '+new Date(prev.updated_at||prev.created_at).toLocaleDateString('fr-FR')+'</em>';})()+'</span></div><div class="report-actions"><button class="app-btn" type="button" data-export-report="'+a.id+'" data-mode="simple">Aperçu gratuit · 1 page</button><button class="app-btn primary" type="button" data-export-report="'+a.id+'" data-mode="full">Rapport complet · détaillé</button><button class="app-btn" type="button" data-open-audit="'+a.id+'">Dossier</button></div></article>';
     }
     const STUDIO_AI_SYSTEM='Tu es rédacteur pour un consultant en visibilité locale. Tu reformules un brouillon déjà préparé pour un commerce. Règles : français naturel et professionnel ; n’invente jamais de fait, de prix, de chiffre, d’avis, de note, de délai ni de promesse de résultat ; conserve tous les passages entre crochets [à compléter] et les consignes « à vérifier » ; garde la structure et les titres du brouillon ; ne publie rien, rends seulement le texte.';
-async function claudeAssist(system, prompt, maxTokens){
-  const client=await getClient();
-  const {data}=await client.auth.getSession();
-  const token=data&&data.session&&data.session.access_token;
-  if(!token) throw new Error('session expirée, reconnecte-toi.');
-  const ctrl=new AbortController(); const timer=setTimeout(()=>ctrl.abort(),45000);
-  try{
-    const r=await fetch(SUPABASE_URL+'/functions/v1/claude-assist',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token,'apikey':SUPABASE_PUBLISHABLE_KEY},body:JSON.stringify({system,prompt,maxTokens}),signal:ctrl.signal});
-    const d=await r.json().catch(()=>({}));
-    if(!r.ok) throw new Error(d.error||('erreur '+r.status));
-    if(!d.text) throw new Error('réponse vide.');
-    return d;
-  }catch(e){
-    if(e.name==='AbortError') throw new Error('délai dépassé, réessaie.');
-    throw e;
-  }finally{ clearTimeout(timer); }
-}
+async function claudeAssist(system, prompt, maxTokens){ return claudeAssistWith(getClient, system, prompt, maxTokens); }
 function bizIconSvg(c){
   const d=(c&&c.details)||{};
   const raw=[c&&c.name,c&&c.category,d.category,d.primaryType,Array.isArray(d.types)?d.types.join(' '):''].filter(Boolean).join(' ').toLowerCase();
