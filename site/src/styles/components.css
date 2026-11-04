@@ -187,3 +187,35 @@ button.ds-tier { cursor: pointer; }
 .ds-note { margin-top: var(--ds-s-3); }
 .ds-empty--error { border-color: var(--ds-danger); }
 .ds-d-actions { display: flex; align-items: center; gap: var(--ds-s-3); flex-wrap: wrap; }
+
+/* ---------- Lot 3 : recherche et ajout de commerces ---------- */
+.ds-seg { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--ds-s-1); padding: var(--ds-s-1); background: var(--ds-surface); border: 1px solid var(--ds-line); border-radius: var(--ds-r-pill); }
+.ds-seg__btn { min-height: var(--ds-touch); border: 0; border-radius: var(--ds-r-pill); background: transparent; color: var(--ds-text-2); font: inherit; font-size: var(--ds-fs-sm); font-weight: 700; padding: 0 var(--ds-s-2); cursor: pointer; }
+.ds-seg__btn.is-on { background: var(--ds-lavender); color: var(--ds-on-light); }
+.ds-seg__btn:focus-visible { outline: 3px solid var(--ds-lavender); outline-offset: 2px; }
+.ds-psearch { display: grid; gap: var(--ds-s-4); }
+.ds-psplit { display: grid; gap: var(--ds-s-4); min-width: 0; }
+.ds-psplit__form:empty { display: none; }
+.ds-psplit__form, .ds-psplit__out { min-width: 0; }
+.ds-places { display: grid; gap: var(--ds-s-3); min-width: 0; }
+.ds-place { display: grid; gap: var(--ds-s-3); min-width: 0; }
+.ds-place__head { display: flex; gap: var(--ds-s-3); align-items: center; min-width: 0; }
+.ds-place__id { min-width: 0; }
+.ds-place__name { margin: 0; font-size: var(--ds-fs-md); font-weight: 800; overflow-wrap: anywhere; }
+.ds-place__badges { display: flex; flex-wrap: wrap; gap: var(--ds-s-2); }
+.ds-place__why { margin: 0; padding-left: var(--ds-s-5); color: var(--ds-text-2); font-size: var(--ds-fs-sm); display: grid; gap: 2px; }
+.ds-place__actions { display: flex; flex-wrap: wrap; gap: var(--ds-s-3); align-items: center; }
+.ds-note { font-size: var(--ds-fs-sm); color: var(--ds-text-2); line-height: 1.45; margin: 0; }
+.ds-note--warn { color: #FFE9B8; background: #3A2A0B; border: 1px solid var(--ds-warn); border-radius: var(--ds-r-sm); padding: var(--ds-s-3) var(--ds-s-4); }
+.ds-msg--warn { padding: var(--ds-s-3) var(--ds-s-4); border-radius: var(--ds-r-sm); border: 1px solid var(--ds-warn); background: #3A2A0B; color: #FFE9B8; }
+#psNotice:empty { display: none; }
+#psNotice { scroll-margin-top: calc(var(--ds-header-h) + var(--ds-s-4)); }
+.ds-linkbtn { border: 0; background: transparent; color: var(--ds-lavender); font: inherit; font-weight: 700; text-decoration: underline; cursor: pointer; min-height: 32px; padding: 0 var(--ds-s-2); }
+.ds-form-grid { display: grid; gap: var(--ds-s-4); }
+.ds-kv { margin: 0; display: grid; gap: var(--ds-s-2); font-size: var(--ds-fs-sm); }
+.ds-kv div { display: grid; gap: 2px; }
+.ds-kv dt { color: var(--ds-muted); font-weight: 700; font-size: var(--ds-fs-xs); }
+.ds-kv dd { margin: 0; overflow-wrap: anywhere; }
+.ds-suggest { display: grid; gap: var(--ds-s-2); }
+.ds-field__label { font-size: var(--ds-fs-sm); font-weight: 700; color: var(--ds-text-2); }
+.ds-card .ds-input[type="search"] { width: 100%; }

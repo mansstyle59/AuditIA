@@ -59,3 +59,9 @@
   .ds-m-main .ds-detail-kpis .ds-stat__value { font-size: 1.25rem; }
   .ds-m-main .ds-section-title { flex-wrap: wrap; }
 }
+
+@media (max-width: 899.98px) {
+  /* Lot 3 : boutons pleine largeur dans les cartes de résultat, onglets compacts */
+  .ds-place__actions .ds-btn, .ds-psearch .ds-d-actions .ds-btn { flex: 1 1 100%; }
+  .ds-seg__btn { font-size: var(--ds-fs-xs); }
+}

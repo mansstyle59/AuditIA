@@ -40,8 +40,8 @@ function kpis(s) {
 function welcome() {
   return emptyState({
     title: 'Bienvenue sur AuditIA',
-    text: "Aucun commerce n'est encore enregistré. L'ajout de commerces sera disponible dans la nouvelle interface au prochain lot ; en attendant, utilisez l'interface actuelle.",
-  }) + `<div class="ds-d-actions">${linkBtn({ label: "Ouvrir l'interface actuelle", href: './', primary: true })}</div>`;
+    text: "Aucun commerce n'est encore enregistré. Recherchez un commerce pour l'ajouter à votre portefeuille.",
+  }) + `<div class="ds-d-actions">${btn({ label: 'Trouver des commerces', variant: 'primary', attrs: 'data-nav="prospects"' })}</div>`;
 }
 
 export function homeMobile(data) {

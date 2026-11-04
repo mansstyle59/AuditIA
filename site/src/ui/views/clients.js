@@ -1,5 +1,5 @@
 // AuditIA — liste des clients : recherche, niveaux, catégories, tri (règles de l'ancienne interface).
-import { badge, card, chips, emptyState, linkRow, avatar, searchField, linkBtn } from '../components/ui.js';
+import { badge, btn, card, chips, emptyState, linkRow, avatar, searchField, linkBtn } from '../components/ui.js';
 import { portfolio, ageLabel, clientCategory } from '../../data/portfolio.js';
 import { escHtml } from '../../core/utils.js';
 
@@ -32,7 +32,7 @@ export function clientsToolbarHtml(ui) {
 // Résultats : synthèse, niveaux, catégories, liste. Remplacés à chaque filtre sans toucher au champ de recherche.
 export function clientsResultsHtml(data, ui) {
   const p = portfolio(data.clients, data.audits, ui);
-  if (!p.total) return emptyState({ title: 'Aucun client pour le moment', text: "L'ajout de commerces sera disponible dans la nouvelle interface au prochain lot. En attendant, utilisez l'interface actuelle." }) + `<div class="ds-d-actions">${linkBtn({ label: "Ouvrir l'interface actuelle", href: './', primary: true })}</div>`;
+  if (!p.total) return emptyState({ title: 'Aucun client pour le moment', text: 'Recherchez un commerce pour l’ajouter à votre portefeuille.' }) + `<div class="ds-d-actions">${btn({ label: 'Trouver des commerces', variant: 'primary', attrs: 'data-nav="prospects"' })}</div>`;
   const summary = `<div class="ds-tiers">
     <div class="ds-tier ds-tier--avg"><b>${p.avg == null ? '—' : p.avg}</b><span>score moyen${ui.q || ui.tier ? ' (filtré)' : ''}</span></div>
     ${p.tiers.map(([key, label, n]) => `<button type="button" class="ds-tier ds-tier--${key}${ui.tier === key ? ' is-on' : ''}" data-client-tier="${key}" aria-pressed="${ui.tier === key}"><b>${n}</b><span>${label}</span></button>`).join('')}
@@ -48,6 +48,6 @@ export function clientsResultsHtml(data, ui) {
 }
 
 export function clientsView(data, ui) {
-  return `${card({ body: `<div class="ds-d-stack">${clientsToolbarHtml(ui)}</div>` })}
+  return `${card({ body: `<div class="ds-d-stack">${clientsToolbarHtml(ui)}<div class="ds-d-actions">${btn({ label: 'Ajouter un commerce', attrs: 'data-nav="prospects"' })}</div></div>` })}
     <div class="ds-d-stack" id="clientsResults">${clientsResultsHtml(data, ui)}</div>`;
 }

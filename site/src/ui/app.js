@@ -1,13 +1,15 @@
 // AuditIA — point d'entrée de la NOUVELLE interface.
 // Lot 1 : authentification réelle (Supabase) et protection de la coquille.
 // Lot 2 : accueil, liste des clients et fiche client alimentés par les données réelles.
-// Les autres sections (audits, prospection…) restent à brancher aux lots suivants.
+// Lot 3 : section Prospects (recherche de commerces, commerces proches, ajout manuel avec contrôle des doublons).
+// Les audits, les rapports et les réglages restent à brancher aux lots suivants.
 import { NAV, emptyState, spinnerCard, errorCard } from './components/ui.js';
 import { mobileShell } from './layout-mobile.js';
 import { desktopShell } from './layout-desktop.js';
 import { homeMobile, homeDesktop } from './views/home.js';
 import { clientsView, clientsResultsHtml } from './views/clients.js';
 import { clientDetailView } from './views/client-detail.js';
+import { createSearchController } from './search-controller.js';
 import { accountView } from './views/account.js';
 import { authScreen, authLoading, authError } from './screens/auth.js';
 import { loadWorkspaceData, dataErrorMessage } from '../data/queries.js';
@@ -23,11 +25,25 @@ const state = {
   ui: { q: '', tier: '', sort: 'urgence' }, // filtres de la liste des clients
   gen: 0, // numéro de chargement : un résultat périmé (déconnexion, nouveau chargement) est ignoré
 };
-const LIVE_VIEWS = ['home', 'clients', 'client'];
+const LIVE_VIEWS = ['home', 'clients', 'client', 'prospects'];
 
 // Les e-mails de réinitialisation renvoient vers la racine du site (ancienne interface incluse).
 // Pour qu'ils reviennent sur cette page, l'URL devrait être autorisée dans Supabase (réglage distant, non modifié ici).
 const REDIRECT_URL = location.origin + location.pathname.replace(/[^/]*$/, '');
+// Section Prospects : le contrôleur garde son propre état ; il lit les clients pour repérer les doublons
+const search = createSearchController({
+  getUser: () => state.user,
+  getClients: () => state.data.clients,
+  getSupabase: () => getAuthClient(),
+  rerender: () => { if (state.user && state.view === 'prospects') renderWorkspace(); },
+  // Rechargement silencieux (sans écran de chargement) : sert à vérifier les doublons et à mettre les listes à jour
+  reload: async () => {
+    const loaded = await loadWorkspaceData(await getAuthClient());
+    if (!state.user) throw new Error('session terminée');
+    state.data = { status: 'ready', ...loaded, error: '' };
+    return loaded;
+  },
+});
 const auth = createAuthService({ getClient: getAuthClient, redirectUrl: REDIRECT_URL });
 
 /* ---------- Écrans de connexion ---------- */
@@ -75,6 +91,7 @@ function bodyFor(isWide) {
     state.view = 'clients'; // client introuvable (supprimé ?) : retour à la liste
   }
   if (state.view === 'clients') return clientsView(d, state.ui);
+  if (state.view === 'prospects') return search.html();
   return isWide ? homeDesktop(d) : homeMobile(d);
 }
 
@@ -89,6 +106,7 @@ function renderWorkspace() {
     ? desktopShell({ ...params, account: { email: state.user.email || '' } })
     : mobileShell(params);
   document.documentElement.dataset.layout = isWide ? 'desktop' : 'mobile';
+  if (state.view === 'prospects' && state.data.status === 'ready') search.mounted();
 }
 
 // Chargement des clients et des audits (lecture seule). Un résultat arrivé après une déconnexion est ignoré.
@@ -113,6 +131,7 @@ function enter(user) {
   state.view = 'home';
   state.clientId = null;
   state.ui = { q: '', tier: '', sort: 'urgence' };
+  search.reset();
   window.scrollTo(0, 0);
   loadData();
 }
@@ -127,6 +146,7 @@ function refreshClientResults() {
 async function logout() {
   state.user = null;
   state.gen++; // annule un chargement en cours
+  search.reset(); // vide les résultats, la clé et les recherches en cours
   state.data = { status: 'idle', clients: [], audits: [], error: '' };
   await auth.signOut();
   showAuth('signin');
@@ -185,6 +205,7 @@ root.addEventListener('click', event => {
   if (t.closest('[data-retry]')) { boot(); return; }
   if (t.closest('[data-logout]')) { logout(); return; }
   if (!state.user) return;
+  if (search.onClick(t)) return;
   const open = t.closest('[data-open-client]');
   if (open) { state.view = 'client'; state.clientId = open.dataset.openClient; renderWorkspace(); window.scrollTo(0, 0); return; }
   if (t.closest('[data-reload]')) { loadData(); return; }
@@ -198,7 +219,9 @@ root.addEventListener('click', event => {
 
 // Recherche et tri des clients : seuls les résultats sont recomposés, le champ garde le focus
 root.addEventListener('input', event => {
-  if (state.user && event.target.matches('[data-client-filter]')) { state.ui.q = event.target.value; refreshClientResults(); }
+  if (!state.user) return;
+  if (event.target.matches('[data-client-filter]')) { state.ui.q = event.target.value; refreshClientResults(); return; }
+  search.onInput(event.target);
 });
 root.addEventListener('change', event => {
   if (state.user && event.target.matches('[data-client-sort]')) { state.ui.sort = event.target.value; refreshClientResults(); }
@@ -206,6 +229,7 @@ root.addEventListener('change', event => {
 
 root.addEventListener('submit', event => {
   const id = event.target.id;
+  if (state.user && search.onSubmit(event.target)) { event.preventDefault(); return; }
   if (id === 'fSignin') onSignin(event);
   else if (id === 'fForgot') onForgot(event);
   else if (id === 'fReset') onReset(event);

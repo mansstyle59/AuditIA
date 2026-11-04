@@ -43,3 +43,23 @@ Voir le rapport de livraison du lot 1.
 
 ### Tests (Supabase SIMULÉ, aucune connexion réelle)
 Voir le rapport de livraison du lot 2.
+
+## LOT 3 — Recherche et ajout de commerces (réalisé)
+
+Section « Prospects » de la nouvelle interface : recherche en langage naturel, commerces proches, ajout manuel.
+
+### Modules
+- `site/src/api/places.js` : appels Google Places portés à l'identique de l'ancienne interface (mêmes adresses, champs demandés, corps de requête, délais, rayon 5 km, 20 résultats). La clé est passée en paramètre, jamais affichée ni stockée.
+- `site/src/data/places-search.js` : logique pure : analyse de la phrase (`parseNaturalLanguageTarget` inchangé, avec une 2ᵉ tentative sans accents pour « Électriciens », « café »), filtres (sans site, note < 4, nombre d'avis), détection des doublons, construction de la ligne `clients`.
+- `site/src/data/queries.js` : lecture de la clé Google Places déjà enregistrée (`app_settings`, lecture seule) et insertion d'un commerce (`clients`).
+- `site/src/ui/search-controller.js` et `views/prospects.js` : état, états d'écran (chargement, vide, erreur API, réseau, délai, géolocalisation refusée, résultats partiels, réessayer).
+- `app.js`, `home.js`, `clients.js` : navigation vers Prospects, liens « Trouver des commerces / Ajouter un commerce ».
+
+### Doublons (nouveau : l'ancienne interface n'en contrôlait pas)
+Même `place_id` Google, ou même nom + même ville (accents et casse ignorés). Contrôle affiché dans les résultats, puis refait sur des données rechargées juste avant l'insertion (autre appareil). Si la vérification échoue, l'ajout est annulé.
+
+### Volontairement non repris (lots suivants)
+Création et lancement d'un audit à l'ajout (lot 4), recherche de la date du domaine, mise à jour du statut de la clé dans les réglages (lot 6).
+
+### Sécurité
+Seule écriture : insertion dans `clients`. Tables, RLS, Edge Functions et clés inchangées.
