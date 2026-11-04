@@ -104,7 +104,7 @@ export const AUDIT_CATEGORY_META = [
   { id: 'local_seo', label: 'SEO local & mots-clés', description: 'Référencement technique et présence dans les recherches explorées.', scored: true },
   { id: 'social', label: 'Réseaux sociaux & annuaires', description: 'Profils sociaux et présence dans les annuaires détectés.', scored: true },
   { id: 'geo', label: 'Visibilité IA & GEO', description: 'Données structurées, lisibilité et accès des assistants IA.', scored: true },
-  { id: 'context', label: 'Données légales, domaine & concurrence', description: 'Informations de contexte vérifiables, sans note artificielle.', scored: false },
+  { id: 'context', label: 'Domaine & concurrence locale', description: 'Repères complémentaires présentés comme contexte, sans note artificielle.', scored: false },
 ];
 
 const CATEGORY_BY_CRITERION = {
@@ -128,6 +128,7 @@ const CATEGORY_BY_CRITERION = {
   'Réseaux sociaux reliés': 'social',
   'Présence dans les annuaires détectés': 'social',
   'Présence sur plusieurs réseaux': 'social',
+  'Entreprise présente dans SIRENE': 'geo',
   'Données structurées LocalBusiness': 'geo',
   'Contenu lisible sur la page': 'geo',
   'Adresse et horaires en clair': 'geo',
@@ -164,11 +165,6 @@ function contextEvidence(a, c) {
   const d = (c && c.details) || {};
   const si = a && a.site;
   const out = [];
-  if (d.sirene && d.sirene.matched) {
-    out.push({ label: 'Registre SIRENE', status: 'measured', source: 'SIRENE', detail: d.sirene.dateCreation ? 'Entreprise retrouvée · création le ' + new Date(d.sirene.dateCreation).toLocaleDateString('fr-FR') : 'Entreprise retrouvée dans le registre.' });
-  } else {
-    out.push({ label: 'Registre SIRENE', status: 'unmeasured', source: 'SIRENE', detail: 'Entreprise non confirmée par cette recherche : cela ne prouve pas une absence d’immatriculation.' });
-  }
   if (!(c && c.website)) {
     out.push({ label: 'Ancienneté du domaine', status: 'na', source: 'WHOIS / RDAP', detail: 'Sans objet : aucun site web n’est renseigné.' });
   } else if (d.domainCreated) {
