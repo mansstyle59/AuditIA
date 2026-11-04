@@ -9,6 +9,7 @@ const NAV = [
   { id: 'top', label: 'Accueil' },
   { id: 'fonctionnalites', label: 'Fonctionnalités' },
   { id: 'exemples', label: 'Exemples de rapports' },
+  { id: 'contenu-audit', label: 'Contenu de l’audit' },
   { id: 'apropos', label: 'À propos' },
 ];
 
@@ -89,6 +90,41 @@ function forWho() {
   </section>`;
 }
 
+
+function auditDetails() {
+  const areas = [
+    ['search', 'Fiche établissement', 'Informations, catégories, coordonnées, horaires et cohérence des données publiques.'],
+    ['chart', 'Référencement local', 'Présence locale, pages utiles, titres, contenus et éléments SEO accessibles.'],
+    ['target', 'Visibilité & concurrence', 'Repères de visibilité et comparaison des informations disponibles, sans promesse de classement.'],
+    ['chef', 'Avis & confiance', 'Volume et qualité apparente des avis, réponses et signaux de confiance visibles.'],
+    ['bolt', 'Performance du site', 'Temps de chargement et indicateurs techniques disponibles, notamment via PageSpeed.'],
+    ['tools', 'Priorités d’amélioration', 'Actions classées par impact estimé, effort et urgence pour guider les prochaines étapes.'],
+  ];
+  const steps = [
+    ['01', 'Choisissez le commerce', 'Recherchez l’établissement ou renseignez ses informations principales.'],
+    ['02', 'Lancez l’analyse', 'AuditIA rassemble les données accessibles et évalue les différents axes.'],
+    ['03', 'Passez à l’action', 'Consultez le score, les constats et les recommandations dans le dossier et le PDF.'],
+  ];
+  return `<section class="ds-l-wrap ds-l-details" id="contenu-audit" aria-labelledby="lDetails">
+    <h2 id="lDetails" class="ds-l-h2">Que contient un audit AuditIA ?</h2>
+    <p class="ds-l-section-lead">Une vue structurée de la présence en ligne du commerce, avec des constats compréhensibles et des pistes concrètes.</p>
+    <ul class="ds-l-audit-grid">${areas.map(([ico,title,text]) => `<li class="ds-l-audit-card">${featIcon(ico)}<h3>${title}</h3><p>${text}</p></li>`).join('')}</ul>
+    <div class="ds-l-deliverables">
+      <div><span class="ds-l-mini-label">LIVRABLES</span><h3>Des résultats faciles à exploiter</h3><p>Retrouvez les éléments clés dans l’espace AuditIA et préparez un rapport PDF professionnel à partager avec votre client.</p></div>
+      <ul class="ds-l-deliver-list">
+        <li><strong>Score sur 100</strong><span>Un repère synthétique, à lire avec le détail des critères.</span></li>
+        <li><strong>Constats et points à améliorer</strong><span>Les éléments repérés pendant l’analyse, avec leur contexte.</span></li>
+        <li><strong>Plan d’action priorisé</strong><span>Des recommandations organisées pour avancer étape par étape.</span></li>
+      </ul>
+    </div>
+  </section>
+  <section class="ds-l-wrap ds-l-process" aria-labelledby="lProcess">
+    <h2 id="lProcess" class="ds-l-h2">Simple, de la recherche au rapport</h2>
+    <ol class="ds-l-steps">${steps.map(([num,title,text]) => `<li><span class="ds-l-step-num">${num}</span><div><h3>${title}</h3><p>${text}</p></div></li>`).join('')}</ol>
+    <p class="ds-l-disclaimer">Les résultats dépendent des informations accessibles et des services connectés. Un score est un indicateur d’aide à la décision, pas une garantie de positionnement Google ni de croissance commerciale.</p>
+  </section>`;
+}
+
 function cta() {
   return `<section class="ds-l-wrap"><div class="ds-l-banner">
     <div class="ds-l-banner__ico">${featIcon('chart')}</div>
@@ -111,6 +147,7 @@ export function landingScreen({ loginCard }) {
       ${hero()}
       ${why()}
       ${forWho()}
+      ${auditDetails()}
       ${cta()}
       ${about()}
       <section class="ds-l-login ds-l-wrap" id="connexion" aria-label="Connexion">${loginCard}</section>
