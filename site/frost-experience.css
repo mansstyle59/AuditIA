@@ -700,3 +700,18 @@ html body:has(.workspace-app) .ai-float-launcher{
     min-height:0!important;height:auto!important;
   }
 }
+
+/* AuditIA v108 — mobile: remove oversized decorative hero artwork (desktop keeps it) */
+@media(max-width:760px){
+  html body[data-view="Accueil"]:has(.workspace-app) .workspace-app .dk-hero-art{
+    display:none!important;
+    width:0!important;height:0!important;max-width:0!important;max-height:0!important;
+    margin:0!important;padding:0!important;visibility:hidden!important;
+  }
+  html body[data-view="Accueil"]:has(.workspace-app) .workspace-app .dk-hero-in{
+    display:block!important;grid-template-columns:1fr!important;
+  }
+  html body[data-view="Accueil"]:has(.workspace-app) .workspace-app .dk-hero-copy{
+    width:100%!important;max-width:100%!important;
+  }
+}
