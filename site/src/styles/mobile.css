@@ -77,3 +77,47 @@
   .ds-dossier-head .ds-d-actions .ds-btn { flex: 1 1 100%; }
   .ds-audit-row__act .ds-btn { min-height: 44px; }
 }
+
+
+/* Correctif iOS : bande supérieure opaque et texte net (nouvelle-interface). */
+@media (max-width: 899.98px) {
+  html {
+    background: #12052B;
+  }
+  body {
+    background-color: #12052B;
+    background-image: none;
+  }
+  .ds-mobile {
+    position: relative;
+    isolation: isolate;
+    padding-top: 0;
+  }
+  .ds-m-header {
+    top: 0;
+    padding-top: calc(env(safe-area-inset-top, 0px) + 12px);
+    background: #12052B;
+    background-color: #12052B;
+    background-image: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    filter: none;
+    transform: none;
+    opacity: 1;
+  }
+  .ds-m-brand,
+  .ds-m-title {
+    filter: none;
+    -webkit-filter: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    opacity: 1;
+    transform: none;
+    text-shadow: none;
+    -webkit-font-smoothing: antialiased;
+  }
+  .ds-m-brand {
+    color: #C4B5FD;
+    text-rendering: geometricPrecision;
+  }
+}
