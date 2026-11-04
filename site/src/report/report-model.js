@@ -91,9 +91,25 @@ function buildCriteria(diag) {
     status: !x.measured ? 'unmeasured' : x.ok ? 'ok' : 'fix',
     text: clean(!x.measured ? 'Donnée non disponible : exclu du score.' : x.ok ? x.advice : (x.gap || x.advice)),
   });
+  const categories = (diag.categories || []).filter(x => x.scored).map(cat => ({
+    id: clean(cat.id), label: clean(cat.label), description: clean(cat.description),
+    score: num(cat.score), measuredCount: num(cat.measuredCount) || 0,
+    totalCount: num(cat.totalCount) || 0, coverage: num(cat.coverage) || 0,
+    fixCount: num(cat.fixCount) || 0, items: (cat.items || []).map(mk),
+  }));
+  const contextCategory = (diag.categories || []).find(x => x.id === 'context');
+  const context = contextCategory ? {
+    label: clean(contextCategory.label), description: clean(contextCategory.description),
+    measuredCount: num(contextCategory.measuredCount) || 0, totalCount: num(contextCategory.totalCount) || 0,
+    items: (contextCategory.items || []).map(x => ({
+      label: clean(x.label), source: clean(x.source), detail: clean(x.detail),
+      status: x.status === 'measured' ? 'measured' : x.status === 'na' ? 'na' : 'unmeasured',
+    })),
+  } : null;
   return {
     seo: diag.items.filter(x => x.pillar === 'seo').map(mk),
     geo: diag.items.filter(x => x.pillar === 'geo').map(mk),
+    categories, context,
   };
 }
 
