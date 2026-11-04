@@ -52,4 +52,10 @@
   /* Stat-cards compactes sur petit écran */
   .ds-m-main .ds-card { padding: var(--ds-s-4); }
   .ds-m-main .ds-row { min-height: 56px; }
+
+  /* Lot 2 : listes et fiches en une colonne ; le texte long passe à la ligne */
+  .ds-m-main .ds-row--btn { align-items: center; }
+  .ds-m-main .ds-row__title { overflow-wrap: anywhere; }
+  .ds-m-main .ds-detail-kpis .ds-stat__value { font-size: 1.25rem; }
+  .ds-m-main .ds-section-title { flex-wrap: wrap; }
 }

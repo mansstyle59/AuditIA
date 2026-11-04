@@ -1,21 +1,29 @@
 // AuditIA — point d'entrée de la NOUVELLE interface.
 // Lot 1 : authentification réelle (Supabase) et protection de la coquille.
-// Les écrans métier (accueil, clients, audits…) restent à brancher aux lots suivants :
-// l'accueil affiche encore des données de démonstration, clairement signalées.
-import { NAV, emptyState } from './components/ui.js';
+// Lot 2 : accueil, liste des clients et fiche client alimentés par les données réelles.
+// Les autres sections (audits, prospection…) restent à brancher aux lots suivants.
+import { NAV, emptyState, spinnerCard, errorCard } from './components/ui.js';
 import { mobileShell } from './layout-mobile.js';
 import { desktopShell } from './layout-desktop.js';
 import { homeMobile, homeDesktop } from './views/home.js';
+import { clientsView, clientsResultsHtml } from './views/clients.js';
+import { clientDetailView } from './views/client-detail.js';
 import { accountView } from './views/account.js';
 import { authScreen, authLoading, authError } from './screens/auth.js';
-import { DEMO } from './demo-data.js';
+import { loadWorkspaceData, dataErrorMessage } from '../data/queries.js';
 import { getAuthClient } from '../auth/client.js';
 import { NOT_ALLOWED, createAuthService, parseAuthLink } from '../auth/service.js';
 
 const root = document.getElementById('app');
 const wide = window.matchMedia('(min-width: 900px)');
 const TITLES = Object.fromEntries(NAV.map(n => [n.id, n.label]));
-const state = { user: null, active: 'home', recoveryShown: false };
+const state = {
+  user: null, view: 'home', clientId: null, recoveryShown: false,
+  data: { status: 'idle', clients: [], audits: [], error: '' },
+  ui: { q: '', tier: '', sort: 'urgence' }, // filtres de la liste des clients
+  gen: 0, // numéro de chargement : un résultat périmé (déconnexion, nouveau chargement) est ignoré
+};
+const LIVE_VIEWS = ['home', 'clients', 'client'];
 
 // Les e-mails de réinitialisation renvoient vers la racine du site (ancienne interface incluse).
 // Pour qu'ils reviennent sur cette page, l'URL devrait être autorisée dans Supabase (réglage distant, non modifié ici).
@@ -55,29 +63,71 @@ function placeholder() {
   });
 }
 
+function bodyFor(isWide) {
+  if (state.view === 'settings') return accountView(state.user);
+  if (!LIVE_VIEWS.includes(state.view)) return placeholder();
+  const d = state.data;
+  if (d.status === 'idle' || d.status === 'loading') return spinnerCard('Chargement de vos données…');
+  if (d.status === 'error') return errorCard({ title: 'Chargement impossible', text: d.error });
+  if (state.view === 'client') {
+    const c = d.clients.find(x => String(x.id) === String(state.clientId));
+    if (c) return clientDetailView(c, d.audits);
+    state.view = 'clients'; // client introuvable (supprimé ?) : retour à la liste
+  }
+  if (state.view === 'clients') return clientsView(d, state.ui);
+  return isWide ? homeDesktop(d) : homeMobile(d);
+}
+
 function renderWorkspace() {
   if (!state.user) { showAuth('signin'); return; } // protection : jamais de contenu sans session valide
   const isWide = wide.matches;
-  let body;
-  if (state.active === 'home') body = isWide ? homeDesktop(DEMO) : homeMobile(DEMO);
-  else if (state.active === 'settings') body = accountView(state.user);
-  else body = placeholder();
-  const params = { title: TITLES[state.active], active: state.active, body };
+  const body = bodyFor(isWide);
+  const active = state.view === 'client' ? 'clients' : state.view;
+  const title = state.view === 'client' ? 'Fiche client' : TITLES[state.view];
+  const params = { title, active, body };
   root.innerHTML = isWide
     ? desktopShell({ ...params, account: { email: state.user.email || '' } })
     : mobileShell(params);
   document.documentElement.dataset.layout = isWide ? 'desktop' : 'mobile';
 }
 
+// Chargement des clients et des audits (lecture seule). Un résultat arrivé après une déconnexion est ignoré.
+async function loadData() {
+  const gen = ++state.gen;
+  state.data = { status: 'loading', clients: [], audits: [], error: '' };
+  renderWorkspace();
+  try {
+    const client = await getAuthClient();
+    const loaded = await loadWorkspaceData(client);
+    if (gen !== state.gen || !state.user) return;
+    state.data = { status: 'ready', ...loaded, error: '' };
+  } catch (err) {
+    if (gen !== state.gen || !state.user) return;
+    state.data = { status: 'error', clients: [], audits: [], error: dataErrorMessage(err) };
+  }
+  renderWorkspace();
+}
+
 function enter(user) {
   state.user = user;
-  state.active = 'home';
-  renderWorkspace();
+  state.view = 'home';
+  state.clientId = null;
+  state.ui = { q: '', tier: '', sort: 'urgence' };
   window.scrollTo(0, 0);
+  loadData();
+}
+
+function refreshClientResults() {
+  const el = document.getElementById('clientsResults');
+  if (el) el.innerHTML = clientsResultsHtml(state.data, state.ui);
+  const input = document.querySelector('[data-client-filter]');
+  if (input && input.value !== state.ui.q) input.value = state.ui.q;
 }
 
 async function logout() {
   state.user = null;
+  state.gen++; // annule un chargement en cours
+  state.data = { status: 'idle', clients: [], audits: [], error: '' };
   await auth.signOut();
   showAuth('signin');
 }
@@ -134,8 +184,24 @@ root.addEventListener('click', event => {
   }
   if (t.closest('[data-retry]')) { boot(); return; }
   if (t.closest('[data-logout]')) { logout(); return; }
+  if (!state.user) return;
+  const open = t.closest('[data-open-client]');
+  if (open) { state.view = 'client'; state.clientId = open.dataset.openClient; renderWorkspace(); window.scrollTo(0, 0); return; }
+  if (t.closest('[data-reload]')) { loadData(); return; }
+  const tier = t.closest('[data-client-tier]');
+  if (tier) { const k = tier.dataset.clientTier; state.ui.tier = state.ui.tier === k ? '' : k; refreshClientResults(); return; }
+  const chip = t.closest('[data-client-chip]');
+  if (chip) { state.ui.q = chip.dataset.clientChip; refreshClientResults(); return; }
   const nav = t.closest('[data-nav]');
-  if (nav && state.user) { state.active = nav.dataset.nav; renderWorkspace(); window.scrollTo(0, 0); }
+  if (nav) { state.view = nav.dataset.nav; renderWorkspace(); window.scrollTo(0, 0); }
+});
+
+// Recherche et tri des clients : seuls les résultats sont recomposés, le champ garde le focus
+root.addEventListener('input', event => {
+  if (state.user && event.target.matches('[data-client-filter]')) { state.ui.q = event.target.value; refreshClientResults(); }
+});
+root.addEventListener('change', event => {
+  if (state.user && event.target.matches('[data-client-sort]')) { state.ui.sort = event.target.value; refreshClientResults(); }
 });
 
 root.addEventListener('submit', event => {

@@ -1,66 +1,77 @@
-// AuditIA — page d'accueil : mêmes composants, compositions différentes selon l'écran.
-import { btn, stat, card, scoreBadge, bar, sectionTitle, listItem, demoBanner } from '../components/ui.js';
+// AuditIA — accueil alimenté par les données réelles (aucune donnée de démonstration).
+// Mêmes composants pour mobile et ordinateur, compositions différentes.
+import { btn, stat, card, badge, scoreBadge, bar, sectionTitle, emptyState, linkBtn, linkRow, avatar } from '../components/ui.js';
+import { auditHasAnalysis } from '../../audit/scoring.js';
+import { homeStats, portfolio } from '../../data/portfolio.js';
 
-function auditList(audits) {
-  return `<ul class="ds-list">${audits.map(a =>
-    listItem({ title: a.client, meta: a.meta, right: scoreBadge(a.score) })
-  ).join('')}</ul>`;
+function auditRows(audits, clients, empty) {
+  if (!audits.length) return `<p class="ds-row__meta">${empty}</p>`;
+  const byId = new Map(clients.map(c => [String(c.id), c]));
+  return `<ul class="ds-list">${audits.map(a => {
+    const c = byId.get(String(a.client_id));
+    const name = (c && c.name) || a.title || 'Commerce';
+    const done = auditHasAnalysis(a);
+    const score = Math.max(0, Math.min(100, Math.round(Number(a.score) || 0)));
+    return linkRow({
+      title: name,
+      meta: [c && c.city, done ? 'Audit terminé' : 'À analyser'].filter(Boolean).join(' · '),
+      right: done ? scoreBadge(score) : badge('À analyser'),
+      lead: avatar(name),
+      attrs: c ? `data-open-client="${String(c.id).replace(/"/g, '&quot;')}"` : 'disabled',
+    });
+  }).join('')}</ul>`;
 }
 
-function actionBars(actions) {
-  return `<div class="ds-d-stack">${actions.map(a => bar({ label: a.label, pct: a.pct })).join('')}</div>`;
+function levels(data) {
+  const p = portfolio(data.clients, data.audits);
+  if (!p.total) return '';
+  return p.tiers.map(([, label, n]) => bar({ label: `${label} (${n})`, pct: Math.round((n / p.total) * 100) })).join('');
 }
 
-function distributionBars(distribution, total) {
-  return distribution.map(d => bar({ label: `${d.label} (${d.count})`, pct: Math.round((d.count / total) * 100) })).join('');
+function kpis(s) {
+  return [
+    stat({ label: s.clientCount > 1 ? 'Commerces suivis' : 'Commerce suivi', value: String(s.clientCount) }),
+    stat({ label: s.doneCount > 1 ? 'Audits analysés' : 'Audit analysé', value: String(s.doneCount) }),
+    stat({ label: 'Score moyen', value: s.avg == null ? '—' : s.avg + '/100' }),
+    stat({ label: 'À analyser', value: String(s.waitingCount) }),
+  ].join('');
 }
 
-// Mobile : une colonne, cartes empilées, actions au pouce
+function welcome() {
+  return emptyState({
+    title: 'Bienvenue sur AuditIA',
+    text: "Aucun commerce n'est encore enregistré. L'ajout de commerces sera disponible dans la nouvelle interface au prochain lot ; en attendant, utilisez l'interface actuelle.",
+  }) + `<div class="ds-d-actions">${linkBtn({ label: "Ouvrir l'interface actuelle", href: './', primary: true })}</div>`;
+}
+
 export function homeMobile(data) {
-  const total = data.distribution.reduce((sum, d) => sum + d.count, 0);
+  const s = homeStats(data.clients, data.audits);
+  if (!s.clientCount && !s.auditCount) return welcome();
   return `
-    ${demoBanner()}
-    <div class="ds-grid">${data.kpis.map(stat).join('')}</div>
-
-    ${sectionTitle('Actions rapides')}
-    <div class="ds-grid">
-      ${btn({ label: 'Nouvel audit', variant: 'primary', block: true })}
-      ${btn({ label: 'Ajouter un client', block: true })}
-    </div>
-
-    ${sectionTitle('Derniers audits')}
-    ${card({ body: auditList(data.audits) })}
-
-    ${sectionTitle('Répartition des scores')}
-    ${card({ body: `<div class="ds-d-stack">${distributionBars(data.distribution, total)}</div>` })}
-
-    ${sectionTitle('À traiter')}
-    ${card({ body: actionBars(data.actions) })}
+    <div class="ds-grid">${kpis(s)}</div>
+    ${sectionTitle('Derniers audits', btn({ label: 'Voir les commerces', attrs: 'data-nav="clients"' }))}
+    ${card({ body: auditRows(s.latest.slice(0, 3), data.clients, 'Aucun audit pour le moment.') })}
+    ${s.clientCount ? sectionTitle('Niveau des commerces') + card({ body: `<div class="ds-d-stack">${levels(data)}</div>` }) : ''}
+    ${s.waitingCount ? sectionTitle('À analyser') + card({ body: auditRows(s.waiting.slice(0, 3), data.clients, '') }) : ''}
   `;
 }
 
-// Ordinateur : indicateurs en ligne, deux colonnes (audits à gauche, synthèse à droite)
 export function homeDesktop(data) {
-  const total = data.distribution.reduce((sum, d) => sum + d.count, 0);
+  const s = homeStats(data.clients, data.audits);
+  if (!s.clientCount && !s.auditCount) return welcome();
   return `
-    ${demoBanner()}
     <div class="ds-d-toolbar">
       <p class="ds-row__meta">Vue d'ensemble de votre activité</p>
-      <div class="ds-d-actions">
-        ${btn({ label: 'Ajouter un client' })}
-        ${btn({ label: 'Nouvel audit', variant: 'primary' })}
-      </div>
+      <div class="ds-d-actions">${btn({ label: 'Actualiser', attrs: 'data-reload' })}${btn({ label: 'Voir les commerces', variant: 'primary', attrs: 'data-nav="clients"' })}</div>
     </div>
-
-    <div class="ds-grid ds-d-kpis">${data.kpis.map(stat).join('')}</div>
-
+    <div class="ds-grid ds-d-kpis">${kpis(s)}</div>
     <div class="ds-d-split">
       <div class="ds-d-stack">
-        ${card({ title: 'Derniers audits', body: auditList(data.audits) })}
+        ${card({ title: 'Derniers audits', body: auditRows(s.latest, data.clients, 'Aucun audit pour le moment.') })}
       </div>
       <div class="ds-d-stack">
-        ${card({ title: 'Répartition des scores', body: `<div class="ds-d-stack">${distributionBars(data.distribution, total)}</div>` })}
-        ${card({ title: 'À traiter', body: actionBars(data.actions) })}
+        ${s.clientCount ? card({ title: 'Niveau des commerces', body: `<div class="ds-d-stack">${levels(data)}</div>` }) : ''}
+        ${s.waitingCount ? card({ title: 'À analyser', body: auditRows(s.waiting, data.clients, '') }) : ''}
       </div>
     </div>
   `;

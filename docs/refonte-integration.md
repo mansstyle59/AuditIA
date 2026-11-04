@@ -20,7 +20,26 @@ L'ancienne interface (`site/index.html`) reste inchangée et fonctionnelle. Supa
 
 ### À savoir
 - Les e-mails de réinitialisation renvoient vers la racine du site (ancienne interface), car l'URL de la nouvelle page n'est pas forcément autorisée dans les réglages Supabase (non modifiés). L'écran de nouveau mot de passe de la nouvelle interface fonctionne dès qu'un lien arrive sur cette page.
-- L'accueil affiche encore des données de démonstration signalées par un bandeau « Démo ».
+- (lot 2) L’accueil affiche désormais les vraies données.
 
 ### Tests (Supabase simulé, aucune connexion réelle)
 Voir le rapport de livraison du lot 1.
+
+## LOT 2 — Accueil et gestion des clients (réalisé)
+
+### Modules
+- `site/src/data/queries.js` : lecture seule des tables `clients` et `audits` (mêmes requêtes que l'ancienne interface : `select('*')`, tri `created_at` décroissant) et messages d'erreur lisibles (réseau, session expirée, autre).
+- `site/src/data/portfolio.js` : règles métier pures reprises de l'ancienne interface (statistiques d'accueil, score et niveau d'un commerce, tendance, filtre, tri, fiche client). Aucune dépendance à l'affichage.
+- `site/src/ui/views/home.js`, `clients.js`, `client-detail.js` : accueil, liste (recherche, tri, niveaux, catégories) et fiche client (appeler, site web, localiser, audits associés, évolution, informations).
+- `site/src/ui/app.js` : chargement (attente / erreur avec « Réessayer » / vide / prêt), navigation accueil → clients → fiche, déconnexion qui vide les données. Les résultats arrivant après une déconnexion sont ignorés.
+- Les données de démonstration (`demo-data.js`) sont supprimées : aucune donnée fictive dans l'interface connectée.
+
+### Volontairement non branché (lots suivants)
+- Ouverture du détail d'un audit (lot 4), ajout/modification d'un commerce (lot 3), réglages `app_settings` (lot 6). Messages honnêtes + lien vers l'ancienne interface.
+
+### Sécurité
+- Uniquement des requêtes GET sur `clients` et `audits`. Aucune écriture, aucune Edge Function, tables/RLS/clés inchangées.
+- Le site web d'un commerce n'est affiché en lien que s'il commence par http(s) ; tout le texte venant de la base est échappé.
+
+### Tests (Supabase SIMULÉ, aucune connexion réelle)
+Voir le rapport de livraison du lot 2.

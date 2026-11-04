@@ -43,4 +43,11 @@
   .ds-d-split { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(280px, 1fr); gap: var(--ds-s-6); align-items: start; }
   .ds-d-main .ds-card { padding: var(--ds-s-6); }
   .ds-d-main .ds-stat__value { font-size: 2.125rem; }
+
+  /* Lot 2 : recherche et tri sur une ligne, liste en deux colonnes, fiche en deux colonnes */
+  .ds-toolbar { grid-template-columns: minmax(0, 1fr) 240px; align-items: end; }
+  .ds-tiers { grid-template-columns: 1.2fr repeat(4, minmax(0, 1fr)); }
+  .ds-tier--avg { grid-column: auto; }
+  .ds-clients { grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); }
+  .ds-detail { grid-template-columns: minmax(0, 1.5fr) minmax(300px, 1fr); gap: var(--ds-s-6); align-items: start; }
 }

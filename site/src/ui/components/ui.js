@@ -86,9 +86,57 @@ export function emptyState({ title, text }) {
   </div>`;
 }
 
-export function demoBanner() {
-  return `<div class="ds-demo-banner" role="note">
-    ${badge('Démo', 'demo')}
-    <span>Données de démonstration : rien n'est enregistré ni envoyé. L'interface actuelle reste disponible.</span>
+/* ---------- Lot 2 : composants pour les listes et les fiches ---------- */
+
+// Pastille avec l'initiale du commerce (remplace l'icône par métier de l'ancienne interface)
+export function avatar(name) {
+  const letter = String(name || '?').trim().charAt(0).toUpperCase() || '?';
+  return `<span class="ds-avatar" aria-hidden="true">${escHtml(letter)}</span>`;
+}
+
+// Ligne de liste entièrement cliquable (bouton) : attrs porte l'action, ex. data-open-client="…"
+export function linkRow({ title, meta = '', right = '', attrs = '', lead = '' }) {
+  return `<li><button type="button" class="ds-row ds-row--btn" ${attrs}>
+    ${lead}<span class="ds-row__main"><span class="ds-row__title">${escHtml(title)}</span>${meta ? `<span class="ds-row__meta">${escHtml(meta)}</span>` : ''}</span>
+    ${right}<span class="ds-row__chev" aria-hidden="true">›</span>
+  </button></li>`;
+}
+
+// Lien d'apparence « bouton » (appeler, site web, interface actuelle…)
+export function linkBtn({ label, href, primary = false, external = false }) {
+  const cls = primary ? 'ds-btn ds-btn--primary' : 'ds-btn';
+  const ext = external ? ' target="_blank" rel="noopener noreferrer"' : '';
+  return `<a class="${cls}" href="${escHtml(href)}"${ext}>${escHtml(label)}</a>`;
+}
+
+export function spinnerCard(text) {
+  return `<div class="ds-card ds-empty" role="status" aria-live="polite"><span class="ds-spinner" aria-hidden="true"></span><p class="ds-empty__text">${escHtml(text)}</p></div>`;
+}
+
+export function errorCard({ title, text, label = 'Réessayer', attrs = 'data-reload' }) {
+  return `<div class="ds-card ds-empty ds-empty--error" role="alert">
+    <h2 class="ds-card__title">${escHtml(title)}</h2>
+    <p class="ds-empty__text">${escHtml(text)}</p>
+    ${btn({ label, variant: 'primary', attrs })}
   </div>`;
+}
+
+export function searchField({ value = '', placeholder = '', label = 'Rechercher', attrs = '' }) {
+  return `<label class="ds-field ds-search"><span class="ds-sr-only">${escHtml(label)}</span>
+    <input class="ds-input" type="search" inputmode="search" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="${escHtml(placeholder)}" value="${escHtml(value)}" ${attrs}></label>`;
+}
+
+export function chips({ items, current = '', attr, allLabel = 'Tous', ariaLabel = '' }) {
+  const mk = (value, label) => `<button type="button" class="ds-chip${value === current ? ' is-on' : ''}" ${attr}="${escHtml(value)}" aria-pressed="${value === current}">${escHtml(label)}</button>`;
+  return `<div class="ds-chips" role="group" aria-label="${escHtml(ariaLabel)}">${mk('', allLabel)}${items.map(v => mk(v, v)).join('')}</div>`;
+}
+
+// Courbe d'évolution (valeurs de 0 à 100, du plus ancien au plus récent)
+export function sparkline(values) {
+  if (!values || values.length < 2) return '';
+  const w = 240, h = 56, step = w / (values.length - 1);
+  const pts = values.map((v, i) => [i * step, h - 6 - (Math.max(0, Math.min(100, v)) / 100) * (h - 12)]);
+  const d = pts.map(([x, y], i) => (i ? 'L' : 'M') + x.toFixed(1) + ' ' + y.toFixed(1)).join(' ');
+  const [lx, ly] = pts[pts.length - 1];
+  return `<svg class="ds-spark" viewBox="0 0 ${w} ${h}" role="img" aria-label="Évolution du score : de ${values[0]} à ${values[values.length - 1]} sur 100"><path d="${d}"/><circle cx="${lx.toFixed(1)}" cy="${ly.toFixed(1)}" r="4"/></svg>`;
 }
