@@ -130,3 +130,33 @@
     border-radius: 16px !important;
   }
 }
+
+/* ---------- Icônes de l'accueil : taille contrôlée (sinon elles prennent toute la largeur) ---------- */
+html body[data-view="Accueil"]:has(.workspace-app) .workspace-app .dk-chip svg {
+  width: 14px !important;
+  height: 14px !important;
+  flex: 0 0 14px !important;
+  fill: #FFC93C !important;
+  stroke: none !important;
+}
+html body[data-view="Accueil"]:has(.workspace-app) .workspace-app .dk-btn svg {
+  width: 18px !important;
+  height: 18px !important;
+  flex: 0 0 18px !important;
+  stroke: currentColor !important;
+  fill: none !important;
+}
+
+/* ---------- Boutons de l'accueil : couleurs de la maquette ---------- */
+html body[data-view="Accueil"]:has(.workspace-app) .workspace-app .dk-btn-main {
+  background: linear-gradient(135deg, #8344FF, #5B2BE0) !important;
+  border: 1px solid transparent !important;
+  color: #fff !important;
+  box-shadow: 0 10px 24px rgba(91, 43, 224, 0.35) !important;
+}
+html body[data-view="Accueil"]:has(.workspace-app) .workspace-app .dk-btn-ghost {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.28) !important;
+  color: #fff !important;
+  box-shadow: none !important;
+}
