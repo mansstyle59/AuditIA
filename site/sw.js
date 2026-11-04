@@ -47,15 +47,20 @@ self.addEventListener('fetch', e => {
       return (await caches.match(req)) || (await caches.match('./index.html'));
     }
     const cached = await caches.match(req);
-    // Récupération réseau en arrière-plan : met le cache à jour pour la prochaine fois.
-    const network = fetch(req).then(res => {
+    // CSS/JS critiques : consulter le réseau sans utiliser une réponse fraîche en cache navigateur.
+    const isCriticalAsset = /\.(css|js)$/i.test(url.pathname);
+    const network = fetch(req, isCriticalAsset ? { cache: 'no-store' } : {}).then(res => {
       const copy = res.clone();
       caches.open(CACHE).then(c => c.put(req, copy)).catch(() => {});
       return res;
     }).catch(() => null);
-    // Si on a une copie en cache : on la sert IMMÉDIATEMENT (démarrage instantané).
+    // Pour CSS/JS, attendre la vérification réseau afin d'éviter une ancienne interface.
+    if (isCriticalAsset) {
+      const fresh = await network;
+      return fresh || cached || caches.match('./index.html');
+    }
+    // Les autres ressources restent cache-first pour un démarrage rapide.
     if (cached) return cached;
-    // Sinon on attend le réseau, avec repli sur la coquille.
     const net = await network;
     return net || caches.match('./index.html');
   })());
