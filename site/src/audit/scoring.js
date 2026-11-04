@@ -286,7 +286,7 @@ export function visibilityAudit(a,c){
       const seoP=pill('seo'),geoP=pill('geo'),valid=[seoP,geoP].filter(p=>p.score!=null&&p.measuredCount>0);
       const index=valid.length?Math.round(valid.reduce((n,p)=>n+p.score,0)/valid.length):null;
       const measuredItems=items.filter(x=>x.measured),strengths=measuredItems.filter(x=>x.ok===true),weaknesses=measuredItems.filter(x=>x.ok===false&&x.gap);
-      const categories = AUDIT_CATEGORY_META.map(meta => categorySummary(meta, meta.id === 'context' ? contextEvidence(a,c) : items.filter(x => x.category === meta.id)));
+      const categories = AUDIT_CATEGORY_META.map(meta => categorySummary(meta, meta.id === 'context' ? contextEvidence(a,c).map(x => ({ ...x, measured: x.status === 'measured', ok: null, weight: 0 })) : items.filter(x => x.category === meta.id)));
        return {items,categories,seo:seoP,geo:geoP,index,strengths,weaknesses,measuredCount:measuredItems.length,totalCount:items.length,coverage:items.length?Math.round(measuredItems.length/items.length*100):0,hasScore:index!=null,scoreRange:valid.length?{low:Math.round(valid.reduce((n,p)=>n+(p.low||0),0)/valid.length),high:Math.round(valid.reduce((n,p)=>n+(p.high||0),0)/valid.length)}:null};
     }
 
