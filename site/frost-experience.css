@@ -1,0 +1,150 @@
+/* AuditIA — Frost-inspired premium experience (additive layer).
+   Keeps application logic and existing navigation intact. */
+:root{
+  --fx-ink:#1c1738;
+  --fx-muted:#746c91;
+  --fx-line:rgba(111,92,164,.15);
+  --fx-violet:#7655e8;
+  --fx-violet-2:#a38bff;
+  --fx-glass:rgba(255,255,255,.76);
+}
+html body:has(.workspace-app),html body:has(.workspace-app) .workspace-app{
+  font-family:"Plus Jakarta Sans",system-ui,-apple-system,sans-serif;
+}
+html body:has(.workspace-app) .workspace-app{
+  background:
+    radial-gradient(ellipse at 78% 0%,rgba(132,103,224,.11),transparent 34%),
+    radial-gradient(ellipse at 4% 16%,rgba(180,154,242,.10),transparent 30%),
+    #f5f3fb!important;
+}
+html body:has(.workspace-app) .workspace-head{
+  position:relative;align-items:flex-end;margin:26px 0 24px!important;
+  padding:28px 30px!important;overflow:hidden;border:1px solid rgba(255,255,255,.74);
+  border-radius:26px!important;
+  background:
+    linear-gradient(105deg,rgba(20,17,52,.97) 0%,rgba(38,28,83,.93) 52%,rgba(72,51,121,.86) 100%),
+    url("./hero-shop.png") center 48%/cover!important;
+  box-shadow:0 24px 60px rgba(38,24,86,.16),inset 0 1px rgba(255,255,255,.12);
+}
+html body:has(.workspace-app) .workspace-head:before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(90deg,rgba(12,12,34,.38),transparent 72%),
+    radial-gradient(ellipse at 82% 18%,rgba(189,167,255,.22),transparent 44%);
+}
+html body:has(.workspace-app) .workspace-head>div:first-child,
+html body:has(.workspace-app) .workspace-head .workspace-actions{position:relative;z-index:1}
+html body:has(.workspace-app) .workspace-head .eyebrow{
+  display:inline-flex;align-items:center;gap:8px;padding:7px 11px;border-radius:99px;
+  background:rgba(188,166,255,.15);border:1px solid rgba(219,205,255,.23);
+  color:#e6ddff!important;font-size:10px;letter-spacing:1.6px;
+}
+html body:has(.workspace-app) .workspace-head :is(h1,.page-title){
+  color:#fff!important;font-size:clamp(30px,4vw,48px)!important;
+  line-height:1.03;letter-spacing:-1.8px!important;font-weight:800;
+}
+html body:has(.workspace-app) .workspace-head p{
+  color:rgba(245,240,255,.78)!important;font-size:13px!important;
+  max-width:58ch;line-height:1.55;margin-top:9px!important;
+}
+html body:has(.workspace-app) .workspace-head .workspace-actions .app-btn{
+  position:relative;border:1px solid rgba(255,255,255,.22)!important;
+  border-radius:14px!important;background:rgba(255,255,255,.10)!important;
+  color:#fff!important;box-shadow:0 8px 22px rgba(0,0,0,.12);
+  backdrop-filter:blur(9px);
+}
+html body:has(.workspace-app) .workspace-head .workspace-actions .app-btn svg{
+  color:#fff!important;stroke:#fff!important;
+}
+html body:has(.workspace-app) .desktop-nav{
+  padding:7px!important;margin:0 0 20px!important;gap:5px!important;
+  border:1px solid rgba(111,92,164,.13);border-radius:18px!important;
+  background:rgba(255,255,255,.7)!important;
+  box-shadow:0 12px 35px rgba(49,34,91,.06);
+  backdrop-filter:blur(12px);
+}
+html body:has(.workspace-app) .desktop-nav button{
+  min-height:42px;border:1px solid transparent!important;border-radius:12px!important;
+  padding:9px 13px!important;color:#6e668a!important;background:transparent!important;
+  font-size:12px!important;font-weight:750;transition:background .22s,color .22s,transform .22s;
+}
+html body:has(.workspace-app) .desktop-nav button:hover{
+  color:#4a368f!important;background:#f0ebff!important;transform:translateY(-1px);
+}
+html body:has(.workspace-app) .desktop-nav button.active{
+  color:#fff!important;background:linear-gradient(130deg,#7655e8,#9875f4)!important;
+  box-shadow:0 7px 18px rgba(118,85,232,.24);
+}
+html body:has(.workspace-app) .desktop-nav button.active svg{stroke:#fff!important}
+html body:has(.workspace-app) .workspace-main>.app-panel,
+html body:has(.workspace-app) .workspace-main>.schema-grid .app-panel,
+html body:has(.workspace-app) .workspace-main>.audit-overview,
+html body:has(.workspace-app) .workspace-main>.hx,
+html body:has(.workspace-app) .workspace-main>.hx-demo{
+  border-radius:22px!important;border-color:var(--fx-line)!important;
+  box-shadow:0 18px 44px rgba(43,30,86,.065)!important;
+}
+html body:has(.workspace-app) .workspace-main :is(.app-panel,.schema-card,.audit-overview,.client-card,.audit-card){
+  transition:box-shadow .22s ease,border-color .22s ease,transform .22s ease;
+}
+html body:has(.workspace-app) .workspace-main :is(.app-panel,.schema-card,.client-card):hover{
+  border-color:rgba(118,85,232,.25)!important;
+  box-shadow:0 22px 48px rgba(43,30,86,.09)!important;
+}
+html body:has(.workspace-app) .workspace-main .app-panel :is(h2,h3){
+  letter-spacing:-.45px;
+}
+html body:has(.workspace-app) .workspace-main .eyebrow{
+  letter-spacing:1.35px;
+}
+html body:has(.workspace-app) .workspace-main .app-btn{
+  transition:transform .18s ease,box-shadow .18s ease,filter .18s ease;
+}
+html body:has(.workspace-app) .workspace-main .app-btn:hover{
+  transform:translateY(-1px);filter:brightness(1.035);
+}
+html body:has(.workspace-app) .workspace-main .app-btn.primary{
+  box-shadow:0 9px 22px rgba(118,85,232,.20);
+}
+html body:has(.workspace-app) .workspace-main :is(input,select,textarea):focus-visible{
+  outline:3px solid rgba(118,85,232,.22)!important;outline-offset:1px;
+}
+html body:has(.workspace-app) .ai-float-launcher{
+  box-shadow:0 14px 34px rgba(92,66,180,.28)!important;
+}
+@media(min-width:761px){
+  html body:has(.workspace-app) .workspace-app{padding-top:100px!important}
+  html body:has(.workspace-app) .workspace-head{min-height:164px}
+}
+@media(max-width:760px){
+  html body:has(.workspace-app) .workspace-app{
+    background:
+      radial-gradient(ellipse at 80% 0%,rgba(132,103,224,.10),transparent 38%),
+      #f5f3fb!important;
+  }
+  html body:has(.workspace-app) .workspace-head{
+    margin:10px 12px 18px!important;padding:23px 20px!important;
+    min-height:145px;display:flex!important;align-items:flex-end!important;
+    border-radius:22px!important;background-position:center!important;
+  }
+  html body:has(.workspace-app) .workspace-head :is(h1,.page-title){
+    font-size:32px!important;line-height:1.04!important;
+  }
+  html body:has(.workspace-app) .workspace-head p{
+    font-size:12px!important;max-width:34ch;
+  }
+  html body:has(.workspace-app) .workspace-head .workspace-actions{display:none!important}
+  html body:has(.workspace-app) .desktop-nav{display:none!important}
+  html body:has(.workspace-app) .workspace-main>.app-panel,
+  html body:has(.workspace-app) .workspace-main>.schema-grid .app-panel,
+  html body:has(.workspace-app) .workspace-main>.audit-overview{
+    border-radius:20px!important;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  html body:has(.workspace-app) *,
+  html body:has(.workspace-app) *:before,
+  html body:has(.workspace-app) *:after{
+    scroll-behavior:auto!important;animation-duration:.01ms!important;
+    animation-iteration-count:1!important;transition-duration:.01ms!important;
+  }
+}
