@@ -198,25 +198,6 @@ export function buildReport(audit, client, allAudits = [], now = new Date()) {
   const metrics = lh ? Object.entries((an.scan && an.scan.metrics) || {}).filter(([, v]) => v).map(([k, v]) => ({ label: clean(k), value: clean(v) })) : [];
 
   const si = audit.site || null;
-  const sir = (d.sirene && d.sirene.matched) ? d.sirene : {};
-  const bp = {
-    legalName: clean(sir.denomination), siren: clean(sir.siren), siret: clean(sir.siret),
-    legalForm: clean(sir.formeJuridique), naf: clean(sir.naf),
-    creationDate: clean(sir.dateCreation), ageLabel: ageLabel(sir.dateCreation, now),
-    establishments: num(sir.etablissements), legalAddress: clean(sir.adresse),
-    postalCode: clean(sir.codePostal), legalCity: clean(sir.ville),
-    legalStatus: sir.matched ? 'matched' : 'unavailable',
-    confidence: clean(sir.matchConfidence || (sir.matched ? 'à vérifier' : 'non confirmé')),
-    fetchedAt: clean(sir.fetchedAt),
-    officialUrl: sir.siren ? 'https://annuaire-entreprises.data.gouv.fr/entreprise/' + encodeURIComponent(sir.siren) : '',
-    phone: clean((client && client.phone) || d.phone), email: clean(d.email),
-    website: clean((client && client.website) || d.website),
-    hours: Array.isArray(d.hours) ? d.hours.filter(Boolean) : [],
-    googleStatus: clean(d.businessStatus || ''),
-    rating: num(d.rating), reviews: num(d.reviews),
-    address: clean(d.address || [sir.adresse,sir.codePostal,sir.ville].filter(Boolean).join(' '))
-  };
-
   const presence = si ? {
     socials: (si.socials || []).map(x => clean(x.net)).filter(Boolean),
     directories: (si.directories || []).map(x => clean(x.name)).filter(Boolean),
@@ -238,7 +219,6 @@ export function buildReport(audit, client, allAudits = [], now = new Date()) {
     },
     pillars: { seo: { ...pillar(diag.seo), total: countOf('seo') }, geo: { ...pillar(diag.geo), total: countOf('geo') } },
 
-    businessProfile: bp,
     sources: buildSources(audit, client),
     unmeasuredNotes: (an.unmeasured || []).filter(x => x.n > 0).map(x => ({ label: clean(x.label), why: clean(x.why), n: x.n })),
     infoNotes: (an.unmeasured || []).filter(x => x.n === 0).map(x => ({ label: clean(x.label), why: clean(x.why) })),
