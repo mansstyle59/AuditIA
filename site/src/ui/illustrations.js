@@ -130,14 +130,15 @@ export function featIcon(name) {
 
 /* ---------- Aperçu d'un rapport (carte claire) ---------- */
 export function reportPreviewHtml() {
-  const items = ['Fiche Google', 'SEO local', 'Avis clients', 'Performance web'];
-  return `<figure class="ds-rp-card">
-    <figcaption class="ds-rp-card__head"><span class="ds-rp-card__title">Rapport d’audit — Commerce local</span><span class="ds-rp-card__tag">Exemple fictif</span></figcaption>
-    <div class="ds-rp-card__body">
-      <svg class="ds-rp-card__ring" viewBox="0 0 110 110" role="img" aria-label="Score d’exemple : ${EX_SCORE} sur 100" xmlns="http://www.w3.org/2000/svg"><defs>${GREEN_GRAD('rpGreen')}</defs>${ring(55, 55, 44, EX_SCORE, 'rpGreen', '#E4DBFF', '#24104D', '#6B5C9A', 32)}</svg>
-      <ul class="ds-rp-card__list">${items.map(t => `<li><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7.5" fill="#22C55E"/><path d="M4.6 8.2l2.3 2.3 4.5-4.9" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>${t}</li>`).join('')}</ul>
-      <img class="ds-rp-card__shop" src="./assets/shop-card.webp" alt="Illustration d’un commerce local" width="480" height="327" loading="lazy" decoding="async">
-    </div>
-    <svg class="ds-rp-card__bars" viewBox="0 0 360 54" preserveAspectRatio="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">${bars(0, 4, 360, 46, BARS.concat([62, 88, 70, 92]), '#8B5CF6')}</svg>
-  </figure>`;
+ const items=[['Fiche Google','Données établissement'],['SEO local','Présence & mots-clés'],['Avis clients','Réputation en ligne'],['Performance web','Vitesse du site']];
+ return `<figure class="ds-rp-card" aria-label="Exemple fictif de rapport AuditIA">
+ <figcaption class="ds-rp-card__head"><span class="ds-rp-card__brand"><span class="ds-rp-card__brand-mark" aria-hidden="true">✦</span><span><strong>AuditIA</strong><small>RAPPORT DE VISIBILITÉ LOCALE</small></span><span class="ds-rp-card__tag">✧ Exemple fictif</span></figcaption>
+ <div class="ds-rp-card__intro"><div><span class="ds-rp-card__eyebrow">SYNTHÈSE DU COMMERCE</span><h3>Votre présence en ligne</h3><p>Vue d’ensemble · Audit commercial</p></div><span class="ds-rp-card__status"><i></i> Analyse exemple</span></div>
+ <div class="ds-rp-card__body"><div class="ds-rp-card__score"><svg class="ds-rp-card__ring" viewBox="0 0 110 110" role="img" aria-label="Score fictif : ${EX_SCORE} sur 100" xmlns="http://www.w3.org/2000/svg"><defs>${GREEN_GRAD('rpGreen')}</defs>${ring(55,55,44,EX_SCORE,'rpGreen','#E4DBFF','#24104D','#6B5C9A',32)}</svg><span class="ds-rp-card__score-label">Score global</span><strong class="ds-rp-card__score-value">${EX_SCORE}<small>/100</small></strong><span class="ds-rp-card__score-note">Indicateur fictif</span></div>
+ <div class="ds-rp-card__checks"><h4>Points analysés</h4><ul class="ds-rp-card__list">${items.map(([t,sub])=>`<li><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7.5" fill="#22C55E"/><path d="M4.6 8.2l2.3 2.3 4.5-4.9" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg><span><strong>${t}</strong><small>${sub}</small></span></li>`).join('')}</ul></div>
+ <div class="ds-rp-card__shop-wrap"><img class="ds-rp-card__shop" src="./assets/shop-card.webp" alt="Illustration d’un commerce local" width="480" height="327" loading="lazy" decoding="async"><span class="ds-rp-card__shop-label">Commerce local · Illustration</span></div></div>
+ <div class="ds-rp-card__metrics"><div><span>Présence locale</span><strong>À renforcer</strong></div><div><span>Analyse</span><strong>Multi-critères</strong></div><div><span>Recommandations</span><strong>Plan d’action</strong></div></div>
+ <div class="ds-rp-card__chart-head"><span><strong>Repères de performance</strong><small>Visualisation illustrative</small></span><span class="ds-rp-card__chart-pill">Exemple</span></div>
+ <svg class="ds-rp-card__bars" viewBox="0 0 360 54" preserveAspectRatio="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">${bars(0,4,360,46,BARS.concat([62,88,70,92]),'#8B5CF6')}</svg>
+ <p class="ds-rp-card__footnote">Données et score fictifs — aperçu visuel, non issu d’un audit réel.</p></figure>`;
 }
