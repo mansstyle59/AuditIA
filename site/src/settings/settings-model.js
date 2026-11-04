@@ -19,20 +19,27 @@ export const EDITABLE = [
 ];
 export const EDITABLE_KEYS = EDITABLE.map(f => f.key);
 
-// Services : seuls Places et PageSpeed alimentent réellement la nouvelle interface (lots 3 et 4).
-export const SERVICES = [
-  { id: 'places', column: 'google_places_api_key', label: 'Google Places', role: 'Recherche et détails des commerces (Prospects).', used: true },
-  { id: 'pagespeed', column: 'pagespeed_api_key', label: 'PageSpeed Insights', role: 'Performance du site dans les audits.', used: true },
-  { id: 'claude', column: null, label: 'Assistant Claude', role: 'Fonction serveur : la clé reste côté serveur et n’est jamais lue ici.', used: false, server: true },
+// Intégrations : seules Places et PageSpeed sont raccordées aux analyses de la nouvelle interface.
+// Les autres clés peuvent être enregistrées ici, mais leur présence ne signifie pas que le connecteur est déjà activé.
+export const API_SERVICES = [
+  { column: 'google_places_api_key', label: 'Google Places', role: 'Recherche, coordonnées et détails des commerces.', group: 'core', used: true, secret: true, url: 'https://console.cloud.google.com/google/maps-apis/credentials', link: 'Gérer la clé Google Cloud' },
+  { column: 'pagespeed_api_key', label: 'PageSpeed Insights', role: 'Mesure des performances et indicateurs Lighthouse.', group: 'core', used: true, secret: true, url: 'https://console.cloud.google.com/apis/library/pagespeedonline.googleapis.com', link: 'Activer PageSpeed Insights' },
+  { column: 'google_maps_api_key', label: 'Google Maps', role: 'Clé conservée pour une future carte interactive.', group: 'other', used: false, secret: true, url: 'https://console.cloud.google.com/google/maps-apis/credentials', link: 'Gérer la clé Google Maps' },
+  { column: 'bing_webmaster_api_key', label: 'Bing Webmaster Tools', role: 'Données de visibilité Bing — connecteur non activé dans cette version.', group: 'other', used: false, secret: true, url: 'https://www.bing.com/webmasters/', link: 'Ouvrir Bing Webmaster Tools' },
+  { column: 'openai_api_key', label: 'OpenAI', role: 'Clé serveur réservée aux futures fonctions IA ; jamais utilisée dans le navigateur.', group: 'other', used: false, secret: true, url: 'https://platform.openai.com/api-keys', link: 'Gérer les clés OpenAI' },
+  { column: 'logo_dev_publishable_key', label: 'Logo.dev', role: 'Clé publishable pour les logos — jamais de clé secrète ici.', group: 'other', used: false, secret: false, url: 'https://www.logo.dev/', link: 'Gérer Logo.dev' },
 ];
-// Colonnes de clés lues uniquement pour savoir si elles sont renseignées (jamais affichées).
-export const KEY_COLUMNS = ['google_places_api_key', 'pagespeed_api_key', 'google_maps_api_key', 'logo_dev_publishable_key', 'bing_webmaster_api_key', 'openai_api_key'];
-export const OTHER_KEYS = [
-  { column: 'google_maps_api_key', label: 'Google Maps' },
-  { column: 'logo_dev_publishable_key', label: 'Logo.dev' },
-  { column: 'bing_webmaster_api_key', label: 'Bing Webmaster' },
-  { column: 'openai_api_key', label: 'OpenAI' },
+export const KEY_COLUMNS = API_SERVICES.map(s => s.column);
+export const API_META_FIELDS = [
+  { key: 'search_console_property', label: 'Propriété Google Search Console', type: 'text', max: 300, hint: 'Ex. sc-domain:monsite.fr ou URL de la propriété.' },
+  { key: 'google_business_profile_url', label: 'Lien Google Business Profile', type: 'url', max: 2048, hint: 'Lien direct vers la fiche établissement.' },
+  { key: 'integrations_notes', label: 'Notes d’intégration', type: 'textarea', max: 3000, hint: 'Notes internes sur les projets, restrictions ou connexions.' },
 ];
+export const API_META_KEYS = API_META_FIELDS.map(f => f.key);
+
+// Compatibilité pour les anciens composants qui lisent encore OTHER_KEYS.
+export const OTHER_KEYS = API_SERVICES.filter(s => s.group === 'other').map(s => ({ column: s.column, label: s.label }));
+
 
 export const isAdminUser = user => !!(user && user.email && String(user.email).trim().toLowerCase() === ADMIN_EMAIL.toLowerCase());
 
