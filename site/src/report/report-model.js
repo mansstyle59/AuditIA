@@ -114,17 +114,6 @@ function buildCriteria(diag) {
 }
 
 
-const ageLabel = (iso, now = new Date()) => {
-  if (!iso) return '';
-  const d = new Date(iso);
-  if (!Number.isFinite(d.getTime())) return '';
-  let months = (now.getFullYear() - d.getFullYear()) * 12 + now.getMonth() - d.getMonth();
-  if (now.getDate() < d.getDate()) months--;
-  if (months < 0) return '';
-  const years = Math.floor(months / 12), rest = months % 12;
-  return years ? years + ' an' + (years > 1 ? 's' : '') + (rest ? ' et ' + rest + ' mois' : '') : months + ' mois';
-};
-
 function buildCompetitors(si) {
   const cp = si && si.competitors;
   if (!cp || !Array.isArray(cp.list) || !cp.list.length) return null;
@@ -248,7 +237,7 @@ export function buildReport(audit, client, allAudits = [], now = new Date()) {
       coverage: diag.coverage, measured: diag.measuredCount, total: diag.totalCount,
     },
     pillars: { seo: { ...pillar(diag.seo), total: countOf('seo') }, geo: { ...pillar(diag.geo), total: countOf('geo') } },
-    businessProfile: buildBusinessProfile(audit, client, now),
+
     businessProfile: bp,
     sources: buildSources(audit, client),
     unmeasuredNotes: (an.unmeasured || []).filter(x => x.n > 0).map(x => ({ label: clean(x.label), why: clean(x.why), n: x.n })),
