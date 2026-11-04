@@ -113,6 +113,54 @@ function buildCriteria(diag) {
   };
 }
 
+
+const ageLabel = (iso, now = new Date()) => {
+  if (!iso) return '';
+  const d = new Date(iso);
+  if (!Number.isFinite(d.getTime())) return '';
+  let months = (now.getFullYear() - d.getFullYear()) * 12 + now.getMonth() - d.getMonth();
+  if (now.getDate() < d.getDate()) months--;
+  if (months < 0) return '';
+  const years = Math.floor(months / 12), rest = months % 12;
+  return years ? years + ' an' + (years > 1 ? 's' : '') + (rest ? ' et ' + rest + ' mois' : '') : months + ' mois';
+};
+function buildBusinessProfile(audit, client, now) {
+  const d = (client && client.details) || {};
+  const s = d.sirene && d.sirene.matched ? d.sirene : {};
+  const addr = clean(d.address || [s.adresse, s.codePostal, s.ville].filter(Boolean).join(', '));
+  const created = clean(s.dateCreation || '');
+  const phone = clean((client && client.phone) || d.phone || '');
+  const email = clean(d.email || '');
+  const website = clean((client && client.website) || d.website || '');
+  const hours = Array.isArray(d.hours) ? d.hours.filter(Boolean) : Array.isArray(d.openingHours) ? d.openingHours.filter(Boolean) : [];
+  const googleStatus = clean(d.businessStatus || d.status || '');
+  const sourceName = s.matched ? 'Annuaire des Entreprises / recherche API publique' : 'Registre public non rapproché';
+  const officialUrl = s.siren ? 'https://annuaire-entreprises.data.gouv.fr/entreprise/' + encodeURIComponent(s.siren) : '';
+  return {
+    legalName: clean(s.denomination || ''),
+    siren: clean(s.siren || ''),
+    siret: clean(s.siret || ''),
+    legalForm: clean(s.formeJuridique || ''),
+    naf: clean(s.naf || ''),
+    creationDate: created,
+    ageLabel: ageLabel(created, now),
+    establishments: num(s.etablissements),
+    postalCode: clean(s.codePostal || ''),
+    legalCity: clean(s.ville || ''),
+    address: addr,
+    phone, email, website, hours,
+    googleStatus,
+    rating: num(d.rating), reviews: num(d.reviews),
+    googleMapsUrl: clean(d.googleMapsUrl || d.mapsUrl || ''),
+    officialUrl,
+    officialSource: sourceName,
+    legalStatus: s.matched ? 'matched' : 'unavailable',
+    legalConfidence: clean(s.matchConfidence || (s.matched ? 'À vérifier avec l’adresse de l’établissement' : 'Aucune correspondance confirmée')),
+    fetchedAt: clean(s.fetchedAt || ''),
+    ageIsEstimate: !!created,
+  };
+}
+
 function buildCompetitors(si) {
   const cp = si && si.competitors;
   if (!cp || !Array.isArray(cp.list) || !cp.list.length) return null;
@@ -217,6 +265,7 @@ export function buildReport(audit, client, allAudits = [], now = new Date()) {
       coverage: diag.coverage, measured: diag.measuredCount, total: diag.totalCount,
     },
     pillars: { seo: { ...pillar(diag.seo), total: countOf('seo') }, geo: { ...pillar(diag.geo), total: countOf('geo') } },
+    businessProfile: buildBusinessProfile(audit, client, now),
     sources: buildSources(audit, client),
     unmeasuredNotes: (an.unmeasured || []).filter(x => x.n > 0).map(x => ({ label: clean(x.label), why: clean(x.why), n: x.n })),
     infoNotes: (an.unmeasured || []).filter(x => x.n === 0).map(x => ({ label: clean(x.label), why: clean(x.why) })),
