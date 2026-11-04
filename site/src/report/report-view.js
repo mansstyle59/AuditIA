@@ -33,6 +33,29 @@ function criteria(title, list, p) {
     <ul class="rp-rows">${list.map(x => `<li><div class="rp-row__top"><b>${escHtml(x.label)}</b>${statusPill(x.status)}</div><p>${escHtml(x.text)}</p>${x.status !== 'unmeasured' && x.source ? `<span class="rp-src">Source : ${escHtml(x.source)}</span>` : ''}</li>`).join('')}</ul></details>`;
 }
 
+function categoryCriteria(cat) {
+  const items = cat.items || [];
+  const score = cat.score == null ? 'Score non calculable' : cat.score + '/100';
+  const tone = cat.score == null ? 'none' : cat.score >= 75 ? 'good' : cat.score >= 50 ? 'warn' : 'bad';
+  const statusText = cat.score == null ? 'Données insuffisantes' : cat.fixCount
+    ? cat.fixCount + ' point' + (cat.fixCount > 1 ? 's' : '') + ' à améliorer'
+    : 'Aucun défaut relevé parmi les critères mesurés';
+  return `<details class="rp-det rp-category">
+    <summary><span><b>${escHtml(cat.label)}</b><small>${escHtml(cat.description || '')}</small></span><span class="rp-sum">${escHtml(score)} · ${cat.measuredCount}/${cat.totalCount}</span></summary>
+    <div class="rp-category__meta">${pill(statusText, tone)}<span>${cat.coverage}% de couverture</span></div>
+    <ul class="rp-rows">${items.map(x => `<li><div class="rp-row__top"><b>${escHtml(x.label)}</b>${statusPill(x.status)}</div><p>${escHtml(x.text)}</p>${x.source ? `<span class="rp-src">Source : ${escHtml(x.source)}</span>` : ''}</li>`).join('')}</ul>
+  </details>`;
+}
+
+function contextCriteria(ctx) {
+  if (!ctx || !ctx.items || !ctx.items.length) return '';
+  const status = value => value === 'measured' ? srcPill('measured') : value === 'na' ? srcPill('na') : srcPill('unmeasured');
+  return `<details class="rp-det rp-category">
+    <summary><span><b>${escHtml(ctx.label)}</b><small>${escHtml(ctx.description || '')}</small></span><span class="rp-sum">${ctx.measuredCount}/${ctx.totalCount} disponibles · non noté</span></summary>
+    <ul class="rp-rows">${ctx.items.map(x => `<li><div class="rp-row__top"><b>${escHtml(x.label)}</b>${status(x.status)}</div><p>${escHtml(x.detail)}</p><span class="rp-src">Source : ${escHtml(x.source)}</span></li>`).join('')}</ul>
+    ${note('Ces éléments donnent du contexte à l’analyse. Ils ne modifient pas le score global.')}</details>`;
+}
+
 export function reportPreviewHtml(m) {
   if (!m || !m.ok) return `<p class="rp-note" role="alert">${escHtml((m && m.reason) || 'Rapport indisponible.')}</p>`;
   const cd = chartData(m);
@@ -53,8 +76,8 @@ export function reportPreviewHtml(m) {
     ${cd.indicators.length ? barsSvg(cd.indicators, { title: 'Indicateurs disponibles (sur 100)', id: 'indicators', suffix: '' }) : note('Aucun indicateur chiffré n’est disponible : les données mesurées sont insuffisantes.')}
     ${cd.pillars.some(p => p.value == null) ? note('Un volet sans valeur n’a pas pu être chiffré : ses données ne sont pas disponibles.') : ''}`, 'summary'));
 
-  n++; out.push(sec(n, 'Indicateurs SEO et GEO', `${note('Chaque critère est mesuré à partir d’une source identifiée. Un critère « non mesuré » est exclu du score : ce n’est ni un défaut ni une réussite.')}
-    ${criteria('SEO · être trouvé sur Google', m.criteria.seo, m.pillars.seo)}${criteria('GEO · être compris par les assistants IA', m.criteria.geo, m.pillars.geo)}`, 'criteria'));
+  n++; out.push(sec(n, 'Diagnostic détaillé par catégorie', `${note('Les scores par catégorie sont calculés uniquement sur les contrôles réellement mesurés. Une donnée absente ne vaut ni défaut ni réussite.')}
+    ${(m.criteria.categories || []).map(categoryCriteria).join('')}${contextCriteria(m.criteria.context)}`, 'criteria'));
 
   const nMeas = m.sources.filter(s => s.status === 'measured').length, nUn = m.sources.filter(s => s.status === 'unmeasured').length, nNa = m.sources.filter(s => s.status === 'na').length;
   n++; out.push(sec(n, 'Sources et fiabilité des mesures', `${note(`${nMeas} source${nMeas > 1 ? 's' : ''} mesurée${nMeas > 1 ? 's' : ''}, ${nUn} non mesurée${nUn > 1 ? 's' : ''}${nNa ? `, ${nNa} sans objet` : ''}. Une source non mesurée n’a pas répondu : aucune valeur n’est estimée à sa place.`)}
