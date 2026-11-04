@@ -96,18 +96,44 @@ function recoCard(an) {
 }
 
 function criteriaCard(an) {
-  const group = (pillar, label, open) => {
-    const items = an.diag.items.filter(x => x.pillar === pillar);
-    if (!items.length) return '';
-    const m = items.filter(x => x.measured).length;
-    const rows = items.map(x => {
+  const categories = Array.isArray(an.diag.categories) ? an.diag.categories : [];
+  const scored = categories.filter(x => x.scored);
+  const tone = score => score == null ? 'neutral' : score >= 75 ? 'good' : score >= 50 ? 'warn' : 'danger';
+  const categoryRows = scored.map((cat, i) => {
+    const items = Array.isArray(cat.items) ? cat.items : [];
+    const measured = items.filter(x => x.measured).length;
+    const scoreText = cat.score == null ? 'Non mesuré' : cat.score + '/100';
+    const stateText = cat.score == null ? 'Données insuffisantes' : cat.fixCount
+      ? cat.fixCount + ' point' + (cat.fixCount > 1 ? 's' : '') + ' à corriger'
+      : 'Aucun défaut relevé parmi les contrôles mesurés';
+    const meter = cat.score == null ? '' : `<div class="ds-cat-meter" role="img" aria-label="Score de catégorie : ${cat.score} sur 100"><span class="ds-cat-meter__fill ds-cat-meter__fill--${tone(cat.score)}" style="width:${Math.max(0,Math.min(100,cat.score))}%"></span></div>`;
+    const rows = items.length ? items.map(x => {
       const st = !x.measured ? badge('Non mesuré') : x.ok ? badge('Conforme', 'good') : badge('À corriger', 'danger');
-      const txt = !x.measured ? 'Donnée non disponible : exclu du score.' : x.ok ? x.advice : (x.gap || x.advice);
+      const txt = !x.measured ? 'Donnée non disponible : exclue du score.' : x.ok ? x.advice : (x.gap || x.advice);
       return `<li class="ds-crit"><div class="ds-crit__top"><span class="ds-crit__name">${escHtml(x.label)}</span>${st}</div><p class="ds-row__meta">${escHtml(txt)}</p><span class="ds-row__meta ds-crit__src">Source : ${escHtml(x.source)}</span></li>`;
-    }).join('');
-    return `<details class="ds-crit-group"${open ? ' open' : ''}><summary><span>${escHtml(label)}</span><span class="ds-row__meta">${m} mesuré${m > 1 ? 's' : ''} / ${items.length}</span></summary><ul class="ds-crits">${rows}</ul></details>`;
-  };
-  return card({ title: 'Critères du diagnostic', body: group('seo', 'SEO · Google', true) + group('geo', 'GEO · assistants IA', false) });
+    }).join('') : '<li class="ds-crit"><p class="ds-row__meta">Aucun contrôle exploitable pour cette catégorie lors de cet audit.</p></li>';
+    return `<details class="ds-crit-group ds-cat-group"${i === 0 ? ' open' : ''}>
+      <summary class="ds-cat-summary"><span class="ds-cat-summary__main"><b>${escHtml(cat.label)}</b><small>${escHtml(cat.description || '')}</small><span class="ds-cat-summary__state">${escHtml(stateText)}</span></span>
+        <span class="ds-cat-summary__score">${badge(scoreText, tone(cat.score))}<small>${measured}/${items.length} mesurés</small></span>
+      </summary>
+      ${meter}<ul class="ds-crits">${rows}</ul>
+      <p class="ds-cat-foot">${cat.coverage}% de couverture de cette catégorie · les contrôles non mesurés ne sont pas considérés comme des défauts.</p>
+    </details>`;
+  }).join('');
+
+  const context = categories.find(x => x.id === 'context');
+  const contextRows = context && Array.isArray(context.items) ? context.items.map(x => {
+    const st = x.status === 'measured' ? badge('Donnée disponible', 'good') : x.status === 'na' ? badge('Sans objet') : badge('Non mesuré');
+    return `<li class="ds-crit"><div class="ds-crit__top"><span class="ds-crit__name">${escHtml(x.label)}</span>${st}</div><p class="ds-row__meta">${escHtml(x.detail)}</p><span class="ds-row__meta ds-crit__src">Source : ${escHtml(x.source)}</span></li>`;
+  }).join('') : '';
+  const contextBlock = contextRows ? `<details class="ds-crit-group ds-cat-group"><summary class="ds-cat-summary"><span class="ds-cat-summary__main"><b>${escHtml(context.label)}</b><small>${escHtml(context.description)}</small><span class="ds-cat-summary__state">Informations de contexte · non notées</span></span><span class="ds-cat-summary__score">${badge((context.measuredCount || 0) + '/' + (context.totalCount || 0) + ' disponibles')}</span></summary><ul class="ds-crits">${contextRows}</ul><p class="ds-cat-foot">Ces éléments apportent du contexte. Ils n’augmentent ni ne diminuent le score global.</p></details>` : '';
+  const measured = an.diag.measuredCount, total = an.diag.totalCount;
+  return card({
+    title: 'Diagnostic détaillé par catégorie',
+    body: `<p class="ds-row__meta ds-cat-intro">Chaque domaine possède son propre score et son taux de couverture. Seuls les contrôles réellement mesurés entrent dans les scores ; une donnée manquante reste neutre.</p>
+      <div class="ds-cat-overview"><strong>${measured}/${total} contrôles mesurés</strong><span>${an.diag.coverage}% de couverture globale</span></div>
+      ${categoryRows}${contextBlock}`,
+  });
 }
 
 function strengthsCard(an) {
