@@ -1,0 +1,54 @@
+/* =====================================================================
+   AuditIA — finitions ordinateur (couche finale, chargée après home-compact.css)
+   Ne s'applique qu'à partir de 761 px. Le mobile n'est pas modifié.
+   ===================================================================== */
+@media (min-width: 761px) {
+  /* En-têtes de page : bannière sobre, sans illustration géante en fond. */
+  html body[data-view]:has(.workspace-app) .workspace-app .workspace-main > .workspace-head {
+    padding: 20px 24px !important;
+    min-height: 0 !important;
+  }
+  html body:has(.workspace-app) .workspace-main > .workspace-head .ws-head-art {
+    display: none !important;
+  }
+  html body:has(.workspace-app) .workspace-main > .workspace-head,
+  html body:has(.workspace-app) .workspace-main > .workspace-head[style] {
+    background-image: none !important;
+  }
+  html body[data-view]:has(.workspace-app) .workspace-app .workspace-main > .workspace-head::after {
+    display: none !important;
+    content: none !important;
+  }
+
+  /* Filtres « Nouveautés » : une seule ligne alignée. */
+  html body:has(.workspace-app) .workspace-app .nv-filters .nv-city-input {
+    width: 100% !important;
+    max-width: none !important;
+    height: 48px !important;
+  }
+  html body:has(.workspace-app) .workspace-app .nv-filters .nv-city-input input[data-nv-city] {
+    width: auto !important;
+    flex: 1 1 auto !important;
+  }
+  html body:has(.workspace-app) .workspace-app .nv-filters {
+    display: grid !important;
+    grid-template-columns: 220px minmax(0, 1fr) auto !important;
+    align-items: end !important;
+    gap: 14px !important;
+    padding: 18px 20px !important;
+  }
+  html body:has(.workspace-app) .workspace-app .nv-filters > label {
+    display: block !important;
+    min-width: 0 !important;
+  }
+  html body:has(.workspace-app) .workspace-app .nv-filters .nv-city-label {
+    grid-column: auto !important;
+  }
+  html body:has(.workspace-app) .workspace-app .nv-filters > [data-nv-refresh] {
+    grid-column: auto !important;
+    height: 48px !important;
+    min-height: 48px !important;
+    padding: 0 22px !important;
+    white-space: nowrap !important;
+  }
+}
