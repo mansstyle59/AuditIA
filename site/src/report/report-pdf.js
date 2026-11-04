@@ -241,17 +241,36 @@ export function buildReportPdf(JsPDF, m) {
     if (miss) para('Un volet sans valeur ci-dessus n’a pas pu être chiffré : ses données ne sont pas disponibles.', { size: 8.8, color: C.muted });
   } else para('Aucun indicateur chiffré n’est disponible : les données mesurées sont insuffisantes.', { color: C.muted });
 
-  /* =============== INDICATEURS SEO / GEO =============== */
-  section('Indicateurs SEO et GEO', 72);
-  para('Chaque critère est mesuré à partir d’une source identifiée. Un critère « non mesuré » est exclu du score : ce n’est ni un défaut ni une réussite.', { size: 9, color: C.muted });
-  const statusCell = s => s === 'ok' ? { badge: 'Conforme', tone: 'good' } : s === 'fix' ? { badge: 'À améliorer', tone: 'bad' } : { badge: 'Non mesuré', tone: 'none' };
+  /* =============== DIAGNOSTIC PAR CATÉGORIE =============== */
+  section('Diagnostic détaillé par catégorie', 90);
+  para('Chaque catégorie présente les contrôles disponibles, leur source et leur état. Les scores de catégorie ne prennent en compte que les éléments réellement mesurés ; les données manquantes ne sont pas pénalisées.', { size: 9, color: C.muted });
+  const statusCell = s => s === 'ok' ? { badge: 'Conforme', tone: 'good' }
+    : s === 'fix' ? { badge: 'À améliorer', tone: 'bad' }
+    : s === 'measured' ? { badge: 'Disponible', tone: 'good' }
+    : s === 'na' ? { badge: 'Sans objet', tone: 'none' }
+    : { badge: 'Non mesuré', tone: 'none' };
   const critTable = (title, list, p) => {
     if (!list.length) return;
     sub(`${title} · ${list.filter(x => x.status !== 'unmeasured').length} mesuré${list.filter(x => x.status !== 'unmeasured').length > 1 ? 's' : ''} sur ${list.length}` + (p.value != null ? ` · score ${p.value}/100` : ''), 26);
     table([{ w: 48 }, { w: 28 }, { w: 98 }], ['Critère', 'État', 'Constat'], list.map(x => [{ text: x.label, bold: true }, statusCell(x.status), x.text + (x.status !== 'unmeasured' && x.source ? ' (' + x.source + ')' : '')]));
   };
-  critTable('SEO · être trouvé sur Google', m.criteria.seo, m.pillars.seo);
-  critTable('GEO · être compris par les assistants IA', m.criteria.geo, m.pillars.geo);
+  const categoryTables = (m.criteria.categories || []);
+  if (categoryTables.length) {
+    categoryTables.forEach(cat => {
+      if (!cat.items.length) { sub(cat.label + ' · aucun contrôle exploitable', 12); return; }
+      const measured = cat.measuredCount || 0;
+      sub(`${cat.label} · ${measured}/${cat.totalCount} mesurés · ${cat.score == null ? 'score non calculable' : 'score ' + cat.score + '/100'} · couverture ${cat.coverage}%`, 26);
+      table([{ w: 48 }, { w: 28 }, { w: 98 }], ['Critère', 'État', 'Constat'], cat.items.map(x => [{ text: x.label, bold: true }, statusCell(x.status), x.text + (x.source ? ' (' + x.source + ')' : '')]));
+    });
+  } else {
+    critTable('SEO · être trouvé sur Google', m.criteria.seo, m.pillars.seo);
+    critTable('GEO · être compris par les assistants IA', m.criteria.geo, m.pillars.geo);
+  }
+  if (m.criteria.context && m.criteria.context.items.length) {
+    sub('Données légales, domaine et concurrence · éléments de contexte non notés', 26);
+    table([{ w: 48 }, { w: 28 }, { w: 98 }], ['Élément', 'État', 'Information'], m.criteria.context.items.map(x => [{ text: x.label, bold: true }, statusCell(x.status), x.detail + (x.source ? ' (' + x.source + ')' : '')]));
+    para('Ces informations enrichissent le diagnostic mais ne modifient pas le score global.', { size: 8.8, color: C.muted });
+  }
 
   /* =============== SOURCES ET FIABILITÉ =============== */
   section('Sources et fiabilité des mesures', 70);
