@@ -97,6 +97,96 @@ export function improvementPlan(a,c){
       return items.sort((x,y)=>rank[x.priority]-rank[y.priority]);
     }
 
+export const AUDIT_CATEGORY_META = [
+  { id: 'google', label: 'Fiche Google & informations pratiques', description: 'Identification de l’établissement, coordonnées, horaires et photos.', scored: true },
+  { id: 'reputation', label: 'Avis & e-réputation', description: 'Note publique et volume d’avis observés.', scored: true },
+  { id: 'website', label: 'Site web & expérience mobile', description: 'Sécurité, lisibilité mobile, contact et qualité technique.', scored: true },
+  { id: 'local_seo', label: 'SEO local & mots-clés', description: 'Référencement technique et présence dans les recherches explorées.', scored: true },
+  { id: 'social', label: 'Réseaux sociaux & annuaires', description: 'Profils sociaux et présence dans les annuaires détectés.', scored: true },
+  { id: 'geo', label: 'Visibilité IA & GEO', description: 'Données structurées, lisibilité et accès des assistants IA.', scored: true },
+  { id: 'context', label: 'Données légales, domaine & concurrence', description: 'Informations de contexte vérifiables, sans note artificielle.', scored: false },
+];
+
+const CATEGORY_BY_CRITERION = {
+  'Fiche Google Business': 'google',
+  'Présence reconnue (Google/Maps)': 'google',
+  'Horaires renseignés': 'google',
+  'Téléphone visible': 'google',
+  'Photos sur la fiche Google': 'google',
+  'Note Google': 'reputation',
+  'Volume d’avis': 'reputation',
+  'Avis publics': 'reputation',
+  'Site web': 'website',
+  'Site sécurisé (HTTPS)': 'website',
+  'Performance mobile': 'website',
+  'Balises SEO (titre + description)': 'website',
+  'Compatible mobile': 'website',
+  'Prise de contact en ligne': 'website',
+  'Référencement technique (Lighthouse)': 'local_seo',
+  'Présence sur les mots-clés explorés': 'local_seo',
+  'Ville dans le titre': 'local_seo',
+  'Réseaux sociaux reliés': 'social',
+  'Présence dans les annuaires détectés': 'social',
+  'Présence sur plusieurs réseaux': 'social',
+  'Données structurées LocalBusiness': 'geo',
+  'Contenu lisible sur la page': 'geo',
+  'Adresse et horaires en clair': 'geo',
+  'Cohérence du téléphone': 'geo',
+  'Description claire': 'geo',
+  'Robots IA et robots.txt': 'geo',
+  'Fichier llms.txt': 'geo',
+  'FAQ détectée': 'geo',
+  'Contenu structuré': 'geo',
+  'Informations concrètes': 'geo',
+  'Date de mise à jour lisible': 'geo',
+};
+
+function categorySummary(meta, items) {
+  const measured = items.filter(x => x.measured);
+  const weight = measured.reduce((n, x) => n + (Number(x.weight) || 0), 0);
+  const earned = measured.reduce((n, x) => n + (Number(x.weight) || 0) * (x.val == null ? (x.ok ? 1 : 0) : x.val), 0);
+  const totalWeight = items.reduce((n, x) => n + (Number(x.weight) || 0), 0);
+  return {
+    ...meta,
+    items,
+    score: meta.scored && weight > 0 ? Math.round(earned / weight * 100) : null,
+    measuredCount: measured.length,
+    totalCount: items.length,
+    coverage: items.length ? Math.round(measured.length / items.length * 100) : 0,
+    fixCount: measured.filter(x => x.ok === false).length,
+    unmeasuredCount: items.length - measured.length,
+    measuredWeight: weight,
+    possibleWeight: totalWeight,
+  };
+}
+
+function contextEvidence(a, c) {
+  const d = (c && c.details) || {};
+  const si = a && a.site;
+  const out = [];
+  if (d.sirene && d.sirene.matched) {
+    out.push({ label: 'Registre SIRENE', status: 'measured', source: 'SIRENE', detail: d.sirene.dateCreation ? 'Entreprise retrouvée · création le ' + new Date(d.sirene.dateCreation).toLocaleDateString('fr-FR') : 'Entreprise retrouvée dans le registre.' });
+  } else {
+    out.push({ label: 'Registre SIRENE', status: 'unmeasured', source: 'SIRENE', detail: 'Entreprise non confirmée par cette recherche : cela ne prouve pas une absence d’immatriculation.' });
+  }
+  if (!(c && c.website)) {
+    out.push({ label: 'Ancienneté du domaine', status: 'na', source: 'WHOIS / RDAP', detail: 'Sans objet : aucun site web n’est renseigné.' });
+  } else if (d.domainCreated) {
+    const date = new Date(d.domainCreated);
+    out.push({ label: 'Ancienneté du domaine', status: 'measured', source: 'WHOIS / RDAP', detail: Number.isNaN(date.getTime()) ? 'Date de création : ' + String(d.domainCreated) : 'Domaine créé le ' + date.toLocaleDateString('fr-FR') + '.' });
+  } else {
+    out.push({ label: 'Ancienneté du domaine', status: 'unmeasured', source: 'WHOIS / RDAP', detail: 'Date de création non disponible.' });
+  }
+  const competitors = si && si.competitors;
+  if (competitors && Array.isArray(competitors.list) && competitors.list.length) {
+    const rank = competitors.selfRank ? 'Position n°' + competitors.selfRank + ' sur ' + (competitors.total || competitors.list.length) + ' selon le volume d’avis. ' : '';
+    out.push({ label: 'Concurrence locale', status: 'measured', source: 'Google Places', detail: rank + competitors.list.length + ' commerces comparés. Ce repère ne représente pas le classement Google Maps.' });
+  } else {
+    out.push({ label: 'Concurrence locale', status: 'unmeasured', source: 'Google Places', detail: 'Aucune comparaison exploitable n’a été retournée.' });
+  }
+  return out;
+}
+
 export function visibilityAudit(a,c){
       const d=(c&&c.details)||{}, scan=a&&a.scan, si=a&&a.site;
       const site=String((c&&c.website)||d.website||'').trim();
@@ -118,7 +208,7 @@ export function visibilityAudit(a,c){
         const measured=observed!==null&&observed!==undefined;
         const ok=measured?!!observed:null;
         const v=measured?(val==null?(ok?1:0):Math.max(0,Math.min(1,Number(val)))):null;
-        items.push({pillar,label,ok,measured,weight,source:source||'Données du dossier',advice:!measured?'À vérifier : donnée non disponible.':ok?good:bad,gap:measured&&!ok?bad:'',val:v});
+        items.push({pillar,label,category:CATEGORY_BY_CRITERION[label] || (pillar === 'geo' ? 'geo' : 'local_seo'),ok,measured,weight,source:source||'Données du dossier',advice:!measured?'À vérifier : donnée non disponible.':ok?good:bad,gap:measured&&!ok?bad:'',val:v});
       };
       // SEO : présence locale, réputation, site et mesures techniques réellement disponibles.
       add('seo','Fiche Google Business',hasGoogle,18,'La fiche Google n’est pas confirmée dans les données du dossier. Vérifier la fiche publique avant de conclure.','Fiche Google identifiée.',null,'Fiche commerce');
@@ -196,7 +286,8 @@ export function visibilityAudit(a,c){
       const seoP=pill('seo'),geoP=pill('geo'),valid=[seoP,geoP].filter(p=>p.score!=null&&p.measuredCount>0);
       const index=valid.length?Math.round(valid.reduce((n,p)=>n+p.score,0)/valid.length):null;
       const measuredItems=items.filter(x=>x.measured),strengths=measuredItems.filter(x=>x.ok===true),weaknesses=measuredItems.filter(x=>x.ok===false&&x.gap);
-      return {items,seo:seoP,geo:geoP,index,strengths,weaknesses,measuredCount:measuredItems.length,totalCount:items.length,coverage:items.length?Math.round(measuredItems.length/items.length*100):0,hasScore:index!=null,scoreRange:valid.length?{low:Math.round(valid.reduce((n,p)=>n+(p.low||0),0)/valid.length),high:Math.round(valid.reduce((n,p)=>n+(p.high||0),0)/valid.length)}:null};
+      const categories = AUDIT_CATEGORY_META.map(meta => categorySummary(meta, meta.id === 'context' ? contextEvidence(a,c) : items.filter(x => x.category === meta.id)));
+       return {items,categories,seo:seoP,geo:geoP,index,strengths,weaknesses,measuredCount:measuredItems.length,totalCount:items.length,coverage:items.length?Math.round(measuredItems.length/items.length*100):0,hasScore:index!=null,scoreRange:valid.length?{low:Math.round(valid.reduce((n,p)=>n+(p.low||0),0)/valid.length),high:Math.round(valid.reduce((n,p)=>n+(p.high||0),0)/valid.length)}:null};
     }
 
 export function visibilityVerdict(i,diag){
