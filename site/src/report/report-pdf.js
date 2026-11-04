@@ -220,6 +220,10 @@ export function buildReportPdf(JsPDF, m) {
   font('normal', 8.5, C.muted);
   wrap('Rapport établi à partir des seules données réellement mesurées lors de l’audit. Une donnée non mesurée n’est jamais comptée comme un défaut.', CW, 8.5, 'normal').forEach((l, i) => pdf.text(l, M, 262 + i * 4));
 
+  /* La couverture utilise des coordonnées fixes : repartir sur une page dédiée évite
+     que la fiche commerce se superpose au bandeau violet de la page 1. */
+  newPage();
+
   /* =============== IDENTITÉ ET INFORMATIONS DU COMMERCE =============== */
   section('Fiche détaillée du commerce', 62);
   const bp = m.businessProfile || {};
