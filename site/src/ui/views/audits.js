@@ -214,8 +214,25 @@ function historyCard(history, currentId) {
 function clientCard(c) {
   if (!c) return '';
   const d = c.details || {};
-  const rows = [['Ville', c.city], ['Adresse', d.address], ['Site web', c.website], ['Note Google', d.rating != null ? '★ ' + d.rating + ' (' + (d.reviews || 0) + ' avis)' : '']].filter(r => r[1]);
-  return card({ title: 'Commerce', body: `<dl class="ds-info">${rows.map(([k, v]) => `<div><dt>${escHtml(k)}</dt><dd>${escHtml(v)}</dd></div>`).join('')}</dl>${btn({ label: 'Ouvrir la fiche client', attrs: `data-open-client="${escHtml(c.id)}"` })}` });
+  const s = d.sirene && d.sirene.matched ? d.sirene : {};
+  const rows = [
+    ['Adresse', d.address || [s.adresse, s.codePostal, s.ville].filter(Boolean).join(' ')],
+    ['Téléphone', c.phone || d.phone],
+    ['E-mail', d.email],
+    ['Site web', c.website || d.website],
+    ['SIREN', s.siren],
+    ['SIRET du siège', s.siret],
+    ['Raison sociale', s.denomination],
+    ['Date de création', s.dateCreation],
+    ['Forme juridique', s.formeJuridique],
+    ['Activité / code APE', [s.naf, s.nafSection].filter(Boolean).join(' · ')],
+    ['Établissements déclarés', s.etablissements],
+    ['État administratif', s.etatAdministratif === 'A' ? 'Actif' : s.etatAdministratif === 'F' ? 'Fermé' : s.etatAdministratif],
+    ['Note Google', d.rating != null ? '★ ' + d.rating + ' (' + (d.reviews || 0) + ' avis)' : ''],
+    ['Horaires Google', Array.isArray(d.hours) ? d.hours.join(' · ') : '']
+  ].filter(r => r[1] != null && String(r[1]).trim() !== '');
+  const legal = s.siren ? '<p class="ds-row__meta">Source : <a href="https://annuaire-entreprises.data.gouv.fr/entreprise/' + encodeURIComponent(s.siren) + '" target="_blank" rel="noopener noreferrer">Annuaire des Entreprises ↗</a> · Correspondance ' + escHtml(s.matchConfidence || 'à vérifier') + '</p>' : '<p class="ds-row__meta">Informations légales non confirmées : lancez une analyse complète pour interroger le registre public. Aucune donnée n’est déduite.</p>';
+  return card({ title: 'Fiche complète du commerce', body: '<dl class="ds-info">' + rows.map(([k, v]) => '<div><dt>' + escHtml(k) + '</dt><dd>' + escHtml(Array.isArray(v) ? v.join(' · ') : v) + '</dd></div>').join('') + '</dl>' + legal + btn({ label: 'Ouvrir la fiche client', attrs: 'data-open-client="' + escHtml(c.id) + '"' }) });
 }
 
 export function auditDossierView(a, c, d, ctl) {
