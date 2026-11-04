@@ -4737,7 +4737,7 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./maquette.css?v=30">
 <link rel="stylesheet" href="./desktop.css?v=11">
-<link rel="stylesheet" href="./mobile.css?v=3">
+<link rel="stylesheet" href="./mobile.css?v=4">
 <link rel="stylesheet" href="./auditia-refonte-v2.css?v=7">
   <link rel="stylesheet" href="./frost-experience.css?v=8">
 
@@ -7280,7 +7280,7 @@ function mqLatestHtml(){
         const reportRows=appAudits.filter(a=>{if(!q)return true;const c=appClients.find(x=>x.id===a.client_id);const d=c&&c.details||{};return norm([(c&&c.name)||'',(c&&c.city)||'',(c&&c.category)||'',(d.category||''),(a.title||''),(a.status||''),String(a.score||'')].join(' ')).includes(q);});
         const readyReports=reportRows.filter(a=>a.site||a.scan||auditHasAnalysis(a)).length;
         const reportList=reportRows.length?'<div class="report-list">'+reportRows.map(reportCardHtml).join('')+'</div>':'<div class="app-empty">'+(appAudits.length?'Aucun rapport pour « '+escHtml(auditFilter)+' ».':'Les rapports apparaissent ici après un audit.')+'</div>';
-        body='<div class="reports-page"><div class="audit-kpis"><article><b>'+reportRows.length+'</b><span>Dossiers</span></article><article><b>'+readyReports+'</b><span>Prêts à exporter</span></article><article><b>'+Math.max(0,reportRows.length-readyReports)+'</b><span>Sans analyse</span></article></div>'+(appAudits.length?'<input class="app-filter" data-audit-filter placeholder="Filtrer les graphiques par commerce, ville…" value="'+escHtml(auditFilter)+'">':'')+reportBoardHtml(reportRows)+'<section class="app-panel"><div class="rp-head"><h2>Exporter</h2>'+(appAudits.length?'<button type="button" class="app-btn" data-export-csv>Exporter en CSV</button>':'')+'</div>'+reportList+'</section></div>';
+        body='<div class="reports-page"><div class="audit-kpis"><article><b>'+reportRows.length+'</b><span>Dossiers</span></article><article><b>'+readyReports+'</b><span>Prêts à exporter</span></article><article><b>'+Math.max(0,reportRows.length-readyReports)+'</b><span>Sans analyse</span></article></div>'+(appAudits.length?'<input class="app-filter" data-audit-filter placeholder="Filtrer par commerce ou ville…" value="'+escHtml(auditFilter)+'">':'')+reportBoardHtml(reportRows)+'<section class="app-panel"><div class="rp-head"><h2>Exporter</h2>'+(appAudits.length?'<button type="button" class="app-btn" data-export-csv>Exporter en CSV</button>':'')+'</div>'+reportList+'</section></div>';
       } else if(appView==='Profil') {
          const meta=appUser?.user_metadata||{};
          const displayName=String(meta.display_name||meta.full_name||'');
