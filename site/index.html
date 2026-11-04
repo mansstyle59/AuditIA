@@ -4815,6 +4815,27 @@ header.app-topbar>a.tb-brand small{font-size:12px!important;color:#C9C4F0!import
       }
     }
   </style>
+  <!-- AuditIA anti-flou global : aucune surface n'utilise de flou (backdrop-filter), sur mobile comme sur desktop.
+       Placé en dernier pour l'emporter sur tous les blocs de styles précédents ; la sélection renforcée
+       (html body *:not(#_):not(#__)) bat les règles !important plus spécifiques. -->
+  <style id="auditia-anti-flou-global">
+    html body *:not(#_):not(#__),
+    html body *:not(#_):not(#__)::before,
+    html body *:not(#_):not(#__)::after {
+      -webkit-backdrop-filter: none !important;
+      backdrop-filter: none !important;
+    }
+    @media (max-width: 760px) {
+      html body:has(.workspace-app) .status-safe,
+      html body:has(.workspace-app) header.app-topbar,
+      html body:has(.workspace-app) .mobile-tabbar {
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+        filter: none !important;
+        opacity: 1 !important;
+      }
+    }
+  </style>
 </head>
 <body>
   <div class="status-safe" aria-hidden="true"></div>
