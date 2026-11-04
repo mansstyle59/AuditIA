@@ -715,3 +715,16 @@ html body:has(.workspace-app) .ai-float-launcher{
     width:100%!important;max-width:100%!important;
   }
 }
+
+/* AuditIA v110 — robust mobile hero artwork removal; independent of active view attributes */
+@media screen and (max-width: 760px){
+  body:has(.workspace-app) .workspace-app img.dk-hero-art,
+  .workspace-app img.dk-hero-art{
+    display:none!important;visibility:hidden!important;opacity:0!important;
+    width:0!important;height:0!important;max-width:0!important;max-height:0!important;
+    min-width:0!important;min-height:0!important;margin:0!important;padding:0!important;
+    border:0!important;position:absolute!important;overflow:hidden!important;
+  }
+  body:has(.workspace-app) .workspace-app .dk-hero-in,
+  .workspace-app .dk-hero-in{grid-template-columns:minmax(0,1fr)!important;}
+}
