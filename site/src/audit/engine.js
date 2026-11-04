@@ -33,8 +33,7 @@ const clone = o => JSON.parse(JSON.stringify(o));
 export function createAuditEngine(deps0) {
   const deps = Object.assign({
     getSupabase: () => null,
-    getPlacesKey: () => '',
-    getPagespeedKey: () => '',
+    getClient: () => null,
     timeoutScale: () => Number(globalThis.__liveTimeoutScale) || 1,
     wait: ms => new Promise(r => setTimeout(r, ms)),
     now: () => Date.now()
@@ -49,8 +48,7 @@ export function createAuditEngine(deps0) {
 
   /* Sources externes : mêmes fonctions que l'ancienne interface, clés lues en lecture seule. */
   const src = createAuditSources({
-    getPlacesKey: () => deps.getPlacesKey(),
-    getPagespeedKey: () => deps.getPagespeedKey(),
+    getClient: () => deps.getClient(),
     onSearch: () => { if (current && current.status === 'running') { current.stats.searches += 1; emit(); } },
     onFact: (label, value, detail) => setFact(label, value, detail)
   });

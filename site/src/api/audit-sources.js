@@ -6,15 +6,17 @@
    mêmes délais, mêmes secours. Seules les variables globales de l'ancienne page sont remplacées par des
    dépendances injectées (clés lues en lecture seule, rappels de progression).
    Les 5 autres sources (site, SIRENE, âge du domaine, capture, robots.txt/llms.txt) sont dans web-read.js. */
-import { safeHttpUrl, withTimeout, norm, siteHost } from '../core/utils.js';
+import { safeHttpUrl, norm, siteHost } from '../core/utils.js';
+import { secureApi } from './secure-api.js';
+import { placePhotoCount } from './places.js';
 import { SOCIAL_RX, businessInUrl } from '../audit/site-analysis.js';
 import { targetKeywords } from '../audit/scoring.js';
 import { readSiteText } from './web-read.js';
 
 export function createAuditSources(deps0){
   const deps=Object.assign({
-    getPlacesKey:()=>'', getPagespeedKey:()=>'',
-    onKeyStatus:()=>{}, onSearch:()=>{}, onFact:()=>{}
+    getClient:()=>null,
+    onSearch:()=>{}, onFact:()=>{}
   },deps0||{});
   const serpMemo=new Map();
       const DIRECTORY_RX=[['Pages Jaunes',/pagesjaunes\.fr/],['Google Maps',/(maps\.google\.|goo\.gl\/maps|g\.page)/],['TripAdvisor',/tripadvisor\./],['TheFork',/(thefork\.|lafourchette\.)/],['Yelp',/yelp\./],['Mappy',/mappy\./],['Petit Futé',/petitfute\./],['Justacôté',/justacote\./],['Cylex',/cylex/],['Foursquare',/foursquare\./],['Booking',/booking\.com/],['Uber Eats',/ubereats\./],['Deliveroo',/deliveroo\./],['Planity',/planity\./],['Doctolib',/doctolib\./],['Treatwell',/treatwell\./],['Resy',/resy\./]];
@@ -66,19 +68,17 @@ export function createAuditSources(deps0){
         return {socials,directories:dirs.slice(0,8)};
       }
       async function fetchPlacePhotos(placeId){
-        const key=deps.getPlacesKey(); if(!key||!placeId) return null;
-        try{ const r=await withTimeout(fetch('https://places.googleapis.com/v1/places/'+encodeURIComponent(placeId),{headers:{'X-Goog-Api-Key':key,'X-Goog-FieldMask':'photos'}}),12000); if(!r.ok) return null; const d=await r.json(); return Array.isArray(d.photos)?d.photos.length:0; }catch(e){ return null; }
+        if(!placeId) return null;
+        try{ return await placePhotoCount(deps.getClient, placeId); }catch(e){ return null; }
       }
       /* Concurrents locaux : commerces du même type dans la ville (Google Places), classés par avis */
       async function fetchCompetitors(c){
-        const key=deps.getPlacesKey(); if(!key) return null;
         const d=(c&&c.details)||{}; const city=String((c&&c.city)||'').trim();
         const base=targetKeywords(c).base||String((c&&c.category)||d.category||'commerce').toLowerCase();
         const query=(base+' '+city).trim();
         try{
-          const r=await withTimeout(fetch('https://places.googleapis.com/v1/places:searchText',{method:'POST',headers:{'Content-Type':'application/json','X-Goog-Api-Key':key,'X-Goog-FieldMask':'places.id,places.displayName,places.rating,places.userRatingCount,places.websiteUri,places.primaryTypeDisplayName,places.businessStatus,places.googleMapsUri'},body:JSON.stringify({textQuery:query,languageCode:'fr',regionCode:'FR',maxResultCount:20})}),15000);
-          if(!r.ok) return null;
-          const data=await r.json(); const places=data.places||[]; if(!places.length) return null;
+          const data=await secureApi(deps.getClient,{action:'places_searchText',textQuery:query,maxResultCount:20,mask:'competitors'},15000,'Google refuse la recherche des concurrents.');
+          const places=data.places||[]; if(!places.length) return null;
           const selfId=d.place_id||''; const selfName=norm((c&&c.name)||'');
           const seen=new Set(); const all=[];
           places.forEach(p=>{
@@ -89,8 +89,8 @@ export function createAuditSources(deps0){
           });
           if(selfName&&!all.some(x=>x.isSelf)&&city){
             try{
-              const r2=await withTimeout(fetch('https://places.googleapis.com/v1/places:searchText',{method:'POST',headers:{'Content-Type':'application/json','X-Goog-Api-Key':key,'X-Goog-FieldMask':'places.id,places.displayName,places.rating,places.userRatingCount,places.websiteUri,places.primaryTypeDisplayName,places.businessStatus,places.googleMapsUri'},body:JSON.stringify({textQuery:String((c&&c.name)||'')+' '+city,languageCode:'fr',regionCode:'FR',maxResultCount:10})}),12000);
-              if(r2.ok){ ((await r2.json()).places||[]).forEach(p=>{ const id=p.id||'', nm=(p.displayName&&p.displayName.text)||''; if(!nm||(id&&seen.has(id))) return; if(id) seen.add(id); const website=String(p.websiteUri||'').startsWith('http')?p.websiteUri:''; all.push({placeId:id,name:nm,rating:(typeof p.rating==='number')?p.rating:null,reviews:Number(p.userRatingCount)||0,website,primaryType:(p.primaryTypeDisplayName&&p.primaryTypeDisplayName.text)||'',businessStatus:p.businessStatus||'',mapsUrl:p.googleMapsUri||'',isSelf:(!!selfId&&id===selfId)||(!selfId&&!!selfName&&norm(nm)===selfName)}); }); }
+              const d2=await secureApi(deps.getClient,{action:'places_searchText',textQuery:String((c&&c.name)||'')+' '+city,maxResultCount:10,mask:'competitors'},12000,'Google refuse la recherche des concurrents.');
+              { (d2.places||[]).forEach(p=>{ const id=p.id||'', nm=(p.displayName&&p.displayName.text)||''; if(!nm||(id&&seen.has(id))) return; if(id) seen.add(id); const website=String(p.websiteUri||'').startsWith('http')?p.websiteUri:''; all.push({placeId:id,name:nm,rating:(typeof p.rating==='number')?p.rating:null,reviews:Number(p.userRatingCount)||0,website,primaryType:(p.primaryTypeDisplayName&&p.primaryTypeDisplayName.text)||'',businessStatus:p.businessStatus||'',mapsUrl:p.googleMapsUri||'',isSelf:(!!selfId&&id===selfId)||(!selfId&&!!selfName&&norm(nm)===selfName)}); }); }
             }catch(e){}
           }
           all.sort((a,b)=>(b.reviews-a.reviews)||((b.rating||0)-(a.rating||0))||a.name.localeCompare(b.name,'fr'));
@@ -127,14 +127,11 @@ export function createAuditSources(deps0){
       }
       async function fetchPagespeed(site){
         site=safeHttpUrl(site); if(!site) throw new Error('adresse non autorisée');
-        const key=String(deps.getPagespeedKey()||'').trim();
-        const u=new URL('https://www.googleapis.com/pagespeedonline/v5/runPagespeed');
-        u.searchParams.set('url',site); u.searchParams.set('strategy','mobile');
-        ['performance','accessibility','best-practices','seo'].forEach(cat=>u.searchParams.append('category',cat));
-        u.searchParams.set('locale','fr'); if(key) u.searchParams.set('key',key);
-        const r=await withTimeout(fetch(u.toString()),60000);
-        if(!r.ok){ if(key&&(r.status===400||r.status===401||r.status===403)) deps.onKeyStatus('pagespeed',false,key); const dd=await r.json().catch(()=>null); const m=(dd&&dd.error&&dd.error.message)||('HTTP '+r.status); throw new Error(r.status===429?'quota PageSpeed atteint':r.status===400?'adresse non analysable':m); }
-        const data=await r.json(); const lh=data.lighthouseResult; if(key) deps.onKeyStatus('pagespeed',true,key);
+        // Passe par le proxy serveur : la clé PageSpeed reste côté serveur. Les 4 catégories sont fixées par le serveur.
+        let data;
+        try{ data=await secureApi(deps.getClient,{action:'pagespeed',url:site,strategy:'mobile'},60000); }
+        catch(e){ if(e&&e.status===429) throw new Error('quota PageSpeed atteint'); if(e&&e.status===400) throw new Error('adresse non analysable'); throw new Error(e&&e.message?e.message:'PageSpeed indisponible'); }
+        const lh=data.lighthouseResult;
         if(!lh||!lh.categories) throw new Error('aucun résultat Lighthouse');
         const sc=k=>typeof (lh.categories[k]||{}).score==='number'?Math.round(lh.categories[k].score*100):null;
         const au=lh.audits||{}; const dv=k=>(au[k]&&au[k].displayValue)||null;

@@ -4,7 +4,7 @@
 // Écritures (les mêmes que l'ancienne interface, rien d'autre) : insertion d'un dossier `audits` si le client n'en a
 // pas de non analysé ; puis, par le moteur, mise à jour de `clients.details` et de `audits`.
 import { createAuditEngine } from '../audit/engine.js';
-import { loadAuditKeys, insertAudit, dataErrorMessage } from '../data/queries.js';
+import { insertAudit, dataErrorMessage } from '../data/queries.js';
 import { reusableAudit, newAuditRow, applyAuditResult, AUDIT_TITLE } from '../data/audits.js';
 import { liveHtml, bannerHtml } from './views/audit-live.js';
 import { auditsResultsHtml } from './views/audits.js';
@@ -12,13 +12,13 @@ import { auditsResultsHtml } from './views/audits.js';
 /* ctx : getUser(), getData(), setData(data), getSupabase(), rerender(), reload(), open(auditId)
          → rerender = recomposition complète de l'écran courant ; reload = rechargement silencieux des données. */
 export function createAuditController(ctx) {
-  const s = { keys: { status: 'idle', places: '', pagespeed: '', error: '' }, notice: null, launching: false, tick: null, filter: { q: '', state: '' } };
+  const s = { notice: null, launching: false, tick: null, filter: { q: '', state: '' } };
   let gen = 0, sb = null;   // client Supabase résolu au lancement (le moteur le lit de façon synchrone)
 
   const engine = createAuditEngine({
     getSupabase: () => sb,
-    getPlacesKey: () => s.keys.places,
-    getPagespeedKey: () => s.keys.pagespeed,
+    // Le proxy serveur vérifie la session : aucune clé n'est lue ni transmise ici.
+    getClient: async () => sb || ctx.getSupabase(),
   });
 
   /* Rafraîchissement partiel : on ne remplace que la zone de progression et les bandeaux, pour garder
@@ -52,21 +52,6 @@ export function createAuditController(ctx) {
     refreshLive();
   });
 
-  async function ensureKeys() {
-    if (s.keys.status === 'ready') return;
-    const my = ++gen;
-    s.keys.status = 'loading';
-    try {
-      const k = await loadAuditKeys(sb || await ctx.getSupabase(), ctx.getUser().id);
-      if (my !== gen) return;
-      s.keys = { status: 'ready', places: k.places, pagespeed: k.pagespeed, error: '' };
-    } catch (e) {
-      if (my !== gen) return;
-      // Clés illisibles : l'analyse continue, les sources qui en ont besoin seront signalées indisponibles.
-      s.keys = { status: 'error', places: '', pagespeed: '', error: dataErrorMessage(e) };
-    }
-  }
-
   /* Lance l'analyse d'un dossier existant. */
   async function run(auditId) {
     const data = ctx.getData();
@@ -78,8 +63,6 @@ export function createAuditController(ctx) {
     }
     s.notice = null;
     try { sb = await ctx.getSupabase(); } catch (e) { s.notice = { kind: 'error', text: 'Connexion impossible : ' + dataErrorMessage(e) }; ctx.rerender(); return false; }
-    await ensureKeys();
-    if (s.keys.status === 'error') s.notice = { kind: 'warn', text: 'Clés de service illisibles (' + s.keys.error + ') : les sources Google seront signalées indisponibles.' };
     const client = data.clients.find(c => String(c.id) === String(audit.client_id)) || null;
     ctx.open(audit.id);
     engine.start({ audit, client });   // non attendu : l'analyse continue même si l'utilisateur change d'écran
@@ -115,7 +98,7 @@ export function createAuditController(ctx) {
     last: id => engine.last(id),
     run, launchForClient, refreshLive,
     notice: () => s.notice, clearNotice: () => { s.notice = null; },
-    reset() { gen++; stopTicker(); engine.dismiss(); s.keys = { status: 'idle', places: '', pagespeed: '', error: '' }; s.notice = null; s.launching = false; s.filter = { q: '', state: '' }; },
+    reset() { gen++; stopTicker(); engine.dismiss(); s.notice = null; s.launching = false; s.filter = { q: '', state: '' }; },
     /* Saisie dans la recherche des audits : seule la liste est recomposée (le champ garde le focus). */
     onInput(el) {
       if (!el.matches('[data-audit-filter]')) return false;

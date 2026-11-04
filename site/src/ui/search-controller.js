@@ -1,8 +1,10 @@
 // AuditIA — contrôleur de la section « Prospects » (lot 3) : état, appels Google Places, ajout au portefeuille.
 // Aucune écriture hors de l'ajout d'un commerce (table clients). Les résultats périmés sont ignorés.
+// Migration LOT 8 : les appels Google passent par le proxy serveur (secure-api). Le navigateur ne lit plus aucune clé.
+// Si la clé n'est pas configurée côté serveur, le proxy répond 424 : l'erreur est affichée avec errKind 'config'.
 import { PlacesError, searchText, searchNearby, autocomplete, placeDetails, getBrowserPosition } from '../api/places.js';
 import { parseTarget, applyFilters, findDuplicate, clientRowFromPlace, clientRowFromForm } from '../data/places-search.js';
-import { loadPlacesKey, insertClient, dataErrorMessage } from '../data/queries.js';
+import { insertClient, dataErrorMessage } from '../data/queries.js';
 import { prospectsView, outHtml, noticeHtml } from './views/prospects.js';
 
 const fresh = () => ({
@@ -21,8 +23,9 @@ export function createSearchController(ctx) {
   let gen = 0;          // change à chaque réinitialisation : une réponse tardive est ignorée
   let acSeq = 0;
   let acTimer = null;
-  let placesKey = '';   // gardée en mémoire seulement ; jamais affichée
 
+  // Le proxy vérifie la session à chaque appel : on lui passe le client Supabase, jamais une clé.
+  const getClient = () => ctx.getSupabase();
   const live = g => g === gen && !!ctx.getUser();
   const clients = () => ctx.getClients();
 
@@ -33,21 +36,10 @@ export function createSearchController(ctx) {
     if (out) out.innerHTML = outHtml(s, clients());
   }
 
-  async function ensureKey() {
-    if (['ready', 'missing', 'loading', 'error'].includes(s.key.status)) return;
-    const g = gen;
-    s.key = { status: 'loading', error: '' };
-    try {
-      const sb = await ctx.getSupabase();
-      const k = await loadPlacesKey(sb, ctx.getUser().id);
-      if (!live(g)) return;
-      placesKey = k;
-      s.key = { status: k ? 'ready' : 'missing', error: '' };
-    } catch (e) {
-      if (!live(g)) return;
-      s.key = { status: 'error', error: dataErrorMessage(e) };
-    }
-    ctx.rerender();
+  // Plus de lecture de clé ici : l'état « prêt » ne signifie que « l'écran peut lancer une recherche ».
+  // La présence de la clé est vérifiée côté serveur à chaque appel (erreur 424 → errKind 'config').
+  function ensureKey() {
+    if (s.key.status !== 'ready') s.key = { status: 'ready', error: '' };
   }
 
   // ----- recherche en langage naturel -----
@@ -55,12 +47,11 @@ export function createSearchController(ctx) {
     const text = String(q || '').trim();
     if (!text) return;
     s.nl.q = text; s.last = { type: 'nl', arg: text }; s.notice = null;
-    if (!placesKey) { s.nl = { ...s.nl, status: 'error', errKind: 'config', error: '' }; ctx.rerender(); return; }
     const g = gen, parsed = parseTarget(text);
     s.nl = { ...s.nl, status: 'loading', rows: [], parsed, error: '', errKind: '' };
     ctx.rerender();
     try {
-      const raw = await searchText(placesKey, parsed);
+      const raw = await searchText(getClient, parsed);
       if (!live(g)) return;
       const f = applyFilters(raw, parsed);
       s.nl = { ...s.nl, status: 'done', rows: f.rows, raw: raw.length, removed: f.removed, parsed };
@@ -75,7 +66,6 @@ export function createSearchController(ctx) {
   async function runNearby() {
     if (s.nearby.status === 'loading') return;
     s.last = { type: 'nearby' }; s.notice = null;
-    if (!placesKey) { s.nearby = { ...s.nearby, status: 'error', errKind: 'config' }; ctx.rerender(); return; }
     const g = gen;
     s.nearby = { ...s.nearby, status: 'loading', rows: [], error: '', errKind: '', mode: 'gps', msg: 'Autorisez la localisation si le navigateur vous le demande…' };
     ctx.rerender();
@@ -90,7 +80,7 @@ export function createSearchController(ctx) {
     if (!live(g)) return;
     s.nearby.msg = 'Recherche des établissements proches…'; ctx.rerender();
     try {
-      const rows = await searchNearby(placesKey, pos);
+      const rows = await searchNearby(getClient, pos);
       if (!live(g)) return;
       s.nearby = { ...s.nearby, status: 'done', rows, raw: rows.length, mode: 'gps' };
     } catch (e) {
@@ -109,7 +99,7 @@ export function createSearchController(ctx) {
     s.nearby = { ...s.nearby, status: 'loading', rows: [], error: '', errKind: '', mode: 'city', msg: 'Recherche des commerces de ' + c + '…' };
     ctx.rerender();
     try {
-      const rows = await searchText(placesKey, parseTarget('commerces ' + c));
+      const rows = await searchText(getClient, parseTarget('commerces ' + c));
       if (!live(g)) return;
       s.nearby = { ...s.nearby, status: 'done', rows, raw: rows.length, mode: 'city' };
     } catch (e) {
@@ -125,12 +115,11 @@ export function createSearchController(ctx) {
     clearTimeout(acTimer);
     const text = value.trim();
     if (text.length < 2) { acSeq++; s.manual.status = 'idle'; s.manual.suggestions = []; refresh(); return; }
-    if (!placesKey) return;
     acTimer = setTimeout(async () => {
       const seq = ++acSeq, g = gen;
       s.manual.status = 'loading'; refresh();
       try {
-        const list = await autocomplete(placesKey, text);
+        const list = await autocomplete(getClient, text);
         if (seq !== acSeq || !live(g)) return;
         s.manual = { ...s.manual, status: 'done', suggestions: list, error: '' };
       } catch (e) {
@@ -142,12 +131,12 @@ export function createSearchController(ctx) {
   }
 
   async function pick(placeId) {
-    if (!placeId || !placesKey) return;
+    if (!placeId) return;
     const g = gen;
     s.manual = { ...s.manual, pickStatus: 'loading', pickError: '', suggestions: [] };
     refresh();
     try {
-      const p = await placeDetails(placesKey, placeId);
+      const p = await placeDetails(getClient, placeId);
       if (!live(g)) return;
       s.manual = { ...s.manual, pickStatus: 'idle', picked: p, status: 'idle' };
       ctx.rerender();
@@ -193,7 +182,7 @@ export function createSearchController(ctx) {
   function rowsFor(src) { return src === 'nearby' ? s.nearby.rows : s.nl.rows; }
 
   return {
-    reset() { gen++; acSeq++; clearTimeout(acTimer); placesKey = ''; s = fresh(); },
+    reset() { gen++; acSeq++; clearTimeout(acTimer); s = fresh(); },
     html() { return prospectsView(s, clients()); },
     // appelé après chaque rendu de la section
     mounted() { ensureKey(); },
@@ -203,7 +192,7 @@ export function createSearchController(ctx) {
       const ex = t.closest('[data-ps-example]');
       if (ex) { runNl(ex.dataset.psExample); return true; }
       if (t.closest('[data-ps-nearby]')) { runNearby(); return true; }
-      if (t.closest('[data-ps-keyretry]')) { s.key = { status: 'idle', error: '' }; ctx.rerender(); return true; }
+      if (t.closest('[data-ps-keyretry]')) { s.key = { status: 'idle', error: '' }; ensureKey(); ctx.rerender(); return true; }
       if (t.closest('[data-ps-retry]')) {
         const l = s.last || { type: s.tab };
         if (l.type === 'city') runCity(l.arg); else if (l.type === 'nearby') runNearby(); else runNl(l.arg || s.nl.q);
