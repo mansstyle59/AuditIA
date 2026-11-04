@@ -2,7 +2,7 @@
 import { card, btn, badge, spinnerCard, errorCard } from '../components/ui.js';
 import { accountCard } from './account.js';
 import { escHtml } from '../../core/utils.js';
-import { EDITABLE, SERVICES, OTHER_KEYS, serviceStatus } from '../../settings/settings-model.js';
+import { EDITABLE, API_SERVICES, API_META_FIELDS } from '../../settings/settings-model.js';
 
 const fmt = iso => { try { return new Date(iso).toLocaleString('fr-FR', { dateStyle: 'long', timeStyle: 'short' }); } catch (e) { return ''; } };
 
@@ -19,18 +19,63 @@ function field(f, s) {
   return `<div class="ds-field"><label class="ds-field__label" for="${id}">${escHtml(f.label)}${f.required ? ' *' : ''}</label>${input}${err ? `<p class="ds-field__err" id="${eid}" role="alert">${escHtml(err)}</p>` : ''}</div>`;
 }
 
+function apiField(svc, s) {
+  const status = s.apiStatus && s.apiStatus[svc.column] || {};
+  const configured = !!status.configured;
+  const stored = !!status.stored;
+  const disabled = !s.canEdit || s.apiSaving ? 'disabled' : '';
+  const id = 'api_' + svc.column;
+  const placeholder = stored
+    ? 'Clé enregistrée — saisir une nouvelle valeur pour remplacer'
+    : status.server
+      ? 'Secret serveur actif — saisir une surcharge facultative'
+      : 'Coller la clé API ici';
+  const state = configured
+    ? (stored ? badge('Clé enregistrée', 'neutral') : badge('Secret serveur', 'neutral'))
+    : badge('À configurer', 'warn');
+  const keyInput = `<div class="ds-api-keyline"><input class="ds-input" id="${id}" type="password" data-api-field="${svc.column}" value="${escHtml(s.apiDraft && s.apiDraft[svc.column] || '')}" placeholder="${escHtml(placeholder)}" autocomplete="new-password" autocapitalize="off" spellcheck="false" ${disabled}><button type="button" class="ds-btn ds-api-action" data-api-reveal="${svc.column}" ${disabled}>Afficher</button></div>`;
+  const clear = stored
+    ? `<button type="button" class="ds-api-clear" data-api-clear="${svc.column}" ${disabled}>Supprimer la clé enregistrée</button>`
+    : '';
+  const usage = svc.used
+    ? '<span class="ds-api-use ds-api-use--active">Utilisée par les audits</span>'
+    : '<span class="ds-api-use">Enregistrée pour intégration ultérieure</span>';
+  const hint = status.hint ? `<small class="ds-api-hint">${escHtml(status.source || 'Clé disponible')} · ${escHtml(status.hint)}</small>` : `<small class="ds-api-hint">${escHtml(status.source || 'Aucune clé enregistrée')}</small>`;
+  return `<article class="ds-api-service">
+    <div class="ds-api-service__top"><div><h4>${escHtml(svc.label)}</h4><p>${escHtml(svc.role)}</p></div>${state}</div>
+    ${usage}${keyInput}${hint}
+    <div class="ds-api-service__actions"><a class="ds-api-link" href="${escHtml(svc.url)}" target="_blank" rel="noopener noreferrer">${escHtml(svc.link)} ↗</a>${clear}</div>
+  </article>`;
+}
+
 function servicesCard(s) {
-  const rows = SERVICES.map(svc => {
-    const st = serviceStatus(svc, s.masks);
-    return `<li class="ds-svc"><div class="ds-svc__main"><b>${escHtml(svc.label)}</b><span>${escHtml(svc.role)}</span><small>${escHtml(st.detail)}</small></div>${badge(st.label, st.tone)}</li>`;
+  const primary = API_SERVICES.filter(x => x.group === 'core').map(x => apiField(x, s)).join('');
+  const other = API_SERVICES.filter(x => x.group === 'other').map(x => apiField(x, s)).join('');
+  const fields = API_META_FIELDS.map(f => {
+    const id = 'api_' + f.key;
+    const value = s.apiOther && s.apiOther[f.key] || '';
+    const disabled = !s.canEdit || s.apiSaving ? 'disabled' : '';
+    const control = f.type === 'textarea'
+      ? `<textarea class="ds-input ds-textarea" id="${id}" rows="3" maxlength="${f.max}" data-api-field="${f.key}" placeholder="${escHtml(f.hint)}" ${disabled}>${escHtml(value)}</textarea>`
+      : `<input class="ds-input" id="${id}" type="${f.type === 'url' ? 'url' : 'text'}" maxlength="${f.max}" data-api-field="${f.key}" value="${escHtml(value)}" placeholder="${escHtml(f.hint)}" autocomplete="off" ${disabled}>`;
+    return `<div class="ds-field"><label class="ds-field__label" for="${id}">${escHtml(f.label)}</label>${control}</div>`;
   }).join('');
-  const others = s.masks ? OTHER_KEYS.filter(o => s.masks[o.column] && s.masks[o.column].present).map(o => o.label) : [];
-  const note = others.length
-    ? `<p class="ds-hint">Clés présentes mais non utilisées par la nouvelle interface : ${escHtml(others.join(', '))}.</p>` : '';
+  const note = s.apiError
+    ? `<p class="ds-msg ds-msg--warn">${escHtml(s.apiError)}</p>`
+    : '<p class="ds-hint">Les clés sensibles sont envoyées uniquement à la fonction serveur AuditIA. Elles ne sont jamais relues en clair dans le navigateur, ni placées dans le cache local.</p>';
+  const notice = s.apiNotice ? `<p class="ds-msg ds-msg--${s.apiNotice.kind === 'ok' ? 'ok' : 'error'}" role="${s.apiNotice.kind === 'ok' ? 'status' : 'alert'}">${escHtml(s.apiNotice.text)}</p>` : '';
+  const actions = s.canEdit
+    ? `<div class="ds-savebar ds-api-savebar"><span class="ds-api-savehint">${s.apiSaving ? 'Enregistrement sécurisé…' : 'Les changements sont enregistrés sur votre compte.'}</span><button type="submit" class="ds-btn ds-btn--primary" data-api-save ${!s.apiDirty || s.apiSaving ? 'disabled' : ''}>${s.apiSaving ? 'Enregistrement…' : 'Enregistrer les intégrations'}</button></div>`
+    : '<p class="ds-msg ds-msg--warn">Lecture seule : seul le compte administrateur peut modifier les intégrations.</p>';
   return card({
-    title: 'Services et clés API',
-    body: `<ul class="ds-svcs">${rows}</ul>${note}
-      <p class="ds-hint">Les clés ne sont jamais affichées en entier et ne se modifient pas ici : utilisez l’ancienne interface. Aucun test réel n’est lancé depuis cet écran (il pourrait consommer un quota) : « Clé renseignée » signifie seulement qu’une valeur existe.</p>`,
+    title: 'API et intégrations',
+    body: `<form data-api-settings-form novalidate>
+      <p class="ds-api-intro">Gérez les connexions utilisées par AuditIA. Les clés Google Places et PageSpeed peuvent être remplacées ici sans les exposer dans le navigateur.</p>
+      <fieldset class="ds-api-group"><legend>Services utilisés par les audits</legend><div class="ds-api-grid">${primary}</div></fieldset>
+      <fieldset class="ds-api-group"><legend>Autres intégrations</legend><p class="ds-hint">Ces connecteurs sont conservés dans vos réglages. Une clé enregistrée ne signifie pas que l’intégration est déjà activée dans le moteur d’audit.</p><div class="ds-api-grid">${other}</div></fieldset>
+      <fieldset class="ds-api-group"><legend>Propriétés et informations complémentaires</legend><div class="ds-fgrid">${fields}</div></fieldset>
+      ${note}${notice}${actions}
+    </form>`,
   });
 }
 
@@ -54,5 +99,5 @@ function brandCard(s) {
 }
 
 export function settingsView(s, user) {
-  return `<div class="ds-settings"><div class="ds-settings__side">${accountCard(user)}${servicesCard(s)}</div><div class="ds-settings__main">${brandCard(s)}</div></div>`;
+  return `<div class="ds-settings"><div class="ds-settings__side">${accountCard(user)}</div><div class="ds-settings__main">${brandCard(s)}${servicesCard(s)}</div></div>`;
 }
