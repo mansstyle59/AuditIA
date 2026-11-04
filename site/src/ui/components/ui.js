@@ -89,9 +89,27 @@ export function emptyState({ title, text }) {
 /* ---------- Lot 2 : composants pour les listes et les fiches ---------- */
 
 // Pastille avec l'initiale du commerce (remplace l'icône par métier de l'ancienne interface)
-export function avatar(name) {
-  const letter = String(name || '?').trim().charAt(0).toUpperCase() || '?';
-  return `<span class="ds-avatar" aria-hidden="true">${escHtml(letter)}</span>`;
+export function avatar(name, category = '') {
+  // Icône métier plutôt qu'une initiale : le nom et la catégorie déterminent le pictogramme.
+  const context = `${category} ${name || ''}`
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  let paths = '<path d="M3 10.5V20h18v-9.5"/><path d="M2 10.5 4 4h16l2 6.5"/><path d="M2 10.5c0 1.3 1 2.3 2.3 2.3s2.3-1 2.3-2.3c0 1.3 1 2.3 2.3 2.3s2.3-1 2.3-2.3c0 1.3 1 2.3 2.3 2.3s2.3-1 2.3-2.3c0 1.3 1 2.3 2.3 2.3s2.3-1 2.3-2.3"/><path d="M9 20v-5h6v5"/>';
+  if (/bijou|joaill|bijouter|montre|horlog/.test(context)) {
+    paths = '<path d="m6 3-4 6 10 12L22 9l-4-6H6Z"/><path d="M2 9h20M6 3l3 6 3 12 3-12 3-6"/>';
+  } else if (/beaut|bien-etre|coiff|hair|estheti|ongler|barbier|salon/.test(context)) {
+    paths = '<circle cx="6" cy="6" r="2.5"/><circle cx="6" cy="18" r="2.5"/><path d="m8 8 12 12M8 16 20 4"/>';
+  } else if (/habitat|immobilier|maison|logement/.test(context)) {
+    paths = '<path d="m3 10 9-7 9 7v10h-6v-6H9v6H3V10Z"/>';
+  } else if (/restaurant|cafe|bar |brasserie|boulanger|patisserie|traiteur|aliment/.test(context)) {
+    paths = '<path d="M7 3v7M4 3v4a3 3 0 0 0 6 0V3M7 10v11M16 3v18M16 3c3 2 4 5 4 8h-4"/>';
+  } else if (/vetement|mode|textile|chauss|boutique/.test(context)) {
+    paths = '<path d="m8 4 4 2 4-2 5 4-3 4-2-2v11H8V10l-2 2-3-4 5-4Z"/>';
+  } else if (/auto|voiture|garage|mecanique|moto/.test(context)) {
+    paths = '<path d="m5 11 1.5-5h11L19 11l2 2v6h-3v-2H6v2H3v-6l2-2Z"/><path d="M6.5 14h.01M17.5 14h.01M6 11h12"/>';
+  } else if (/artisan|travaux|renov|plomb|electric|menuis|jardin|outil|construction/.test(context)) {
+    paths = '<path d="m14 7 3-3a4 4 0 0 1-5 5L6 15a2.1 2.1 0 1 0 3 3l6-6a4 4 0 0 1 5-5l-3 3"/>';
+  }
+  return `<span class="ds-avatar ds-avatar--icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false">${paths}</svg></span>`;
 }
 
 // Ligne de liste entièrement cliquable (bouton) : attrs porte l'action, ex. data-open-client="…"
