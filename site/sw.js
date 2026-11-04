@@ -10,6 +10,8 @@ const ASSETS = [
   './auditia-refonte-v2.css', './frost-experience.css', './home-compact.css', './app-polish.css',
   './vendor/html2canvas.min.js', './vendor/jspdf.umd.min.js',
   './vendor/supabase.js',
+  './src/api/bodacc.js',
+  './src/api/places-model.js',
   './src/audit/scoring.js',
   './src/audit/site-analysis.js',
   './src/core/auth-helpers.js',
