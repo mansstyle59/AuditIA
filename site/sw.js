@@ -16,7 +16,8 @@ const ASSETS = [
   './src/audit/site-analysis.js',
   './src/core/auth-helpers.js',
   './src/core/config.js',
-  './src/core/utils.js'
+  './src/core/utils.js',
+  './src/report/pdf-helpers.js'
 ];
 
 self.addEventListener('install', e => {
