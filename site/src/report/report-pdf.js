@@ -220,6 +220,36 @@ export function buildReportPdf(JsPDF, m) {
   font('normal', 8.5, C.muted);
   wrap('Rapport établi à partir des seules données réellement mesurées lors de l’audit. Une donnée non mesurée n’est jamais comptée comme un défaut.', CW, 8.5, 'normal').forEach((l, i) => pdf.text(l, M, 262 + i * 4));
 
+  /* =============== IDENTITÉ ET INFORMATIONS DU COMMERCE =============== */
+  section('Fiche détaillée du commerce', 62);
+  const bp = m.businessProfile || {};
+  const profileRows = [
+    ['Nom commercial', m.meta.business], ['Raison sociale', bp.legalName],
+    ['Adresse du commerce', bp.address || m.meta.address], ['Téléphone', bp.phone || m.meta.phone],
+    ['E-mail public', bp.email], ['Site internet', bp.website || m.meta.website],
+    ['SIREN', bp.siren], ['SIRET du siège', bp.siret], ['Forme juridique', bp.legalForm],
+    ['Activité principale / APE', bp.naf], ['Date de création légale', bp.creationDate],
+    ['Ancienneté à la date du rapport', bp.ageLabel], ['Nombre d’établissements', bp.establishments],
+    ['Code postal / commune', [bp.postalCode,bp.legalCity].filter(Boolean).join(' ')],
+    ['Statut de l’établissement', bp.googleStatus],
+    ['Note Google / avis', bp.rating != null ? frNum(bp.rating) + '/5 · ' + (bp.reviews || 0) + ' avis' : '']
+  ].filter(x => x[1] !== null && x[1] !== undefined && String(x[1]).trim() !== '');
+  if (profileRows.length) {
+    table([{w:57},{w:117}], ['Information','Donnée vérifiée / enregistrée'], profileRows);
+  } else {
+    para('Informations détaillées indisponibles dans le dossier. Relancez une analyse avec une fiche Google correctement associée.', {color:C.muted});
+  }
+  if (bp.hours && bp.hours.length) {
+    sub('Horaires déclarés sur la fiche Google', Math.min(14 + bp.hours.length * 6, 66));
+    bp.hours.forEach(h => para(h, {size:8.8, gap:1}));
+  } else para('Horaires : non renseignés dans les données disponibles.', {size:8.8,color:C.muted});
+  if (bp.legalStatus === 'matched') {
+    para('Rapprochement registre public : ' + (bp.confidence || 'à vérifier') + '. Vérifiez le SIRET et l’adresse avant usage administratif.', {size:8.2,color:C.muted});
+    if (bp.officialUrl) link('Consulter la fiche officielle de l’entreprise', bp.officialUrl);
+  } else {
+    para('Identité légale non confirmée : aucun SIREN/SIRET n’est présenté comme certain. La recherche n’a pas trouvé de correspondance suffisamment fiable.', {size:8.5,color:C.muted});
+  }
+
   /* =============== SYNTHÈSE =============== */
   newPage();
   section('Synthèse de l’audit', 60);
