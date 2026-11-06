@@ -37,7 +37,8 @@
   /* Dégradés : thème sombre d'origine, accents violets maîtrisés */
   --ds-grad-bg: linear-gradient(180deg, #1A0838 0%, #12052B 100%);
   --ds-grad-hero: linear-gradient(135deg, #3A1B7E 0%, #2A1260 45%, #1A0838 100%);
-  --ds-grad-cta: linear-gradient(135deg, #A78BFA 0%, #8B5CF6 55%, #6D3FE0 100%);
+  /* CTA : stops suffisamment sombres pour conserver un texte blanc lisible (contraste WCAG AA). */
+  --ds-grad-cta: linear-gradient(135deg, #7B3FE4 0%, #6D28D9 55%, #5B21B6 100%);
   --ds-grad-text: linear-gradient(90deg, #C9A8FF 0%, #E0B8FF 100%);
   --ds-grad-banner: linear-gradient(120deg, #4B2399 0%, #6B35C8 55%, #5A2DB3 100%);
   /* Espacements */
