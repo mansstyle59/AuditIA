@@ -30,38 +30,70 @@ jobs:
           import json, re, subprocess, tempfile
 
           root = Path("site")
-          html_path = root / "index.html"
-          html = html_path.read_text(encoding="utf-8")
-          scripts = re.findall(r"<script\b([^>]*)>([\s\S]*?)</script>", html, re.I)
-          ld = [(attrs, body) for attrs, body in scripts if re.search(r"application/ld\+json", attrs, re.I)]
-          for _, body in ld:
-              json.loads(body)
-          inline = [(attrs, body) for attrs, body in scripts if not re.search(r"\bsrc\s*=", attrs, re.I) and not re.search(r"application/ld\+json", attrs, re.I)]
-          external = re.findall(r"""<script\b[^>]*\bsrc\s*=\s*["']([^"']+)["']""", html, re.I)
-          if not inline and not external:
-              raise SystemExit("No inline or external JavaScript found in site/index.html")
-          for src in external:
-              if not src.startswith(("https://", "http://", "//")):
-                  target = (html_path.parent / src.split("?", 1)[0].split("#", 1)[0]).resolve()
+          html_paths = [root / "index.html", root / "nouvelle-interface.html"]
+          html_documents = []
+          inline_scripts = []
+          external_scripts = []
+
+          for html_path in html_paths:
+              if not html_path.is_file():
+                  raise SystemExit(f"HTML entrypoint not found: {html_path}")
+              html = html_path.read_text(encoding="utf-8")
+              html_documents.append((html_path, html))
+              scripts = re.findall(r"<script\\b([^>]*)>([\\s\\S]*?)</script>", html, re.I)
+              ld = [(attrs, body) for attrs, body in scripts if re.search(r"application/ld\\+json", attrs, re.I)]
+              for _, body in ld:
+                  json.loads(body)
+              inline = [(attrs, body) for attrs, body in scripts if not re.search(r"\\bsrc\\s*=", attrs, re.I) and not re.search(r"application/ld\\+json", attrs, re.I)]
+              external = re.findall(r"""<script\\b[^>]*\\bsrc\\s*=\\s*["']([^"']+)["']""", html, re.I)
+              if not inline and not external:
+                  raise SystemExit(f"No inline or external JavaScript found in {html_path}")
+              inline_scripts.extend((html_path, attrs, body) for attrs, body in inline)
+              external_scripts.extend((html_path, src) for src in external)
+
+              # Contrôle des ressources locales référencées par chaque page HTML.
+              local_refs = re.findall(r"""<(?:link|script|img)\\b[^>]*?\\b(?:href|src)\\s*=\\s*["']([^"']+)["']""", html, re.I)
+              for ref in local_refs:
+                  if ref.startswith(("https://", "http://", "//", "data:", "mailto:", "#")):
+                      continue
+                  target_path = urlsplit(ref).path
+                  if not target_path:
+                      continue
+                  target = (html_path.parent / target_path).resolve()
                   if not target.is_file():
-                      raise SystemExit(f"External script not found: {src}")
+                      raise SystemExit(f"HTML resource not found: {ref} (from {html_path})")
+
+          # L'interface officielle doit charger son module principal, pas seulement la redirection.
+          official_html = next(html for path, html in html_documents if path.name == "nouvelle-interface.html")
+          official_scripts = re.findall(r"<script\\b([^>]*)>([\\s\\S]*?)</script>", official_html, re.I)
+          official_module = any(
+              re.search(r"""\\btype\\s*=\\s*["']module["']""", attrs, re.I)
+              and re.search(r"""\\bsrc\\s*=\\s*["']\\./src/ui/app\\.js["']""", attrs, re.I)
+              for attrs, _ in official_scripts
+          )
+          if not official_module:
+              raise SystemExit("Official entrypoint must load ./src/ui/app.js as a module")
+
           with tempfile.TemporaryDirectory() as tmp:
-              for i, (attrs, body) in enumerate(inline, 1):
-                  # Un <script type="module"> (avec import) se vérifie en .mjs ; les scripts classiques en .js.
-                  is_module = re.search(r"""type\s*=\s*["']module["']""", attrs, re.I)
+              for i, (owner, attrs, body) in enumerate(inline_scripts, 1):
+                  # Scripts module inline : .mjs ; scripts classiques : .js.
+                  is_module = re.search(r"""type\\s*=\\s*["']module["']""", attrs, re.I)
                   js = Path(tmp) / (f"inline-{i}.mjs" if is_module else f"inline-{i}.js")
                   js.write_text(body, encoding="utf-8")
                   subprocess.run(["node", "--check", str(js)], check=True)
-          # Modules du moteur (site/src) : syntaxe + imports relatifs qui doivent pointer vers un fichier existant.
+
+          # Modules du moteur (site/src) : syntaxe + imports relatifs existants.
           src_dir = root / "src"
           src_files = sorted(src_dir.rglob("*.js")) if src_dir.is_dir() else []
           with tempfile.TemporaryDirectory() as tmp:
               for f in src_files:
-                  copy = Path(tmp) / (f.stem + ".mjs")
+                  copy = Path(tmp) / f.relative_to(src_dir).with_suffix(".mjs")
+                  copy.parent.mkdir(parents=True, exist_ok=True)
                   copy.write_text(f.read_text(encoding="utf-8"), encoding="utf-8")
                   subprocess.run(["node", "--check", str(copy)], check=True)
-          rel_import = re.compile(r"""(?:import|export)\s[^;]*?from\s*['"](\.{1,2}/[^'"?]+)""")
-          for owner, text in [(html_path, "\n".join(body for _, body in inline))] + [(f, f.read_text(encoding="utf-8")) for f in src_files]:
+
+          rel_import = re.compile(r"""(?:import|export)\\s[^;]*?from\\s*['"]([.]{1,2}/[^'"?]+)""")
+          for owner, text in [(path, "\\n".join(body for script_owner, _, body in inline_scripts if script_owner == path)) for path, _ in html_documents] + [(f, f.read_text(encoding="utf-8")) for f in src_files]:
               for target in rel_import.findall(text):
                   if not (owner.parent / target).resolve().is_file():
                       raise SystemExit(f"Import introuvable : {target} (depuis {owner})")
@@ -69,14 +101,14 @@ jobs:
           subprocess.run(["node", "--check", str(root / "oca-lavender.js")], check=True)
           json.loads((root / "manifest.webmanifest").read_text(encoding="utf-8"))
           sw = (root / "sw.js").read_text(encoding="utf-8")
-          assets_block = re.search(r"const ASSETS\s*=\s*\[([\s\S]*?)\];", sw)
+          assets_block = re.search(r"const ASSETS\\s*=\\s*\\[([\\s\\S]*?)\\];", sw)
           if not assets_block:
               raise SystemExit("Service-worker ASSETS list not found")
           assets = re.findall(r"""['"]([^'"]+)['"]""", assets_block.group(1))
           missing = [asset for asset in assets if asset not in ("./",) and not (root / asset.removeprefix("./")).is_file()]
           if missing:
               raise SystemExit("Missing service-worker assets: " + ", ".join(missing))
-          print(f"Validation OK: {len(inline)} inline scripts, {len(external)} external scripts, {len(src_files)} src modules, manifest JSON and {len(assets)} service-worker assets.")
+          print(f"Validation OK: {len(html_documents)} HTML entrypoints, {len(inline_scripts)} inline scripts, {len(external_scripts)} external scripts, {len(src_files)} src modules, local HTML assets, manifest JSON and {len(assets)} service-worker assets.")
           PY
       - name: Upload site artifact
         uses: actions/upload-pages-artifact@v3
