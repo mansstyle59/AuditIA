@@ -11,7 +11,7 @@
   .ds-m-header {
     position: sticky; top: 0; z-index: 40;
     display: flex; flex-direction: column; justify-content: flex-end; gap: 2px;
-    padding: calc(var(--ds-safe-top) + var(--ds-s-3)) var(--ds-s-4) var(--ds-s-3);
+    padding: calc(var(--ds-safe-top) + var(--ds-safe-top-extra)) var(--ds-s-4) var(--ds-s-3);
     min-height: var(--ds-header-h);
     background: var(--ds-bg-1);
     border-bottom: 1px solid var(--ds-line-soft);
@@ -79,14 +79,23 @@
 }
 
 
-/* Correctif iOS : bande supérieure opaque et texte net (nouvelle-interface). */
+/* iOS Safari : zone haute opaque, sans flou, et marge visuelle de 28 px sous la safe area. */
 @media (max-width: 899.98px) {
-  html {
-    background: #12052B;
+  html,
+  body {
+    background-color: var(--ds-bg-0);
   }
   body {
-    background-color: #12052B;
     background-image: none;
+  }
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0 0 auto;
+    height: var(--ds-safe-top);
+    z-index: 1000;
+    background: var(--ds-bg-0);
+    pointer-events: none;
   }
   .ds-mobile {
     position: relative;
@@ -95,9 +104,7 @@
   }
   .ds-m-header {
     top: 0;
-    padding-top: calc(env(safe-area-inset-top, 0px) + 12px);
-    background: #12052B;
-    background-color: #12052B;
+    background: var(--ds-bg-0);
     background-image: none;
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
@@ -117,7 +124,7 @@
     -webkit-font-smoothing: antialiased;
   }
   .ds-m-brand {
-    color: #C4B5FD;
+    color: var(--ds-lavender);
     text-rendering: geometricPrecision;
   }
 }
