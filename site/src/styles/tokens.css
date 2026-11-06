@@ -64,8 +64,9 @@
   --ds-header-h: 64px;
   --ds-tabbar-h: 68px;
   --ds-container: 1240px;
-  /* Zones de sécurité iOS */
+  /* Zones de sécurité iOS : marge visuelle supplémentaire du header mobile */
   --ds-safe-top: env(safe-area-inset-top, 0px);
+  --ds-safe-top-extra: 28px;
   --ds-safe-right: env(safe-area-inset-right, 0px);
   --ds-safe-bottom: env(safe-area-inset-bottom, 0px);
   --ds-safe-left: env(safe-area-inset-left, 0px);
