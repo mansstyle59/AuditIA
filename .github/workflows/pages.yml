@@ -111,6 +111,17 @@ jobs:
               raise SystemExit("Missing service-worker assets: " + ", ".join(missing))
           print(f"Validation OK: {len(html_documents)} HTML entrypoints, {len(inline_scripts)} inline scripts, {len(external_scripts)} external scripts, {len(src_files)} src modules, local HTML assets, manifest JSON and {len(assets)} service-worker assets.")
           PY
+      - name: Validate CSS syntax
+        shell: bash
+        run: |
+          mapfile -t css_files < <(find site -type f -name '*.css' -print | sort)
+          if [ "${#css_files[@]}" -eq 0 ]; then
+            echo "No CSS files found under site/"
+            exit 1
+          fi
+          # PostCSS parser checks CSS syntax without rewriting the published files.
+          npx --yes --package=postcss-cli@11.0.1 postcss "${css_files[@]}" --no-map --dir "$RUNNER_TEMP/auditia-css-check"
+          echo "CSS syntax OK: ${#css_files[@]} files"
       - name: Upload site artifact
         uses: actions/upload-pages-artifact@v3
         with:
