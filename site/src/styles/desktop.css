@@ -61,6 +61,19 @@
   /* Liste clients : garder les filtres de niveau confortables sur tablette paysage. */
   .ds-tiers { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .ds-tier--avg { grid-column: 1 / -1; }
+
+  /* Liste Audits : éviter une première colonne trop étroite avec la sidebar sur petit desktop.
+     La composition en deux lignes reprend le rythme mobile sans réduire les actions. */
+  .ds-audit-head { display: none; }
+  .ds-audit-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: "main score" "date act";
+    gap: var(--ds-s-2) var(--ds-s-3);
+  }
+  .ds-audit-row__main { grid-area: main; }
+  .ds-audit-row__date { grid-area: date; }
+  .ds-audit-row__score { grid-area: score; justify-self: end; }
+  .ds-audit-row__act { grid-area: act; justify-self: end; }
 }
 
 @media (min-width: 900px) {
