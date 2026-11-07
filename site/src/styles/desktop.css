@@ -91,15 +91,37 @@
 
 /* Lot 4 : audits — ordinateur (tableau professionnel et colonnes) */
 @media (min-width: 900px) {
-  .ds-audit-head, .ds-audit-row { display: grid; grid-template-columns: minmax(0, 2.2fr) minmax(150px, 1fr) 110px 200px; grid-template-areas: none; gap: var(--ds-s-4); align-items: center; }
-  .ds-audit-head { padding: 0 var(--ds-s-4); margin-bottom: var(--ds-s-2); font-size: var(--ds-fs-xs); font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: var(--ds-lavender); }
-  .ds-audit-row > * { grid-area: auto; } .ds-audit-row__score, .ds-audit-row__act { justify-self: start; }
-  .ds-audit-rows { gap: var(--ds-s-2); } .ds-audit-row:hover { border-color: var(--ds-line); background: var(--ds-surface-2); }
   .ds-dossier-head { grid-template-columns: minmax(260px, 1fr) minmax(0, auto); align-items: center; }
   .ds-dossier-head .ds-d-actions { justify-content: flex-end; max-width: 560px; }
   .ds-live { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; }
   .ds-live > .ds-live__top, .ds-live > .ds-prog, .ds-live > .ds-prog__row, .ds-live > .ds-live__counts, .ds-live > .ds-msg, .ds-live > p, .ds-live > .ds-facts { grid-column: 1 / -1; }
   .ds-live > .ds-srcs { grid-column: 1 / -1; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* Audits : tableau à quatre colonnes uniquement quand la largeur permet
+   réellement d'afficher la sidebar et les colonnes. Entre 900 et 1099 px,
+   la composition tablette définie plus haut (2 lignes) reste prioritaire. */
+@media (min-width: 1100px) {
+  .ds-audit-head, .ds-audit-row {
+    display: grid;
+    grid-template-columns: minmax(0, 2.2fr) minmax(150px, 1fr) 110px 200px;
+    grid-template-areas: none;
+    gap: var(--ds-s-4);
+    align-items: center;
+  }
+  .ds-audit-head {
+    padding: 0 var(--ds-s-4);
+    margin-bottom: var(--ds-s-2);
+    font-size: var(--ds-fs-xs);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--ds-lavender);
+  }
+  .ds-audit-row > * { grid-area: auto; }
+  .ds-audit-row__score, .ds-audit-row__act { justify-self: start; }
+  .ds-audit-rows { gap: var(--ds-s-2); }
+  .ds-audit-row:hover { border-color: var(--ds-line); background: var(--ds-surface-2); }
 }
 
 /* Lot 7 : ordinateur — bouton retour à sa taille (pas étiré), carte latérale lisible */
