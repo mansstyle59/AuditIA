@@ -45,7 +45,24 @@
     border: 0; background: transparent; color: var(--ds-muted);
     font-size: var(--ds-fs-xs); font-weight: 600; line-height: 1.1;
   }
-  .ds-m-tab.is-active { color: var(--ds-text); }
+  .ds-m-tab.is-active {
+    position: relative;
+    color: var(--ds-text);
+  }
+  /* Repère violet discret : l'onglet actif reste identifiable sans dépendre uniquement de la couleur du texte. */
+  .ds-m-tab.is-active::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 24px;
+    height: 3px;
+    transform: translateX(-50%);
+    border-radius: 0 0 3px 3px;
+    background: var(--ds-primary-2);
+    box-shadow: 0 0 10px rgba(167, 139, 250, 0.24);
+    pointer-events: none;
+  }
   .ds-m-tab.is-active .ds-icon { color: var(--ds-lavender); }
   .ds-m-tab:active { background: var(--ds-surface); }
 
