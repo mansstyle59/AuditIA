@@ -57,6 +57,10 @@
 @media (min-width: 900px) and (max-width: 1099.98px) {
   .ds-d-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .ds-d-split { grid-template-columns: minmax(0, 1fr); }
+
+  /* Liste clients : garder les filtres de niveau confortables sur tablette paysage. */
+  .ds-tiers { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ds-tier--avg { grid-column: 1 / -1; }
 }
 
 @media (min-width: 900px) {
