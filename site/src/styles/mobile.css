@@ -78,7 +78,6 @@
   .ds-audit-row__act .ds-btn { min-height: 44px; }
 }
 
-
 /* iOS Safari : zone haute opaque, sans flou, et marge visuelle de 28 px sous la safe area. */
 @media (max-width: 899.98px) {
   html,
@@ -126,5 +125,13 @@
   .ds-m-brand {
     color: var(--ds-lavender);
     text-rendering: geometricPrecision;
+  }
+
+  /* Les ancres de notification doivent tenir compte de la vraie hauteur du header
+     mobile : safe-area iOS + marge visuelle + contenu du header. */
+  #psNotice {
+    scroll-margin-top: calc(
+      var(--ds-safe-top) + var(--ds-safe-top-extra) + var(--ds-header-h) + var(--ds-s-4)
+    );
   }
 }
