@@ -59,19 +59,37 @@ export function businessAge(a,c){
 
 export function rankBadge(r){ if(r.error) return {t:'indisponible',c:'no'}; if(r.pos==null) return {t:'non trouvé',c:'bad'}; if(r.pos<=3) return {t:'n°'+r.pos+' · très bien placé',c:'ok'}; if(r.pos<=10) return {t:'n°'+r.pos+' · page 1',c:'mid'}; return {t:'page 2 (n°'+r.pos+')',c:'bad'}; }
 
+
+/* Normalisation stricte des valeurs Google : une chaîne vide ou un booléen n'est pas une mesure. */
+function googleRatingValue(value){
+  if(value==null||value===''||typeof value==='boolean') return null;
+  const n=Number(value);
+  return Number.isFinite(n)&&n>=0&&n<=5?n:null;
+}
+function googleReviewCount(value){
+  if(value==null||value===''||typeof value==='boolean') return null;
+  const n=Number(value);
+  return Number.isInteger(n)&&n>=0?n:null;
+}
+function googlePhotoCount(value){
+  if(value==null||value===''||typeof value==='boolean') return null;
+  const n=Number(value);
+  return Number.isInteger(n)&&n>=0?n:null;
+}
+
 export function improvementPlan(a,c){
       const d=(c&&c.details)||{}; const si=(a&&a.site)||{}; const s=a&&a.scan;
       const kw=targetKeywords(c); const city=String((c&&c.city)||'').trim(); const base=kw.base||'votre activité';
       const hasGoogle=!!String(d.place_id||'').trim();
-      const rating=(d.rating!=null&&Number.isFinite(Number(d.rating)))?Number(d.rating):null;
-      const reviews=(d.reviews!=null&&Number.isFinite(Number(d.reviews)))?Number(d.reviews):null;
-      const photos=(d.photoCount!=null&&Number.isFinite(Number(d.photoCount)))?Number(d.photoCount):null;
+      const rating=googleRatingValue(d.rating);
+      const reviews=googleReviewCount(d.reviews);
+      const photos=googlePhotoCount(d.photoCount);
       const hoursKnown=Array.isArray(d.hours); const hours=hoursKnown&&d.hours.length>0;
       const hasWeb=!!String((c&&c.website)||'').trim();
       const perf=(s&&s.scores)?s.scores.performance:null;
       const socials=(si.socials)||[]; const haveNet=new Set(socials.map(x=>x.net));
       const missingNet=['Instagram','Facebook','TikTok'].filter(m=>!haveNet.has(m));
-      const dirs=(si.directories)||[]; const comp=si.competitors; const topComp=comp&&Array.isArray(comp.list)?comp.list.find(x=>!x.isSelf&&x.reviews!=null&&Number.isFinite(Number(x.reviews))):null;
+      const dirs=(si.directories)||[]; const comp=si.competitors; const topComp=comp&&Array.isArray(comp.list)?comp.list.find(x=>!x.isSelf&&googleReviewCount(x.reviews)!=null):null;
       const items=[]; const push=(axis,title,why,how,priority,impact)=>items.push({axis,title,why,how,priority,impact});
       if(!hasGoogle) push('Fiche Google','Vérifier et relier la fiche Google Business Profile','Aucun Place ID Google Places n’est associé à ce dossier. Cela ne prouve pas que la fiche est absente : vérifier la fiche publique avant de conclure.',['Rechercher le commerce dans Google Maps avec son nom, son adresse et sa ville','Confirmer qu’il s’agit du bon établissement (adresse et téléphone)','Associer un Place ID issu d’une source autorisée','Ne créer une fiche que si aucune fiche existante n’a été trouvée'],'Haute','Fort');
       else push('Fiche Google','Contrôler et compléter la fiche Google Business Profile','Une fiche Google Places est associée à ce dossier. Vérifier que les informations sont exactes et que le propriétaire dispose des accès nécessaires ; la présence d’un Place ID ne prouve pas que la fiche est revendiquée.',['Contrôler nom, adresse, téléphone, catégorie et horaires','Vérifier les accès du propriétaire dans Google Business Profile','Compléter description, photos et liens d’action si nécessaire','Confirmer la cohérence avec le site et les annuaires'],'Haute','Fort');
@@ -191,8 +209,8 @@ export function visibilityAudit(a,c){
       const d=(c&&c.details)||{}, scan=a&&a.scan, si=a&&a.site;
       const site=String((c&&c.website)||d.website||'').trim();
       const secure=/^https:\/\//i.test(site);
-      const rating=(d.rating!=null&&Number.isFinite(Number(d.rating)))?Number(d.rating):null;
-      const reviews=(d.reviews!=null&&Number.isFinite(Number(d.reviews)))?Number(d.reviews):null;
+      const rating=googleRatingValue(d.rating);
+      const reviews=googleReviewCount(d.reviews);
       const phone=String((c&&c.phone)||d.phone||'').trim();
       const hasGoogle=!!String(d.place_id||'').trim();
       const hours=Array.isArray(d.hours)&&d.hours.length>0;
@@ -232,7 +250,7 @@ export function visibilityAudit(a,c){
         const socials=(si.socials||[]).filter(x=>x&&x.url);
         add('seo','Réseaux sociaux reliés',socials.length>0,6,'Aucun lien de réseau social n’a été détecté dans les pages analysées. Vérifier les liens du pied de page et les profils officiels.','Au moins un lien social détecté.',Math.min(1,socials.length/2),'Lecture du site');
       }
-      if(d.photoCount!=null&&Number.isFinite(Number(d.photoCount))){const n=Number(d.photoCount),pv=tier(n,[[10,1],[5,0.8],[1,0.4],[0,0]]);add('seo','Photos sur la fiche Google',n>=5,6,'Nombre de photos récupéré : '+n+'. Vérifier la qualité et la récence, pas seulement le volume.','Nombre de photos récupéré : '+n+'.',pv,'Google Places');}
+      if(googlePhotoCount(d.photoCount)!=null){const n=googlePhotoCount(d.photoCount),pv=tier(n,[[10,1],[5,0.8],[1,0.4],[0,0]]);add('seo','Photos sur la fiche Google',n>=5,6,'Nombre de photos récupéré : '+n+'. Vérifier la qualité et la récence, pas seulement le volume.','Nombre de photos récupéré : '+n+'.',pv,'Google Places');}
       if(si&&si.booking!=null) add('seo','Prise de contact en ligne',!!((si.booking&&si.booking.length)||si.whatsapp),4,'Aucun parcours de réservation ou contact direct n’a été détecté sur la page analysée.','Un moyen de prise de contact directe a été détecté.',null,'Lecture du site');
       if(si&&si.rankings&&si.rankings.some(r=>!r.error)){
         const usable=si.rankings.filter(r=>!r.error),n=usable.length,topN=usable.filter(r=>r.pos!=null&&r.pos<=10).length,top3=usable.filter(r=>r.pos!=null&&r.pos<=3).length,foundN=usable.filter(r=>r.found).length;
