@@ -47,5 +47,9 @@ assert.equal(parseRobotsPolicy("Sitemap: https://example.com/sitemap.xml\n", "Au
   "a sitemap-only robots.txt does not restrict crawling");
 assert.equal(parseRobotsPolicy("not a robots directive", "AuditIA", "/").allowed, null,
   "an unparseable robots file is unknown, not permission to crawl");
+assert.equal(parseRobotsPolicy("User-agent: *\nDisallow: /" + "a".repeat(2050), "AuditIA", "/").allowed, null,
+  "overlong rule patterns fail closed");
+assert.equal(parseRobotsPolicy("x".repeat(512 * 1024 + 1), "AuditIA", "/").status, "too-large",
+  "oversized robots files are rejected before parsing");
 
 console.log("AuditIA robots policy tests passed.");
