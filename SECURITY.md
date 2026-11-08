@@ -9,6 +9,12 @@
 - Le service worker ne met en cache que les fichiers de l’application, jamais une requête avec paramètres.
 - Les couleurs de marque injectées dans le style doivent être un code hexadécimal. Le logo enregistré est converti en PNG.
 
+## Politique robots.txt pour les audits
+- Avant de demander la lecture d'une page, une capture ou une mesure PageSpeed, le moteur vérifie les règles robots.txt pour le jeton produit AuditIA et le chemin concerné.
+- Si le chemin est interdit, ces lectures sont marquées « ignorées » et ne sont pas lancées. llms.txt n'est lu que si son chemin est autorisé.
+- Si robots.txt est inaccessible ou illisible, le crawl est suspendu par prudence. Un fichier robots.txt vide ou clairement absent est traité comme n'imposant aucune règle.
+- Limite importante : la lecture HTML et les captures utilisent des services tiers (Jina Reader, AllOrigins, WordPress mShots). AuditIA vérifie sa propre politique avant de leur transmettre une URL, mais ne contrôle pas leur User-Agent ni leur respect interne des règles robots. La conformité complète du comportement de ces proxys n'est pas confirmée ; ne pas présenter ces lectures comme un crawl direct d'AuditIA.
+
 ## À ne pas mettre dans le dépôt ni dans le navigateur
 Ne jamais versionner les clés privées/service-role, mots de passe, tokens de webhook ou secrets API. Les clés de navigateur (Google Places, PageSpeed, OpenAI, Bing) ne doivent pas être considérées comme secrètes si le code client les lit : elles peuvent être extraites depuis le navigateur. Les déplacer derrière une fonction serveur/Edge Function, puis les stocker dans les secrets Supabase, avec restrictions de clés côté fournisseur.
 
