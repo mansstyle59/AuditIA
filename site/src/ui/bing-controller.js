@@ -4,7 +4,7 @@ import { escHtml, safeHttpUrl } from '../core/utils.js';
 
 function dateText(value) {
   let date = null;
-  const ms = String(value || '').match(/\\/Date\\((\\d+)\\)\\//);
+  const ms = String(value || '').match(/\/Date\((\d+)\)\//);
   if (ms) date = new Date(Number(ms[1]));
   else if (value) date = new Date(value);
   return date && Number.isFinite(date.getTime()) ? date.toLocaleDateString('fr-FR') : 'Date indisponible';
