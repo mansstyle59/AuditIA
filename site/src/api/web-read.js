@@ -73,7 +73,7 @@ export async function fetchSirene(c){
 export async function readSiteText(url,opts,timeout){const ctl=new AbortController();const t=setTimeout(()=>ctl.abort(),timeout||40000);try{const r=await fetch(url,{...(opts||{}),signal:ctl.signal});if(!r.ok){const e=new Error('HTTP '+r.status);e.status=r.status;throw e;}return await r.text();}finally{clearTimeout(t);}}
 
 function looksHtmlText(text){
-  return /^\\s*</.test(text||'') || /<html|<body/i.test(text||'');
+  return /^\s*</.test(text||'') || /<html|<body/i.test(text||'');
 }
 
 function robotsFileMissing(text){
