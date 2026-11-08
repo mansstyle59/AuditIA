@@ -128,4 +128,45 @@ const noMeasuredCompetitorAdvice = noMeasuredCompetitorPlan.find(item => item.ax
 assert.doesNotMatch(noMeasuredCompetitorAdvice.why, /Concurrent sans avis/,
   "unknown competitor counts must be omitted from review advice");
 
+
+
+// Malformed numeric values must stay unavailable, not become zero via Number("") or Number(false).
+const malformedProfile = client({
+  place_id: "ChIJ-auditia-malformed",
+  rating: "",
+  reviews: "",
+  photoCount: "",
+  hours: [],
+});
+const malformedPlan = improvementPlan(audit, malformedProfile);
+const malformedReviewAdvice = malformedPlan.find(item => item.axis === "Avis & réputation");
+assert.match(malformedReviewAdvice.title, /Vérifier les avis Google/);
+assert.doesNotMatch(malformedReviewAdvice.why, /\\b0 avis\\b/,
+  "an empty review count must not be interpreted as zero");
+assert.doesNotMatch(malformedPlan.filter(item => item.axis === "Fiche Google").map(item => item.title).join(" "),
+  /Ajouter des photos récentes/,
+  "an empty photo count must not be interpreted as zero photos");
+
+const malformedAudit = visibilityAudit(audit, malformedProfile);
+for (const label of ["Note Google", "Volume d’avis"]) {
+  const criterion = malformedAudit.items.find(item => item.label === label);
+  assert.ok(criterion && criterion.measured === false,
+    label + " must be unmeasured when its numeric source is empty");
+}
+assert.equal(malformedAudit.items.find(item => item.label === "Photos sur la fiche Google"), undefined,
+  "an empty photo count must not create a measured zero-photo criterion");
+
+const booleanProfile = client({
+  place_id: "ChIJ-auditia-boolean",
+  rating: true,
+  reviews: false,
+  photoCount: true,
+});
+const booleanAudit = visibilityAudit(audit, booleanProfile);
+for (const label of ["Note Google", "Volume d’avis"]) {
+  const criterion = booleanAudit.items.find(item => item.label === label);
+  assert.ok(criterion && criterion.measured === false,
+    label + " must reject boolean values");
+}
+
 console.log("AuditIA scoring evidence tests passed.");
