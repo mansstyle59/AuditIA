@@ -184,4 +184,24 @@ const stringZeroAudit = visibilityAudit(audit, stringZeroProfile);
 assert.ok(stringZeroAudit.items.find(item => item.label === "Note Google").measured);
 assert.ok(stringZeroAudit.items.find(item => item.label === "Volume d’avis").measured);
 
+
+const stringZeroPhotoCriterion = stringZeroAudit.items.find(item => item.label === "Photos sur la fiche Google");
+assert.ok(stringZeroPhotoCriterion && stringZeroPhotoCriterion.measured && stringZeroPhotoCriterion.val === 0,
+  "a numeric string containing zero is a measured zero-photo value");
+
+const outOfRangeProfile = client({
+  place_id: "ChIJ-auditia-out-of-range",
+  rating: 6,
+  reviews: -1,
+  photoCount: 2.5,
+});
+const outOfRangeAudit = visibilityAudit(audit, outOfRangeProfile);
+for (const label of ["Note Google", "Volume d’avis"]) {
+  const criterion = outOfRangeAudit.items.find(item => item.label === label);
+  assert.ok(criterion && criterion.measured === false,
+    label + " must reject out-of-range or fractional values");
+}
+assert.equal(outOfRangeAudit.items.find(item => item.label === "Photos sur la fiche Google"), undefined,
+  "fractional photo counts must not be scored");
+
 console.log("AuditIA scoring evidence tests passed.");
