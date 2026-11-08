@@ -121,7 +121,7 @@ function buildCompetitors(si) {
   let shown = all.slice(0, MAX_COMPETITORS);
   const self = all.find(x => x.isSelf);
   if (self && !shown.includes(self)) shown = shown.slice(0, MAX_COMPETITORS - 1).concat(self);   // le commerce audité reste toujours visible
-  return { list: shown, total: all.length, hidden: all.length - shown.length, selfRank: num(cp.selfRank), count: num(cp.total) || all.length };
+  return { list: shown, total: all.length, hidden: all.length - shown.length, selfRank: num(cp.selfRank), count: num(cp.rankedTotal) ?? num(cp.total) ?? all.length };
 }
 
 function buildRankings(si) {
