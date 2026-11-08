@@ -71,7 +71,7 @@ export function improvementPlan(a,c){
       const perf=(s&&s.scores)?s.scores.performance:null;
       const socials=(si.socials)||[]; const haveNet=new Set(socials.map(x=>x.net));
       const missingNet=['Instagram','Facebook','TikTok'].filter(m=>!haveNet.has(m));
-      const dirs=(si.directories)||[]; const comp=si.competitors; const topComp=comp&&comp.list&&comp.list.find(x=>!x.isSelf);
+      const dirs=(si.directories)||[]; const comp=si.competitors; const topComp=comp&&comp.list&&comp.list.find(x=>!x.isSelf&&x.reviews!=null);
       const items=[]; const push=(axis,title,why,how,priority,impact)=>items.push({axis,title,why,how,priority,impact});
       if(!hasGoogle) push('Fiche Google','Vérifier et associer la fiche Google Business Profile','Aucun identifiant Google Places n’est associé à ce dossier. Cela ne prouve pas que la fiche n’existe pas : vérifiez le commerce dans Google Maps/Places avant de conclure.',['Rechercher le nom exact et la ville dans Google Maps ou Places','Comparer l’adresse et le téléphone avec les informations du commerçant','Associer la fiche confirmée au dossier AuditIA via Google Places'],'Haute','Fort');
        else push('Fiche Google','Vérifier et compléter la fiche Google Business Profile si vous en êtes gestionnaire','Une fiche Google Places est associée au dossier, mais cela ne confirme pas les droits de gestion ni la complétude du profil.',['Confirmer que vous êtes propriétaire ou gestionnaire de la fiche','Vérifier catégories, description, adresse, téléphone et horaires','Compléter les informations manquantes si vous disposez des accès'],'Haute','Fort');
