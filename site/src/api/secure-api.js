@@ -19,7 +19,7 @@ const PROXY_MESSAGES = {
   pagespeed_key_not_configured: 'La clé PageSpeed n’est pas configurée côté serveur.',
   bing_webmaster_key_not_configured: 'La clé Bing Webmaster n’est pas configurée côté serveur.',
   bing_site_not_verified: 'Ce site n’est pas vérifié dans le compte Bing Webmaster connecté.',
-  bing_webmaster_unavailable: 'Bing Webmaster Tools est temporairement indisponible.'
+  bing_webmaster_unavailable: 'Bing Webmaster Tools est temporairement indisponible.',
   rate_limit_exceeded: 'Trop de requêtes. Patientez une minute puis réessayez.',
   daily_quota_exceeded: 'Quota journalier atteint. Réessayez demain.',
   secure_api_unavailable: 'Service temporairement indisponible. Réessayez.',
