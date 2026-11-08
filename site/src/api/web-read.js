@@ -5,6 +5,7 @@
 import { safeHttpUrl, withTimeout } from '../core/utils.js';
 import { AI_BOTS, parseRobotsForAI } from '../audit/site-analysis.js';
 import { parseRobotsPolicy, isRobotsResponseUnverifiable } from '../audit/robots.js';
+import { readTextLimited } from './bounded-fetch.mjs';
 
 export async function fetchDomainDate(website){
       try{
@@ -70,7 +71,7 @@ export async function fetchSirene(c){
     fetchedAt:new Date().toISOString()};
 }
 
-export async function readSiteText(url,opts,timeout){const ctl=new AbortController();const t=setTimeout(()=>ctl.abort(),timeout||40000);try{const r=await fetch(url,{...(opts||{}),signal:ctl.signal});if(!r.ok){const e=new Error('HTTP '+r.status);e.status=r.status;throw e;}return await r.text();}finally{clearTimeout(t);}}
+export async function readSiteText(url,opts,timeout,maxBytes=5*1024*1024){return readTextLimited(url,opts,timeout||40000,maxBytes);}
 
 function looksHtmlText(text){
   return /^\s*</.test(text||'') || /<html|<body/i.test(text||'');
@@ -92,9 +93,9 @@ export async function fetchRobotsPolicy(site){
   const targetPath=(parsed.pathname||'/')+parsed.search;
   const robotsUrl='https://api.allorigins.win/raw?url='+encodeURIComponent(origin+'/robots.txt');
   let rb=null;
-  try{ rb=await readSiteText(robotsUrl,{},8000); }
+  try{ rb=await readSiteText(robotsUrl,{},8000,512*1024); }
   catch(e){
-    return robotsInfoUnavailable('unavailable');
+    return robotsInfoUnavailable(e&&e.code==='response_too_large'?'too-large':'unavailable');
   }
   if(isRobotsResponseUnverifiable(rb)){
     return {...robotsInfoUnavailable('unverifiable-response'),policy:{...robotsInfoUnavailable('unverifiable-response').policy,path:targetPath}};
@@ -133,7 +134,7 @@ export async function readSiteHtml(url){
     {headers:{
       'X-Return-Format':'html',
       'X-Timeout':'20',
-      'X-Robots-Txt':'true'
+      'X-Robots-Txt':'AuditIA'
     }},
     20000
   );
