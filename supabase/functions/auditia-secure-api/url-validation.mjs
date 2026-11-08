@@ -14,13 +14,13 @@ const BLOCKED_SUFFIXES = [
   ".nip.io", ".sslip.io", ".xip.io", ".localtest.me", ".lvh.me", ".vcap.me", ".traefik.me",
 ];
 
-function parseIPv4(host: string): number[] | null {
+function parseIPv4(host) {
   if (!/^\d{1,3}(?:\.\d{1,3}){3}$/.test(host)) return null;
   const parts = host.split(".").map(Number);
   return parts.every(n => Number.isInteger(n) && n >= 0 && n <= 255) ? parts : null;
 }
 
-function isNonPublicIPv4(parts: number[] | null): boolean {
+function isNonPublicIPv4(parts) {
   if (!parts) return true;
   const [a, b, c] = parts;
   if (a === 0 || a === 10 || a === 127 || a >= 224) return true;
@@ -36,7 +36,7 @@ function isNonPublicIPv4(parts: number[] | null): boolean {
   return false;
 }
 
-function parseIPv6(host: string): number[] | null {
+function parseIPv6(host) {
   let value = String(host || "").toLowerCase().replace(/^\[|\]$/g, "");
   if (!value.includes(":") || value.includes("%")) return null;
 
@@ -65,7 +65,7 @@ function parseIPv6(host: string): number[] | null {
   return groups.length === 8 && groups.every(n => Number.isInteger(n) && n >= 0 && n <= 0xffff) ? groups : null;
 }
 
-function isNonPublicIPv6(host: string): boolean {
+function isNonPublicIPv6(host) {
   const groups = parseIPv6(host);
   if (!groups) return true;
   if (groups.every(n => n === 0)) return true; // unspecified
@@ -91,9 +91,9 @@ function isNonPublicIPv6(host: string): boolean {
   return false;
 }
 
-export function isPublicHttpUrl(value: unknown): boolean {
+export function isPublicHttpUrl(value) {
   if (typeof value !== "string" || !value.trim()) return false;
-  let url: URL;
+  let url;
   try { url = new URL(value.trim()); } catch { return false; }
   if ((url.protocol !== "https:" && url.protocol !== "http:") || url.username || url.password) return false;
 
