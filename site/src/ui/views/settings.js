@@ -70,7 +70,7 @@ function servicesCard(s) {
   return card({
     title: 'API et intégrations',
     body: `<form data-api-settings-form novalidate>
-      <p class="ds-api-intro">Gérez les connexions utilisées par AuditIA. Les clés Google Places et PageSpeed peuvent être remplacées ici sans les exposer dans le navigateur.</p>
+      <p class="ds-api-intro">Gérez les connexions utilisées par AuditIA. Les clés Google Places, PageSpeed et Bing Webmaster sont transmises à la fonction serveur sécurisée ; elles ne sont jamais affichées après enregistrement.</p>
       <fieldset class="ds-api-group"><legend>Services utilisés par les audits</legend><div class="ds-api-grid">${primary}</div></fieldset>
       <fieldset class="ds-api-group"><legend>Autres intégrations</legend><p class="ds-hint">Ces connecteurs sont conservés dans vos réglages. Une clé enregistrée ne signifie pas que l’intégration est déjà activée dans le moteur d’audit.</p><div class="ds-api-grid">${other}</div></fieldset>
       <fieldset class="ds-api-group"><legend>Propriétés et informations complémentaires</legend><div class="ds-fgrid">${fields}</div></fieldset>
