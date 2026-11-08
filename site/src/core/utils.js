@@ -6,17 +6,7 @@ export function safeColor(value,fallback){ return /^#(?:[0-9a-fA-F]{3}|[0-9a-fA-
 
 export const escHtml = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
-export function safeHttpUrl(value){
-      const raw=String(value||'').trim();
-      if(!/^https?:\/\//i.test(raw)) return '';
-      let u;
-      try{ u=new URL(raw); }catch(e){ return ''; }
-      if(u.username||u.password||(u.protocol!=='https:'&&u.protocol!=='http:')) return '';
-      const h=u.hostname.toLowerCase().replace(/^\[|\]$/g,'');
-      if(!h||h==='localhost'||h.endsWith('.localhost')||h.endsWith('.local')||h==='0.0.0.0'||h==='::1'||h==='metadata.google.internal') return '';
-      if(/^(127\.|10\.|192\.168\.|169\.254\.|172\.(1[6-9]|2\d|3[0-1])\.|0\.)/.test(h)) return '';
-      return u.href;
-    }
+export { safePublicHttpUrl as safeHttpUrl } from './public-url.mjs';
 
 export function keyHash(v){let h=5381;const s=String(v||'');for(let i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))>>>0;return h.toString(36);}
 

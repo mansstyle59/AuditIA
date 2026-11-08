@@ -1,4 +1,5 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import { isPublicHttpUrl } from "./url-validation.mjs";
 
 // AuditIA — auditia-secure-api, VERSION 2.
 // Seul point d'accès serveur aux API Google (Places API New, PageSpeed Insights).
@@ -101,12 +102,7 @@ function clampInt(value: unknown, min: number, max: number, fallback: number): n
   return Number.isFinite(n) ? Math.min(max, Math.max(min, Math.trunc(n))) : fallback;
 }
 function validPublicUrl(value: string): boolean {
-  try {
-    const u = new URL(value);
-    return (u.protocol === "https:" || u.protocol === "http:") &&
-      !["localhost", "127.0.0.1", "0.0.0.0", "::1"].includes(u.hostname) &&
-      !u.hostname.endsWith(".local") && !u.hostname.endsWith(".internal");
-  } catch { return false; }
+  return isPublicHttpUrl(value);
 }
 async function serviceFetch(path: string, init: RequestInit = {}) {
   return fetch(`${PROJECT_URL}/rest/v1/${path}`, {

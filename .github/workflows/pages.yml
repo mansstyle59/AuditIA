@@ -111,6 +111,8 @@ jobs:
               raise SystemExit("Missing service-worker assets: " + ", ".join(missing))
           print(f"Validation OK: {len(html_documents)} HTML entrypoints, {len(inline_scripts)} inline scripts, {len(external_scripts)} external scripts, {len(src_files)} src modules, local HTML assets, manifest JSON and {len(assets)} service-worker assets.")
           PY
+      - name: Test URL validation (SSRF fixtures)
+        run: node --test tests/security-url-validation.test.mjs
       - name: Validate CSS syntax
         shell: bash
         run: |
