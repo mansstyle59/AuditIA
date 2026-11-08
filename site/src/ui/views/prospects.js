@@ -1,7 +1,7 @@
 // AuditIA — vue « Prospects » : recherche de commerces, commerces proches, ajout manuel.
 // Affichage seulement : l'état et les appels réseau sont gérés par search-controller.js.
 import { badge, btn, emptyState, errorCard, linkBtn, spinnerCard, avatar } from '../components/ui.js';
-import { escHtml, safeHttpUrl } from '../../core/utils.js';
+import { escHtml, safeHttpUrl, formatGoogleProfileSummary } from '../../core/utils.js';
 import { nearbyOpportunity } from '../../api/places-model.js';
 import { CATEGORIES, filterLabels, findDuplicate } from '../../data/places-search.js';
 
@@ -23,7 +23,7 @@ export function placeCard(p, index, src, clients, adding) {
   const dup = findDuplicate(clients, p);
   const tone = opp.closed ? 'danger' : opp.score >= 60 ? 'good' : opp.score >= 30 ? 'warn' : 'neutral';
   const meta = [p.category, p.address].filter(Boolean).join(' · ');
-  const rating = p.rating != null ? `★ ${p.rating} (${p.reviews || 0} avis)` : 'Pas de note';
+  const rating = formatGoogleProfileSummary(p.rating, p.reviews) || 'Pas de note';
   const closed = statusLabel(p.status);
   const site = safeHttpUrl(p.website);
   const reasons = opp.reasons.length ? `<ul class="ds-place__why">${opp.reasons.map(r => `<li>${escHtml(r)}</li>`).join('')}</ul>` : '';
@@ -110,7 +110,8 @@ function addForm(s, clients) {
   const d = [];
   if (p.address) d.push(['Adresse', p.address]);
   if (p.phone) d.push(['Téléphone', p.phone]);
-  if (p.rating != null) d.push(['Note Google', `★ ${p.rating} (${p.reviews || 0} avis)`]);
+  const googleSummary = formatGoogleProfileSummary(p.rating, p.reviews);
+  if (googleSummary) d.push(['Note Google / avis', googleSummary]);
   if (Array.isArray(p.hours) && p.hours.length) d.push(['Horaires', p.hours.length + ' jours renseignés']);
   if (statusLabel(p.status)) d.push(['Statut', statusLabel(p.status)]);
   const info = d.length ? `<dl class="ds-kv">${d.map(([k, v]) => `<div><dt>${escHtml(k)}</dt><dd>${escHtml(v)}</dd></div>`).join('')}</dl>` : '';
