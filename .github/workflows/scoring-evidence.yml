@@ -1,0 +1,31 @@
+name: AuditIA scoring evidence tests
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "site/src/audit/scoring.js"
+      - "site/src/audit/scoring.test.mjs"
+      - ".github/workflows/scoring-evidence.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "site/src/audit/scoring.js"
+      - "site/src/audit/scoring.test.mjs"
+      - ".github/workflows/scoring-evidence.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Test score evidence and recommendations
+        run: node site/src/audit/scoring.test.mjs
