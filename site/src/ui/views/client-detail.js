@@ -3,7 +3,7 @@
 import { btn, card, stat, badge, scoreBadge, sparkline, emptyState, linkBtn, avatar } from '../components/ui.js';
 import { clientDetail, clientInfoRows, clientCategory } from '../../data/portfolio.js';
 import { auditHasAnalysis } from '../../audit/scoring.js';
-import { escHtml, safeHttpUrl } from '../../core/utils.js';
+import { escHtml, safeHttpUrl, formatGoogleProfileSummary } from '../../core/utils.js';
 import { bannerSlot } from './audit-live.js';
 import { noticeBlock } from './audits.js';
 
@@ -39,8 +39,9 @@ export function clientDetailView(c, audits, ctl) {
   const site = safeHttpUrl(c.website);
   const mapsQ = encodeURIComponent([c.name, d.address || c.city].filter(Boolean).join(' '));
   const sub = [c.city, clientCategory(c)].filter(Boolean).join(' · ');
+  const googleSummary = formatGoogleProfileSummary(d.rating, d.reviews);
   const header = `<section class="ds-card ds-client-head">
-    <div class="ds-client-id">${avatar(c.name)}<div class="ds-client-id__txt"><h2>${escHtml(c.name || 'Commerce')}</h2>${sub ? `<p class="ds-row__meta">${escHtml(sub)}</p>` : ''}${d.rating != null ? `<p class="ds-row__meta">★ ${escHtml(d.rating)} · ${escHtml(d.reviews || 0)} avis Google</p>` : ''}</div></div>
+    <div class="ds-client-id">${avatar(c.name)}<div class="ds-client-id__txt"><h2>${escHtml(c.name || 'Commerce')}</h2>${sub ? `<p class="ds-row__meta">${escHtml(sub)}</p>` : ''}${googleSummary ? `<p class="ds-row__meta">${escHtml(googleSummary)} · Google</p>` : ''}</div></div>
     <div class="ds-d-actions">
       ${tel ? linkBtn({ label: 'Appeler', href: 'tel:' + tel }) : ''}
       ${site ? linkBtn({ label: 'Site web', href: site, external: true }) : ''}
