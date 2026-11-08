@@ -1,0 +1,51 @@
+name: AuditIA scoring evidence tests
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "site/src/audit/scoring.js"
+      - "site/src/audit/scoring.test.mjs"
+      - ".github/workflows/scoring-evidence.yml"
+      - "site/src/core/utils.js"
+      - "site/src/core/google-evidence.test.mjs"
+      - "site/src/api/audit-sources.js"
+      - "site/src/report/report-model.js"
+      - "site/src/report/report-view.js"
+      - "site/src/report/report-pdf.js"
+      - "site/src/ui/views/audits.js"
+      - "site/src/ui/views/client-detail.js"
+      - "site/src/ui/views/prospects.js"
+  pull_request:
+    branches: [main]
+    paths:
+      - "site/src/audit/scoring.js"
+      - "site/src/audit/scoring.test.mjs"
+      - ".github/workflows/scoring-evidence.yml"
+      - "site/src/core/utils.js"
+      - "site/src/core/google-evidence.test.mjs"
+      - "site/src/api/audit-sources.js"
+      - "site/src/report/report-model.js"
+      - "site/src/report/report-view.js"
+      - "site/src/report/report-pdf.js"
+      - "site/src/ui/views/audits.js"
+      - "site/src/ui/views/client-detail.js"
+      - "site/src/ui/views/prospects.js"
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Test score evidence and recommendations
+        run: node site/src/audit/scoring.test.mjs
+      - name: Test Google evidence formatting and competitor review counts
+        run: node site/src/core/google-evidence.test.mjs

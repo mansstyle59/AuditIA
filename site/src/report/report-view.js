@@ -1,6 +1,6 @@
 // AuditIA — aperçu HTML du rapport (lot 5). Même modèle et mêmes graphiques que le PDF.
 // L'aperçu est du HTML (fiable sur iPhone, sans iframe PDF) : feuille blanche lisible, sections empilées sur mobile.
-import { escHtml } from '../core/utils.js';
+import { escHtml, formatGoogleProfileSummary } from '../core/utils.js';
 import { chartData, gaugeSvg, barsSvg, lineSvg } from './report-charts.js';
 import { toneOf } from './report-model.js';
 import { defaultBrand } from '../settings/brand.js';
@@ -78,7 +78,7 @@ export function reportPreviewHtml(m) {
     fact('E-mail', bp.email), fact('Site web', bp.website), fact('SIREN', bp.siren), fact('SIRET du siège', bp.siret),
     fact('Forme juridique', bp.legalForm), fact('Activité / code APE', bp.naf),
     fact('Date de création légale', bp.creationDate), fact('Ancienneté', bp.ageLabel),
-    fact('Établissements', bp.establishments), fact('Note Google', bp.rating == null ? '' : frNum(bp.rating) + '/5 · ' + (bp.reviews || 0) + ' avis')
+    fact('Établissements', bp.establishments), fact('Note Google / avis', formatGoogleProfileSummary(bp.rating, bp.reviews))
   ].filter(Boolean).join('');
   const hoursHtml = (bp.hours || []).length ? '<ul class="rp-list">' + bp.hours.map(h => '<li>' + escHtml(h) + '</li>').join('') + '</ul>' : note('Horaires non disponibles dans la fiche enregistrée.');
   const sourceHtml = bp.legalStatus === 'matched'

@@ -27,3 +27,33 @@ export const norm=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[̀-�
 export function siteHost(c){ const w=String((c&&c.website)||'').trim(); if(!w) return ''; try{ return new URL(/^https?:\/\//i.test(w)?w:'https://'+w).hostname.replace(/^www\./,''); }catch(e){ return ''; } }
 
 export function hexToRgb(h){ h=String(h||'#5B5FEF').replace('#',''); if(h.length===3)h=h.split('').map(x=>x+x).join(''); const n=parseInt(h,16); const v=isNaN(n)?0x5B5FEF:n; return [(v>>16)&255,(v>>8)&255,v&255]; }
+
+/* Données Google : préserver la différence entre zéro observé et valeur indisponible. */
+export function googleReviewCount(value){
+  if(value==null||value===''||typeof value==='boolean') return null;
+  const n=Number(value);
+  return Number.isInteger(n)&&n>=0?n:null;
+}
+export function googleRatingValue(value){
+  if(value==null||value===''||typeof value==='boolean') return null;
+  const n=Number(value);
+  return Number.isFinite(n)&&n>=0&&n<=5?n:null;
+}
+export function formatGoogleProfileSummary(rating,reviews){
+  const r=googleRatingValue(rating), n=googleReviewCount(reviews);
+  if(r==null&&n==null) return '';
+  const ratingText=r==null?'Note non disponible':'★ '+String(r).replace('.',',')+'/5';
+  const reviewsText=n==null?'avis non disponibles':n+' avis';
+  return ratingText+' · '+reviewsText;
+}
+export function compareGoogleReviewCounts(a,b){
+  const ar=googleReviewCount(a&&a.reviews), br=googleReviewCount(b&&b.reviews);
+  if(ar==null&&br!=null) return 1;
+  if(ar!=null&&br==null) return -1;
+  if(ar!=null&&br!=null&&ar!==br) return br-ar;
+  const at=googleRatingValue(a&&a.rating), bt=googleRatingValue(b&&b.rating);
+  if(at==null&&bt!=null) return 1;
+  if(at!=null&&bt==null) return -1;
+  if(at!=null&&bt!=null&&at!==bt) return bt-at;
+  return String(a&&a.name||'').localeCompare(String(b&&b.name||''),'fr');
+}
