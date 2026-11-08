@@ -115,6 +115,8 @@ jobs:
         run: node --test tests/security-url-validation.test.mjs
       - name: Test robots.txt crawl policy
         run: node site/src/audit/robots.test.mjs
+      - name: Test bounded web reads and robots identity
+        run: node tests/web-read-limits.test.mjs
       - name: Validate CSS syntax
         shell: bash
         run: |
