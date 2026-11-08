@@ -42,6 +42,24 @@ assert.equal(parseRobotsPolicy(combinedGroups, "AuditIA", "/one").allowed, false
 assert.equal(parseRobotsPolicy(combinedGroups, "AuditIA", "/two").allowed, false,
   "rules from repeated matching user-agent groups are combined");
 
+const emptyDisallowBoundary = `User-agent: AuditIA
+Disallow:
+User-agent: OtherBot
+Disallow: /private
+`;
+assert.equal(parseRobotsPolicy(emptyDisallowBoundary, "AuditIA", "/private").allowed, true,
+  "an empty Disallow still terminates the preceding user-agent group");
+assert.equal(parseRobotsPolicy(emptyDisallowBoundary, "OtherBot", "/private").allowed, false,
+  "the next user-agent group keeps its own Disallow rule");
+
+const emptyAllowBoundary = `User-agent: AuditIA
+Allow:
+User-agent: OtherBot
+Disallow: /blocked
+`;
+assert.equal(parseRobotsPolicy(emptyAllowBoundary, "AuditIA", "/blocked").allowed, true,
+  "an empty Allow still terminates the preceding user-agent group");
+
 const overlappingGroups = `User-agent: Audit
 Disallow: /legacy
 User-agent: AuditIA
