@@ -75,4 +75,57 @@ assert.match(zeroReviewsRecommendation.title, /collecte d’avis/);
 assert.match(zeroReviewsRecommendation.why, /0 avis/,
   "an explicitly observed zero must remain distinguishable from missing data");
 
+
+const competitorAudit = {
+  site: {
+    competitors: {
+      total: 8,
+      selfRank: 5,
+      list: [
+        { name: "Concurrent sans avis", reviews: null, rating: 4.8, isSelf: false },
+        { name: "Commerce audité", reviews: 5, rating: 4.0, isSelf: true },
+        { name: "Concurrent avec avis", reviews: 12, rating: 4.5, isSelf: false },
+      ],
+    },
+    rankings: [{ kw: "boulangerie Narbonne", pos: 4, found: true, error: false }],
+  },
+  scan: null,
+};
+const lowReviewPlan = improvementPlan(competitorAudit, client({
+  place_id: "ChIJ-auditia-low-reviews",
+  rating: 4.0,
+  reviews: 5,
+}));
+const lowReviewAdvice = lowReviewPlan.find(item => item.axis === "Avis & réputation");
+assert.match(lowReviewAdvice.why, /Concurrent avec avis en a déjà 12/);
+assert.doesNotMatch(lowReviewAdvice.why, /Concurrent sans avis.*(?:null|0) avis/i,
+  "competitors without a measured review count must not be described as having zero reviews");
+const localSeoAdvice = lowReviewPlan.find(item => item.axis === "SEO local");
+assert.match(localSeoAdvice.why, /Concurrent avec avis \(12 avis\)/);
+assert.doesNotMatch(localSeoAdvice.why, /Concurrent sans avis.*(?:null|0) avis/i,
+  "local SEO advice must not cite an unknown competitor review count");
+
+const noMeasuredCompetitorAudit = {
+  site: {
+    competitors: {
+      total: 2,
+      selfRank: null,
+      list: [
+        { name: "Concurrent sans avis", reviews: null, rating: 4.8, isSelf: false },
+        { name: "Commerce audité", reviews: 5, rating: 4.0, isSelf: true },
+      ],
+    },
+    rankings: [],
+  },
+  scan: null,
+};
+const noMeasuredCompetitorPlan = improvementPlan(noMeasuredCompetitorAudit, client({
+  place_id: "ChIJ-auditia-no-ranked-competitor",
+  rating: 4.0,
+  reviews: 5,
+}));
+const noMeasuredCompetitorAdvice = noMeasuredCompetitorPlan.find(item => item.axis === "Avis & réputation");
+assert.doesNotMatch(noMeasuredCompetitorAdvice.why, /Concurrent sans avis/,
+  "unknown competitor counts must be omitted from review advice");
+
 console.log("AuditIA scoring evidence tests passed.");
