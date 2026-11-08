@@ -1,6 +1,7 @@
 /* AuditIA — analyse d'une page web (réseaux sociaux, réservation, suivi, CMS, signaux SEO/GEO).
    Fonctions pures (HTML en entrée → objet en sortie), déplacées telles quelles depuis site/index.html (étape 2). */
 import { norm } from '../core/utils.js';
+import { hasLocalBusinessSchema } from './schema-evidence.mjs';
 
 export const SOCIAL_RX=[['Instagram',/(^|\.)instagram\.com$/],['Facebook',/(^|\.)facebook\.com$|(^|\.)fb\.com$/],['TikTok',/(^|\.)tiktok\.com$/],['YouTube',/(^|\.)youtube\.com$|(^|\.)youtu\.be$/],['LinkedIn',/(^|\.)linkedin\.com$/],['X / Twitter',/(^|\.)(twitter|x)\.com$/],['Pinterest',/(^|\.)pinterest\.[a-z]+$/],['Snapchat',/(^|\.)snapchat\.com$/]];
 
@@ -49,8 +50,7 @@ export function analyzeSite(html,pageUrl){
       const viewport=!!doc.querySelector('meta[name="viewport" i]');
       const ldTypes=new Set();
       doc.querySelectorAll('script[type="application/ld+json"]').forEach(s=>{try{const walk=o=>{if(!o||typeof o!=='object')return;if(Array.isArray(o))return o.forEach(walk);const t=o['@type'];(Array.isArray(t)?t:[t]).filter(Boolean).forEach(x=>ldTypes.add(String(x)));if(o['@graph'])walk(o['@graph']);};walk(JSON.parse(s.textContent));}catch(e){}});
-      const LOCAL_TYPES=/LocalBusiness|Restaurant|FoodEstablishment|Bakery|CafeOrCoffeeShop|BarOrPub|Store|HairSalon|BeautySalon|DaySpa|HealthAndBeautyBusiness|Hotel|LodgingBusiness|AutoRepair|AutomotiveBusiness|HomeAndConstructionBusiness|Plumber|Electrician|HousePainter|ProfessionalService|MedicalBusiness|Dentist|Physician|Organization/;
-      const localSchema=[...ldTypes].some(t=>LOCAL_TYPES.test(t));
+      const localSchema=hasLocalBusinessSchema([...ldTypes]);
       const text=(doc.body&&doc.body.textContent||'').replace(/\s+/g,' ');
       const words=text.split(' ').filter(w=>w.length>2).length;
       const hoursOnSite=/horaires|heures d.ouverture|ouvert du/i.test(text)||(/\b(lundi|mardi)\b/i.test(text)&&/\b\d{1,2}\s?h|\d{1,2}:\d{2}/.test(text));
