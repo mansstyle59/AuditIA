@@ -104,7 +104,7 @@ export function improvementPlan(a,c){
 export const AUDIT_CATEGORY_META = [
   { id: 'google', label: 'Fiche Google & informations pratiques', description: 'Identification de l’établissement, coordonnées, horaires et photos.', scored: true },
   { id: 'reputation', label: 'Avis & e-réputation', description: 'Note publique et volume d’avis observés.', scored: true },
-  { id: 'website', label: 'Site web & expérience mobile', description: 'Sécurité, lisibilité mobile, contact et qualité technique.', scored: true },
+  { id: 'website', label: 'Site web & expérience mobile', description: 'Protocole HTTPS, lisibilité mobile, contact et qualité technique.', scored: true },
   { id: 'local_seo', label: 'SEO local & mots-clés', description: 'Référencement technique et présence dans les recherches explorées.', scored: true },
   { id: 'social', label: 'Réseaux sociaux & annuaires', description: 'Profils sociaux et présence dans les annuaires détectés.', scored: true },
   { id: 'geo', label: 'Visibilité IA & GEO', description: 'Données structurées, lisibilité et accès des assistants IA.', scored: true },
