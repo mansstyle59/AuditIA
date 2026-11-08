@@ -5,7 +5,7 @@
 - Les politiques SQL limitent l'accès aux données au compte administrateur autorisé et à ses propres lignes.
 - La clé Supabase publiée dans le navigateur est une clé publique ; elle ne remplace jamais RLS.
 - L'index `audits_client_id_idx` accélère la relation entre audits et commerces.
-- Les liens affichés et les adresses envoyées aux services d’analyse doivent être `http` ou `https`. Les adresses locales, privées et les schémas `javascript:` sont refusés.
+- Les URL d’audit et les adresses envoyées aux services d’analyse doivent être `http` ou `https`, sans identifiants intégrés. Les hôtes locaux/privés, IPv6 littérales, plages IPv4 réservées, adresses de métadonnées cloud et domaines de résolution wildcard connus (`nip.io`, `sslip.io`, etc.) sont refusés côté navigateur et dans la validation de la fonction Edge. Cette validation ne remplace pas une résolution DNS sécurisée côté serveur pour prévenir les DNS rebinding.
 - Le service worker ne met en cache que les fichiers de l’application, jamais une requête avec paramètres.
 - Les couleurs de marque injectées dans le style doivent être un code hexadécimal. Le logo enregistré est converti en PNG.
 
