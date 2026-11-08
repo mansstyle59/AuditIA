@@ -43,6 +43,8 @@ assert.equal(parseRobotsPolicy(combinedGroups, "AuditIA", "/two").allowed, false
   "rules from repeated matching user-agent groups are combined");
 
 assert.equal(parseRobotsPolicy("# no directives\n", "AuditIA", "/").allowed, true);
+assert.equal(parseRobotsPolicy("Sitemap: https://example.com/sitemap.xml\n", "AuditIA", "/").allowed, true,
+  "a sitemap-only robots.txt does not restrict crawling");
 assert.equal(parseRobotsPolicy("not a robots directive", "AuditIA", "/").allowed, null,
   "an unparseable robots file is unknown, not permission to crawl");
 
