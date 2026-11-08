@@ -138,7 +138,7 @@ export async function readSiteHtml(url){
     }},
     45000
   );
-  if(text&&text.length>200&&/<(html|head|body)[\\s>]/i.test(text)) return text;
+  if(text&&text.length>200&&/<(html|head|body)[\s>]/i.test(text)) return text;
   throw new Error('page vide, illisible ou refusée par robots.txt via Jina Reader');
 }
 
