@@ -5,6 +5,7 @@ const BLOCKED_HOSTS = new Set([
   "localhost", "localhost.localdomain", "ip6-localhost", "ip6-loopback",
   "metadata", "metadata.google.internal", "metadata.azure.com", "metadata.aws.internal",
   "instance-data.ec2.internal", "host.docker.internal", "gateway.docker.internal",
+  "localtest.me", "lvh.me", "vcap.me", "traefik.me", "nip.io", "sslip.io", "xip.io",
 ]);
 
 const BLOCKED_SUFFIXES = [
