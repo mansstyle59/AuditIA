@@ -236,7 +236,7 @@ export function buildReportPdf(JsPDF, m) {
     ['Ancienneté à la date du rapport', bp.ageLabel], ['Nombre d’établissements', bp.establishments],
     ['Code postal / commune', [bp.postalCode,bp.legalCity].filter(Boolean).join(' ')],
     ['Statut de l’établissement', bp.googleStatus],
-    ['Note Google / avis', bp.rating != null ? frNum(bp.rating) + '/5 · ' + (bp.reviews || 0) + ' avis' : '']
+    ['Note Google / avis', bp.rating == null && bp.reviews == null ? '' : [bp.rating != null ? frNum(bp.rating) + '/5' : 'Note non disponible', bp.reviews != null ? bp.reviews + ' avis' : 'Avis non disponibles'].join(' · ')]
   ].filter(x => x[1] !== null && x[1] !== undefined && String(x[1]).trim() !== '');
   if (profileRows.length) {
     table([{w:57},{w:117}], ['Information','Donnée vérifiée / enregistrée'], profileRows);
