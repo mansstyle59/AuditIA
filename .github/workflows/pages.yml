@@ -122,6 +122,8 @@ jobs:
           # PostCSS parser checks CSS syntax without rewriting the published files.
           npx --yes --package=postcss-cli@11.0.1 postcss "${css_files[@]}" --no-map --dir "$RUNNER_TEMP/auditia-css-check"
           echo "CSS syntax OK: ${#css_files[@]} files"
+      - name: Test robots.txt crawl policy
+        run: node site/src/audit/robots.test.mjs
       - name: Upload site artifact
         uses: actions/upload-pages-artifact@v3
         with:
