@@ -38,18 +38,14 @@ function matchingGroups(groups, userAgent) {
   const specific = [];
 
   for (const group of groups) {
-    for (const agent of group.agents) {
-      if (agent !== "*" && productToken.includes(agent)) {
-        specific.push({ group, specificity: agent.length });
-      }
+    if (group.agents.some(agent => agent !== "*" && productToken.includes(agent))) {
+      specific.push(group);
     }
   }
 
-  if (specific.length) {
-    const longest = Math.max(...specific.map(item => item.specificity));
-    return [...new Set(specific.filter(item => item.specificity === longest).map(item => item.group))];
-  }
-
+  // RFC 9309 §2.2.1 : si plusieurs groupes correspondent au produit,
+  // leurs règles sont combinées. Le groupe "*" ne sert que de repli.
+  if (specific.length) return [...new Set(specific)];
   return groups.filter(group => group.agents.includes("*"));
 }
 
@@ -145,5 +141,5 @@ export function parseRobotsPolicy(text, userAgent = "AuditIA", pathAndQuery = "/
    Empty or HTML responses must not be interpreted as permission to crawl. */
 export function isRobotsResponseUnverifiable(text) {
   const body = String(text || "").trim();
-  return !body || /^\\s*</.test(body) || /<html|<body/i.test(body);
+  return !body || /^\s*</.test(body) || /<html|<body/i.test(body);
 }
