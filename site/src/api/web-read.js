@@ -4,6 +4,7 @@
    Déplacées telles quelles depuis site/index.html (étape 2) : mêmes adresses, mêmes délais maximum, mêmes secours. */
 import { safeHttpUrl, withTimeout } from '../core/utils.js';
 import { AI_BOTS, parseRobotsForAI } from '../audit/site-analysis.js';
+import { parseRobotsPolicy } from '../audit/robots.js';
 
 export async function fetchDomainDate(website){
       try{
@@ -71,15 +72,61 @@ export async function fetchSirene(c){
 
 export async function readSiteText(url,opts,timeout){const ctl=new AbortController();const t=setTimeout(()=>ctl.abort(),timeout||40000);try{const r=await fetch(url,{...(opts||{}),signal:ctl.signal});if(!r.ok){const e=new Error('HTTP '+r.status);e.status=r.status;throw e;}return await r.text();}finally{clearTimeout(t);}}
 
-export async function fetchGeoFiles(site){
-      let origin;try{origin=new URL(site).origin;}catch(e){return null;}
-      const get=async path=>{try{const t=await readSiteText('https://api.allorigins.win/raw?url='+encodeURIComponent(origin+path),{},12000);return typeof t==='string'?t:null;}catch(e){return null;}};
-      const [rb,ll]=await Promise.all([get('/robots.txt'),get('/llms.txt')]);
-      const looksHtml=t=>/^\s*</.test(t||'')||/<html|<body/i.test(t||'');
-      const robots=rb==null?null:(looksHtml(rb)||!/user-agent/i.test(rb)?{read:true,blocked:[],total:AI_BOTS.length,missing:true}:parseRobotsForAI(rb));
-      const llms=ll==null?null:(!looksHtml(ll)&&ll.trim().length>40);
-      return {robots,llms};
-    }
+function looksHtmlText(text){
+  return /^\\s*</.test(text||'') || /<html|<body/i.test(text||'');
+}
+
+function robotsFileMissing(text){
+  const body=String(text||'').trim();
+  return !body || (looksHtmlText(body) && /(?:404|not found|introuvable|does not exist)/i.test(body));
+}
+
+function robotsInfoForMissing(){
+  return {
+    robots:{read:true,blocked:[],total:AI_BOTS.length,missing:true},
+    policy:{status:'missing',allowed:true,llmsAllowed:true,matchedRule:null,userAgent:'AuditIA'}
+  };
+}
+
+/* Lecture préalable de robots.txt : le moteur doit décider du crawl avant d'appeler
+   les proxys de lecture, PageSpeed ou le service de capture. */
+export async function fetchRobotsPolicy(site){
+  let parsed;
+  try{ parsed=new URL(site); }catch(e){ return {robots:null,policy:{status:'invalid-url',allowed:null,llmsAllowed:null,userAgent:'AuditIA'}}; }
+  const origin=parsed.origin;
+  const targetPath=(parsed.pathname||'/')+parsed.search;
+  const robotsUrl='https://api.allorigins.win/raw?url='+encodeURIComponent(origin+'/robots.txt');
+  let rb=null;
+  try{ rb=await readSiteText(robotsUrl,{},8000); }
+  catch(e){
+    if(e&&e.status===404) return robotsInfoForMissing();
+    return {robots:{read:false,blocked:[],total:AI_BOTS.length,unavailable:true},policy:{status:'unavailable',allowed:null,llmsAllowed:null,userAgent:'AuditIA',path:targetPath}};
+  }
+  if(robotsFileMissing(rb)) return robotsInfoForMissing();
+  const policy=parseRobotsPolicy(rb,'AuditIA',targetPath);
+  const llmsPolicy=parseRobotsPolicy(rb,'AuditIA','/llms.txt');
+  const robots=policy.status==='invalid'
+    ? {read:false,blocked:[],total:AI_BOTS.length,invalid:true}
+    : parseRobotsForAI(rb);
+  return {robots,policy:{...policy,llmsAllowed:llmsPolicy.allowed}};
+}
+
+export async function fetchGeoFiles(site, robotsInfo=null){
+  let info=robotsInfo;
+  if(!info) info=await fetchRobotsPolicy(site);
+  const policy=info&&info.policy;
+  let origin;
+  try{origin=new URL(site).origin;}catch(e){return {robots:info&&info.robots||null,policy:policy||null,llms:null};}
+  let llms=null;
+  // llms.txt est lui aussi une ressource crawlée : ne le lire que si robots l'autorise.
+  if(policy&&policy.llmsAllowed===true){
+    try{
+      const text=await readSiteText('https://api.allorigins.win/raw?url='+encodeURIComponent(origin+'/llms.txt'),{},8000);
+      llms=!looksHtmlText(text)&&text.trim().length>40;
+    }catch(e){llms=null;}
+  }
+  return {robots:info&&info.robots||null,policy:policy||null,llms};
+}
 
 export async function readSiteHtml(url){
       url=safeHttpUrl(url); if(!url) throw new Error('adresse non autorisée');
