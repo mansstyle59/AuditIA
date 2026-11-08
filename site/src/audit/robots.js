@@ -91,15 +91,20 @@ function ruleSpecificity(pattern) {
  */
 export function parseRobotsPolicy(text, userAgent = "AuditIA", pathAndQuery = "/") {
   const rawText = String(text || "");
-  const cleanText = rawText.split(/\r?\n/).map(line => line.replace(/#.*$/, "").trim()).filter(Boolean);
+  const safePath = String(pathAndQuery || "/");
   if (rawText.length > 512 * 1024) {
-    return { status: "too-large", allowed: null, matchedRule: null, userAgent, path: String(pathAndQuery || "/") };
+    return { status: "too-large", allowed: null, matchedRule: null, userAgent, path: safePath };
+  }
+  const lines = rawText.split(/\r?\n/);
+  if (lines.length > 10000) {
+    return { status: "too-large", allowed: null, matchedRule: null, userAgent, path: safePath };
+  }
+  const cleanText = lines.map(line => line.replace(/#.*$/, "").trim()).filter(Boolean);
+  const ruleLines = cleanText.filter(line => /^(?:allow|disallow)\s*:/i.test(line));
+  if (ruleLines.length > 5000 || ruleLines.some(line => line.replace(/^(?:allow|disallow)\s*:/i, "").trim().length > 2048)) {
+    return { status: "too-large", allowed: null, matchedRule: null, userAgent, path: safePath };
   }
   const groups = parseGroups(rawText);
-  const ruleCount = groups.reduce((total, group) => total + group.rules.length, 0);
-  if (ruleCount > 5000 || groups.some(group => group.rules.some(rule => rule.pattern.length > 2048))) {
-    return { status: "too-large", allowed: null, matchedRule: null, userAgent, path: String(pathAndQuery || "/") };
-  }
   const path = String(pathAndQuery || "/").split("#")[0];
   const normalizedPath = path.startsWith("/") ? path : "/" + path;
 
