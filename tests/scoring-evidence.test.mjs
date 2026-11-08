@@ -47,7 +47,7 @@ test("un client saisi manuellement ne prouve pas une fiche Google ni ses statist
   assert.ok(!titles.includes("Lancer une collecte d’avis Google"));
   assert.ok(!titles.includes("Faire remonter la note Google"));
   assert.ok(!titles.includes("Vérifier les horaires sur la fiche Google"));
-  assert.ok(!titles.includes("Publier des “posts” Google régulièrement"));
+  assert.ok(!titles.includes("Publier des “posts” Google si vous gérez la fiche"));
   assert.ok(!titles.includes("Créer un site vitrine"));
 });
 
@@ -69,7 +69,7 @@ test("un identifiant Google Places permet d’utiliser les données Google réel
   assert.ok(titles.includes("Lancer une collecte d’avis Google"));
   assert.ok(titles.includes("Vérifier les horaires sur la fiche Google"));
   assert.ok(titles.includes("Ajouter des photos récentes (et régulièrement)"));
-  assert.ok(titles.includes("Publier des “posts” Google régulièrement"));
+  assert.ok(titles.includes("Publier des “posts” Google si vous gérez la fiche"));
 });
 
 test("le contrôle HTTPS décrit uniquement le protocole de l’URL, pas la validité TLS", () => {
