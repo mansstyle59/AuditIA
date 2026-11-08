@@ -4,7 +4,7 @@
    Déplacées telles quelles depuis site/index.html (étape 2) : mêmes adresses, mêmes délais maximum, mêmes secours. */
 import { safeHttpUrl, withTimeout } from '../core/utils.js';
 import { AI_BOTS, parseRobotsForAI } from '../audit/site-analysis.js';
-import { parseRobotsPolicy } from '../audit/robots.js';
+import { parseRobotsPolicy, isRobotsResponseUnverifiable } from '../audit/robots.js';
 
 export async function fetchDomainDate(website){
       try{
@@ -74,13 +74,6 @@ export async function readSiteText(url,opts,timeout){const ctl=new AbortControll
 
 function looksHtmlText(text){
   return /^\s*</.test(text||'') || /<html|<body/i.test(text||'');
-}
-
-/* Un proxy ne permet pas de distinguer sûrement un robots.txt absent d'une page d'erreur
-   du proxy. Une réponse vide ou HTML est donc considérée comme non vérifiable (fail closed). */
-export function isRobotsResponseUnverifiable(text){
-  const body=String(text||'').trim();
-  return !body || looksHtmlText(body);
 }
 
 function robotsInfoUnavailable(status='unavailable'){
