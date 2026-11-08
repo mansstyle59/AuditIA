@@ -90,6 +90,8 @@ await assert.rejects(
 );
 
 const webReadSource = readFileSync(new URL("../site/src/api/web-read.js", import.meta.url), "utf8");
+assert.match(webReadSource, /export async function fetchRobotsPolicy\\(site\\)\\s*\\{\\s*site=safeHttpUrl\\(site\\);\\s*if\\(!site\\)/,
+  "fetchRobotsPolicy must reject invalid public URLs before any proxy request");
 assert.match(webReadSource, /'X-Robots-Txt'\s*:\s*'AuditIA'/,
   "Jina Reader must check robots.txt using the AuditIA user-agent token");
 assert.match(webReadSource, /readSiteText\(robotsUrl,\{\},8000,512\*1024\)/,
