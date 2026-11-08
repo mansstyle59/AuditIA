@@ -5,7 +5,7 @@
 import { safeHttpUrl, withTimeout } from '../core/utils.js';
 import { AI_BOTS, parseRobotsForAI } from '../audit/site-analysis.js';
 import { parseRobotsPolicy, isRobotsResponseUnverifiable } from '../audit/robots.js';
-import { readTextLimited } from './bounded-fetch.mjs';
+import { readTextLimited, readBytesLimited } from './bounded-fetch.mjs';
 
 export async function fetchDomainDate(website){
       try{
@@ -24,7 +24,7 @@ export async function fetchSirene(c){
   const city=String((c&&c.city)||'').trim();
   const details=(c&&c.details)||{};
   const address=String(details.address||(c&&c.address)||'').trim();
-  const postal=(address.match(/\\b\\d{5}\\b/)||[])[0]||'';
+  const postal=(address.match(/\b\d{5}\b/)||[])[0]||'';
   const queries=[...new Set([
     [name,postal,city].filter(Boolean).join(' '),
     [name,city].filter(Boolean).join(' '),
@@ -39,7 +39,7 @@ export async function fetchSirene(c){
     (data&&Array.isArray(data.results)?data.results:[]).forEach(x=>{if(x&&x.siren&&!all.some(y=>String(y.siren)===String(x.siren)))all.push(x);});
     if(all.length>=20) break;
   }
-  const norm=s=>String(s||'').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+  const norm=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
   const target=norm(name), targetCity=norm(city), targetPostal=postal;
   const scored=all.map(res=>{
     const siege=res.siege||{};
@@ -61,7 +61,7 @@ export async function fetchSirene(c){
   if(!best||best.score<55) return {matched:false,reason:all.length?'Correspondances insuffisamment fiables':'Aucun résultat dans le registre',candidates:all.length,fetchedAt:new Date().toISOString()};
   const {res,siege,score}=best;
   const dir=(res.dirigeants&&res.dirigeants[0])||null;
-  const dirName=dir?((dir.nom||dir.nom_patronymique)?((dir.prenoms||dir.prenom||'')+' '+(dir.nom||dir.nom_patronymique)).replace(/\\s+/g,' ').trim():(dir.denomination||'')):'';
+  const dirName=dir?((dir.nom||dir.nom_patronymique)?((dir.prenoms||dir.prenom||'')+' '+(dir.nom||dir.nom_patronymique)).replace(/\s+/g,' ').trim():(dir.denomination||'')):'';
   return {matched:true,matchScore:score,matchConfidence:score>=85?'élevée':score>=65?'moyenne':'à vérifier',
     siren:res.siren||'',siret:siege.siret||'',denomination:res.nom_complet||res.nom_raison_sociale||'',
     dateCreation:siege.date_creation||res.date_creation||'',naf:res.activite_principale||siege.activite_principale||'',
@@ -147,15 +147,14 @@ export async function fetchScreenshot(site){
   const svc='https://s.wordpress.com/mshots/v1/'+encodeURIComponent(site)+'?w=1000&h=750';
   const url='https://api.allorigins.win/raw?url='+encodeURIComponent(svc);
   const maxBytes=8*1024*1024;
-  const ctl=new AbortController();
-  const timer=setTimeout(()=>ctl.abort(),18000);
   try{
-    const r=await fetch(url,{signal:ctl.signal});
-    if(!r.ok) return null;
-    const declared=Number(r.headers.get('content-length')||0);
-    if(declared>maxBytes) return null;
-    const blob=await r.blob();
-    if(blob.size<=9000||blob.size>maxBytes||!/^image\//i.test(blob.type||'image/jpeg')) return null;
+    // Lecture progressive : ne pas charger un Blob arbitrairement volumineux avant
+    // de vérifier sa taille. Le proxy peut omettre Content-Length.
+    const {bytes,contentType}=await readBytesLimited(url,{},18000,maxBytes);
+    if(bytes.byteLength<=9000) return null;
+    const imageType=contentType||'image/jpeg';
+    if(!/^image\//i.test(imageType)) return null;
+    const blob=new Blob([bytes],{type:imageType});
     return await new Promise(resolve=>{
       const reader=new FileReader();
       reader.onload=()=>resolve(reader.result);
@@ -163,5 +162,4 @@ export async function fetchScreenshot(site){
       reader.readAsDataURL(blob);
     });
   }catch(e){return null;}
-  finally{clearTimeout(timer);}
 }
