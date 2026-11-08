@@ -24,6 +24,7 @@ export function cityFromComponents(comps){
 export function normalizeReviewCount(value){
   if(value===null||value===undefined||value==='') return null;
   if(typeof value!=='number'&&typeof value!=='string') return null;
+  if(typeof value==='string'&&value.trim()==='') return null;
   const n=typeof value==='number'?value:Number(value.trim());
   return Number.isSafeInteger(n)&&n>=0?n:null;
 }
