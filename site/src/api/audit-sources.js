@@ -6,7 +6,7 @@
    mêmes délais, mêmes secours. Seules les variables globales de l'ancienne page sont remplacées par des
    dépendances injectées (clés lues en lecture seule, rappels de progression).
    Les 5 autres sources (site, SIRENE, âge du domaine, capture, robots.txt/llms.txt) sont dans web-read.js. */
-import { safeHttpUrl, norm, siteHost } from '../core/utils.js';
+import { safeHttpUrl, norm, siteHost, googleReviewCount, compareGoogleReviewCounts } from '../core/utils.js';
 import { secureApi } from './secure-api.js';
 import { placePhotoCount } from './places.js';
 import { SOCIAL_RX, businessInUrl } from '../audit/site-analysis.js';
@@ -85,21 +85,23 @@ export function createAuditSources(deps0){
             const id=p.id||'', nm=(p.displayName&&p.displayName.text)||'';
             if(!nm||(id&&seen.has(id))) return; if(id) seen.add(id);
             const website=String(p.websiteUri||'').startsWith('http')?p.websiteUri:'';
-            all.push({placeId:id,name:nm,rating:(typeof p.rating==='number')?p.rating:null,reviews:Number(p.userRatingCount)||0,website,primaryType:(p.primaryTypeDisplayName&&p.primaryTypeDisplayName.text)||'',businessStatus:p.businessStatus||'',mapsUrl:p.googleMapsUri||'',isSelf:(!!selfId&&id===selfId)||(!selfId&&!!selfName&&norm(nm)===selfName)});
+            all.push({placeId:id,name:nm,rating:(typeof p.rating==='number')?p.rating:null,reviews:googleReviewCount(p.userRatingCount),website,primaryType:(p.primaryTypeDisplayName&&p.primaryTypeDisplayName.text)||'',businessStatus:p.businessStatus||'',mapsUrl:p.googleMapsUri||'',isSelf:(!!selfId&&id===selfId)||(!selfId&&!!selfName&&norm(nm)===selfName)});
           });
           if(selfName&&!all.some(x=>x.isSelf)&&city){
             try{
               const d2=await secureApi(deps.getClient,{action:'places_searchText',textQuery:String((c&&c.name)||'')+' '+city,maxResultCount:10,mask:'competitors'},12000,'Google refuse la recherche des concurrents.');
-              { (d2.places||[]).forEach(p=>{ const id=p.id||'', nm=(p.displayName&&p.displayName.text)||''; if(!nm||(id&&seen.has(id))) return; if(id) seen.add(id); const website=String(p.websiteUri||'').startsWith('http')?p.websiteUri:''; all.push({placeId:id,name:nm,rating:(typeof p.rating==='number')?p.rating:null,reviews:Number(p.userRatingCount)||0,website,primaryType:(p.primaryTypeDisplayName&&p.primaryTypeDisplayName.text)||'',businessStatus:p.businessStatus||'',mapsUrl:p.googleMapsUri||'',isSelf:(!!selfId&&id===selfId)||(!selfId&&!!selfName&&norm(nm)===selfName)}); }); }
+              { (d2.places||[]).forEach(p=>{ const id=p.id||'', nm=(p.displayName&&p.displayName.text)||''; if(!nm||(id&&seen.has(id))) return; if(id) seen.add(id); const website=String(p.websiteUri||'').startsWith('http')?p.websiteUri:''; all.push({placeId:id,name:nm,rating:(typeof p.rating==='number')?p.rating:null,reviews:googleReviewCount(p.userRatingCount),website,primaryType:(p.primaryTypeDisplayName&&p.primaryTypeDisplayName.text)||'',businessStatus:p.businessStatus||'',mapsUrl:p.googleMapsUri||'',isSelf:(!!selfId&&id===selfId)||(!selfId&&!!selfName&&norm(nm)===selfName)}); }); }
             }catch(e){}
           }
-          all.sort((a,b)=>(b.reviews-a.reviews)||((b.rating||0)-(a.rating||0))||a.name.localeCompare(b.name,'fr'));
-          all.forEach((x,i)=>x.rank=i+1);
+          all.sort(compareGoogleReviewCounts);
+          const ranked=all.filter(x=>x.reviews!=null);
+          ranked.forEach((x,i)=>x.rank=i+1);
+          all.filter(x=>x.reviews==null).forEach(x=>x.rank=null);
           const self=all.find(x=>x.isSelf)||null, top=all.slice(0,8);
-          if(self&&!top.some(x=>x.isSelf)){top.pop();top.push(self);top.sort((a,b)=>a.rank-b.rank);}
-          const ahead=self?all.filter(x=>x.rank<self.rank).sort((a,b)=>a.rank-b.rank):[];
+          if(self&&!top.some(x=>x.isSelf)){top.pop();top.push(self);top.sort(compareGoogleReviewCounts);}
+          const ahead=self&&self.rank!=null?ranked.filter(x=>x.rank<self.rank).sort((a,b)=>a.rank-b.rank):[];
           const nextAhead=ahead.length?ahead[ahead.length-1]:null, rated=all.filter(x=>x.rating!=null);
-          return {query,total:all.length,selfRank:self?self.rank:null,selfFound:!!self,leader:all[0]||null,nextAhead,averageRating:rated.length?rated.reduce((n,x)=>n+x.rating,0)/rated.length:null,averageReviews:all.length?Math.round(all.reduce((n,x)=>n+x.reviews,0)/all.length):0,list:top};
+          return {query,total:all.length,rankedTotal:ranked.length,selfRank:self&&self.rank!=null?self.rank:null,selfFound:!!self,leader:all[0]||null,nextAhead,averageRating:rated.length?rated.reduce((n,x)=>n+x.rating,0)/rated.length:null,averageReviews:ranked.length?Math.round(ranked.reduce((n,x)=>n+x.reviews,0)/ranked.length):null,list:top};
         }catch(e){ return null; }
       }
       /* Classement : pour chaque mot-clé client, à quelle position apparaît le commerce (recherche web réelle) */
