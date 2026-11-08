@@ -57,7 +57,7 @@ function ruleRegex(pattern) {
   const endAnchored = pattern.endsWith("$");
   const body = endAnchored ? pattern.slice(0, -1) : pattern;
   const escaped = body.replace(/[.+?^{}()|[\]\\]/g, "\\$&").replace(/\*/g, ".*");
-  return new RegExp("^" + escaped + (endAnchored ? "$" : ""), "i");
+  return new RegExp("^" + escaped + (endAnchored ? "$" : ""));
 }
 
 function ruleSpecificity(pattern) {
