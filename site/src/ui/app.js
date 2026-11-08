@@ -15,6 +15,7 @@ import { createAuditController } from './audit-controller.js';
 import { createReportController } from './report-controller.js';
 import { auditsView, auditDossierView } from './views/audits.js';
 import { createSettingsController } from './settings-controller.js';
+import { createBingController } from './bing-controller.js';
 import { authScreen, authLoading, authError } from './screens/auth.js';
 import { landingClick } from './screens/landing.js';
 import { loadWorkspaceData, dataErrorMessage } from '../data/queries.js';
@@ -76,6 +77,11 @@ const settings = createSettingsController({
   rerender: () => { if (state.user && state.view === 'settings') renderWorkspace(); },
   onSaved: brand => { state.brand = brand; paintBrand(brand); }, // marque mise à jour sans recomposer l'écran
 });
+const bing = createBingController({
+  getSupabase: () => getAuthClient(),
+  getClient: id => state.data.clients.find(c => String(c.id) === String(id)) || null,
+  rerender: () => { if (state.user && state.view === 'client') renderWorkspace(); },
+});
 const auth = createAuthService({ getClient: getAuthClient, redirectUrl: REDIRECT_URL });
 
 /* ---------- Écrans de connexion ---------- */
@@ -126,7 +132,7 @@ function bodyFor(isWide) {
   if (d.status === 'error') return errorCard({ title: 'Chargement impossible', text: d.error });
   if (state.view === 'client') {
     const c = d.clients.find(x => String(x.id) === String(state.clientId));
-    if (c) return clientDetailView(c, d.audits, audits);
+    if (c) return clientDetailView(c, d.audits, audits, bing);
     state.view = 'clients'; // client introuvable (supprimé ?) : retour à la liste
   }
   if (state.view === 'clients') return clientsView(d, state.ui);
@@ -188,7 +194,7 @@ function enter(user) {
   state.clientId = null;
   state.ui = { q: '', tier: '', sort: 'urgence' };
   search.reset();
-  report.close(); audits.reset(); settings.reset();
+  report.close(); audits.reset(); settings.reset(); bing.reset();
   window.scrollTo(0, 0);
   loadData();
   loadBrandNow(user);
@@ -266,6 +272,7 @@ root.addEventListener('click', event => {
   if (t.closest('[data-retry]')) { boot(); return; }
   if (t.closest('[data-logout]')) { logout(); return; }
   if (!state.user) return;
+  if (bing.onClick(t)) return;
   if (audits.onClick(t)) return;
   if (search.onClick(t)) return;
   if (settings.onClick(t)) return;

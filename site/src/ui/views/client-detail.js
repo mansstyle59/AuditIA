@@ -32,7 +32,7 @@ function auditsCard(audits, c, ctl) {
   return card({ title: 'Audits de ce client', body: `<ul class="ds-list">${rows}</ul><div class="ds-d-actions">${launch}</div>` });
 }
 
-export function clientDetailView(c, audits, ctl) {
+export function clientDetailView(c, audits, ctl, bingCtl = null) {
   const d = c.details || {};
   const info = clientDetail(c, audits);
   const tel = String(c.phone || d.phone || '').replace(/[^\d+]/g, '');
@@ -55,6 +55,7 @@ export function clientDetailView(c, audits, ctl) {
     ? card({ title: 'Évolution du score', body: `<div class="ds-spark-wrap">${sparkline(info.history)}</div><p class="ds-row__meta">Du plus ancien au plus récent audit.</p>` }) : '';
   return `${btn({ label: '← Clients', attrs: 'data-nav="clients"' })}
     ${bannerSlot(ctl ? ctl.snapshot() : null)}${noticeBlock(ctl ? ctl.notice() : null)}
+    ${bingCtl ? bingCtl.html(c) : ''}
     <div class="ds-detail">
       <div class="ds-d-stack ds-detail__main">${header}${stats}${auditsCard(info.audits, c, ctl)}</div>
       <div class="ds-d-stack ds-detail__side">${evo}${infoCard(c)}</div>
