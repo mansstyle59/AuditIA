@@ -75,6 +75,16 @@ function matchesRobotsPattern(pattern, path) {
   return endAnchored ? p === body.length && t === path.length : p === body.length;
 }
 
+// RFC 9309 : decoder les caractères non réservés (%7E → ~), mais
+// conserver les caractères réservés encodés (%2F reste distinct de /).
+function normalizeRobotsEncoding(value) {
+  return String(value || "").replace(/%([0-9a-f]{2})/gi, (match, hex) => {
+    const code = Number.parseInt(hex, 16);
+    const char = String.fromCharCode(code);
+    return /[A-Za-z0-9._~-]/.test(char) ? char : "%" + hex.toUpperCase();
+  });
+}
+
 function ruleSpecificity(pattern) {
   return Array.from(pattern).filter(char => char !== "*" && char !== "$").length;
 }
@@ -102,7 +112,7 @@ export function parseRobotsPolicy(text, userAgent = "AuditIA", pathAndQuery = "/
   }
   const groups = parseGroups(rawText);
   const path = String(pathAndQuery || "/").split("#")[0];
-  const normalizedPath = path.startsWith("/") ? path : "/" + path;
+  const normalizedPath = normalizeRobotsEncoding(path.startsWith("/") ? path : "/" + path);
 
   const meaningfulText = cleanText.filter(line => !/^sitemap\s*:/i.test(line));
   if (!meaningfulText.length) {
@@ -118,9 +128,10 @@ export function parseRobotsPolicy(text, userAgent = "AuditIA", pathAndQuery = "/
   }
 
   const matching = selected.flatMap(group => group.rules)
-    .filter(rule => matchesRobotsPattern(rule.pattern, normalizedPath))
+    .map(rule => ({ ...rule, normalizedPattern: normalizeRobotsEncoding(rule.pattern) }))
+    .filter(rule => matchesRobotsPattern(rule.normalizedPattern, normalizedPath))
     .sort((a, b) => {
-      const diff = ruleSpecificity(b.pattern) - ruleSpecificity(a.pattern);
+      const diff = ruleSpecificity(b.normalizedPattern) - ruleSpecificity(a.normalizedPattern);
       if (diff) return diff;
       if (a.directive !== b.directive) return a.directive === "allow" ? -1 : 1;
       return 0;
