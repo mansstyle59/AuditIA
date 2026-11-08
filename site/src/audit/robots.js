@@ -16,17 +16,21 @@ function parseGroups(text) {
 
     if (key === "user-agent") {
       // Plusieurs User-agent consécutifs appartiennent au même groupe.
-      // Un nouveau groupe commence après le premier Allow/Disallow.
-      if (!current || current.rules.length) {
-        current = { agents: [], rules: [] };
+      // Un nouveau groupe commence après toute directive Allow/Disallow,
+      // même si son motif est vide (une règle vide reste une règle RFC 9309).
+      if (!current || current.ruleSeen) {
+        current = { agents: [], rules: [], ruleSeen: false };
         groups.push(current);
       }
       if (value) current.agents.push(value.toLowerCase());
       continue;
     }
 
-    if (current && (key === "allow" || key === "disallow") && value) {
-      current.rules.push({ directive: key, pattern: value });
+    if (current && (key === "allow" || key === "disallow")) {
+      // Une directive vide autorise tout, mais termine le bloc User-agent
+      // avant le groupe suivant.
+      current.ruleSeen = true;
+      if (value) current.rules.push({ directive: key, pattern: value });
     }
   }
 
