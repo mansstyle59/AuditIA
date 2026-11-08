@@ -184,6 +184,20 @@ export function createAuditEngine(deps0) {
         hasWeb ? fetchGeoFiles(site, robotsInfo) : skip
       ]);
 
+      if (hasWeb && gf && row('geo')) {
+        const geoState = row('geo');
+        if (gf.policy && gf.policy.llmsAllowed === false) {
+          geoState.note += ' llms.txt interdit par robots.txt.';
+        } else if (gf.policy && gf.policy.llmsAllowed === true) {
+          geoState.note += gf.llms === true
+            ? ' llms.txt lu.'
+            : gf.llms === false
+              ? ' llms.txt absent ou non exploitable.'
+              : ' llms.txt inaccessible.';
+        }
+        emit();
+      }
+
       if (html) { siteRes = analyzeSite(html, site); siteRes.hasWebsite = true; siteRes.pageRead = true; siteRes.geo = Object.assign({}, geoFromHtml(html), gf || {}); setFact('Site web', 'Page lue', (siteRes.finalUrl || site) + ' · ' + ((siteRes.socials || []).length) + ' réseaux sur la page'); }
       else if (hasWeb) {
         siteRes = { socials: [], directories: [], hasWebsite: true, pageRead: false, analyzedAt: new Date().toISOString(), finalUrl: site, geo: Object.assign({}, gf || {}) };
