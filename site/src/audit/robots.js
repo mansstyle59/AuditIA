@@ -53,11 +53,30 @@ function matchingGroups(groups, userAgent) {
   return groups.filter(group => group.agents.includes("*"));
 }
 
-function ruleRegex(pattern) {
+function matchesRobotsPattern(pattern, path) {
   const endAnchored = pattern.endsWith("$");
   const body = endAnchored ? pattern.slice(0, -1) : pattern;
-  const escaped = body.replace(/[.+?^{}()|[\]\\]/g, "\\$&").replace(/\*/g, ".*");
-  return new RegExp("^" + escaped + (endAnchored ? "$" : ""));
+  let p = 0, t = 0, lastStar = -1, retry = 0;
+
+  // Glob matching in linear time; avoids compiling untrusted robots rules into regexes.
+  while (t < path.length) {
+    if (p < body.length && body[p] === path[t]) {
+      p++;
+      t++;
+      if (p === body.length && !endAnchored) return true;
+    } else if (p < body.length && body[p] === "*") {
+      lastStar = p++;
+      retry = t;
+    } else if (lastStar !== -1) {
+      p = lastStar + 1;
+      t = ++retry;
+    } else {
+      return false;
+    }
+  }
+
+  while (p < body.length && body[p] === "*") p++;
+  return endAnchored ? p === body.length && t === path.length : p === body.length;
 }
 
 function ruleSpecificity(pattern) {
@@ -71,8 +90,16 @@ function ruleSpecificity(pattern) {
  * renvoie allowed=null afin que l'appelant puisse suspendre le crawl par prudence.
  */
 export function parseRobotsPolicy(text, userAgent = "AuditIA", pathAndQuery = "/") {
-  const cleanText = String(text || "").split(/\r?\n/).map(line => line.replace(/#.*$/, "").trim()).filter(Boolean);
-  const groups = parseGroups(text);
+  const rawText = String(text || "");
+  const cleanText = rawText.split(/\r?\n/).map(line => line.replace(/#.*$/, "").trim()).filter(Boolean);
+  if (rawText.length > 512 * 1024) {
+    return { status: "too-large", allowed: null, matchedRule: null, userAgent, path: String(pathAndQuery || "/") };
+  }
+  const groups = parseGroups(rawText);
+  const ruleCount = groups.reduce((total, group) => total + group.rules.length, 0);
+  if (ruleCount > 5000 || groups.some(group => group.rules.some(rule => rule.pattern.length > 2048))) {
+    return { status: "too-large", allowed: null, matchedRule: null, userAgent, path: String(pathAndQuery || "/") };
+  }
   const path = String(pathAndQuery || "/").split("#")[0];
   const normalizedPath = path.startsWith("/") ? path : "/" + path;
 
@@ -89,10 +116,8 @@ export function parseRobotsPolicy(text, userAgent = "AuditIA", pathAndQuery = "/
     return { status: "available", allowed: true, matchedRule: null, userAgent, path: normalizedPath };
   }
 
-  const matching = selected.flatMap(group => group.rules.map(rule => ({ ...rule, regex: ruleRegex(rule.pattern) })))
-    .filter(rule => {
-      try { return rule.regex.test(normalizedPath); } catch { return false; }
-    })
+  const matching = selected.flatMap(group => group.rules)
+    .filter(rule => matchesRobotsPattern(rule.pattern, normalizedPath))
     .sort((a, b) => {
       const diff = ruleSpecificity(b.pattern) - ruleSpecificity(a.pattern);
       if (diff) return diff;
