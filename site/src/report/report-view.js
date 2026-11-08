@@ -78,7 +78,7 @@ export function reportPreviewHtml(m) {
     fact('E-mail', bp.email), fact('Site web', bp.website), fact('SIREN', bp.siren), fact('SIRET du siège', bp.siret),
     fact('Forme juridique', bp.legalForm), fact('Activité / code APE', bp.naf),
     fact('Date de création légale', bp.creationDate), fact('Ancienneté', bp.ageLabel),
-    fact('Établissements', bp.establishments), fact('Note Google', bp.rating == null ? '' : frNum(bp.rating) + '/5 · ' + (bp.reviews || 0) + ' avis')
+    fact('Établissements', bp.establishments), fact('Note Google', bp.rating == null && bp.reviews == null ? '' : [bp.rating != null ? frNum(bp.rating) + '/5' : 'Note non disponible', bp.reviews != null ? bp.reviews + ' avis' : 'Avis non disponibles'].join(' · '))
   ].filter(Boolean).join('');
   const hoursHtml = (bp.hours || []).length ? '<ul class="rp-list">' + bp.hours.map(h => '<li>' + escHtml(h) + '</li>').join('') + '</ul>' : note('Horaires non disponibles dans la fiche enregistrée.');
   const sourceHtml = bp.legalStatus === 'matched'
