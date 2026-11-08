@@ -12,7 +12,7 @@
 ## Politique robots.txt pour les audits
 - Avant de demander la lecture d'une page, une capture ou une mesure PageSpeed, le moteur vérifie les règles robots.txt pour le jeton produit AuditIA et le chemin concerné.
 - Si le chemin est interdit, ces lectures sont marquées « ignorées » et ne sont pas lancées. llms.txt n'est lu que si son chemin est autorisé.
-- Si robots.txt est inaccessible ou illisible, le crawl est suspendu par prudence. Un fichier robots.txt vide ou clairement absent est traité comme n'imposant aucune règle.
+- Si robots.txt est inaccessible, illisible, vide ou renvoyé sous forme de page HTML, le crawl est suspendu par prudence. Avec le proxy AllOrigins, un HTTP 404 ne permet pas de distinguer un robots.txt absent d'une erreur du proxy : AuditIA ne l'interprète donc pas comme une autorisation de crawler.
 - Limite importante : la lecture HTML et les captures utilisent des services tiers (Jina Reader, AllOrigins, WordPress mShots). AuditIA vérifie sa propre politique avant de leur transmettre une URL, mais ne contrôle pas leur User-Agent ni leur respect interne des règles robots. La conformité complète du comportement de ces proxys n'est pas confirmée ; ne pas présenter ces lectures comme un crawl direct d'AuditIA.
 
 ## À ne pas mettre dans le dépôt ni dans le navigateur
