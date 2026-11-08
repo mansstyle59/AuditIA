@@ -113,6 +113,8 @@ jobs:
           PY
       - name: Test URL validation (SSRF fixtures)
         run: node --test tests/security-url-validation.test.mjs
+      - name: Test robots.txt crawl policy
+        run: node site/src/audit/robots.test.mjs
       - name: Validate CSS syntax
         shell: bash
         run: |
