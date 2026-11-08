@@ -9,16 +9,25 @@
 - Le service worker ne met en cache que les fichiers de l’application, jamais une requête avec paramètres.
 - Les couleurs de marque injectées dans le style doivent être un code hexadécimal. Le logo enregistré est converti en PNG.
 
-## À ne pas mettre dans le dépôt ni dans le navigateur
-Ne jamais versionner les clés privées/service-role, mots de passe, tokens de webhook ou secrets API. Les clés de navigateur (Google Places, PageSpeed, OpenAI, Bing) ne doivent pas être considérées comme secrètes si le code client les lit : elles peuvent être extraites depuis le navigateur. Les déplacer derrière une fonction serveur/Edge Function, puis les stocker dans les secrets Supabase, avec restrictions de clés côté fournisseur.
+## Politique robots.txt pour les audits
+- Avant de demander la lecture d'une page, une capture ou une mesure PageSpeed, le moteur vérifie les règles robots.txt pour le jeton produit AuditIA et le chemin concerné.
+- Si le chemin est interdit, ces lectures sont marquées « ignorées » et ne sont pas lancées. llms.txt n'est lu que si son chemin est autorisé.
+- Si robots.txt est inaccessible, illisible, vide ou renvoyé sous forme de page HTML, le crawl est suspendu par prudence. Avec le proxy AllOrigins, un HTTP 404 ne permet pas de distinguer un robots.txt absent d'une erreur du proxy : AuditIA ne l'interprète donc pas comme une autorisation de crawler.
+- Limite importante : la lecture HTML et les captures utilisent des services tiers (Jina Reader, AllOrigins, WordPress mShots). AuditIA vérifie sa propre politique avant de leur transmettre une URL, mais ne contrôle pas leur User-Agent ni leur respect interne des règles robots. La conformité complète du comportement de ces proxys n'est pas confirmée ; ne pas présenter ces lectures comme un crawl direct d'AuditIA.
 
-## Webhooks et limitation de débit
-Le projet actuel est un site statique GitHub Pages et ne déclare actuellement aucune Edge Function Supabase. Il n'y a donc pas de point d'entrée serveur AuditIA où placer un secret de webhook et un limiteur fiable. Un compteur côté navigateur ne protège pas contre les abus. Avant d'exposer des webhooks ou des appels API coûteux, créer une Edge Function qui :
-1. vérifie l'identité Supabase de l'utilisateur et autorise seulement les opérations nécessaires ;
-2. valide les paramètres et limite taille/fréquence des requêtes côté serveur ;
-3. lit les clés depuis les secrets de fonction, jamais depuis `app_settings` ou le JavaScript client ;
-4. applique un rate limit côté serveur (par utilisateur et/ou IP) et renvoie `429` en cas de dépassement ;
-5. journalise les refus sans enregistrer les clés ni les données sensibles.
+## À ne pas mettre dans le dépôt ni dans le navigateur
+Ne jamais versionner les clés privées/service-role, mots de passe, tokens de webhook ou secrets API. La clé Supabase publishable du navigateur est publique par conception et ne remplace jamais RLS.
+
+Les clés Google Places/PageSpeed et autres clés API de réglages sont traitées côté serveur : le navigateur ne sélectionne pas les colonnes contenant les valeurs brutes. Il appelle `auditia-secure-api` pour lire un état masqué ou enregistrer une clé. La fonction utilise actuellement les colonnes API de `app_settings` via `service_role`, avec priorité aux valeurs enregistrées et repli sur les secrets de fonction. Les valeurs brutes ne sont pas renvoyées par `settings_read`. Ne jamais ajouter de lecture directe de ces colonnes au frontend.
+
+Les politiques RLS et les permissions réelles de `app_settings` doivent être vérifiées dans Supabase : les migrations de cette table ne sont pas présentes dans le dépôt, donc leur configuration effective ne peut pas être confirmée ici.
+
+## Proxy serveur et limitation de débit
+- `auditia-secure-api` est la fonction Edge utilisée pour Google Places et PageSpeed. Elle vérifie le jeton Supabase, l'e-mail confirmé et le compte administrateur, puis applique une liste blanche d'actions et des limites de requêtes.
+- Les quotas sont appliqués côté serveur par la RPC `auditia_consume_rate_limit` (fenêtres minute et jour). En cas d'indisponibilité du limiteur, l'appel échoue de manière fermée.
+- Les clés sont lues depuis les réglages serveur ou les secrets de fonction. Ne jamais exposer les valeurs brutes dans les réponses, journaux ou modules navigateur.
+- `claude-assist` est une fonction distincte ; sa clé Anthropic reste dans les secrets Supabase.
+- Tout nouvel endpoint doit conserver l'authentification, l'autorisation minimale, la validation des entrées, les quotas et les journaux sans données sensibles.
 
 ## État de déploiement
 - Edge Function : `auditia-secure-api` (active, JWT vérifié dans le code de la fonction).

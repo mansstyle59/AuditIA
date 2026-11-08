@@ -3,8 +3,9 @@ import { isPublicHttpUrl } from "./url-validation.mjs";
 
 // AuditIA — auditia-secure-api, VERSION 2.
 // Seul point d'accès serveur aux API Google (Places API New, PageSpeed Insights).
-// - Clés : uniquement dans les secrets de la fonction (GOOGLE_PLACES_API_KEY, PAGESPEED_API_KEY).
-//   Aucune lecture de app_settings, aucun repli. Une clé n'est jamais renvoyée ni journalisée.
+// - Google Places/PageSpeed : clés lues depuis les colonnes API privées de app_settings (via service_role)
+//   ou depuis les secrets de fonction en secours. settings_read ne renvoie que des états/indices masqués ;
+//   les clés brutes restent côté serveur et ne sont jamais journalisées.
 // - Accès : jeton utilisateur vérifié auprès d'Auth, e-mail confirmé, administrateur uniquement.
 // - Entrées : action en liste blanche, champs bornés, Content-Type JSON obligatoire.
 // - Quotas : par minute et par jour, par utilisateur et par action (table existante via la RPC de limitation).
