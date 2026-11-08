@@ -19,12 +19,38 @@ export function cityFromComponents(comps){
       return pick('locality')||pick('postal_town')||pick('administrative_area_level_2')||'';
     }
 
+
+/* Un nombre d'avis absent ou mal formé reste non mesuré ; seul un zéro explicite vaut zéro. */
+export function normalizeReviewCount(value){
+  if(value===null||value===undefined||value==='') return null;
+  if(typeof value!=='number'&&typeof value!=='string') return null;
+  if(typeof value==='string'&&value.trim()==='') return null;
+  const n=typeof value==='number'?value:Number(value.trim());
+  return Number.isSafeInteger(n)&&n>=0?n:null;
+}
+
+/* Classement par volume d'avis observé : les commerces sans compteur connu restent non classés. */
+export function rankByReviewEvidence(rows){
+  const sorted=(Array.isArray(rows)?rows:[]).map(row=>({...row,reviews:normalizeReviewCount(row.reviews)}));
+  sorted.sort((a,b)=>{
+    if(a.reviews===null&&b.reviews!==null) return 1;
+    if(a.reviews!==null&&b.reviews===null) return -1;
+    if(a.reviews!==null&&b.reviews!==null&&a.reviews!==b.reviews) return b.reviews-a.reviews;
+    const ar=Number.isFinite(a.rating)?a.rating:null;
+    const br=Number.isFinite(b.rating)?b.rating:null;
+    if(ar!==br){ if(ar===null) return 1; if(br===null) return -1; return br-ar; }
+    return String(a.name||'').localeCompare(String(b.name||''),'fr');
+  });
+  let rank=0;
+  return sorted.map(row=>({...row,rank:row.reviews===null?null:++rank}));
+}
+
 export function normalizePlace(p){
       let website=p.websiteUri||''; if(website&&!/^https?:\/\//i.test(website)) website='https://'+website;
       return { placeId:p.id, name:(p.displayName&&p.displayName.text)||'', address:p.formattedAddress||'',
         city:cityFromComponents(p.addressComponents), category:mapCategory(p.primaryType,p.types),
         primaryType:p.primaryType||'', phone:p.nationalPhoneNumber||'', website:website,
-        rating:typeof p.rating==='number'?p.rating:null, reviews:p.userRatingCount||0,
+        rating:typeof p.rating==='number'?p.rating:null, reviews:normalizeReviewCount(p.userRatingCount),
         status:p.businessStatus||'', hours:(p.regularOpeningHours&&p.regularOpeningHours.weekdayDescriptions)||null,
         summary:(p.editorialSummary&&p.editorialSummary.text)||'', photoCount:Array.isArray(p.photos)?p.photos.length:null };
     }
@@ -35,8 +61,9 @@ export function nearbyOpportunity(p){
       if(!Array.isArray(p.hours)||!p.hours.length){score+=15;reasons.push('horaires non renseignés dans la fiche');}
       if(p.rating==null){score+=15;reasons.push('note Google indisponible');}
       else if(p.rating<4){score+=20;reasons.push('note Google sous 4/5');}
-      if(Number(p.reviews||0)<10){score+=15;reasons.push('moins de 10 avis Google');}
-      else if(Number(p.reviews||0)<30){score+=8;reasons.push('moins de 30 avis Google');}
+      const reviews=normalizeReviewCount(p.reviews);
+      if(reviews!==null&&reviews<10){score+=15;reasons.push('moins de 10 avis Google');}
+      else if(reviews!==null&&reviews<30){score+=8;reasons.push('moins de 30 avis Google');}
       if(p.status==='CLOSED_PERMANENTLY'){score=0;reasons.splice(0,reasons.length,'établissement signalé fermé définitivement');}
       return {score:Math.min(100,score),reasons:reasons.slice(0,3),closed:p.status==='CLOSED_PERMANENTLY'};
     }
