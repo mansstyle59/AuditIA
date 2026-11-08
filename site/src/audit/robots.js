@@ -76,7 +76,8 @@ export function parseRobotsPolicy(text, userAgent = "AuditIA", pathAndQuery = "/
   const path = String(pathAndQuery || "/").split("#")[0];
   const normalizedPath = path.startsWith("/") ? path : "/" + path;
 
-  if (!cleanText.length) {
+  const meaningfulText = cleanText.filter(line => !/^sitemap\s*:/i.test(line));
+  if (!meaningfulText.length) {
     return { status: "empty", allowed: true, matchedRule: null, userAgent, path: normalizedPath };
   }
   if (!groups.length) {
