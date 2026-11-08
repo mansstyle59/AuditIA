@@ -38,7 +38,7 @@ function apiField(svc, s) {
     ? `<button type="button" class="ds-api-clear" data-api-clear="${svc.column}" ${disabled}>Supprimer la clé enregistrée</button>`
     : '';
   const usage = svc.used
-    ? '<span class="ds-api-use ds-api-use--active">Utilisée par les audits</span>'
+    ? '<span class="ds-api-use ds-api-use--active">Utilisée dans AuditIA</span>'
     : '<span class="ds-api-use">Enregistrée pour intégration ultérieure</span>';
   const hint = status.hint ? `<small class="ds-api-hint">${escHtml(status.source || 'Clé disponible')} · ${escHtml(status.hint)}</small>` : `<small class="ds-api-hint">${escHtml(status.source || 'Aucune clé enregistrée')}</small>`;
   return `<article class="ds-api-service">
