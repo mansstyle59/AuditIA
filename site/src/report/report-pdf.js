@@ -4,6 +4,7 @@
 // Mise en page : A4 portrait, marges 18 mm, tableaux sans ligne coupée (en-tête répété), titres jamais isolés en bas de page.
 import { COLORS, hexToRgb, toneColor, chartData } from './report-charts.js';
 import { REPORT_TITLE, toneOf } from './report-model.js';
+import { formatGoogleProfileSummary } from '../core/utils.js';
 import { defaultBrand, logoFormat } from '../settings/brand.js';
 
 const PW = 210, PH = 297, M = 18, CW = PW - 2 * M, TOP = 24, BOT = PH - 19, PT = 0.3528;
@@ -236,7 +237,7 @@ export function buildReportPdf(JsPDF, m) {
     ['Ancienneté à la date du rapport', bp.ageLabel], ['Nombre d’établissements', bp.establishments],
     ['Code postal / commune', [bp.postalCode,bp.legalCity].filter(Boolean).join(' ')],
     ['Statut de l’établissement', bp.googleStatus],
-    ['Note Google / avis', bp.rating != null ? frNum(bp.rating) + '/5 · ' + (bp.reviews || 0) + ' avis' : '']
+    ['Note Google / avis', formatGoogleProfileSummary(bp.rating, bp.reviews)]
   ].filter(x => x[1] !== null && x[1] !== undefined && String(x[1]).trim() !== '');
   if (profileRows.length) {
     table([{w:57},{w:117}], ['Information','Donnée vérifiée / enregistrée'], profileRows);
