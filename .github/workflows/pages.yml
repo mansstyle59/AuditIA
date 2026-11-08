@@ -117,6 +117,8 @@ jobs:
         run: node --test tests/scoring-evidence.test.mjs
       - name: Test local business schema evidence
         run: node --test tests/schema-evidence.test.mjs
+      - name: Test Google review-count evidence
+        run: node --test tests/place-review-evidence.test.mjs
       - name: Validate CSS syntax
         shell: bash
         run: |
