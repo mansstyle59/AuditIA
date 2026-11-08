@@ -99,9 +99,39 @@ function clampInt(value: unknown, min: number, max: number, fallback: number): n
 function validPublicUrl(value: string): boolean {
   try {
     const u = new URL(value);
-    return (u.protocol === "https:" || u.protocol === "http:") &&
-      !["localhost", "127.0.0.1", "0.0.0.0", "::1"].includes(u.hostname) &&
-      !u.hostname.endsWith(".local") && !u.hostname.endsWith(".internal");
+    if ((u.protocol !== "https:" && u.protocol !== "http:") || u.username || u.password) return false;
+
+    const host = u.hostname.toLowerCase().replace(/^\[|\]$/g, "").replace(/\.$/, "");
+    if (!host) return false;
+
+    const blockedSuffixes = [
+      ".localhost", ".local", ".localdomain", ".internal", ".lan", ".home", ".corp",
+      ".test", ".invalid", ".example", ".onion", ".nip.io", ".sslip.io", ".xip.io",
+      ".localtest.me", ".vcap.me",
+    ];
+    if (host === "localhost" || host === "metadata" || host === "instance-data" ||
+        host === "metadata.google.internal" || host === "instance-data.ec2.internal" ||
+        blockedSuffixes.some((suffix) => host.endsWith(suffix))) return false;
+
+    // Refuser les IPv6 littérales : loopback, link-local, ULA et IPv4-mappées sont difficiles
+    // à classifier sans résolution DNS et ne sont pas nécessaires pour un audit de domaine public.
+    if (host.includes(":")) return false;
+
+    // URL normalise les IPv4 abrégées, octales et hexadécimales avant cette vérification.
+    const match = host.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
+    if (!match) return true;
+    const [a, b, c, d] = match.slice(1).map(Number);
+    if ([a, b, c, d].some((n) => n > 255)) return false;
+
+    const nonPublic = a === 0 || a === 10 || a === 127 || a >= 224 ||
+      (a === 100 && b >= 64 && b <= 127) ||
+      (a === 169 && b === 254) ||
+      (a === 172 && b >= 16 && b <= 31) ||
+      (a === 192 && (b === 0 || b === 2 || b === 168 || (b === 88 && c === 99))) ||
+      (a === 198 && (b === 18 || b === 19 || (b === 51 && c === 100))) ||
+      (a === 203 && b === 0 && c === 113) ||
+      (a === 255 && b === 255 && c === 255 && d === 255);
+    return !nonPublic;
   } catch { return false; }
 }
 async function serviceFetch(path: string, init: RequestInit = {}) {
