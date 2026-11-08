@@ -42,6 +42,16 @@ assert.equal(parseRobotsPolicy(combinedGroups, "AuditIA", "/one").allowed, false
 assert.equal(parseRobotsPolicy(combinedGroups, "AuditIA", "/two").allowed, false,
   "rules from repeated matching user-agent groups are combined");
 
+const overlappingGroups = `User-agent: Audit
+Disallow: /legacy
+User-agent: AuditIA
+Disallow: /private
+`;
+assert.equal(parseRobotsPolicy(overlappingGroups, "AuditIA", "/legacy").allowed, false,
+  "all matching named groups are combined per RFC 9309");
+assert.equal(parseRobotsPolicy(overlappingGroups, "AuditIA", "/private").allowed, false,
+  "the more specific user-agent group also applies");
+
 assert.equal(parseRobotsPolicy("# no directives\n", "AuditIA", "/").allowed, true);
 assert.equal(parseRobotsPolicy("Sitemap: https://example.com/sitemap.xml\n", "AuditIA", "/").allowed, true,
   "a sitemap-only robots.txt does not restrict crawling");
@@ -57,8 +67,14 @@ assert.equal(isRobotsResponseUnverifiable(''), true,
   "an empty proxy response is ambiguous and must fail closed");
 assert.equal(isRobotsResponseUnverifiable('<html><title>404 Not Found</title></html>'), true,
   "an HTML proxy error must not be treated as a missing robots.txt");
-assert.equal(isRobotsResponseUnverifiable('User-agent: *\\nDisallow: /private'), false,
+assert.equal(isRobotsResponseUnverifiable('  \n\t<!doctype html><title>Proxy error</title>'), true,
+  "a doctype HTML proxy error must fail closed even without html/body tags");
+assert.equal(isRobotsResponseUnverifiable('<div>Proxy error</div>'), true,
+  "any HTML-like response must fail closed");
+assert.equal(isRobotsResponseUnverifiable('User-agent: *\nDisallow: /private'), false,
   "a textual robots file can be evaluated");
+assert.equal(parseRobotsPolicy('User-agent: *\nDisallow: /private', "AuditIA", "/private").allowed, false,
+  "the fixture contains a real newline and its Disallow rule is enforced");
 assert.equal(parseRobotsPolicy('404 Not Found', 'AuditIA', '/').allowed, null,
   "a plain-text proxy error is not permission to crawl");
 
