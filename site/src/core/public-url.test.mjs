@@ -41,6 +41,7 @@ const cases = [
   ["http://198.18.0.1", false],
   ["http://203.0.113.10", false],
   ["http://224.0.0.1", false],
+  ["http://192.88.99.1", false],
   ["http://127.0.0.1.nip.io", false],
   ["http://[::1]", false],
   ["http://[fe80::1]", false],
