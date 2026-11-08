@@ -79,3 +79,12 @@ assert.equal(parseRobotsPolicy('404 Not Found', 'AuditIA', '/').allowed, null,
   "a plain-text proxy error is not permission to crawl");
 
 console.log("AuditIA robots policy tests passed.");
+
+
+const encodedUnreserved = "User-agent: *\nDisallow: /~private\n";
+assert.equal(parseRobotsPolicy(encodedUnreserved, "AuditIA", "/%7Eprivate").allowed, false,
+  "percent-encoded unreserved characters must match their literal form");
+assert.equal(parseRobotsPolicy("User-agent: *\nDisallow: /%7eprivate\n", "AuditIA", "/~private").allowed, false,
+  "hex digits in percent-encoding are case-insensitive");
+assert.equal(parseRobotsPolicy("User-agent: *\nDisallow: /private%2Fadmin\n", "AuditIA", "/private/admin").allowed, true,
+  "reserved %2F must not be decoded into a path separator");
