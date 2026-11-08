@@ -139,3 +139,11 @@ export function parseRobotsPolicy(text, userAgent = "AuditIA", pathAndQuery = "/
     path: normalizedPath,
   };
 }
+
+
+/* A proxy response cannot reliably distinguish an origin 404 from a proxy error.
+   Empty or HTML responses must not be interpreted as permission to crawl. */
+export function isRobotsResponseUnverifiable(text) {
+  const body = String(text || "").trim();
+  return !body || /^\\s*</.test(body) || /<html|<body/i.test(body);
+}
