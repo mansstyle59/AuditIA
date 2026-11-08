@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 
 const source = readFileSync(new URL("./robots.js", import.meta.url), "utf8");
 const robots = await import("data:text/javascript;base64," + Buffer.from(source).toString("base64"));
-const { parseRobotsPolicy } = robots;
+const { parseRobotsPolicy, isRobotsResponseUnverifiable } = robots;
 
 const rules = `User-agent: AuditIA
 Disallow: /admin
@@ -51,5 +51,15 @@ assert.equal(parseRobotsPolicy("User-agent: *\nDisallow: /" + "a".repeat(2050), 
   "overlong rule patterns fail closed");
 assert.equal(parseRobotsPolicy("x".repeat(512 * 1024 + 1), "AuditIA", "/").status, "too-large",
   "oversized robots files are rejected before parsing");
+
+
+assert.equal(isRobotsResponseUnverifiable(''), true,
+  "an empty proxy response is ambiguous and must fail closed");
+assert.equal(isRobotsResponseUnverifiable('<html><title>404 Not Found</title></html>'), true,
+  "an HTML proxy error must not be treated as a missing robots.txt");
+assert.equal(isRobotsResponseUnverifiable('User-agent: *\\nDisallow: /private'), false,
+  "a textual robots file can be evaluated");
+assert.equal(parseRobotsPolicy('404 Not Found', 'AuditIA', '/').allowed, null,
+  "a plain-text proxy error is not permission to crawl");
 
 console.log("AuditIA robots policy tests passed.");
