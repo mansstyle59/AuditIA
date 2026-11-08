@@ -125,11 +125,22 @@ export async function fetchGeoFiles(site, robotsInfo=null){
 }
 
 export async function readSiteHtml(url){
-      url=safeHttpUrl(url); if(!url) throw new Error('adresse non autorisée');
-      const tries=[()=>readSiteText('https://r.jina.ai/'+url,{headers:{'X-Return-Format':'html','X-Timeout':'25'}},45000),()=>readSiteText('https://api.allorigins.win/raw?url='+encodeURIComponent(url),{},30000)];
-      let last;for(const f of tries){try{const t=await f();if(t&&t.length>200&&/<(html|head|body)[\s>]/i.test(t))return t;last=new Error('page vide ou illisible');}catch(e){last=e;}}
-      throw last||new Error('page illisible');
-    }
+  url=safeHttpUrl(url); if(!url) throw new Error('adresse non autorisée');
+  // Jina Reader expose un contrôle explicite robots.txt. Le fallback AllOrigins est retiré :
+  // son User-Agent et son respect de robots.txt ne sont pas vérifiables ici, et il pourrait
+  // contourner un refus renvoyé par le premier lecteur.
+  const text=await readSiteText(
+    'https://r.jina.ai/'+url,
+    {headers:{
+      'X-Return-Format':'html',
+      'X-Timeout':'25',
+      'X-Robots-Txt':'true'
+    }},
+    45000
+  );
+  if(text&&text.length>200&&/<(html|head|body)[\\s>]/i.test(text)) return text;
+  throw new Error('page vide, illisible ou refusée par robots.txt via Jina Reader');
+}
 
 export async function fetchScreenshot(site){
       site=safeHttpUrl(site); if(!site) return null;
