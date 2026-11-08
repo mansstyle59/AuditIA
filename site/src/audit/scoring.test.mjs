@@ -141,7 +141,7 @@ const malformedProfile = client({
 const malformedPlan = improvementPlan(audit, malformedProfile);
 const malformedReviewAdvice = malformedPlan.find(item => item.axis === "Avis & réputation");
 assert.match(malformedReviewAdvice.title, /Vérifier les avis Google/);
-assert.doesNotMatch(malformedReviewAdvice.why, /\\b0 avis\\b/,
+assert.doesNotMatch(malformedReviewAdvice.why, /\b0 avis\b/,
   "an empty review count must not be interpreted as zero");
 assert.doesNotMatch(malformedPlan.filter(item => item.axis === "Fiche Google").map(item => item.title).join(" "),
   /Ajouter des photos récentes/,
@@ -168,5 +168,20 @@ for (const label of ["Note Google", "Volume d’avis"]) {
   assert.ok(criterion && criterion.measured === false,
     label + " must reject boolean values");
 }
+
+
+const stringZeroProfile = client({
+  place_id: "ChIJ-auditia-string-zero",
+  rating: "4.5",
+  reviews: "0",
+  photoCount: "0",
+});
+const stringZeroPlan = improvementPlan(audit, stringZeroProfile);
+const stringZeroAdvice = stringZeroPlan.find(item => item.axis === "Avis & réputation");
+assert.match(stringZeroAdvice.why, /0 avis/,
+  "a numeric string containing zero is still a legitimate observed count");
+const stringZeroAudit = visibilityAudit(audit, stringZeroProfile);
+assert.ok(stringZeroAudit.items.find(item => item.label === "Note Google").measured);
+assert.ok(stringZeroAudit.items.find(item => item.label === "Volume d’avis").measured);
 
 console.log("AuditIA scoring evidence tests passed.");
