@@ -76,15 +76,17 @@ function looksHtmlText(text){
   return /^\s*</.test(text||'') || /<html|<body/i.test(text||'');
 }
 
-function robotsFileMissing(text){
+/* Un proxy ne permet pas de distinguer sûrement un robots.txt absent d'une page d'erreur
+   du proxy. Une réponse vide ou HTML est donc considérée comme non vérifiable (fail closed). */
+export function isRobotsResponseUnverifiable(text){
   const body=String(text||'').trim();
-  return !body || (looksHtmlText(body) && /(?:404|not found|introuvable|does not exist)/i.test(body));
+  return !body || looksHtmlText(body);
 }
 
-function robotsInfoForMissing(){
+function robotsInfoUnavailable(status='unavailable'){
   return {
-    robots:{read:true,blocked:[],total:AI_BOTS.length,missing:true},
-    policy:{status:'missing',allowed:true,llmsAllowed:true,matchedRule:null,userAgent:'AuditIA'}
+    robots:{read:false,blocked:[],total:AI_BOTS.length,unavailable:true},
+    policy:{status,allowed:null,llmsAllowed:null,matchedRule:null,userAgent:'AuditIA'}
   };
 }
 
@@ -99,10 +101,11 @@ export async function fetchRobotsPolicy(site){
   let rb=null;
   try{ rb=await readSiteText(robotsUrl,{},8000); }
   catch(e){
-    if(e&&e.status===404) return robotsInfoForMissing();
-    return {robots:{read:false,blocked:[],total:AI_BOTS.length,unavailable:true},policy:{status:'unavailable',allowed:null,llmsAllowed:null,userAgent:'AuditIA',path:targetPath}};
+    return robotsInfoUnavailable('unavailable');
   }
-  if(robotsFileMissing(rb)) return robotsInfoForMissing();
+  if(isRobotsResponseUnverifiable(rb)){
+    return {...robotsInfoUnavailable('unverifiable-response'),policy:{...robotsInfoUnavailable('unverifiable-response').policy,path:targetPath}};
+  }
   const policy=parseRobotsPolicy(rb,'AuditIA',targetPath);
   const llmsPolicy=parseRobotsPolicy(rb,'AuditIA','/llms.txt');
   const robots=policy.status==='invalid'
