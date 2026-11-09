@@ -9,6 +9,7 @@ export const NAV_MOBILE = [
   { id: 'audits', label: 'Audits', icon: 'file' },
   { id: 'prospects', label: 'Prospects', icon: 'target' },
   { id: 'settings', label: 'Réglages', icon: 'settings' },
+  { id: 'bureau', label: 'Agents', icon: 'bot' },
 ];
 export const NAV_DESKTOP = [
   { id: 'home', label: 'Bureau', icon: 'home' },
