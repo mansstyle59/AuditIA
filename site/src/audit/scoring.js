@@ -221,7 +221,16 @@ export function visibilityAudit(a,c){
       else add('seo','Volume d’avis',null,10,'Le nombre d’avis n’est pas disponible.','Nombre d’avis disponible.',null,'Google Places');
        if(googlePlaceId&&d.hours!=null) add('seo','Horaires renseignés',hours,5,'Aucun horaire n’est présent dans les données récupérées. Vérifier la fiche publique avant de conclure.','Horaires présents dans les données récupérées.',null,'Google Places');
       else add('seo','Horaires renseignés',null,5,'Les horaires n’ont pas été récupérés.','Horaires disponibles.',null,'Fiche commerce');
-      add('seo','Téléphone visible',phone?true:(d.phone===null||d.phone===undefined?null:false),5,'Aucun numéro n’est renseigné sur la fiche client. Vérifier la fiche publique.','Numéro renseigné.',null,'Fiche client');
+      const googlePhone = googlePlaceId ? String(d.googlePhone !== undefined ? d.googlePhone || '' : d.phone || phone || '').trim() : '';
+      const phoneMeasured = googlePlaceId ? (googlePhone ? true : false) : (phone ? true : null);
+      add('seo','Téléphone présent sur la fiche Google',phoneMeasured,5,
+        googlePlaceId ? 'Google Places n’a pas fourni de numéro pour la fiche associée. Vérifier le numéro dans Google Maps avant de conclure.' : 'Aucun numéro n’est enregistré dans AuditIA. La fiche Google n’a pas été vérifiée pendant cette analyse.',
+        googlePhone ? 'Numéro reçu depuis Google Places.' : phone ? 'Numéro enregistré dans la fiche client, source Google non confirmée.' : 'Numéro disponible.',null,
+        googlePlaceId ? 'Google Places' : 'Fiche client (non vérifiée)');
+      if(page) add('seo','Lien téléphone cliquable sur le site (tel:)',Array.isArray(si.tel)?si.tel.length>0:null,4,
+        'Aucun lien tel: n’a été détecté dans la page analysée. Le numéro peut toutefois être affiché en texte simple ou sur une autre page.',
+        'Lien tel: détecté sur la page analysée.',null,'Lecture du site');
+      else add('seo','Lien téléphone cliquable sur le site (tel:)',null,4,'La page du site n’a pas été lue.','Lien tel: détecté.',null,'Lecture du site');
       if(perf!=null){const pv=tier(perf,[[90,1],[70,0.8],[50,0.6],[30,0.35],[0,0.15]]);add('seo','Performance mobile',perf>=50,8,'Performance mobile mesurée à '+perf+'/100. Examiner les opportunités Lighthouse avant de choisir les optimisations.','Performance mobile mesurée à '+perf+'/100.',pv,'Google Lighthouse');}
       else add('seo','Performance mobile',null,8,'La performance mobile n’a pas été mesurée.','Performance mobile mesurée.',null,'Google Lighthouse');
       if(seoLh!=null){const lv=tier(seoLh,[[90,1],[70,0.75],[50,0.5],[0,0.25]]);add('seo','Référencement technique (Lighthouse)',seoLh>=80,6,'Score SEO technique Lighthouse : '+seoLh+'/100. Consulter les audits détaillés pour identifier les corrections pertinentes.','Score SEO technique : '+seoLh+'/100.',lv,'Google Lighthouse');}
