@@ -121,6 +121,8 @@ jobs:
         run: node --test tests/place-review-evidence.test.mjs
       - name: Test report business profile evidence
         run: node --test tests/business-profile.test.mjs
+      - name: Test Bureau agents and tasks
+        run: node --test tests/bureau-store.test.mjs
       - name: Validate CSS syntax
         shell: bash
         run: |
