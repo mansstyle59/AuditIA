@@ -1,13 +1,16 @@
 // AuditIA — Bureau : état de l'écran, actions et tâche de fond des agents.
 // Les règles sont dans bureau-store.js ; l'affichage dans views/bureau.js.
-import { emptyStore, loadStore, saveStore, createAgent, addTask, findTask, removeTask, setAgentStatus, tick, messageFor } from './bureau-store.js';
-import { shellHtml, chipsHtml, cardHtml, agentsHtml, readyHtml, pipeHtml, updateScene } from './views/bureau.js';
+import { emptyStore, loadStore, saveStore, createAgent, addTask, findTask, removeTask, setAgentStatus, tick, messageFor, finishSearch, failSearch, setFoundStatus } from './bureau-store.js';
+import { shellHtml, chipsHtml, cardHtml, agentsHtml, readyHtml, pipeHtml, foundHtml, updateScene } from './views/bureau.js';
+import { findCandidates, isKnownClient } from '../data/registry-prospects.js';
+import { insertClient } from '../data/queries.js';
 // (chipsHtml, cardHtml, agentsHtml, readyHtml, pipeHtml : fragments rafraîchis en place)
 
-export function createBureauController({ getUser, getData, getView, rerender }) {
+export function createBureauController({ getUser, getData, getView, rerender, getSupabase, reload }) {
   let owner = null;
   let store = emptyStore();
   let sel = null;
+  const running = new Set(); // tâches de recherche en cours (une seule requête par tâche)
 
   const clients = () => {
     const d = getData();
@@ -41,6 +44,55 @@ export function createBureauController({ getUser, getData, getView, rerender }) 
     put('bu-agents', agentsHtml(store, list));
     put('bu-ready', readyHtml(store, list));
     put('bu-pipe', pipeHtml(store, list));
+    put('bu-found', foundHtml(store));
+  }
+
+  // Recherche dans le registre officiel pour les agents au poste. Les résultats ne sont pas écrits en base.
+  async function runSearches() {
+    if (!owner) return;
+    const o = owner;
+    for (const a of store.agents) {
+      if (a.status !== 'working') continue;
+      const t = a.tasks.find(x => x.type === 'recherche' && x.status === 'todo' && !running.has(x.id));
+      if (!t) continue;
+      running.add(t.id);
+      try {
+        const list = await findCandidates(t.cat, t.zone);
+        if (owner === o) finishSearch(store, t, list, clients());
+      } catch (e) {
+        if (owner === o) failSearch(t, e.message);
+      } finally {
+        running.delete(t.id);
+      }
+      if (owner === o) { save(); if (getView() === 'bureau') refresh(); }
+    }
+  }
+
+  // Ajout d'une entreprise trouvée au portefeuille : seulement sur clic, après contrôle des doublons
+  async function addFound(siret) {
+    const f = (store.found || []).find(x => x.siret === siret);
+    const u = getUser();
+    if (!f || f.status !== 'new' || !u) return;
+    try {
+      if (reload) await reload();
+      if (isKnownClient(f, clients())) {
+        setFoundStatus(store, siret, 'ignored');
+        note('« ' + f.name + ' » est déjà dans votre portefeuille.', '');
+      } else {
+        const sb = await getSupabase();
+        await insertClient(sb, {
+          user_id: u.id, name: f.name, city: f.city, category: f.category,
+          details: { source: 'Registre SIRENE (recherche du Bureau)', siret: f.siret, address: f.address, zip: f.zip, naf: f.naf, fetchedAt: new Date().toISOString() },
+        });
+        setFoundStatus(store, siret, 'added');
+        if (reload) await reload();
+        note('« ' + f.name + ' » ajouté aux prospects.', 'ok');
+      }
+    } catch (e) {
+      note('Ajout impossible : ' + (e && e.message ? e.message : 'erreur inconnue') + '.', 'err');
+    }
+    save();
+    refresh();
   }
 
   // Tâche de fond : les agents au poste avancent, même si l'écran n'est pas ouvert
@@ -50,6 +102,7 @@ export function createBureauController({ getUser, getData, getView, rerender }) 
       save();
       if (getView() === 'bureau') refresh();
     }
+    runSearches();
   }, 5000);
 
   return {
@@ -104,6 +157,14 @@ export function createBureauController({ getUser, getData, getView, rerender }) 
           note(`${a.name} : ${{ work: 'est au poste.', stop: 'arrête de travailler.', cafe: 'est en pause café.', back: 'est de retour au poste.' }[act]}`, '');
         }
         save();
+        refresh();
+        return true;
+      }
+      if (act === 'addfound') { addFound(id); note('Ajout en cours…', ''); return true; }
+      if (act === 'dropfound') {
+        setFoundStatus(store, id, 'ignored');
+        save();
+        note('Entreprise écartée.', '');
         refresh();
         return true;
       }

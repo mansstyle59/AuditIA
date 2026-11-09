@@ -122,7 +122,7 @@ jobs:
       - name: Test report business profile evidence
         run: node --test tests/business-profile.test.mjs
       - name: Test Bureau agents and tasks
-        run: node --test tests/bureau-store.test.mjs
+        run: node --test tests/bureau-store.test.mjs tests/registry-prospects.test.mjs
       - name: Validate CSS syntax
         shell: bash
         run: |
