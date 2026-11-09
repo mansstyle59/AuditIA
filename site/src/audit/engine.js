@@ -158,7 +158,11 @@ export function createAuditEngine(deps0) {
           ...(photos.photoCount != null ? { photoCount: photos.photoCount } : {})
         };
       }
-      if (newDetails && c) { try { await supabase.from('clients').update({ details: newDetails }).eq('id', c.id); } catch (e) { /* même comportement que l'ancienne interface : non bloquant */ } }
+      if (newDetails && c) { try {
+        const clientUpdate = { details: newDetails };
+        if (newDetails.googlePhone) clientUpdate.phone = newDetails.googlePhone;
+        await supabase.from('clients').update(clientUpdate).eq('id', c.id);
+      } catch (e) { /* même comportement que l'ancienne interface : non bloquant */ } }
 
       setPhase('Génération du rapport…', 96);
       await deps.wait(280);
