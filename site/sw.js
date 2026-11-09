@@ -59,6 +59,7 @@ const ASSETS = [
   './src/ui/views/bureau.js',
   './src/ui/bureau-store.js',
   './src/styles/bureau.css',
+  './src/styles/harmonisation.css',
   './src/styles/tokens.css',
   './src/styles/base.css',
   './src/styles/components.css',
