@@ -255,7 +255,21 @@ function controlsHtml(a) {
   return main + cafe;
 }
 
-export function cardHtml(store, clients, sel) {
+// Suppression en deux temps : le bouton demande confirmation avant de retirer l'agent
+function deleteHtml(a, pending) {
+  if (pending !== a.id) {
+    return `<button class="ds-btn ds-btn--sm bu-danger" type="button" data-bu-act="askdel" data-bu-id="${escHtml(a.id)}">Supprimer l’agent</button>`;
+  }
+  return `<div class="bu-confirm" role="alert">
+    <p class="bu-why">Supprimer ${escHtml(a.name)} et ses tâches ? Les prospects gardent leur statut.</p>
+    <div class="bu-card__actions">
+      <button class="ds-btn ds-btn--sm bu-danger" type="button" data-bu-act="confirmdel" data-bu-id="${escHtml(a.id)}">Oui, supprimer</button>
+      <button class="ds-btn ds-btn--sm" type="button" data-bu-act="canceldel" data-bu-id="${escHtml(a.id)}">Annuler</button>
+    </div>
+  </div>`;
+}
+
+export function cardHtml(store, clients, sel, pendingDel = null) {
   const a = store.agents.find(x => x.id === sel) || store.agents[0];
   if (!a) return '<div class="ds-card bu-card"><p class="bu-why">Aucun agent au bureau. Créez-en un pour commencer.</p></div>';
   const pr = progress(store, a, clients);
@@ -269,6 +283,7 @@ export function cardHtml(store, clients, sel) {
     <p class="bu-why">${pr.done} sur ${pr.total} prospects de son métier traités (${pr.pct} %)</p>
     <div class="bu-progress" role="img" aria-label="${pr.pct} % traités"><i style="width:${pr.pct}%"></i></div>
     <div class="bu-card__actions">${controlsHtml(a)}</div>
+    ${deleteHtml(a, pendingDel)}
     <div class="bu-tasks">
       <p class="bu-label">Tâches</p>
       ${a.tasks.length ? a.tasks.map(t => taskRowHtml(a, t)).join('') : '<p class="bu-why">Aucune tâche pour le moment.</p>'}

@@ -1,6 +1,6 @@
 // AuditIA — Bureau : état de l'écran, actions et tâche de fond des agents.
 // Les règles sont dans bureau-store.js ; l'affichage dans views/bureau.js.
-import { emptyStore, loadStore, saveStore, createAgent, addTask, findTask, removeTask, setAgentStatus, tick, messageFor, finishSearch, failSearch, setFoundStatus } from './bureau-store.js';
+import { emptyStore, loadStore, saveStore, createAgent, addTask, findTask, removeTask, removeAgent, setAgentStatus, tick, messageFor, finishSearch, failSearch, setFoundStatus } from './bureau-store.js';
 import { shellHtml, chipsHtml, cardHtml, agentsHtml, readyHtml, pipeHtml, foundHtml, updateScene } from './views/bureau.js';
 import { findCandidates, isKnownClient } from '../data/registry-prospects.js';
 import { insertClient } from '../data/queries.js';
@@ -10,6 +10,7 @@ export function createBureauController({ getUser, getData, getView, rerender, ge
   let owner = null;
   let store = emptyStore();
   let sel = null;
+  let pendingDel = null; // agent dont la suppression attend une confirmation
   const running = new Set(); // tâches de recherche en cours (une seule requête par tâche)
 
   const clients = () => {
@@ -21,7 +22,7 @@ export function createBureauController({ getUser, getData, getView, rerender, ge
   function ensure() {
     const u = getUser();
     if (!u) return false;
-    if (owner !== u.id) { owner = u.id; store = loadStore(u.id); sel = store.agents[0] ? store.agents[0].id : null; }
+    if (owner !== u.id) { owner = u.id; store = loadStore(u.id); sel = store.agents[0] ? store.agents[0].id : null; pendingDel = null; }
     return true;
   }
   const save = () => { if (owner) saveStore(owner, store); };
@@ -40,7 +41,7 @@ export function createBureauController({ getUser, getData, getView, rerender, ge
     updateScene(document.getElementById('bu-room'), store, list, sel);
     const put = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
     put('bu-chips', chipsHtml(store, list));
-    put('bu-card', cardHtml(store, list, sel));
+    put('bu-card', cardHtml(store, list, sel, pendingDel));
     put('bu-agents', agentsHtml(store, list));
     put('bu-ready', readyHtml(store, list));
     put('bu-pipe', pipeHtml(store, list));
@@ -114,7 +115,7 @@ export function createBureauController({ getUser, getData, getView, rerender, ge
       if (!ensure()) return;
       refresh();
     },
-    reset() { owner = null; store = emptyStore(); sel = null; },
+    reset() { owner = null; store = emptyStore(); sel = null; pendingDel = null; },
     onClick(t) {
       if (!getUser()) return false;
       const pin = t.closest('[data-bu-agent]');
@@ -157,6 +158,21 @@ export function createBureauController({ getUser, getData, getView, rerender, ge
           note(`${a.name} : ${{ work: 'est au poste.', stop: 'arrête de travailler.', cafe: 'est en pause café.', back: 'est de retour au poste.' }[act]}`, '');
         }
         save();
+        refresh();
+        return true;
+      }
+      if (act === 'askdel' || act === 'canceldel') {
+        pendingDel = act === 'askdel' ? id : null;
+        refresh();
+        return true;
+      }
+      if (act === 'confirmdel') {
+        const gone = removeAgent(store, id);
+        pendingDel = null;
+        if (!gone) { note('Agent introuvable : il a peut-être déjà été supprimé.', 'err'); refresh(); return true; }
+        if (sel === gone.id) sel = store.agents[0] ? store.agents[0].id : null;
+        save();
+        note(`${gone.name} a quitté le bureau. Ses tâches sont supprimées.`, 'ok');
         refresh();
         return true;
       }

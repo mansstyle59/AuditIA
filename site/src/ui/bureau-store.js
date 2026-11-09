@@ -129,6 +129,15 @@ export function removeTask(store, agentId, taskId) {
   if (a) a.tasks = a.tasks.filter(t => t.id !== taskId);
 }
 
+// Suppression définitive d'un agent, avec ses tâches. Les prospects gardent leur statut :
+// seul l'agent disparaît du bureau. Retourne l'agent supprimé, ou null s'il n'existe pas.
+export function removeAgent(store, agentId) {
+  const i = store.agents.findIndex(x => x.id === agentId);
+  if (i < 0) return null;
+  const [gone] = store.agents.splice(i, 1);
+  return gone;
+}
+
 export function setAgentStatus(store, agentId, status) {
   const a = store.agents.find(x => x.id === agentId);
   if (a && ['idle', 'working', 'break'].includes(status)) a.status = status;

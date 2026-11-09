@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   emptyStore, createAgent, addTask, setAgentStatus, tick, statusOf, progress, counts, messageFor, removeTask, statusLine, LOOKS,
-  addFound, foundNew, setFoundStatus, finishSearch, failSearch,
+  addFound, foundNew, setFoundStatus, finishSearch, failSearch, removeAgent,
 } from '../site/src/ui/bureau-store.js';
 
 const clients = [
@@ -149,4 +149,18 @@ test('plus aucun prospect à contacter : la raison est écrite sur la tâche', (
   const t = a.tasks[0];
   assert.equal(t.status, 'done');
   assert.match(t.reason, /déjà suivis/);
+});
+
+test('suppression d’agent : retire l’agent et ses tâches, garde les autres et les statuts des prospects', () => {
+  const s = emptyStore();
+  const a = createAgent(s, { name: 'Léo', cat: 'Plombier', role: 'SDR IA' }).agent;
+  const b = createAgent(s, { name: 'Zoé', cat: 'Électricien', role: 'SDR IA' }).agent;
+  addTask(s, a.id, { type: 'message', cat: 'Plombier', zone: '' });
+  s.statuses['2'] = { status: 'Contacté', by: 'Léo' };
+  assert.equal(removeAgent(s, a.id).name, 'Léo');
+  assert.deepEqual(s.agents.map(x => x.id), [b.id]);
+  assert.equal(s.agents.some(x => x.tasks.length && x.id === a.id), false);
+  assert.equal(statusOf(s, clients[1]), 'Contacté');
+  assert.equal(removeAgent(s, 'inconnu'), null);
+  assert.equal(s.agents.length, 1);
 });
