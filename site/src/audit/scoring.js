@@ -206,11 +206,11 @@ export function visibilityAudit(a,c){
       const tier=(v,stops)=>{for(const st of stops){if(v>=st[0])return st[1];}return 0;};
       const items=[];
       // Un critère n'entre dans le calcul que si une source a fourni assez de données pour le mesurer.
-      const add=(pillar,label,observed,weight,bad,good,val,source)=>{
+      const add=(pillar,label,observed,weight,bad,good,val,source,unmeasuredReason)=>{
         const measured=observed!==null&&observed!==undefined;
         const ok=measured?!!observed:null;
         const v=measured?(val==null?(ok?1:0):Math.max(0,Math.min(1,Number(val)))):null;
-        items.push({pillar,label,category:CATEGORY_BY_CRITERION[label] || (pillar === 'geo' ? 'geo' : 'local_seo'),ok,measured,weight,source:source||'Données du dossier',advice:!measured?'À vérifier : donnée non disponible.':ok?good:bad,gap:measured&&!ok?bad:'',val:v});
+        items.push({pillar,label,category:CATEGORY_BY_CRITERION[label] || (pillar === 'geo' ? 'geo' : 'local_seo'),ok,measured,weight,source:source||'Données du dossier',advice:!measured?'À vérifier : donnée non disponible.':ok?good:bad,gap:measured&&!ok?bad:'',unmeasuredReason:unmeasuredReason||'',val:v});
       };
       // SEO : présence locale, réputation, site et mesures techniques réellement disponibles.
       add('seo','Fiche Google/Maps associée',hasGoogle,18,'Aucun identifiant Google Places n’est associé à ce dossier. Cela ne prouve pas que la fiche est absente : vérifiez-la avant de conclure.','Identifiant Google Places associé au dossier.',null,'Google Places');
@@ -229,7 +229,8 @@ export function visibilityAudit(a,c){
       add('seo','Téléphone présent dans les données Google Places',phoneMeasured,5,
         'Google Places n’a pas retourné de numéro pour cette fiche. Cela ne prouve pas que le téléphone est absent de Google Maps : contrôle manuel nécessaire.',
         'Numéro reçu dans la réponse Google Places.',null,
-        googlePlaceId ? 'Google Places (champ téléphonique)' : 'Google Places non associé');
+        googlePlaceId ? 'Google Places (champ téléphonique)' : 'Google Places non associé',
+        'Google Places n’a pas retourné de numéro. Cela ne prouve pas que le téléphone est absent de Google Maps/GBP : vérification manuelle nécessaire.');
       if(page) add('seo','Lien téléphone cliquable sur le site (tel:)',Array.isArray(si.tel)?si.tel.length>0:null,4,
         'Aucun lien tel: n’a été détecté dans la page analysée. Le numéro peut toutefois être affiché en texte simple ou sur une autre page.',
         'Lien tel: détecté sur la page analysée.',null,'Lecture du site');
