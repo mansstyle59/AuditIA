@@ -158,7 +158,7 @@ export function createBureauController({ getUser, getData, getView, rerender, ge
       const taskId = btn.dataset.buTask;
 
       if (act === 'create') {
-        const r = createAgent(store, { name: val('bu-name'), cat: val('bu-cat'), role: val('bu-role') });
+        const r = createAgent(store, { name: val('bu-name'), cat: val('bu-cat'), role: val('bu-role'), level: val('bu-level') });
         if (!r.ok) { note(r.error, 'err'); return true; }
         sel = r.agent.id;
         save();

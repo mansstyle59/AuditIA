@@ -197,3 +197,19 @@ test('actions groupées et bilan par agent', () => {
   assert.equal(setAllAgents(s, 'idle'), 1);
   assert.deepEqual(agentStats(a), { messages: 0, found: 0, done: 0 });
 });
+
+test('niveaux : l’expert traite plus vite que le confirmé, le junior un cycle sur deux', () => {
+  const many = Array.from({ length: 10 }, (_, i) => ({ id: 100 + i, name: 'P' + i, city: 'X', category: 'Plombier' }));
+  const done = level => {
+    const s = emptyStore();
+    const a = createAgent(s, { name: 'T', cat: 'Plombier', role: 'SDR IA', level }).agent;
+    addTask(s, a.id, { type: 'message', cat: 'Plombier', zone: '' });
+    setAgentStatus(s, a.id, 'working');
+    tick(s, many); tick(s, many);
+    return s.agents[0].tasks[0].processed || 0;
+  };
+  assert.equal(done('junior'), 1);
+  assert.equal(done('confirme'), 2);
+  assert.equal(done('expert'), 4);
+  assert.equal(createAgent(emptyStore(), { name: 'Z', level: 'nimportequoi' }).agent.level, 'confirme');
+});

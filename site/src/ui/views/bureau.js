@@ -3,7 +3,7 @@ import { escHtml } from '../../core/utils.js';
 import {
   BU_STATUSES, BU_CATS, BU_ALL, BU_STATUS_LABEL, LOOKS,
   statusOf, progress, counts, taskLabel, messageFor, statusLine,
-  TONES, DEFAULT_TONE, followUpsDue, agentStats, FOLLOWUP_DAYS,
+  TONES, DEFAULT_TONE, followUpsDue, agentStats, FOLLOWUP_DAYS, LEVELS, levelOf,
 } from '../bureau-store.js';
 
 // Places des agents dans la pièce (en %) selon la mise en page ; la machine à café sert à la pause
@@ -226,6 +226,8 @@ export function shellHtml(store) {
               <input id="bu-cat" class="ds-input" type="text" list="bu-cats" value="${BU_ALL}" autocomplete="off"></label>
             <label class="ds-field"><span class="ds-field__label">Rôle</span>
               <select id="bu-role" class="ds-input"><option>SDR IA</option><option>Chercheur IA</option></select></label>
+            <label class="ds-field"><span class="ds-field__label">Niveau</span>
+              <select id="bu-level" class="ds-input">${Object.entries(LEVELS).map(([k, v]) => `<option value="${k}"${k === 'confirme' ? ' selected' : ''}>${v.label} · ${v.hint}</option>`).join('')}</select></label>
             <button class="ds-btn ds-btn--primary ds-btn--block" type="button" data-bu-act="create">Créer l’agent</button>
           </div>
           <hr class="bu-hr">
@@ -369,7 +371,7 @@ export function cardHtml(store, clients, sel, pendingDel = null) {
   return `<div class="ds-card bu-card">
     <div class="bu-card__head">
       <span class="bu-avatar" style="background:${escHtml(a.color)}" aria-hidden="true">${escHtml(a.name[0] || '?')}</span>
-      <div class="bu-card__id"><strong>${escHtml(a.name)}</strong><span class="bu-why">${escHtml(a.role)} · ${escHtml(a.cat)}</span></div>
+      <div class="bu-card__id"><strong>${escHtml(a.name)}</strong><span class="bu-why">${escHtml(a.role)} ${escHtml(levelOf(a).label)} · ${escHtml(a.cat)}</span></div>
       <span class="bu-status ${a.status}">${escHtml(BU_STATUS_LABEL[a.status])}</span>
     </div>
     <p class="bu-line" data-state="${escHtml(a.status)}">${escHtml(statusLine(store, a))}</p>
@@ -393,7 +395,7 @@ export function agentsHtml(store, clients) {
       <span class="bu-avatar" style="background:${escHtml(a.color)}" aria-hidden="true">${escHtml(a.name[0] || '?')}</span>
       <div class="bu-row__info">
         <strong>${escHtml(a.name)}</strong>
-        <span class="bu-why">${escHtml(a.role)} · ${escHtml(a.cat)} · ${escHtml(BU_STATUS_LABEL[a.status])} · ${pr.done} sur ${pr.total} traités</span>
+        <span class="bu-why">${escHtml(a.role)} ${escHtml(levelOf(a).label)} · ${escHtml(a.cat)} · ${escHtml(BU_STATUS_LABEL[a.status])} · ${pr.done} sur ${pr.total} traités</span>
         <p class="bu-line" data-state="${escHtml(a.status)}">${escHtml(statusLine(store, a))}</p>
         <div class="bu-progress" role="img" aria-label="${pr.pct} % traités"><i style="width:${pr.pct}%"></i></div>
         ${a.tasks.map(t => taskRowHtml(a, t)).join('') || '<p class="bu-why">Aucune tâche.</p>'}

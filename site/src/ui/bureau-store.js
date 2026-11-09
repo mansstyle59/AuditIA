@@ -121,7 +121,15 @@ export function agentStats(a) {
   };
 }
 
-export function createAgent(store, { name, cat, role }) {
+// Niveaux : vitesse réelle de traitement (prospects traités à chaque cycle de 5 s ; le junior travaille un cycle sur deux)
+export const LEVELS = {
+  junior: { label: 'Junior', perTick: 1, every: 2, hint: '1 prospect toutes les 10 s' },
+  confirme: { label: 'Confirmé', perTick: 1, every: 1, hint: '1 prospect toutes les 5 s' },
+  expert: { label: 'Expert', perTick: 2, every: 1, hint: '2 prospects toutes les 5 s' },
+};
+export const levelOf = a => LEVELS[a && a.level] || LEVELS.confirme;
+
+export function createAgent(store, { name, cat, role, level }) {
   const clean = String(name || '').trim().slice(0, 24);
   if (!clean) return { ok: false, error: 'Donnez un prénom à l’agent.' };
   if (store.agents.length >= BU_MAX_AGENTS) return { ok: false, error: `Le bureau accueille ${BU_MAX_AGENTS} agents au maximum.` };
@@ -131,6 +139,7 @@ export function createAgent(store, { name, cat, role }) {
     id: 'a' + Date.now().toString(36) + i,
     name: clean,
     role: chosenRole,
+    level: LEVELS[level] ? level : 'confirme',
     cat: String(cat || '').trim() || BU_ALL,
     look: LOOKS[i % LOOKS.length],
     color: COLORS[i % COLORS.length],
@@ -202,15 +211,21 @@ export function tick(store, clients) {
     if (a.status !== 'working') return;
     const t = a.tasks.find(x => x.type === 'message' && x.status === 'todo');
     if (!t) { a.status = 'idle'; a.current = null; changed = true; return; }
-    const next = clients.find(c => sameCat(t.cat, c) && statusOf(store, c) === 'À contacter');
-    if (next) {
-      store.statuses[String(next.id)] = { status: 'Message prêt', by: a.name, at: Date.now() };
-      t.processed = (t.processed || 0) + 1;
-      a.current = next.name;
-    } else {
-      t.status = 'done';
-      t.reason = noTargetReason(t, clients);
-      a.current = null;
+    const lv = levelOf(a);
+    a.beat = (a.beat || 0) + 1;
+    if (a.beat % lv.every !== 0) return; // junior : un cycle sur deux
+    for (let k = 0; k < lv.perTick; k++) {
+      const next = clients.find(c => sameCat(t.cat, c) && statusOf(store, c) === 'À contacter');
+      if (next) {
+        store.statuses[String(next.id)] = { status: 'Message prêt', by: a.name, at: Date.now() };
+        t.processed = (t.processed || 0) + 1;
+        a.current = next.name;
+      } else {
+        t.status = 'done';
+        t.reason = noTargetReason(t, clients);
+        a.current = null;
+        break;
+      }
     }
     changed = true;
   });
