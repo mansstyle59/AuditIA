@@ -5,12 +5,94 @@ import {
   statusOf, progress, counts, taskLabel, messageFor, statusLine,
 } from '../bureau-store.js';
 
-// Places des agents dans la pièce (en %), coin café pour la pause
-export const SEATS = [
-  { x: 18, y: 50 }, { x: 34, y: 50 }, { x: 50, y: 50 }, { x: 66, y: 50 }, { x: 82, y: 50 },
-  { x: 26, y: 72 }, { x: 42, y: 72 }, { x: 58, y: 72 }, { x: 74, y: 72 },
-];
-export const COFFEE = { x: 90, y: 34 };
+// Places des agents dans la pièce (en %) selon la mise en page ; la machine à café sert à la pause
+const SEAT_SETS = {
+  desktop: [
+    { x: 12, y: 56 }, { x: 26, y: 56 }, { x: 40, y: 56 }, { x: 54, y: 56 }, { x: 68, y: 56 },
+    { x: 19, y: 80 }, { x: 33, y: 80 }, { x: 47, y: 80 }, { x: 61, y: 80 },
+  ],
+  mobile: [
+    { x: 15, y: 50 }, { x: 40, y: 50 }, { x: 65, y: 50 },
+    { x: 15, y: 69 }, { x: 40, y: 69 }, { x: 65, y: 69 },
+    { x: 15, y: 88 }, { x: 40, y: 88 }, { x: 65, y: 88 },
+  ],
+};
+const COFFEE_SPOT = { desktop: { x: 88, y: 62 }, mobile: { x: 88, y: 52 } };
+const layoutOf = () => (document.documentElement.dataset.layout === 'mobile' ? 'mobile' : 'desktop');
+export const SEATS = SEAT_SETS.desktop;
+export const COFFEE = COFFEE_SPOT.desktop;
+
+// Décor : un vrai bureau (baie vitrée sur la ville, étagère, plantes, tapis) et son coin café avec machine
+function plant(x, y, k = 1) {
+  return `<g transform="translate(${x} ${y}) scale(${k})">
+    <path d="M-4 0 L4 0 L3 -7 L-3 -7 Z" fill="#7b5dd6"/><rect x="-4.4" y="-8.2" width="8.8" height="1.8" rx=".8" fill="#9b82ee"/>
+    <path d="M0 -8 C-6 -14 -9 -20 -7 -27 C-2 -22 -1 -15 0 -8Z" fill="#1fa86a"/>
+    <path d="M0 -8 C6 -15 9 -21 7 -28 C2 -22 1 -15 0 -8Z" fill="#26c27c"/>
+    <path d="M0 -8 C-1 -16 0 -23 1 -31 C4 -23 3 -15 0 -8Z" fill="#17935c"/>
+  </g>`;
+}
+function sceneryHtml(layout) {
+  const d = layout === 'desktop';
+  const W = 100, H = d ? 62.5 : 110;           // espace de dessin en unités ; ratio identique à la pièce
+  const wallH = d ? 25 : 33;
+  const cx = d ? 76 : 70;                        // début du comptoir café
+  const cw = 100 - cx - 1.5;
+  const mx = cx + 2;                    // machine centrée sur le comptoir
+  const winX = d ? 4 : 4, winW = d ? 21 : 22, winY = 4, winH = wallH - 9;
+  const city = Array.from({ length: 9 }, (_, i) => {
+    const bw = winW / 9, bh = 3 + ((i * 7) % 5) * 1.6;
+    const bx = winX + 1 + i * (winW - 2) / 9;
+    const lit = [0, 1, 2].map(k => `<rect x="${(bx + .6 + k * .9).toFixed(2)}" y="${(winY + winH - bh + 1 + (k % 2)).toFixed(2)}" width=".5" height=".6" fill="#ffd98a" opacity="${k === 1 ? .9 : .55}"/>`).join('');
+    return `<rect x="${bx.toFixed(2)}" y="${(winY + winH - 1.4 - bh).toFixed(2)}" width="${(bw * .95).toFixed(2)}" height="${(bh + .4).toFixed(2)}" fill="#1c1250"/>${lit}`;
+  }).join('');
+  return `<svg class="bu-set" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id="bs-wall" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a2181"/><stop offset="1" stop-color="#22134f"/></linearGradient>
+      <linearGradient id="bs-floor" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3b2680"/><stop offset="1" stop-color="#1b0d40"/></linearGradient>
+      <linearGradient id="bs-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#241a73"/><stop offset=".7" stop-color="#6a3bb8"/><stop offset="1" stop-color="#d98fd0"/></linearGradient>
+      <linearGradient id="bs-metal" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8d86a8"/><stop offset=".45" stop-color="#e9e5f6"/><stop offset="1" stop-color="#7d7597"/></linearGradient>
+      <linearGradient id="bs-body" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4a3a8f"/><stop offset="1" stop-color="#1c1347"/></linearGradient>
+      <linearGradient id="bs-wood" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7a5bd0"/><stop offset="1" stop-color="#43297f"/></linearGradient>
+    </defs>
+    <rect width="${W}" height="${wallH}" fill="url(#bs-wall)"/>
+    <rect y="${wallH - 1.6}" width="${W}" height="1.6" fill="#170c3c"/>
+    <path d="M0 ${wallH} H${W} V${H} H0Z" fill="url(#bs-floor)"/>
+    ${Array.from({ length: 9 }, (_, i) => `<path d="M${(i * 12.5 - 6).toFixed(1)} ${H} L${(i * 12.5 + 12.5 * 0).toFixed(1)} ${wallH}" stroke="rgba(196,181,253,.10)" stroke-width=".25"/>`).join('')}
+    ${Array.from({ length: 4 }, (_, i) => `<path d="M0 ${(wallH + (H - wallH) * (i + 1) / 5).toFixed(1)} H${W}" stroke="rgba(196,181,253,.09)" stroke-width=".25"/>`).join('')}
+    <rect x="${winX}" y="${winY}" width="${winW}" height="${winH}" rx=".8" fill="url(#bs-sky)" stroke="#8a74d8" stroke-width=".7"/>
+    <circle cx="${winX + winW * .78}" cy="${winY + 4}" r="1.6" fill="#fff6d8" opacity=".95"/>
+    ${city}
+    <path d="M${winX + winW / 2} ${winY} V${winY + winH} M${winX} ${winY + winH / 2} H${winX + winW}" stroke="#8a74d8" stroke-width=".5"/>
+    <rect x="${winX - .6}" y="${winY + winH}" width="${winW + 1.2}" height="1.1" rx=".4" fill="#b9a4ff"/>
+    <g transform="translate(${cx - 6} 8)"><circle r="2.6" fill="#f4efff" stroke="#b9a4ff" stroke-width=".5"/><path d="M0 0 V-1.7 M0 0 L1.3 .8" stroke="#2a1760" stroke-width=".35" stroke-linecap="round"/></g>
+
+    <!-- coin café : étagère, comptoir, machine -->
+    <rect x="${cx}" y="${wallH - 2.6}" width="${cw}" height="1.6" rx=".5" fill="#b9a4ff"/>
+    <rect x="${cx + .6}" y="${wallH - 1.1}" width="${cw - 1.2}" height="${d ? 10 : 12}" fill="url(#bs-wood)"/>
+    <path d="M${cx + cw / 2} ${wallH - 1.1} V${wallH + (d ? 8.9 : 10.9)}" stroke="rgba(0,0,0,.28)" stroke-width=".3"/>
+    <circle cx="${cx + cw / 2 - 1.6}" cy="${wallH + 3}" r=".45" fill="#e9e5f6"/><circle cx="${cx + cw / 2 + 1.6}" cy="${wallH + 3}" r=".45" fill="#e9e5f6"/>
+    <g class="bu-machine" transform="translate(${mx} ${wallH - 2.6})">
+      <rect x="0" y="-14.6" width="12" height="14.6" rx="1.2" fill="url(#bs-body)" stroke="#8a74d8" stroke-width=".35"/>
+      <rect x="1.2" y="-13.6" width="9.6" height="3.1" rx=".6" fill="#0b0626"/>
+      <circle class="bu-machine__led" cx="2.8" cy="-12.05" r=".55" fill="#2dd4a0"/>
+      <rect x="4.4" y="-12.6" width="5" height="1.1" rx=".3" fill="#7c6bd4"/>
+      <circle cx="3.4" cy="-8.8" r="1" fill="url(#bs-metal)"/><circle cx="8.6" cy="-8.8" r="1" fill="url(#bs-metal)"/>
+      <rect x="4.2" y="-7.8" width="3.6" height="1.2" rx=".4" fill="url(#bs-metal)"/>
+      <rect x="5.4" y="-6.7" width=".9" height="1.5" fill="#cfc8e6"/>
+      <rect x="2" y="-1.1" width="8" height=".7" rx=".3" fill="#cfc8e6"/>
+      <path d="M4.6 -1.1 L4.9 -3.9 H7.1 L7.4 -1.1Z" fill="#fff" stroke="#c9bfe8" stroke-width=".2"/>
+      <path class="bu-steam" d="M5.4 -4.6 q.7 -.9 0 -1.8 M6.6 -4.6 q.7 -.9 0 -1.8" fill="none" stroke="#e9e5f6" stroke-width=".3" stroke-linecap="round"/>
+    </g>
+    <g transform="translate(${cx + cw - 3} ${wallH - 2.6})"><rect x="-2.6" y="-6" width="5.2" height="6" rx="1" fill="#e9e5f6" opacity=".92"/><rect x="-2.1" y="-6.9" width="4.2" height=".9" rx=".4" fill="#6a3bb8"/><rect x="-2.1" y="-4.4" width="4.2" height="2" fill="#7a5bd0"/></g>
+    <g transform="translate(${cx + 17} ${wallH - 2.6})"><path d="M-1.4 0 L-1.2 -2.6 H1.2 L1.4 0Z" fill="#f4efff"/><path d="M1.3 -2 q1 .2 0 1.4" fill="none" stroke="#f4efff" stroke-width=".35"/></g>
+    <text x="${cx + 2.4}" y="${wallH - 18.2}" font-size="1.7" font-weight="700" fill="#cdb9ff" letter-spacing=".15">COIN CAFÉ</text>
+
+    <!-- tapis et plantes -->
+    <rect x="${d ? 5 : 4}" y="${wallH + (H - wallH) * .22}" width="${d ? 66 : 74}" height="${(H - wallH) * (d ? .72 : .74)}" rx="2.2" fill="rgba(124,90,214,.20)" stroke="rgba(196,181,253,.28)" stroke-width=".35"/>
+    ${plant(d ? 3 : 4, wallH + 9, d ? .6 : .7)}
+    ${plant(d ? 96.5 : 95, H - 3, d ? .75 : .8)}
+  </svg>`;
+}
 
 // Coiffure : chaque style garde la même tête, seule la chevelure change
 function hairSvg(look, c) {
@@ -67,21 +149,18 @@ function figure(a) {
   </svg>`;
 }
 
-const sceneKey = agents => agents.map(a => a.id).join(',');
+const sceneKey = agents => layoutOf() + ':' + agents.map(a => a.id).join(',');
 
 function sceneInner(store) {
   return `
-    <div class="bu-wall" aria-hidden="true"></div>
+    ${sceneryHtml(layoutOf())}
     <div class="bu-board" aria-hidden="true">
       <span class="bu-board__label">Prospects traités par agent</span>
       <strong class="bu-board__total" data-bu-total></strong>
       <div class="bu-bars">${store.agents.map(a => `<i data-bu-bar="${escHtml(a.id)}"></i>`).join('')}</div>
     </div>
-    <div class="bu-floor" aria-hidden="true"></div>
-    <div class="bu-table" aria-hidden="true"></div>
-    <div class="bu-coffee" aria-hidden="true"></div>
     <span class="bu-chip" data-bu-chip></span>
-    ${store.agents.map((a, i) => `<span class="bu-desk" style="left:${SEATS[i].x}%;top:${SEATS[i].y + 8}%" aria-hidden="true"></span>`).join('')}
+    ${store.agents.map((a, i) => `<span class="bu-desk" style="left:${SEAT_SETS[layoutOf()][i].x}%;top:${SEAT_SETS[layoutOf()][i].y + 8}%" aria-hidden="true"></span>`).join('')}
     ${store.agents.map(a => `
       <button type="button" class="bu-pin" data-bu-agent="${escHtml(a.id)}">
         <span class="bu-tag"><b>${escHtml(a.name)}</b><span class="bu-tag__amt" data-bu-amt></span></span>
@@ -101,7 +180,8 @@ export function updateScene(room, store, clients, sel) {
   store.agents.forEach((a, i) => {
     const pin = room.querySelector(`[data-bu-agent="${CSS.escape(a.id)}"]`);
     if (!pin) return;
-    const pos = a.status === 'break' ? COFFEE : SEATS[i];
+    const lay = layoutOf();
+    const pos = a.status === 'break' ? COFFEE_SPOT[lay] : SEAT_SETS[lay][i];
     const pr = progress(store, a, clients);
     pin.className = 'bu-pin ' + a.status;
     pin.style.left = pos.x + '%';
@@ -113,6 +193,7 @@ export function updateScene(room, store, clients, sel) {
     const bar = room.querySelector(`[data-bu-bar="${CSS.escape(a.id)}"]`);
     if (bar) { bar.style.setProperty('--h', Math.max(6, pr.pct) + '%'); bar.title = `${a.name} : ${pr.pct} %`; }
   });
+  room.dataset.break = store.agents.some(a => a.status === 'break') ? '1' : '0';
   const total = room.querySelector('[data-bu-total]');
   if (total) total.textContent = `${c.contacted} contactés · ${c.hot} intéressés ou clients`;
   const chip = room.querySelector('[data-bu-chip]');

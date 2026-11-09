@@ -158,12 +158,12 @@ html[data-layout="mobile"] .bu { padding-bottom: calc(96px + env(safe-area-inset
 html[data-layout="mobile"] .bu-grid { display: grid; gap: var(--ds-s-3); }
 html[data-layout="mobile"] .bu-cols { grid-template-columns: minmax(0, 1fr); }
 html[data-layout="mobile"] .bu-chips { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-html[data-layout="mobile"] .bu-room { aspect-ratio: 4 / 3.7; }
+html[data-layout="mobile"] .bu-room { aspect-ratio: 100 / 110; }
 html[data-layout="mobile"] .bu-room::after { left: 5%; right: 5%; bottom: 2%; }
 html[data-layout="mobile"] .bu-board { box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 6px 16px rgba(0,0,0,.3), 0 0 12px rgba(139,92,246,.16); }
 html[data-layout="mobile"] .bu-desk { width: 15%; height: 6%; }
 html[data-layout="mobile"] .bu-chip, html[data-layout="mobile"] .bu-table, html[data-layout="mobile"] .bu-coffee { display: none; }
-html[data-layout="mobile"] .bu-board { left: 6%; width: 88%; top: 5%; height: 24%; }
+html[data-layout="mobile"] .bu-board { left: 29%; width: 38%; top: 4%; height: 22%; padding: 6px 8px; }
 html[data-layout="mobile"] .bu-desk { width: 17%; height: 7%; }
 html[data-layout="mobile"] .bu-pin { width: 52px; height: 70px; }
 html[data-layout="mobile"] .bu-tag { font-size: 10px; padding: 2px 7px; }
@@ -173,3 +173,18 @@ html[data-layout="mobile"] .bu-pipe { grid-auto-flow: column; grid-auto-columns:
 html[data-layout="mobile"] .bu-card { padding: var(--ds-s-4); }
 html[data-layout="mobile"] .bu-panel { padding: var(--ds-s-4); }
 .bu-task__reason { font-size: var(--ds-fs-sm); color: var(--ds-lavender); overflow-wrap: anywhere; }
+
+/* Décor du bureau : baie vitrée, coin café, tapis. Dessiné en SVG à l'échelle de la pièce. */
+.bu-set { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; display: block; }
+.bu-room::before { z-index: 1; }
+.bu-chip { left: 3%; top: auto; bottom: 4%; z-index: 6; background: rgba(10, 3, 38, .88); border: 1px solid rgba(167, 139, 250, .5); font-size: clamp(11px, 1vw, 13px); }
+.bu-board { z-index: 3; }
+.bu-steam { opacity: 0; transform-box: fill-box; }
+.bu-machine__led { fill: #7c6bd4; }
+.bu-room[data-break="1"] .bu-machine__led { fill: #2dd4a0; }
+.bu-room[data-break="1"] .bu-steam { animation: bu-steam 2.2s ease-in-out infinite; }
+@keyframes bu-steam { 0% { opacity: 0; transform: translateY(1px); } 40% { opacity: .85; } 100% { opacity: 0; transform: translateY(-2.4px); } }
+.bu-desk { z-index: 3; }
+@media (prefers-reduced-motion: reduce) { .bu-steam { animation: none !important; opacity: .6; } }
+html[data-layout="mobile"] .bu-board__label { font-size: 9px; }
+html[data-layout="mobile"] .bu-board__total { font-size: 10px; }
