@@ -19,7 +19,7 @@ export const AUDIT_SOURCES = [
   { id: 'site',     label: 'Analyse du site',                     group: 'site',     needsWeb: true,  ms: 20000, issue: 'lecture du site impossible' },
   { id: 'presence', label: 'Réseaux sociaux et annuaires',        group: 'presence', needsWeb: false, ms: 35000, issue: 'présence web indisponible' },
   { id: 'sirene',   label: 'SIRENE (informations légales)',       group: 'fiche',    needsWeb: false, ms: 15000, issue: 'données légales indisponibles' },
-  { id: 'photos',   label: 'Photos de la fiche Google',           group: 'fiche',    needsWeb: false, ms: 15000, issue: 'photos Google indisponibles' },
+  { id: 'photos',   label: 'Fiche Google (coordonnées, horaires et photos)', group: 'fiche', needsWeb: false, ms: 15000, issue: 'fiche Google indisponible' },
   { id: 'domain',   label: 'Âge du domaine',                      group: 'fiche',    needsWeb: true,  ms: 12000, issue: 'date de création du domaine indisponible' },
   { id: 'shot',     label: 'Capture d’écran du site',             group: 'site',     needsWeb: true,  ms: 20000, issue: 'capture du site indisponible' },
   { id: 'rivals',   label: 'Concurrents proches',                 group: 'rivals',   needsWeb: false, ms: 25000, issue: 'comparaison des concurrents indisponible' },
@@ -143,7 +143,21 @@ export function createAuditEngine(deps0) {
       if (speed) scan = speed;
       if (domain) newDetails = { ...(newDetails || (c && c.details) || {}), domainCreated: domain };
       if (sir && sir.matched) newDetails = { ...(newDetails || (c && c.details) || {}), sirene: sir };
-      if (photos != null) newDetails = { ...(newDetails || (c && c.details) || {}), photoCount: photos };
+      if (photos != null) {
+        const baseDetails = newDetails || (c && c.details) || {};
+        newDetails = { ...baseDetails, place_id: baseDetails.place_id || photos.placeId || null,
+          googlePhone: photos.phone || null, googlePhoneCheckedAt: new Date().toISOString(),
+          googlePhoneSource: 'Google Places',
+          ...(photos.phone ? { phone: photos.phone } : {}),
+          ...(photos.rating != null ? { rating: photos.rating } : {}),
+          ...(photos.reviews != null ? { reviews: photos.reviews } : {}),
+          ...(photos.hours != null ? { hours: photos.hours } : {}),
+          ...(photos.status ? { status: photos.status } : {}),
+          ...(photos.address ? { googleAddress: photos.address } : {}),
+          ...(photos.website ? { googleWebsite: photos.website } : {}),
+          ...(photos.photoCount != null ? { photoCount: photos.photoCount } : {})
+        };
+      }
       if (newDetails && c) { try { await supabase.from('clients').update({ details: newDetails }).eq('id', c.id); } catch (e) { /* même comportement que l'ancienne interface : non bloquant */ } }
 
       setPhase('Génération du rapport…', 96);
