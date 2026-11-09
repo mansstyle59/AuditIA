@@ -1,7 +1,7 @@
 // AuditIA — Bureau : état de l'écran, actions et tâche de fond des agents.
 // Les règles sont dans bureau-store.js ; l'affichage dans views/bureau.js.
-import { emptyStore, loadStore, saveStore, counts, createAgent, addTask, findTask, removeTask, removeAgent, setAgentStatus, tick, messageFor, finishSearch, failSearch, setFoundStatus } from './bureau-store.js';
-import { shellHtml, chipsHtml, cardHtml, agentsHtml, readyHtml, pipeHtml, foundHtml, updateScene } from './views/bureau.js';
+import { emptyStore, loadStore, saveStore, counts, createAgent, addTask, findTask, removeTask, removeAgent, setAgentStatus, tick, messageFor, finishSearch, failSearch, setFoundStatus, setProspectStatus, setAllAgents, TONES, DEFAULT_TONE } from './bureau-store.js';
+import { shellHtml, chipsHtml, cardHtml, agentsHtml, readyHtml, followHtml, pipeHtml, foundHtml, updateScene } from './views/bureau.js';
 import { findCandidates, isKnownClient } from '../data/registry-prospects.js';
 import { insertClient } from '../data/queries.js';
 // (chipsHtml, cardHtml, agentsHtml, readyHtml, pipeHtml : fragments rafraîchis en place)
@@ -44,6 +44,7 @@ export function createBureauController({ getUser, getData, getView, rerender, ge
     put('bu-card', cardHtml(store, list, sel, pendingDel));
     put('bu-agents', agentsHtml(store, list));
     put('bu-ready', readyHtml(store, list));
+    put('bu-follow', followHtml(store, list));
     put('bu-pipe', pipeHtml(store, list));
     put('bu-found', foundHtml(store));
   }
@@ -130,6 +131,10 @@ export function createBureauController({ getUser, getData, getView, rerender, ge
           <h2 class="ds-card__title" id="bu-h-ready">Messages prêts à relire</h2>
           <p class="bu-why">Messages d’accroche préparés par vos agents. Relisez-les avant tout envoi : rien n’est envoyé automatiquement.</p>
           <div class="bu-list" id="bu-ready"></div>
+        </section>
+        <section class="ds-card bu-panel" aria-labelledby="bu-h-follow">
+          <h2 class="ds-card__title" id="bu-h-follow">À relancer</h2>
+          <div class="bu-list" id="bu-follow"></div>
         </section>
         <p class="bu-msg" id="bu-msg" role="status" aria-live="polite"></p>
       </div>`;
@@ -224,10 +229,26 @@ export function createBureauController({ getUser, getData, getView, rerender, ge
         refresh();
         return true;
       }
+      if (act === 'workall' || act === 'stopall') {
+        const n = setAllAgents(store, act === 'workall' ? 'working' : 'idle');
+        save();
+        note(n ? (act === 'workall' ? `${n} agent(s) mis au travail.` : `${n} agent(s) arrêté(s).`) : (act === 'workall' ? 'Aucun agent n’a de tâche à traiter.' : 'Aucun agent à arrêter.'), '');
+        refresh();
+        return true;
+      }
+      if (act === 'tone') {
+        if (TONES[id]) { store.tone = id; save(); refresh(); }
+        return true;
+      }
+      if (act === 'setstatus') {
+        const to = btn.dataset.buTo;
+        if (setProspectStatus(store, id, to, 'vous')) { save(); note('Prospect passé à « ' + to + ' ».', 'ok'); refresh(); const v = getView(); if (v === 'home') rerender(); }
+        return true;
+      }
       if (act === 'copy') {
         const c = clients().find(x => String(x.id) === String(id));
         if (!c) return true;
-        const text = messageFor(c);
+        const text = messageFor(c, TONES[store.tone] ? store.tone : DEFAULT_TONE, btn.dataset.buKind === 'relance' ? 'relance' : 'accroche');
         navigator.clipboard.writeText(text)
           .then(() => note('Message copié. Relisez-le avant tout envoi.', 'ok'))
           .catch(() => note('Copie refusée par le navigateur : sélectionnez le texte à la main.', 'err'));

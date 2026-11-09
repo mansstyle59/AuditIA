@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {
   emptyStore, createAgent, addTask, setAgentStatus, tick, statusOf, progress, counts, messageFor, removeTask, statusLine, LOOKS,
   addFound, foundNew, setFoundStatus, finishSearch, failSearch, removeAgent,
+  setProspectStatus, followUpsDue, setAllAgents, agentStats, TONES,
 } from '../site/src/ui/bureau-store.js';
 
 const clients = [
@@ -163,4 +164,36 @@ test('suppression d’agent : retire l’agent et ses tâches, garde les autres 
   assert.equal(statusOf(s, clients[1]), 'Contacté');
   assert.equal(removeAgent(s, 'inconnu'), null);
   assert.equal(s.agents.length, 1);
+});
+
+test('tons de message : trois tons, relance différente de l’accroche', () => {
+  const c = clients[0];
+  const first = Object.keys(TONES).map(t => messageFor(c, t));
+  assert.equal(new Set(first).size, 3);
+  first.forEach(m => assert.ok(m.includes(c.name)));
+  assert.notEqual(messageFor(c, 'direct', 'relance'), messageFor(c, 'direct'));
+});
+
+test('pipeline : statut avancé par l’utilisateur, relance après 3 jours', () => {
+  const s = emptyStore();
+  assert.equal(setProspectStatus(s, 1, 'Inconnu'), false);
+  assert.equal(setProspectStatus(s, 1, 'Contacté', 'vous'), true);
+  assert.equal(statusOf(s, clients[0]), 'Contacté');
+  const now = Date.now();
+  assert.equal(followUpsDue(s, clients, now).length, 0);
+  assert.equal(followUpsDue(s, clients, now + 4 * 86400000).length, 1);
+  setProspectStatus(s, 1, 'Intéressé');
+  assert.equal(followUpsDue(s, clients, now + 9 * 86400000).length, 0);
+});
+
+test('actions groupées et bilan par agent', () => {
+  const s = emptyStore();
+  const a = createAgent(s, { name: 'Inès', cat: 'Plombier', role: 'SDR IA' }).agent;
+  const b = createAgent(s, { name: 'Léo', cat: 'Plombier', role: 'SDR IA' }).agent;
+  addTask(s, a.id, { type: 'message', cat: 'Plombier' });
+  assert.equal(setAllAgents(s, 'working'), 1); // Léo n’a pas de tâche
+  assert.equal(a.status, 'working');
+  assert.equal(b.status, 'idle');
+  assert.equal(setAllAgents(s, 'idle'), 1);
+  assert.deepEqual(agentStats(a), { messages: 0, found: 0, done: 0 });
 });

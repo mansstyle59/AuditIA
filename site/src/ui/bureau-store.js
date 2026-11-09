@@ -66,10 +66,59 @@ export function counts(store, clients) {
   };
 }
 
-// Message d'accroche proposé (à relire avant tout envoi)
-export function messageFor(client) {
+// Tons de message proposés (le texte reste à relire avant tout envoi)
+export const TONES = { chaleureux: 'Chaleureux', direct: 'Direct', formel: 'Formel' };
+export const DEFAULT_TONE = 'chaleureux';
+export const FOLLOWUP_DAYS = 3;
+
+export function messageFor(client, tone = DEFAULT_TONE, kind = 'accroche') {
   const city = String(client.city || '').trim();
-  return `Bonjour, je me suis intéressé à ${client.name}${city ? ' à ' + city : ''}. Je propose un audit gratuit de votre visibilité sur Google et dans les réponses des assistants IA (ChatGPT, Gemini…) : ce qui fonctionne déjà et ce qui manque. Souhaitez-vous recevoir le rapport ?`;
+  const where = city ? ' à ' + city : '';
+  const n = client.name;
+  if (kind === 'relance') {
+    if (tone === 'direct') return `Bonjour, je reviens vers vous au sujet de ${n}. Avez-vous eu le temps de voir mon message sur l’audit gratuit de votre visibilité ? Je peux vous l’envoyer en 2 minutes.`;
+    if (tone === 'formel') return `Bonjour, je me permets de revenir vers vous concernant ${n}${where}. Je vous avais proposé un audit gratuit de votre visibilité en ligne ; êtes-vous disponible pour que je vous en transmette le rapport ?`;
+    return `Bonjour, je reviens vers vous pour ${n}${where}. J’espère que tout va bien ! Je vous avais proposé un audit gratuit de votre visibilité sur Google et les assistants IA : souhaitez-vous que je vous envoie le rapport ?`;
+  }
+  if (tone === 'direct') return `Bonjour, j’ai regardé la visibilité de ${n}${where} sur Google et dans les réponses des assistants IA : il y a des points à corriger. Je vous envoie l’audit gratuit ?`;
+  if (tone === 'formel') return `Bonjour, je me suis intéressé à ${n}${where}. Je vous propose un audit gratuit de votre visibilité sur Google et dans les réponses des assistants IA (ChatGPT, Gemini…), indiquant ce qui fonctionne et ce qui manque. Souhaitez-vous recevoir le rapport ?`;
+  return `Bonjour, je me suis intéressé à ${n}${where}. Je propose un audit gratuit de votre visibilité sur Google et dans les réponses des assistants IA (ChatGPT, Gemini…) : ce qui fonctionne déjà et ce qui manque. Souhaitez-vous recevoir le rapport ?`;
+}
+
+// Fait avancer un prospect dans le pipeline (action de l'utilisateur)
+export function setProspectStatus(store, clientId, status, by = '') {
+  if (!BU_STATUSES.includes(status)) return false;
+  store.statuses[String(clientId)] = { status, by, at: Date.now() };
+  return true;
+}
+
+// Prospects « Contacté » sans suite depuis FOLLOWUP_DAYS jours ou plus
+export function followUpsDue(store, clients, now = Date.now(), days = FOLLOWUP_DAYS) {
+  const limit = now - days * 86400000;
+  return clients.filter(c => {
+    const e = store.statuses[String(c.id)];
+    return e && e.status === 'Contacté' && Number(e.at) && e.at <= limit;
+  });
+}
+
+// Lancer ou arrêter tous les agents d'un coup
+export function setAllAgents(store, status) {
+  let n = 0;
+  store.agents.forEach(a => {
+    if (status === 'working' && !a.tasks.some(t => t.status === 'todo')) return;
+    if (a.status !== status) { a.status = status; n++; }
+  });
+  return n;
+}
+
+// Bilan d'un agent : ce qu'il a réellement produit
+export function agentStats(a) {
+  const t = a.tasks || [];
+  return {
+    messages: t.filter(x => x.type === 'message').reduce((n, x) => n + (x.processed || 0), 0),
+    found: t.filter(x => x.type === 'recherche').reduce((n, x) => n + (x.processed || 0), 0),
+    done: t.filter(x => x.status === 'done').length,
+  };
 }
 
 export function createAgent(store, { name, cat, role }) {
@@ -155,7 +204,7 @@ export function tick(store, clients) {
     if (!t) { a.status = 'idle'; a.current = null; changed = true; return; }
     const next = clients.find(c => sameCat(t.cat, c) && statusOf(store, c) === 'À contacter');
     if (next) {
-      store.statuses[String(next.id)] = { status: 'Message prêt', by: a.name };
+      store.statuses[String(next.id)] = { status: 'Message prêt', by: a.name, at: Date.now() };
       t.processed = (t.processed || 0) + 1;
       a.current = next.name;
     } else {

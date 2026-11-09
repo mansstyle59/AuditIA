@@ -188,3 +188,15 @@ html[data-layout="mobile"] .bu-panel { padding: var(--ds-s-4); }
 @media (prefers-reduced-motion: reduce) { .bu-steam { animation: none !important; opacity: .6; } }
 html[data-layout="mobile"] .bu-board__label { font-size: 9px; }
 html[data-layout="mobile"] .bu-board__total { font-size: 10px; }
+
+/* Bilan de l'agent, relances, avancement du pipeline */
+.bu-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--ds-s-2); margin: 0; text-align: center; }
+.bu-stats div { display: grid; gap: 2px; padding: var(--ds-s-2); border-radius: var(--ds-r-sm); background: var(--ds-bg-1); border: 1px solid var(--ds-line-soft); }
+.bu-stats dd { margin: 0; font-size: 1.25rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.bu-stats dt { font-size: .75rem; color: var(--ds-muted); overflow-wrap: anywhere; }
+.bu-names { list-style: none; padding-left: 0; display: grid; gap: var(--ds-s-2); }
+.bu-names li { display: grid; gap: 4px; }
+.bu-mini { justify-self: start; min-height: 32px; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--ds-line); background: var(--ds-bg-2); color: var(--ds-text); font: inherit; font-size: .75rem; font-weight: 700; cursor: pointer; }
+.bu-mini:hover { border-color: var(--ds-lavender); }
+.bu-mini:focus-visible { outline: 3px solid var(--ds-lavender); outline-offset: 2px; }
+.bu-task__actions a.ds-btn { text-decoration: none; }

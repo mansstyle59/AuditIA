@@ -3,6 +3,7 @@ import { escHtml } from '../../core/utils.js';
 import {
   BU_STATUSES, BU_CATS, BU_ALL, BU_STATUS_LABEL, LOOKS,
   statusOf, progress, counts, taskLabel, messageFor, statusLine,
+  TONES, DEFAULT_TONE, followUpsDue, agentStats, FOLLOWUP_DAYS,
 } from '../bureau-store.js';
 
 // Places des agents dans la pièce (en %) selon la mise en page ; la machine à café sert à la pause
@@ -213,6 +214,7 @@ export function shellHtml(store) {
       <div class="bu-cols">
         <section class="ds-card bu-panel" aria-labelledby="bu-h-team">
           <h2 class="ds-card__title" id="bu-h-team">Équipe et tâches</h2>
+          <div class="bu-card__actions"><button class="ds-btn ds-btn--primary ds-btn--sm" type="button" data-bu-act="workall">Tout lancer</button><button class="ds-btn ds-btn--sm" type="button" data-bu-act="stopall">Tout arrêter</button></div>
           <div class="bu-list" id="bu-agents"></div>
         </section>
         <section class="ds-card bu-panel" aria-labelledby="bu-h-create">
@@ -249,6 +251,11 @@ export function shellHtml(store) {
       <section class="ds-card bu-panel" aria-labelledby="bu-h-ready">
         <h2 class="ds-card__title" id="bu-h-ready">Messages prêts à relire</h2>
         <div class="bu-list" id="bu-ready"></div>
+      </section>
+      <section class="ds-card bu-panel" aria-labelledby="bu-h-follow">
+        <h2 class="ds-card__title" id="bu-h-follow">À relancer</h2>
+        <p class="bu-why">Prospects contactés sans suite depuis ${FOLLOWUP_DAYS} jours ou plus.</p>
+        <div class="bu-list" id="bu-follow"></div>
       </section>
       <section class="ds-card bu-panel" aria-labelledby="bu-h-found">
         <h2 class="ds-card__title" id="bu-h-found">Entreprises trouvées à valider</h2>
@@ -350,6 +357,11 @@ function deleteHtml(a, pending) {
   </div>`;
 }
 
+function statsHtml(a) {
+  const st = agentStats(a);
+  return `<dl class="bu-stats"><div><dd>${st.messages}</dd><dt>messages préparés</dt></div><div><dd>${st.found}</dd><dt>entreprises trouvées</dt></div><div><dd>${st.done}</dd><dt>tâches terminées</dt></div></dl>`;
+}
+
 export function cardHtml(store, clients, sel, pendingDel = null) {
   const a = store.agents.find(x => x.id === sel) || store.agents[0];
   if (!a) return '<div class="ds-card bu-card"><p class="bu-why">Aucun agent au bureau. Créez-en un pour commencer.</p></div>';
@@ -363,6 +375,7 @@ export function cardHtml(store, clients, sel, pendingDel = null) {
     <p class="bu-line" data-state="${escHtml(a.status)}">${escHtml(statusLine(store, a))}</p>
     <p class="bu-why">${pr.done} sur ${pr.total} prospects de son métier traités (${pr.pct} %)</p>
     <div class="bu-progress" role="img" aria-label="${pr.pct} % traités"><i style="width:${pr.pct}%"></i></div>
+    ${statsHtml(a)}
     <div class="bu-card__actions">${controlsHtml(a)}</div>
     ${deleteHtml(a, pendingDel)}
     <div class="bu-tasks">
@@ -390,23 +403,70 @@ export function agentsHtml(store, clients) {
   }).join('');
 }
 
+const telOf = c => {
+  const raw = String(c.phone || (c.details && c.details.phone) || '').replace(/[^\d+]/g, '');
+  if (!raw) return '';
+  if (raw.startsWith('+')) return raw.slice(1);
+  if (raw.startsWith('00')) return raw.slice(2);
+  return raw.startsWith('0') ? '33' + raw.slice(1) : raw;
+};
+
+function sendLinks(c, text) {
+  const t = telOf(c);
+  if (!t) return '<span class="bu-why">Pas de numéro : copiez le message.</span>';
+  const q = encodeURIComponent(text);
+  return `<a class="ds-btn ds-btn--sm" href="https://wa.me/${t}?text=${q}" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+    <a class="ds-btn ds-btn--sm" href="sms:+${t}?&body=${q}">SMS</a>`;
+}
+
+export function toneHtml(store) {
+  const cur = TONES[store.tone] ? store.tone : DEFAULT_TONE;
+  return `<div class="ds-chips" role="group" aria-label="Ton des messages">${Object.entries(TONES).map(([k, l]) =>
+    `<button type="button" class="ds-chip${k === cur ? ' is-on' : ''}" data-bu-act="tone" data-bu-id="${k}" aria-pressed="${k === cur}">${escHtml(l)}</button>`).join('')}</div>`;
+}
+
 export function readyHtml(store, clients) {
   const ready = clients.filter(c => statusOf(store, c) === 'Message prêt');
   if (!ready.length) return '<p class="bu-why">Aucun message prêt. Faites travailler un agent qui a une tâche « Messages ».</p>';
-  return ready.slice(0, 30).map(c => {
+  const tone = TONES[store.tone] ? store.tone : DEFAULT_TONE;
+  return toneHtml(store) + ready.slice(0, 30).map(c => {
     const e = store.statuses[String(c.id)] || {};
+    const text = messageFor(c, tone);
     return `<div class="bu-task">
       <div class="bu-task__label"><strong>${escHtml(c.name)}</strong><span class="bu-why">${escHtml(c.city || '')}${e.by ? ' · préparé par ' + escHtml(e.by) : ''}</span></div>
-      <p class="bu-msgtext">${escHtml(messageFor(c))}</p>
-      <div class="bu-task__actions"><button class="ds-btn ds-btn--sm" type="button" data-bu-act="copy" data-bu-id="${escHtml(c.id)}">Copier le message</button></div>
+      <p class="bu-msgtext">${escHtml(text)}</p>
+      <div class="bu-task__actions"><button class="ds-btn ds-btn--sm" type="button" data-bu-act="copy" data-bu-id="${escHtml(c.id)}">Copier le message</button>
+        ${sendLinks(c, text)}
+        <button class="ds-btn ds-btn--primary ds-btn--sm" type="button" data-bu-act="setstatus" data-bu-id="${escHtml(c.id)}" data-bu-to="Contacté">Marquer contacté</button></div>
     </div>`;
   }).join('') + (ready.length > 30 ? `<p class="bu-why">+ ${ready.length - 30} autres messages prêts</p>` : '');
 }
 
+export function followHtml(store, clients) {
+  const due = followUpsDue(store, clients);
+  if (!due.length) return '<p class="bu-why">Aucune relance à faire pour le moment.</p>';
+  const tone = TONES[store.tone] ? store.tone : DEFAULT_TONE;
+  return due.slice(0, 20).map(c => {
+    const days = Math.floor((Date.now() - store.statuses[String(c.id)].at) / 86400000);
+    const text = messageFor(c, tone, 'relance');
+    return `<div class="bu-task">
+      <div class="bu-task__label"><strong>${escHtml(c.name)}</strong><span class="bu-why">${escHtml(c.city || '')} · contacté il y a ${days} jours</span></div>
+      <p class="bu-msgtext">${escHtml(text)}</p>
+      <div class="bu-task__actions"><button class="ds-btn ds-btn--sm" type="button" data-bu-act="copy" data-bu-id="${escHtml(c.id)}" data-bu-kind="relance">Copier la relance</button>
+        ${sendLinks(c, text)}
+        <button class="ds-btn ds-btn--primary ds-btn--sm" type="button" data-bu-act="setstatus" data-bu-id="${escHtml(c.id)}" data-bu-to="Contacté">Relancé</button>
+        <button class="ds-btn ds-btn--sm" type="button" data-bu-act="setstatus" data-bu-id="${escHtml(c.id)}" data-bu-to="Intéressé">Intéressé</button>
+        <button class="ds-btn ds-btn--sm" type="button" data-bu-act="setstatus" data-bu-id="${escHtml(c.id)}" data-bu-to="Refusé">Refusé</button></div>
+    </div>`;
+  }).join('');
+}
+
+const NEXT = { 'Message prêt': ['Contacté'], 'Contacté': ['Intéressé', 'Refusé'], 'Intéressé': ['Client', 'Refusé'] };
+
 export function pipeHtml(store, clients) {
   return BU_STATUSES.map(s => {
     const items = clients.filter(c => statusOf(store, c) === s);
-    const names = items.slice(0, 6).map(c => `<li>${escHtml(c.name)}</li>`).join('');
+    const names = items.slice(0, 6).map(c => `<li>${escHtml(c.name)}${(NEXT[s] || []).map(to => ` <button type="button" class="bu-mini" data-bu-act="setstatus" data-bu-id="${escHtml(c.id)}" data-bu-to="${escHtml(to)}" aria-label="${escHtml(c.name)} : passer à ${escHtml(to)}">→ ${escHtml(to)}</button>`).join('')}</li>`).join('');
     return `<div class="bu-col">
       <h3>${escHtml(s)} <span>${items.length}</span></h3>
       ${items.length ? `<ul class="bu-names">${names}</ul>${items.length > 6 ? `<p class="bu-why">+ ${items.length - 6}</p>` : ''}` : '<p class="bu-why">Aucun</p>'}
