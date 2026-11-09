@@ -2,7 +2,7 @@
 // Les chiffres viennent des vrais clients, audits et agents (voir data/home-metrics.js et bureau-store.js).
 import { escHtml } from '../../core/utils.js';
 import { icon } from '../components/ui.js';
-import { counts, statusOf, BU_STATUS_LABEL } from '../bureau-store.js';
+import { counts, statusOf, progress, statusLine, BU_STATUS_LABEL } from '../bureau-store.js';
 import { homeStats } from '../../data/portfolio.js';
 import {
   PERIODS, periodOf, periodBadges, prospectSplit, auditPerformance, recentActivity, agoLabel, ringSegments,
@@ -207,6 +207,49 @@ function portfolioCard(ctx) {
 }
 
 /* ---------- Compositions ---------- */
+
+/* ---------- En direct : agents au travail et audit en cours (mis à jour chaque seconde, sans recomposer la page) ---------- */
+function liveRow({ ic, title, line, pct, action = '', tone = '' }) {
+  const wait = '<div class="hm-prog hm-prog--wait" role="progressbar" aria-label="' + escHtml(title) + ' : en cours"><i></i></div>';
+  const bar = pct == null ? (tone === 'agent' ? wait : '') : `<div class="hm-prog" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pct}" aria-label="${escHtml(title)}"><i style="--p:${pct}%"></i></div>`;
+  return `<li class="hm-liverow${tone ? ' hm-liverow--' + tone : ''}">
+    <span class="hm-act__ic" aria-hidden="true">${icon(ic)}</span>
+    <span class="hm-act__txt"><b>${escHtml(title)}</b><small>${escHtml(line)}</small>${bar}</span>${action}
+  </li>`;
+}
+
+export function homeLiveInner(ctx) {
+  const { store, data, snap } = ctx;
+  const rows = [];
+  if (snap && snap.status === 'running') {
+    const pct = Math.max(0, Math.min(100, Math.round(snap.pct)));
+    rows.push(liveRow({
+      ic: 'file', tone: 'audit', title: 'Audit en cours · ' + (snap.clientName || 'Commerce'),
+      line: `${pct} % · ${snap.phase || 'Analyse des sources'}`, pct,
+      action: `<button type="button" class="hm-link hm-link--inline" data-open-audit="${escHtml(snap.auditId)}">Suivre</button>`,
+    }));
+  }
+  store.agents.forEach(a => {
+    if (a.status !== 'working') return;
+    const pr = progress(store, a, data.clients);
+    rows.push(liveRow({ ic: 'bot', tone: 'agent', title: a.name, line: statusLine(store, a), pct: pr.total ? pr.pct : null }));
+  });
+  store.agents.forEach(a => {
+    if (a.status !== 'break') return;
+    rows.push(liveRow({ ic: 'bot', tone: 'break', title: a.name, line: 'En pause café', pct: null }));
+  });
+  return rows.length
+    ? `<ul class="hm-acts">${rows.join('')}</ul>`
+    : '<p class="hm-empty">Rien en cours pour le moment. Dès qu’un agent travaille ou qu’un audit démarre, il apparaît ici en direct.</p>';
+}
+
+function liveCard(ctx) {
+  return `<section class="hm-card hm-panel hm-live" aria-labelledby="hm-h-live">
+    <div class="hm-panel__head"><h2 class="hm-panel__title" id="hm-h-live"><span class="hm-livedot" aria-hidden="true"></span>En direct</h2></div>
+    <div data-home-live aria-live="polite">${homeLiveInner(ctx)}</div>
+  </section>`;
+}
+
 export function bureauHomeMobile(ctx) {
   return `<div class="hm hm--mobile">
     ${kpis(ctx)}
@@ -217,6 +260,7 @@ export function bureauHomeMobile(ctx) {
         ${team(ctx, false)}
       </div>
     </section>
+    ${liveCard(ctx)}
     <div class="hm-periodrow"><span>Activité et performance</span>${periodSelect(ctx.period)}</div>
     ${activityCard(ctx)}
     ${performanceCard(ctx)}
@@ -233,6 +277,7 @@ export function bureauHomeDesktop(ctx) {
       <aside class="hm-card hm-side" aria-label="Prospects traités par agent">${board(ctx)}${donut(ctx)}</aside>
     </div>
     <section class="hm-card hm-teampanel" aria-label="Agents">${team(ctx, true)}</section>
+    ${liveCard(ctx)}
     <div class="hm-trio">${activityCard(ctx)}${performanceCard(ctx)}${actionsCard()}</div>
     ${portfolioCard(ctx)}
   </div>`;

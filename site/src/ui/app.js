@@ -7,7 +7,7 @@
 import { NAV, emptyState, spinnerCard, errorCard, btn } from './components/ui.js';
 import { mobileShell } from './layout-mobile.js';
 import { desktopShell } from './layout-desktop.js';
-import { bureauHomeMobile, bureauHomeDesktop, homeHeaderExtra, HOME_SUBTITLE } from './views/bureau-home.js';
+import { bureauHomeMobile, bureauHomeDesktop, homeLiveInner, homeHeaderExtra, HOME_SUBTITLE } from './views/bureau-home.js';
 import { DEFAULT_PERIOD, PERIODS } from '../data/home-metrics.js';
 import { clientsView, clientsResultsHtml } from './views/clients.js';
 import { clientDetailView } from './views/client-detail.js';
@@ -200,7 +200,7 @@ function bodyFor(isWide) {
   }
   const hc = bureau.homeContext();
   if (!hc) return '';
-  const ctx = { data: d, store: hc.store, sel: hc.sel, period: state.ui.period };
+  const ctx = { data: d, store: hc.store, sel: hc.sel, period: state.ui.period, snap: audits.snapshot() };
   return isWide ? bureauHomeDesktop(ctx) : bureauHomeMobile(ctx);
 }
 
@@ -340,7 +340,17 @@ root.addEventListener('click', event => {
     }
     return;
   }
-  if (t.closest('[data-retry]')) { document.addEventListener('keydown', e => {
+  if (t.closest('[data-retry]')) { // « En direct » : l'accueil se met à jour chaque seconde (agents, audit en cours) sans recomposer la page
+setInterval(() => {
+  if (!state.user || state.view !== 'home' || state.data.status !== 'ready') return;
+  const box = document.querySelector('[data-home-live]');
+  const hc = bureau.homeContext();
+  if (!box || !hc) return;
+  const html = homeLiveInner({ data: state.data, store: hc.store, sel: hc.sel, period: state.ui.period, snap: audits.snapshot() });
+  if (box.dataset.sig !== html) { box.innerHTML = html; box.dataset.sig = html; }
+}, 1000);
+
+document.addEventListener('keydown', e => {
   if (e.key !== '/' || e.metaKey || e.ctrlKey || e.altKey) return;
   const t = e.target;
   if (t && (/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName) || t.isContentEditable)) return;
