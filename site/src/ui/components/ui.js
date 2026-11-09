@@ -12,6 +12,7 @@ export const NAV_MOBILE = [
 ];
 export const NAV_DESKTOP = [
   { id: 'home', label: 'Bureau', icon: 'home' },
+  { id: 'dashboard', label: 'Dashboard', icon: 'bars' },
   { id: 'audits', label: 'Audits', icon: 'file' },
   { id: 'clients', label: 'Clients', icon: 'users' },
   { id: 'prospects', label: 'Prospects', icon: 'target' },

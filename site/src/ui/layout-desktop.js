@@ -6,7 +6,7 @@ import { brandMarkHtml, brandNameHtml } from './components/brand.js';
 export function desktopShell({ title, subtitle = '', active, body, account = null, brand = null, badges = {}, headerExtra = '', search = '' }) {
   const SOON = new Set(['rapports', 'devis', 'formations']);
   const GROUPS = [
-    { label: 'Principal', ids: ['home', 'audits', 'clients', 'prospects'] },
+    { label: 'Principal', ids: ['home', 'dashboard', 'audits', 'clients', 'prospects'] },
     { label: 'Intelligence', ids: ['bureau', 'messages'] },
     { label: 'Développement', ids: ['rapports', 'devis', 'formations'] },
   ];

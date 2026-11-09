@@ -9,6 +9,7 @@ import { mobileShell } from './layout-mobile.js';
 import { desktopShell } from './layout-desktop.js';
 import { bureauHomeMobile, bureauHomeDesktop, homeLiveInner, homeHeaderExtra, HOME_SUBTITLE } from './views/bureau-home.js';
 import { DEFAULT_PERIOD, PERIODS } from '../data/home-metrics.js';
+import { dashboardView } from './views/dashboard.js';
 import { clientsView, clientsResultsHtml } from './views/clients.js';
 import { clientDetailView } from './views/client-detail.js';
 import { createSearchController } from './search-controller.js';
@@ -65,7 +66,7 @@ const state = {
   brand: defaultBrand(), // marque enregistrée (réglages) ; marque par défaut si absente
   gen: 0, // numéro de chargement : un résultat périmé (déconnexion, nouveau chargement) est ignoré
 };
-const LIVE_VIEWS = ['home', 'clients', 'client', 'prospects', 'bureau', 'messages', 'audits', 'audit'];
+const LIVE_VIEWS = ['home', 'dashboard', 'clients', 'client', 'prospects', 'bureau', 'messages', 'audits', 'audit'];
 
 // Les e-mails de réinitialisation renvoient vers la racine du site (ancienne interface incluse).
 // Pour qu'ils reviennent sur cette page, l'URL devrait être autorisée dans Supabase (réglage distant, non modifié ici).
@@ -200,6 +201,7 @@ function bodyFor(isWide) {
   }
   const hc = bureau.homeContext();
   if (!hc) return '';
+  if (state.view === 'dashboard') return dashboardView({ data: d, store: hc.store });
   const ctx = { data: d, store: hc.store, sel: hc.sel, period: state.ui.period, snap: audits.snapshot() };
   return isWide ? bureauHomeDesktop(ctx) : bureauHomeMobile(ctx);
 }

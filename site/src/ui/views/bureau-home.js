@@ -176,6 +176,7 @@ function performanceCard(ctx) {
 
 function actionsCard() {
   const rows = [
+    ['bars', 'Ouvrir le dashboard', 'dashboard'],
     ['search', 'Lancer un audit', 'audits'],
     ['userplus', 'Ajouter un prospect', 'prospects'],
     ['quote', 'Créer un devis', 'devis'],
