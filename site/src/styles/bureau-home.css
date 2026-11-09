@@ -360,3 +360,36 @@ html[data-layout="desktop"] .ds-d-title::before { width: 6px; height: .92em; mar
   .hm-trio { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .hm-trio > :last-child { grid-column: 1 / -1; }
 }
+
+/* ============ Harmonisation des autres pages (Clients, Audits, Prospects, Agents IA, Réglages…) ============
+   Même verre violet, mêmes bordures lumineuses et mêmes boutons que l'accueil. Préfixe html[data-layout]
+   pour passer devant les règles de components.css sans !important. */
+html[data-layout] .ds-card,
+html[data-layout] .bu-card,
+html[data-layout] .bu-panel {
+  color: var(--hm-text); border: 1.5px solid; border-radius: 22px; background: var(--hm-card-bg); box-shadow: var(--hm-card-shadow);
+  border-color: var(--hm-card-line) var(--hm-card-line-soft) var(--hm-card-line-glow) var(--hm-card-line-soft);
+}
+html[data-layout] .ds-card .ds-card,
+html[data-layout] .bu-panel .ds-card { background: var(--hm-inner); box-shadow: none; border: 1px solid var(--hm-inner-line); border-radius: 16px; }
+html[data-layout] .ds-card__title { font-size: 1.1875rem; letter-spacing: -.02em; }
+html[data-layout] .ds-empty { border-radius: 20px; border: 1.5px dashed var(--hm-card-line-soft); background: var(--hm-inner); }
+html[data-layout] .ds-btn {
+  min-height: 48px; border: 1.5px solid var(--hm-card-line-soft); background: var(--hm-inner); color: var(--ds-text);
+  transition: border-color .16s ease, background .16s ease, box-shadow .16s ease;
+}
+html[data-layout] .ds-btn:hover { border-color: var(--hm-card-line); background: var(--ds-surface-hi); }
+html[data-layout] .ds-btn--primary {
+  border-color: #CDB4FF; color: #fff; background: linear-gradient(135deg, #8B3DF5, #6D28D9);
+  box-shadow: 0 8px 22px rgba(109, 40, 217, .45), inset 0 1px 0 rgba(255, 255, 255, .25);
+}
+html[data-layout] .ds-btn--primary:hover { background: linear-gradient(135deg, #9A55FA, #7C3AED); filter: none; }
+html[data-layout] .ds-btn:focus-visible { outline: 3px solid var(--hm-line-hi); outline-offset: 2px; }
+html[data-layout] .ds-input { border: 1.5px solid var(--hm-card-line-soft); border-radius: 14px; background: var(--ds-bg-1); font-size: 16px; }
+html[data-layout] .ds-input:focus-visible { outline: 3px solid color-mix(in srgb, var(--ds-primary) 40%, transparent); outline-offset: 1px; border-color: var(--ds-lavender); }
+html[data-layout] .ds-seg { border: 1.5px solid var(--hm-card-line-soft); background: var(--hm-inner); }
+html[data-layout] .ds-seg__btn.is-on { background: linear-gradient(170deg, #6B3AE2, #3B1C9E); color: #fff; box-shadow: 0 0 14px rgba(168, 85, 247, .55); }
+html[data-layout] .ds-chip { border: 1.5px solid var(--hm-card-line-soft); background: var(--hm-inner); }
+html[data-layout] .ds-chip.is-on { background: linear-gradient(170deg, #6B3AE2, #3B1C9E); border-color: #CDB4FF; color: #fff; }
+html[data-layout] .ds-stat__value { font-weight: 800; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+:root[data-theme="light"] html[data-layout] .ds-input, html[data-theme="light"][data-layout] .ds-input { background: #fff; }
