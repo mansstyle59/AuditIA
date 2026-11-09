@@ -340,7 +340,15 @@ root.addEventListener('click', event => {
     }
     return;
   }
-  if (t.closest('[data-retry]')) { boot(); return; }
+  if (t.closest('[data-retry]')) { document.addEventListener('keydown', e => {
+  if (e.key !== '/' || e.metaKey || e.ctrlKey || e.altKey) return;
+  const t = e.target;
+  if (t && (/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName) || t.isContentEditable)) return;
+  const si = document.querySelector('[data-search-input]');
+  if (si) { e.preventDefault(); si.focus(); }
+});
+
+boot(); return; }
   if (t.closest('[data-logout]')) { logout(); return; }
   if (!state.user) return;
   if (bing.onClick(t)) return;
