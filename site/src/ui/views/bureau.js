@@ -243,7 +243,7 @@ export function shellHtml(store) {
               </select></label>
             <label class="ds-field"><span class="ds-field__label">Métier</span>
               <input id="bu-tcat" class="ds-input" type="text" list="bu-cats" value="${BU_CATS[0]}" autocomplete="off"></label>
-            <label class="ds-field"><span class="ds-field__label">Zone de recherche (code postal ou département)</span>
+            <label class="ds-field"><span class="ds-field__label">Zone (seulement pour une recherche : code postal ou département)</span>
               <input id="bu-zone" class="ds-input" type="text" placeholder="Code postal ou département, ex. 11700 ou 11" autocomplete="off"></label>
             <button class="ds-btn ds-btn--primary ds-btn--block" type="button" data-bu-act="addtask">Ajouter la tâche</button>
           </div>` : '<p class="bu-why">Créez un agent pour lui donner une tâche.</p>'}
@@ -295,16 +295,21 @@ export function chipsHtml(store, clients) {
   ].map(([l, v]) => `<div class="ds-card bu-chip-stat"><span>${escHtml(l)}</span><strong>${v}</strong></div>`).join('');
 }
 
-function taskBadge(t) {
+function taskBadge(t, a) {
   if (t.status === 'done') {
     if (t.failed) return `<span class="ds-badge ds-badge--warn">Non terminée</span>`;
     if (t.type === 'message') return `<span class="ds-badge ds-badge--good">Terminée · ${t.processed || 0} message(s) préparé(s)</span>`;
     return `<span class="ds-badge ds-badge--good">Terminée · ${t.processed || 0} entreprise(s) trouvée(s)</span>`;
   }
-  if (t.type === 'message' && t.processed) return `<span class="ds-badge">En cours · ${t.processed} préparé(s)</span>`;
-  return t.type === 'recherche'
-    ? '<span class="ds-badge ds-badge--warn">Recherche en attente</span>'
-    : '<span class="ds-badge">À faire</span>';
+  const on = a && a.status === 'working';
+  if (t.type === 'message') {
+    if (on) return `<span class="ds-badge ds-badge--live">En cours · ${t.processed || 0} préparé(s)</span>`;
+    if (a && a.status === 'break') return '<span class="ds-badge">En pause</span>';
+    return t.processed ? `<span class="ds-badge">En pause · ${t.processed} préparé(s)</span>` : '<span class="ds-badge ds-badge--warn">À lancer : faites travailler l’agent</span>';
+  }
+  if (on) return '<span class="ds-badge ds-badge--live">Recherche en cours…</span>';
+  if (a && a.status === 'break') return '<span class="ds-badge">En pause</span>';
+  return '<span class="ds-badge ds-badge--warn">À lancer : faites travailler l’agent</span>';
 }
 
 // Entreprises trouvées par les recherches, à valider une par une
@@ -327,7 +332,7 @@ function taskRowHtml(a, t) {
     : '';
   return `<div class="bu-task">
     <span class="bu-task__label">${escHtml(taskLabel(t))}</span>
-    ${taskBadge(t)}
+    ${taskBadge(t, a)}
     ${t.reason ? `<span class="bu-task__reason">${escHtml(t.reason)}</span>` : ''}
     <div class="bu-task__actions">${actions}
       <button class="ds-btn ds-btn--sm" type="button" data-bu-act="deltask" data-bu-id="${escHtml(a.id)}" data-bu-task="${escHtml(t.id)}">Retirer</button>

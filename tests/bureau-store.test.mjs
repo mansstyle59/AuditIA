@@ -213,3 +213,15 @@ test('niveaux : l’expert traite plus vite que le confirmé, le junior un cycle
   assert.equal(done('expert'), 4);
   assert.equal(createAgent(emptyStore(), { name: 'Z', level: 'nimportequoi' }).agent.level, 'confirme');
 });
+
+test('un agent avec seulement une recherche en attente reste au poste', () => {
+  const s = emptyStore();
+  const a = createAgent(s, { name: 'R', cat: 'Plombier', role: 'Chercheur IA' }).agent;
+  assert.equal(addTask(s, a.id, { type: 'recherche', cat: 'Plombier', zone: '11' }).ok, true);
+  setAgentStatus(s, a.id, 'working');
+  assert.equal(tick(s, []), false);
+  assert.equal(s.agents[0].status, 'working');
+  s.agents[0].tasks[0].status = 'done';
+  assert.equal(tick(s, []), true);
+  assert.equal(s.agents[0].status, 'idle');
+});

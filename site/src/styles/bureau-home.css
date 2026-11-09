@@ -568,3 +568,7 @@ html[data-layout="mobile"] .db-grid { grid-template-columns: minmax(0, 1fr); }
 /* Barre du bas mobile : 6 onglets, libellés compacts */
 html[data-layout="mobile"] .ds-m-tab { font-size: clamp(.625rem, 2.9vw, .75rem); padding-inline: 0; }
 html[data-layout="mobile"] .ds-m-tab .ds-icon { width: 22px; height: 22px; }
+
+/* Tâches des agents : état en direct */
+.ds-badge--live { background: rgba(56, 189, 248, .16); border-color: rgba(56, 189, 248, .5); color: #7DD3FC; }
+:root[data-theme="light"] .ds-badge--live { color: #0369A1; }

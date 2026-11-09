@@ -210,7 +210,11 @@ export function tick(store, clients) {
   store.agents.forEach(a => {
     if (a.status !== 'working') return;
     const t = a.tasks.find(x => x.type === 'message' && x.status === 'todo');
-    if (!t) { a.status = 'idle'; a.current = null; changed = true; return; }
+    if (!t) {
+      // Une recherche en attente est traitée par le contrôleur : l'agent reste au poste jusqu'à son terme.
+      if (a.tasks.some(x => x.type === 'recherche' && x.status === 'todo')) return;
+      a.status = 'idle'; a.current = null; changed = true; return;
+    }
     const lv = levelOf(a);
     a.beat = (a.beat || 0) + 1;
     if (a.beat % lv.every !== 0) return; // junior : un cycle sur deux

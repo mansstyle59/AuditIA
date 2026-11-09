@@ -172,8 +172,11 @@ export function createBureauController({ getUser, getData, getView, rerender, ge
         sel = r.agent.id;
         const zone = document.getElementById('bu-zone');
         if (zone) zone.value = '';
+        // L'agent disponible se met tout de suite au travail ; en pause café, il reprend à son retour.
+        const started = r.agent.status === 'idle';
+        if (started) r.agent.status = 'working';
         save();
-        note(`Tâche ajoutée à ${r.agent.name}.`, 'ok');
+        note(started ? `Tâche ajoutée : ${r.agent.name} se met au travail.` : `Tâche ajoutée à ${r.agent.name}.`, 'ok');
         refresh();
         return true;
       }
@@ -182,8 +185,8 @@ export function createBureauController({ getUser, getData, getView, rerender, ge
         const a = setAgentStatus(store, id, status);
         if (!a) return true;
         sel = a.id;
-        if (act === 'work' && !a.tasks.some(x => x.type === 'message' && x.status === 'todo')) {
-          note(`${a.name} est au poste, mais n’a pas de tâche « Messages » à traiter.`, '');
+        if (act === 'work' && !a.tasks.some(x => x.status === 'todo')) {
+          note(`${a.name} est au poste, mais n’a aucune tâche à traiter. Ajoutez-en une.`, '');
         } else {
           note(`${a.name} : ${{ work: 'est au poste.', stop: 'arrête de travailler.', cafe: 'est en pause café.', back: 'est de retour au poste.' }[act]}`, '');
         }
