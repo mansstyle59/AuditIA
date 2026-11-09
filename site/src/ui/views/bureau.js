@@ -158,8 +158,8 @@ export function shellHtml(store) {
               </select></label>
             <label class="ds-field"><span class="ds-field__label">Métier</span>
               <input id="bu-tcat" class="ds-input" type="text" list="bu-cats" value="${BU_CATS[0]}" autocomplete="off"></label>
-            <label class="ds-field"><span class="ds-field__label">Ville ou zone (pour une recherche)</span>
-              <input id="bu-zone" class="ds-input" type="text" placeholder="Ex. Carcassonne et alentours" autocomplete="off"></label>
+            <label class="ds-field"><span class="ds-field__label">Zone de recherche (code postal ou département)</span>
+              <input id="bu-zone" class="ds-input" type="text" placeholder="Code postal ou département, ex. 11700 ou 11" autocomplete="off"></label>
             <button class="ds-btn ds-btn--primary ds-btn--block" type="button" data-bu-act="addtask">Ajouter la tâche</button>
           </div>` : '<p class="bu-why">Créez un agent pour lui donner une tâche.</p>'}
           <datalist id="bu-cats">${[...BU_CATS, BU_ALL].map(c => `<option value="${escHtml(c)}"></option>`).join('')}</datalist>
@@ -168,6 +168,11 @@ export function shellHtml(store) {
       <section class="ds-card bu-panel" aria-labelledby="bu-h-ready">
         <h2 class="ds-card__title" id="bu-h-ready">Messages prêts à relire</h2>
         <div class="bu-list" id="bu-ready"></div>
+      </section>
+      <section class="ds-card bu-panel" aria-labelledby="bu-h-found">
+        <h2 class="ds-card__title" id="bu-h-found">Entreprises trouvées à valider</h2>
+        <p class="bu-why">Trouvées dans le registre officiel (SIRENE). Rien n’est ajouté à vos prospects sans votre clic.</p>
+        <div class="bu-list" id="bu-found"></div>
       </section>
       <section class="ds-card bu-panel" aria-labelledby="bu-h-pipe">
         <h2 class="ds-card__title" id="bu-h-pipe">Pipeline</h2>
@@ -202,23 +207,38 @@ export function chipsHtml(store, clients) {
 
 function taskBadge(t) {
   if (t.status === 'done') {
+    if (t.failed) return `<span class="ds-badge ds-badge--warn">Non terminée</span>`;
     if (t.type === 'message') return `<span class="ds-badge ds-badge--good">Terminée · ${t.processed || 0} message(s) préparé(s)</span>`;
-    return `<span class="ds-badge ds-badge--good">Terminée${t.result ? ' · ' + t.result + ' importés' : ''}</span>`;
+    return `<span class="ds-badge ds-badge--good">Terminée · ${t.processed || 0} entreprise(s) trouvée(s)</span>`;
   }
   if (t.type === 'message' && t.processed) return `<span class="ds-badge">En cours · ${t.processed} préparé(s)</span>`;
   return t.type === 'recherche'
-    ? '<span class="ds-badge ds-badge--warn">À faire dans Prospects</span>'
+    ? '<span class="ds-badge ds-badge--warn">Recherche en attente</span>'
     : '<span class="ds-badge">À faire</span>';
 }
 
+// Entreprises trouvées par les recherches, à valider une par une
+export function foundHtml(store) {
+  const items = (store.found || []).filter(f => f.status === 'new');
+  if (!items.length) return '<p class="bu-why">Aucune entreprise à valider pour le moment.</p>';
+  return items.map(f => `<div class="bu-task">
+    <span class="bu-task__label"><strong>${escHtml(f.name)}</strong>
+      <span>${escHtml([f.address, f.category].filter(Boolean).join(' · '))}</span></span>
+    <div class="bu-task__actions">
+      <button class="ds-btn ds-btn--primary ds-btn--sm" type="button" data-bu-act="addfound" data-bu-id="${escHtml(f.siret)}">Ajouter aux prospects</button>
+      <button class="ds-btn ds-btn--sm" type="button" data-bu-act="dropfound" data-bu-id="${escHtml(f.siret)}">Écarter</button>
+    </div>
+  </div>`).join('');
+}
+
 function taskRowHtml(a, t) {
-  const actions = t.type === 'recherche' && t.status !== 'done'
-    ? `<button class="ds-btn ds-btn--sm" type="button" data-nav="prospects">Ouvrir Prospects</button>
-       <button class="ds-btn ds-btn--sm" type="button" data-bu-act="taskdone" data-bu-id="${escHtml(a.id)}" data-bu-task="${escHtml(t.id)}">Marquer terminée</button>`
+  const actions = t.status !== 'done'
+    ? `<button class="ds-btn ds-btn--sm" type="button" data-bu-act="taskdone" data-bu-id="${escHtml(a.id)}" data-bu-task="${escHtml(t.id)}">Marquer terminée</button>`
     : '';
   return `<div class="bu-task">
     <span class="bu-task__label">${escHtml(taskLabel(t))}</span>
     ${taskBadge(t)}
+    ${t.reason ? `<span class="bu-task__reason">${escHtml(t.reason)}</span>` : ''}
     <div class="bu-task__actions">${actions}
       <button class="ds-btn ds-btn--sm" type="button" data-bu-act="deltask" data-bu-id="${escHtml(a.id)}" data-bu-task="${escHtml(t.id)}">Retirer</button>
     </div>

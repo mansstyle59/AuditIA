@@ -3,6 +3,7 @@
 // Un agent prépare des messages pour les prospects de son métier ; il n'envoie jamais rien.
 // Les prospects sont les clients déjà enregistrés dans AuditIA (données réelles, lues seulement).
 import { norm } from '../core/utils.js';
+import { nafFor, zoneParams, ZONE_HELP, isKnownClient } from '../data/registry-prospects.js';
 
 export const BU_STATUSES = ['À contacter', 'Message prêt', 'Contacté', 'Intéressé', 'Client', 'Refusé'];
 export const BU_DONE = ['Contacté', 'Intéressé', 'Client'];
@@ -18,7 +19,7 @@ const HAIRS = ['#3b2a1f', '#1b1b1b', '#111111', '#7a4b2a', '#2b1d14', '#d4a017']
 // Coiffures et accessoires des personnages (un agent SDR porte un casque, les chercheurs des lunettes)
 export const LOOKS = ['short', 'bun', 'side', 'long'];
 
-export function emptyStore() { return { agents: [], statuses: {} }; }
+export function emptyStore() { return { agents: [], statuses: {}, found: [] }; }
 
 export function loadStore(userId) {
   try {
@@ -99,7 +100,10 @@ export function addTask(store, agentId, { type, cat, zone }) {
   if (!a) return { ok: false, error: 'Créez d’abord un agent.' };
   const kind = type === 'recherche' ? 'recherche' : 'message';
   const place = String(zone || '').trim();
-  if (kind === 'recherche' && !place) return { ok: false, error: 'Indiquez la ville ou la zone à rechercher.' };
+  if (kind === 'recherche') {
+    if (!nafFor(String(cat || '').trim())) return { ok: false, error: 'Choisissez un métier précis pour une recherche.' };
+    if (!zoneParams(place)) return { ok: false, error: ZONE_HELP };
+  }
   a.tasks.push({
     id: 't' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
     type: kind,
@@ -146,11 +150,60 @@ export function tick(store, clients) {
       a.current = next.name;
     } else {
       t.status = 'done';
+      t.reason = noTargetReason(t, clients);
       a.current = null;
     }
     changed = true;
   });
   return changed;
+}
+
+// Explication lisible quand un agent n'a plus de prospect à traiter pour son métier
+function noTargetReason(t, clients) {
+  const team = clients.filter(c => sameCat(t.cat, c));
+  if (!team.length) return 'Aucun prospect enregistré pour ce métier. Lancez une recherche pour en trouver.';
+  return 'Les ' + team.length + ' prospect(s) de ce métier sont déjà suivis : aucun « À contacter » à traiter.';
+}
+
+// Entreprises trouvées par une recherche, à valider avant d'entrer dans le portefeuille
+export function addFound(store, list, taskId) {
+  store.found = store.found || [];
+  let added = 0;
+  for (const c of list) {
+    if (store.found.some(f => f.siret === c.siret)) continue;
+    store.found.push({ ...c, taskId, status: 'new' });
+    added++;
+  }
+  return added;
+}
+
+export function setFoundStatus(store, siret, status) {
+  const f = (store.found || []).find(x => x.siret === siret);
+  if (f) f.status = status;
+  return !!f;
+}
+
+export function foundNew(store) {
+  return (store.found || []).filter(f => f.status === 'new');
+}
+
+// Fin d'une tâche de recherche : on dit combien de nouvelles entreprises ont été trouvées, ou pourquoi aucune
+export function finishSearch(store, task, list, clients) {
+  const fresh = list.filter(c => !isKnownClient(c, clients));
+  const added = addFound(store, fresh, task.id);
+  task.status = 'done';
+  task.processed = added;
+  task.reason = added
+    ? added + ' nouvelle(s) entreprise(s) trouvée(s) dans le registre : à valider ci-dessous.'
+    : (list.length ? 'Toutes les entreprises trouvées sont déjà dans votre portefeuille.' : 'Aucune entreprise active trouvée pour ce métier et cette zone.');
+  return added;
+}
+
+export function failSearch(task, message) {
+  task.status = 'done';
+  task.processed = 0;
+  task.failed = true;
+  task.reason = 'Recherche impossible : ' + message;
 }
 
 // Phrase d'état affichée sur la carte de l'agent : dit ce qu'il fait, ou pourquoi il ne fait rien
@@ -159,11 +212,12 @@ export function statusLine(store, a) {
   const todo = a.tasks.filter(t => t.status === 'todo');
   if (a.status === 'working') {
     if (a.current) return `En cours : message préparé pour ${a.current}.`;
+    if (todo.some(t => t.type === 'recherche')) return 'En cours : recherche d’entreprises dans le registre officiel.';
     if (!todo.some(t => t.type === 'message')) return 'Aucune tâche « Messages » à traiter. Ajoutez-en une ci-dessous.';
     return 'En cours : recherche du prochain prospect à traiter.';
   }
   if (!a.tasks.length) return 'Sans tâche. Ajoutez-en une dans le formulaire ci-dessous.';
   if (todo.some(t => t.type === 'message')) return 'Prêt. Faites-le travailler pour préparer les messages.';
-  if (todo.some(t => t.type === 'recherche')) return 'Tâche de recherche à faire depuis Prospects.';
+  if (todo.some(t => t.type === 'recherche')) return 'Tâche de recherche : faites-le travailler pour interroger le registre.';
   return 'Toutes ses tâches sont terminées.';
 }

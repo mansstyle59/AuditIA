@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   emptyStore, createAgent, addTask, setAgentStatus, tick, statusOf, progress, counts, messageFor, removeTask, statusLine, LOOKS,
+  addFound, foundNew, setFoundStatus, finishSearch, failSearch,
 } from '../site/src/ui/bureau-store.js';
 
 const clients = [
@@ -26,7 +27,7 @@ test('tâche de recherche : zone obligatoire ; tâche de messages sans zone', ()
   const s = emptyStore();
   const a = createAgent(s, { name: 'Max', cat: 'Électricien', role: 'Chercheur IA' }).agent;
   assert.equal(addTask(s, a.id, { type: 'recherche', cat: 'Électricien', zone: ' ' }).ok, false);
-  assert.equal(addTask(s, a.id, { type: 'recherche', cat: 'Électricien', zone: 'Carcassonne' }).ok, true);
+  assert.equal(addTask(s, a.id, { type: 'recherche', cat: 'Électricien', zone: '11000' }).ok, true);
   assert.equal(addTask(s, a.id, { type: 'message', cat: 'Plombier', zone: '' }).ok, true);
   assert.equal(addTask(s, 'inconnu', { type: 'message', cat: 'Plombier' }).ok, false);
   assert.equal(a.tasks.length, 2);
@@ -75,7 +76,7 @@ test('phrase d’état : dit ce que fait l’agent, ou pourquoi il ne fait rien'
   const s = emptyStore();
   const a = createAgent(s, { name: 'Sophie', cat: 'Peintre façadier', role: 'SDR IA' }).agent;
   assert.match(statusLine(s, a), /Sans tâche/);
-  addTask(s, a.id, { type: 'recherche', cat: 'Peintre façadier', zone: 'Carcassonne' });
+  addTask(s, a.id, { type: 'recherche', cat: 'Peintre façadier', zone: '11000' });
   assert.match(statusLine(s, a), /Tâche de recherche/);
   addTask(s, a.id, { type: 'message', cat: 'Peintre façadier' });
   assert.match(statusLine(s, a), /Faites-le travailler/);
@@ -98,4 +99,54 @@ test('création d’agent : apparence cohérente et tâche terminée sans prospe
   assert.equal(a.tasks[0].status, 'done');
   assert.equal(a.current, null);
   assert.equal(a.tasks[0].processed, undefined);
+});
+
+test('recherche : métier précis et zone en code postal ou département', () => {
+  const s = emptyStore();
+  const a = createAgent(s, { name: 'Léa', cat: 'Plombier', role: 'Chercheur IA' }).agent;
+  assert.equal(addTask(s, a.id, { type: 'recherche', cat: 'Tous les métiers', zone: '11000' }).ok, false);
+  assert.equal(addTask(s, a.id, { type: 'recherche', cat: 'Plombier', zone: 'Carcassonne' }).ok, false);
+  assert.equal(addTask(s, a.id, { type: 'recherche', cat: 'Plombier', zone: '11' }).ok, true);
+});
+
+test('fin de recherche : nouvelles entreprises à valider, doublons exclus', () => {
+  const s = emptyStore();
+  const a = createAgent(s, { name: 'Léa', cat: 'Plombier', role: 'Chercheur IA' }).agent;
+  addTask(s, a.id, { type: 'recherche', cat: 'Plombier', zone: '11' });
+  const t = a.tasks[0];
+  const list = [
+    { siret: '11111111111111', name: 'Nouveau Plombier', city: 'Azille' },
+    { siret: '22222222222222', name: 'Plomberie Test', city: 'Palaja' },
+  ];
+  const added = finishSearch(s, t, list, clients);
+  assert.equal(added, 1);
+  assert.equal(t.status, 'done');
+  assert.equal(foundNew(s).length, 1);
+  assert.match(t.reason, /1 nouvelle/);
+  // une deuxième recherche ne recrée pas la même entreprise
+  assert.equal(addFound(s, list.slice(0, 1), t.id), 0);
+  assert.equal(setFoundStatus(s, '11111111111111', 'added'), true);
+  assert.equal(foundNew(s).length, 0);
+});
+
+test('recherche en échec : la tâche le dit, sans rien inventer', () => {
+  const s = emptyStore();
+  const a = createAgent(s, { name: 'Léa', cat: 'Plombier', role: 'Chercheur IA' }).agent;
+  addTask(s, a.id, { type: 'recherche', cat: 'Plombier', zone: '11' });
+  failSearch(a.tasks[0], 'le registre est indisponible');
+  assert.equal(a.tasks[0].failed, true);
+  assert.equal(foundNew(s).length, 0);
+  assert.match(a.tasks[0].reason, /impossible/);
+});
+
+test('plus aucun prospect à contacter : la raison est écrite sur la tâche', () => {
+  const s = emptyStore();
+  const a = createAgent(s, { name: 'Max', cat: 'Plombier', role: 'SDR IA' }).agent;
+  addTask(s, a.id, { type: 'message', cat: 'Plombier' });
+  setAgentStatus(s, a.id, 'working');
+  tick(s, clients);
+  tick(s, clients);
+  const t = a.tasks[0];
+  assert.equal(t.status, 'done');
+  assert.match(t.reason, /déjà suivis/);
 });

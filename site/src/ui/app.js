@@ -91,6 +91,8 @@ const bureau = createBureauController({
   getData: () => state.data,
   getView: () => state.view,
   rerender: () => { if (state.user && state.view === 'bureau') renderWorkspace(); },
+  getSupabase: () => getAuthClient(),
+  reload: silentReload,
 });
 const auth = createAuthService({ getClient: getAuthClient, redirectUrl: REDIRECT_URL });
 

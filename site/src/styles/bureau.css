@@ -151,3 +151,4 @@ html[data-layout="mobile"] .bu-st { width: 9px; height: 9px; }
 html[data-layout="mobile"] .bu-pipe { grid-auto-flow: column; grid-auto-columns: 70vw; grid-template-columns: none; overflow-x: auto; padding-bottom: var(--ds-s-2); }
 html[data-layout="mobile"] .bu-card { padding: var(--ds-s-4); }
 html[data-layout="mobile"] .bu-panel { padding: var(--ds-s-4); }
+.bu-task__reason { font-size: var(--ds-fs-sm); color: var(--ds-lavender); overflow-wrap: anywhere; }
