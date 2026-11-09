@@ -93,6 +93,36 @@ test("un échec de lecture Google Places ne devient pas une preuve d’absence d
   assert.equal(phone?.measured, false);
 });
 
+test("un numéro absent de la réponse Places Details reste non mesuré, même après vérification", () => {
+  const client = {
+    phone: "04 11 22 33 44",
+    details: {
+      place_id: "ChIJfixture",
+      phone: "04 11 22 33 44",
+      googlePhone: null,
+      googlePhoneCheckedAt: "2026-11-09T09:00:00Z",
+    },
+  };
+  const diagnostic = visibilityAudit({}, client);
+  const phone = item(diagnostic, "Téléphone présent dans les données Google Places");
+
+  assert.equal(phone?.measured, false);
+  assert.equal(phone?.ok, null);
+  assert.equal(phone?.source, "Google Places (champ téléphonique)");
+  assert.match(phone?.advice || "", /ne prouve pas que le téléphone est absent de Google Maps/);
+});
+
+test("un téléphone client ancien ne prouve pas la présence du numéro sur Google", () => {
+  const diagnostic = visibilityAudit({}, {
+    phone: "04 11 22 33 44",
+    details: { place_id: "ChIJfixture", phone: "04 11 22 33 44" },
+  });
+  const phone = item(diagnostic, "Téléphone présent dans les données Google Places");
+
+  assert.equal(phone?.measured, false);
+  assert.equal(phone?.ok, null);
+});
+
 test("le contrôle HTTPS décrit uniquement le protocole de l’URL, pas la validité TLS", () => {
   const httpsDiagnostic = visibilityAudit({}, { website: "https://example.test" });
   const httpsItem = item(httpsDiagnostic, "Adresse du site en HTTPS");
