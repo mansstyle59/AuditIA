@@ -1,9 +1,10 @@
 // AuditIA — Bureau : affichage seulement (HTML). Les règles sont dans bureau-store.js.
 import { escHtml } from '../../core/utils.js';
+import { icon } from '../components/ui.js';
 import {
   BU_STATUSES, BU_CATS, BU_ALL, BU_STATUS_LABEL, LOOKS,
   statusOf, progress, counts, taskLabel, messageFor, statusLine,
-  TONES, DEFAULT_TONE, followUpsDue, agentStats, FOLLOWUP_DAYS, LEVELS, levelOf,
+  teamOf, TONES, DEFAULT_TONE, followUpsDue, agentStats, FOLLOWUP_DAYS, LEVELS, levelOf,
 } from '../bureau-store.js';
 
 // Places des agents dans la pièce (en %) selon la mise en page ; la machine à café sert à la pause
@@ -295,23 +296,6 @@ export function chipsHtml(store, clients) {
   ].map(([l, v]) => `<div class="ds-card bu-chip-stat"><span>${escHtml(l)}</span><strong>${v}</strong></div>`).join('');
 }
 
-function taskBadge(t, a) {
-  if (t.status === 'done') {
-    if (t.failed) return `<span class="ds-badge ds-badge--warn">Non terminée</span>`;
-    if (t.type === 'message') return `<span class="ds-badge ds-badge--good">Terminée · ${t.processed || 0} message(s) préparé(s)</span>`;
-    return `<span class="ds-badge ds-badge--good">Terminée · ${t.processed || 0} entreprise(s) trouvée(s)</span>`;
-  }
-  const on = a && a.status === 'working';
-  if (t.type === 'message') {
-    if (on) return `<span class="ds-badge ds-badge--live">En cours · ${t.processed || 0} préparé(s)</span>`;
-    if (a && a.status === 'break') return '<span class="ds-badge">En pause</span>';
-    return t.processed ? `<span class="ds-badge">En pause · ${t.processed} préparé(s)</span>` : '<span class="ds-badge ds-badge--warn">À lancer : faites travailler l’agent</span>';
-  }
-  if (on) return '<span class="ds-badge ds-badge--live">Recherche en cours…</span>';
-  if (a && a.status === 'break') return '<span class="ds-badge">En pause</span>';
-  return '<span class="ds-badge ds-badge--warn">À lancer : faites travailler l’agent</span>';
-}
-
 // Entreprises trouvées par les recherches, à valider une par une
 export function foundHtml(store) {
   const items = (store.found || []).filter(f => f.status === 'new');
@@ -326,18 +310,54 @@ export function foundHtml(store) {
   </div>`).join('');
 }
 
-function taskRowHtml(a, t) {
-  const actions = t.status !== 'done'
-    ? `<button class="ds-btn ds-btn--sm" type="button" data-bu-act="taskdone" data-bu-id="${escHtml(a.id)}" data-bu-task="${escHtml(t.id)}">Marquer terminée</button>`
+// État lisible d'une tâche : libellé, ton et avancement réels (jamais simulés)
+function taskState(a, t, store, clients) {
+  const team = teamOf({ cat: t.cat }, clients);
+  const left = team.filter(c => statusOf(store, c) === 'À contacter').length;
+  const done = t.processed || 0;
+  const working = a.status === 'working';
+  if (t.status === 'done') {
+    if (t.failed) return { tone: 'warn', chip: 'Non terminée', pct: null };
+    return { tone: 'good', chip: 'Terminée', pct: 100 };
+  }
+  if (t.type === 'message') {
+    const total = done + left;
+    const pct = total ? Math.round(done / total * 100) : 0;
+    if (working) return { tone: 'live', chip: 'En cours', pct, info: `${done} préparé(s) · ${left} à traiter` };
+    if (a.status === 'break') return { tone: 'idle', chip: 'En pause', pct, info: `${done} préparé(s) · ${left} à traiter` };
+    return { tone: 'wait', chip: done ? 'En pause' : 'À lancer', pct, info: `${left} prospect(s) à traiter` };
+  }
+  if (working) return { tone: 'live', chip: 'En cours', pct: null, info: 'Interrogation du registre officiel…' };
+  return { tone: a.status === 'break' ? 'idle' : 'wait', chip: a.status === 'break' ? 'En pause' : 'À lancer', pct: null, info: 'En attente de l’agent' };
+}
+
+function taskRowHtml(a, t, store, clients) {
+  const st = taskState(a, t, store, clients);
+  const isSearch = t.type === 'recherche';
+  const title = isSearch ? 'Recherche d’entreprises' : 'Messages d’accroche';
+  const meta = isSearch ? `${t.cat} · ${t.zone}` : t.cat;
+  const result = t.status === 'done'
+    ? (isSearch ? `${t.processed || 0} entreprise(s) trouvée(s)` : `${t.processed || 0} message(s) préparé(s)`)
+    : (st.info || '');
+  const bar = st.pct == null
+    ? (st.tone === 'live' ? '<div class="bu-tk__bar bu-tk__bar--run" aria-hidden="true"><i></i></div>' : '')
+    : `<div class="bu-tk__bar" role="img" aria-label="${st.pct} % réalisé"><i style="width:${st.pct}%"></i></div>`;
+  const done = t.status !== 'done'
+    ? `<button class="ds-btn ds-btn--sm" type="button" data-bu-act="taskdone" data-bu-id="${escHtml(a.id)}" data-bu-task="${escHtml(t.id)}">Terminer</button>`
     : '';
-  return `<div class="bu-task">
-    <span class="bu-task__label">${escHtml(taskLabel(t))}</span>
-    ${taskBadge(t, a)}
-    ${t.reason ? `<span class="bu-task__reason">${escHtml(t.reason)}</span>` : ''}
-    <div class="bu-task__actions">${actions}
+  return `<article class="bu-tk bu-tk--${st.tone}">
+    <span class="bu-tk__ic" aria-hidden="true">${icon(isSearch ? 'search' : 'mail')}</span>
+    <div class="bu-tk__main">
+      <div class="bu-tk__top"><strong class="bu-tk__title">${escHtml(title)}</strong><span class="bu-tk__chip">${escHtml(st.chip)}</span></div>
+      <span class="bu-tk__meta">${escHtml(meta)}</span>
+      ${bar}
+      ${result ? `<span class="bu-tk__info">${escHtml(result)}</span>` : ''}
+      ${t.reason ? `<span class="bu-tk__reason">${escHtml(t.reason)}</span>` : ''}
+    </div>
+    <div class="bu-tk__actions">${done}
       <button class="ds-btn ds-btn--sm" type="button" data-bu-act="deltask" data-bu-id="${escHtml(a.id)}" data-bu-task="${escHtml(t.id)}">Retirer</button>
     </div>
-  </div>`;
+  </article>`;
 }
 
 function controlsHtml(a) {
@@ -387,7 +407,7 @@ export function cardHtml(store, clients, sel, pendingDel = null) {
     ${deleteHtml(a, pendingDel)}
     <div class="bu-tasks">
       <p class="bu-label">Tâches</p>
-      ${a.tasks.length ? a.tasks.map(t => taskRowHtml(a, t)).join('') : '<p class="bu-why">Aucune tâche pour le moment.</p>'}
+      ${a.tasks.length ? a.tasks.map(t => taskRowHtml(a, t, store, clients)).join('') : '<p class="bu-why">Aucune tâche pour le moment.</p>'}
     </div>
   </div>`;
 }
@@ -403,7 +423,7 @@ export function agentsHtml(store, clients) {
         <span class="bu-why">${escHtml(a.role)} ${escHtml(levelOf(a).label)} · ${escHtml(a.cat)} · ${escHtml(BU_STATUS_LABEL[a.status])} · ${pr.done} sur ${pr.total} traités</span>
         <p class="bu-line" data-state="${escHtml(a.status)}">${escHtml(statusLine(store, a))}</p>
         <div class="bu-progress" role="img" aria-label="${pr.pct} % traités"><i style="width:${pr.pct}%"></i></div>
-        ${a.tasks.map(t => taskRowHtml(a, t)).join('') || '<p class="bu-why">Aucune tâche.</p>'}
+        ${a.tasks.map(t => taskRowHtml(a, t, store, clients)).join('') || '<p class="bu-why">Aucune tâche.</p>'}
         <div class="bu-card__actions">${controlsHtml(a)}</div>
       </div>
     </article>`;
