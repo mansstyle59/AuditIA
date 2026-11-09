@@ -8,7 +8,7 @@
    Les 5 autres sources (site, SIRENE, âge du domaine, capture, robots.txt/llms.txt) sont dans web-read.js. */
 import { safeHttpUrl, norm, siteHost } from '../core/utils.js';
 import { secureApi } from './secure-api.js';
-import { placePhotoCount } from './places.js';
+import { placeDetails } from './places.js';
 import { SOCIAL_RX, businessInUrl } from '../audit/site-analysis.js';
 import { targetKeywords } from '../audit/scoring.js';
 import { normalizeReviewCount, rankByReviewEvidence } from './places-model.js';
@@ -70,7 +70,8 @@ export function createAuditSources(deps0){
       }
       async function fetchPlacePhotos(placeId){
         if(!placeId) return null;
-        try{ return await placePhotoCount(deps.getClient, placeId); }catch(e){ return null; }
+        // Enrichit la fiche Google à partir de l'appel Places Details déjà prévu dans l'audit.
+        try{ return await placeDetails(deps.getClient, placeId); }catch(e){ return null; }
       }
       /* Concurrents locaux : commerces du même type dans la ville (Google Places), classés par avis */
       async function fetchCompetitors(c){
