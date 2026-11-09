@@ -109,6 +109,7 @@ test("un numéro absent de la réponse Places Details reste non mesuré, même a
   assert.equal(phone?.measured, false);
   assert.equal(phone?.ok, null);
   assert.equal(phone?.source, "Google Places (champ téléphonique)");
+  assert.match(phone?.unmeasuredReason || "", /ne prouve pas que le téléphone est absent de Google Maps/);
 });
 
 test("un téléphone client ancien ne prouve pas la présence du numéro sur Google", () => {
