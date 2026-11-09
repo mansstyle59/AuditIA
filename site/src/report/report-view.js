@@ -74,17 +74,17 @@ export function reportPreviewHtml(m) {
   const bp = m.businessProfile || {};
   const fact = (label, value) => value != null && String(value).trim() !== '' ? '<div><dt>' + escHtml(label) + '</dt><dd>' + escHtml(value) + '</dd></div>' : '';
   const facts = [
-    fact('Raison sociale', bp.legalName), fact('Adresse', bp.address), fact('Téléphone', bp.phone),
+    fact('Raison sociale', bp.legalName), fact('Dirigeant déclaré (SIRENE)', bp.dirigeant), fact('Adresse', bp.address), fact('Téléphone', bp.phone), fact('Source du téléphone', bp.phoneSource),
     fact('E-mail', bp.email), fact('Site web', bp.website), fact('SIREN', bp.siren), fact('SIRET du siège', bp.siret),
     fact('Forme juridique', bp.legalForm), fact('Activité / code APE', bp.naf),
-    fact('Date de création légale', bp.creationDate), fact('Ancienneté', bp.ageLabel),
+    fact('Date de création légale (SIRENE)', bp.creationDate), fact('Ancienneté', bp.ageLabel),
     fact('Établissements', bp.establishments), fact('Note Google', bp.rating == null && bp.reviews == null ? '' : [bp.rating != null ? frNum(bp.rating) + '/5' : 'Note non disponible', bp.reviews != null ? bp.reviews + ' avis' : 'Avis non disponibles'].join(' · '))
   ].filter(Boolean).join('');
   const hoursHtml = (bp.hours || []).length ? '<ul class="rp-list">' + bp.hours.map(h => '<li>' + escHtml(h) + '</li>').join('') + '</ul>' : note('Horaires non disponibles dans la fiche enregistrée.');
   const sourceHtml = bp.legalStatus === 'matched'
     ? note('Registre public rapproché · confiance ' + (bp.confidence || 'à vérifier') + '. Vérifiez la correspondance avant un usage administratif.') + (bp.officialUrl ? '<p><a href="' + escHtml(bp.officialUrl) + '" target="_blank" rel="noopener noreferrer">Consulter l’Annuaire des Entreprises ↗</a></p>' : '')
     : note('Identité légale non confirmée : aucun SIREN/SIRET n’est présenté comme certain.');
-  n++; out.push(sec(n, 'Fiche détaillée du commerce', (facts ? '<dl class="rp-dl">' + facts + '</dl>' : note('Informations complémentaires indisponibles.')) + '<h4 class="rp-h4">Horaires d’ouverture</h4>' + hoursHtml + sourceHtml, 'business'));
+  n++; out.push(sec(n, 'Fiche détaillée du commerce', (facts ? '<dl class="rp-dl">' + facts + '</dl>' : note('Informations complémentaires indisponibles.')) + (bp.creationDate ? note('La date SIRENE est une date légale d’enregistrement ; elle ne confirme pas à elle seule la date d’ouverture au public du magasin.') : '') + '<h4 class="rp-h4">Horaires d’ouverture</h4>' + hoursHtml + sourceHtml, 'business'));
 
   n++; out.push(sec(n, 'Synthèse de l’audit', `${m.summary.map((s, i) => `<p class="${i === 0 ? 'rp-lead' : ''}">${escHtml(s)}</p>`).join('')}${tiles(m)}
     <h4 class="rp-h4">Indicateurs disponibles</h4>
