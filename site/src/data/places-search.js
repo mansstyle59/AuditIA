@@ -66,7 +66,7 @@ export function clientRowFromPlace(place, userId, over = {}, source = 'Google Pl
     user_id: userId, name, city, category, website, phone: place.phone || null,
     details: {
       place_id: place.placeId || null, address: place.address || '', category, primaryType: place.primaryType || '',
-      phone: place.phone || null, rating: place.rating == null ? null : place.rating, reviews: place.reviews || 0,
+      phone: place.phone || null, rating: place.rating == null ? null : place.rating, reviews: place.reviews == null ? null : place.reviews,
       status: place.status || '', hours: place.hours || null, website: website || place.website || null,
       editorialSummary: place.summary || '', photoCount: place.photoCount == null ? null : place.photoCount,
       domainCreated: null, source, fetchedAt: new Date().toISOString(),
