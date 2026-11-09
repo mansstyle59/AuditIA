@@ -509,3 +509,12 @@ html[data-layout="desktop"] .ds-d-title { font-size: clamp(2.1rem, 2.8vw, 2.7rem
 html[data-layout="desktop"] .ds-d-nav__item { gap: 11px; padding: 8px 12px; }
 @media (max-height: 960px) { .ds-d-pro__list { display: none; } .ds-d-pro { grid-template-columns: auto 1fr; align-items: center; justify-items: start; } .ds-d-pro__btn { grid-column: 1 / -1; } }
 html[data-layout="desktop"] .ds-d-nav { padding: 2px 4px 8px; }
+
+/* Logo de marque unique (connexion, chargement, page d'accueil publique) : le « A » + le nom */
+.ds-lockup { display: inline-flex; align-items: center; gap: 14px; color: var(--ds-text); }
+.ds-lockup__mark { width: 56px; height: 56px; padding: 6px; border-radius: 16px; background: #fff; object-fit: contain; }
+.ds-lockup__text { display: grid; line-height: 1.05; text-align: left; }
+.ds-lockup__text b { font-size: 1.75rem; font-weight: 800; letter-spacing: .06em; }
+.ds-lockup__text small { font-size: .8125rem; color: var(--ds-lavender); font-weight: 600; }
+.ds-auth__brand img.ds-lockup__mark { width: 56px; height: 56px; }
+.ds-lockup img.ds-lockup__mark { width: 52px; height: 52px; }

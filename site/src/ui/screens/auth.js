@@ -6,7 +6,7 @@ import { landingScreen } from './landing.js';
 const TAGLINE = 'Auditer mieux, décider plus clairement';
 
 function brand() {
-  return '<a class="ds-auth__brand" href="./" aria-label="AuditIA by AffiAds — accueil"><img src="./auditia-logo-dark.svg?v=2" alt="AuditIA by AffiAds" width="250" height="72"></a>';
+  return '<a class="ds-auth__brand" href="./" aria-label="AuditIA by AffiAds — accueil"><span class="ds-lockup"><img class="ds-lockup__mark" src="./auditia-mark.svg" alt="" width="56" height="56"><span class="ds-lockup__text"><b>AUDITIA</b><small>by AffiAds</small></span></span></a>';
 }
 
 function pwdField(id, label, autocomplete) {
