@@ -1,8 +1,8 @@
 // AuditIA — Bureau : affichage seulement (HTML). Les règles sont dans bureau-store.js.
 import { escHtml } from '../../core/utils.js';
 import {
-  BU_STATUSES, BU_CATS, BU_ALL, BU_STATUS_LABEL,
-  statusOf, progress, counts, taskLabel, messageFor,
+  BU_STATUSES, BU_CATS, BU_ALL, BU_STATUS_LABEL, LOOKS,
+  statusOf, progress, counts, taskLabel, messageFor, statusLine,
 } from '../bureau-store.js';
 
 // Places des agents dans la pièce (en %), coin café pour la pause
@@ -12,38 +12,60 @@ export const SEATS = [
 ];
 export const COFFEE = { x: 90, y: 34 };
 
-// Bulle flottante : accès au bureau depuis toutes les pages (icône bureau avec un bonhomme)
-export function bureauFabHtml() {
-  return `<button type="button" class="bu-fab" data-nav="bureau" aria-label="Ouvrir le bureau des agents" title="Bureau des agents">
-    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-      <circle cx="8" cy="7" r="2.6"/>
-      <path d="M3.5 15.5v-1.2a3.2 3.2 0 0 1 3.2-3.2h.6a3.2 3.2 0 0 1 3.2 3.2v1.2"/>
-      <path d="M2.5 15.5h19M5 15.5V21M19 15.5V21"/>
-      <rect x="14" y="5" width="7" height="6" rx="1"/>
-      <path d="M17.5 11v4.5"/>
-    </svg>
-  </button>`;
+// Coiffure : chaque style garde la même tête, seule la chevelure change
+function hairSvg(look, c) {
+  const cap = `<path d="M16.5 25 C15 9 45 8 43.5 25 C41 18 36 15.5 30 15.5 C24 15.5 19 18 16.5 25 Z" fill="${c}"/>`;
+  if (look === 'bun') return `${cap}<circle cx="30" cy="7.5" r="4.6" fill="${c}"/>`;
+  if (look === 'side') return `<path d="M16.5 26 C15 9 45 8 43.5 22 C37 15 27 15 22 22 C20.5 24 18.5 25.5 16.5 26 Z" fill="${c}"/>`;
+  if (look === 'long') return `${cap}
+    <path d="M16.5 25 C13.5 36 13 46 17 51 L19.8 48 C18 41 18.6 33 19.6 26 Z" fill="${c}"/>
+    <path d="M43.5 25 C46.5 36 47 46 43 51 L40.2 48 C42 41 41.4 33 40.4 26 Z" fill="${c}"/>`;
+  return cap;
 }
 
-const figure = a => `
-  <svg class="bu-figure" viewBox="0 0 60 80" aria-hidden="true">
-    <rect x="14" y="44" width="32" height="36" rx="12" fill="${escHtml(a.color)}"/>
-    <rect x="26" y="38" width="8" height="9" fill="${escHtml(a.skin)}"/>
-    <circle cx="30" cy="28" r="14" fill="${escHtml(a.skin)}"/>
-    <path d="M15.5 27 C14 9 46 7 44.5 27 C41 19 36 17 30 17 C23 17 18 19 15.5 27 Z" fill="${escHtml(a.hair)}"/>
-    <circle cx="25" cy="30" r="1.8" fill="#1b1440"/>
-    <circle cx="35" cy="30" r="1.8" fill="#1b1440"/>
-    ${a.glasses ? `<circle cx="25" cy="30" r="4" fill="none" stroke="#1b1440" stroke-width="1.1"/>
-      <circle cx="35" cy="30" r="4" fill="none" stroke="#1b1440" stroke-width="1.1"/>
-      <path d="M29 30h2" stroke="#1b1440" stroke-width="1.1"/>` : ''}
-    <path d="M26 36 Q30 39 34 36" fill="none" stroke="#7a3b2e" stroke-width="1.5" stroke-linecap="round"/>
-    <rect class="bu-arm bu-arm-l" x="10" y="50" width="8" height="22" rx="4" fill="${escHtml(a.color)}"/>
-    <rect class="bu-arm bu-arm-r" x="42" y="50" width="8" height="22" rx="4" fill="${escHtml(a.color)}"/>
+// Un personnage de bureau : tête, coiffure, col, veste, badge et bras ; casque pour un SDR, lunettes pour un chercheur
+function figure(a) {
+  const look = LOOKS.includes(a.look) ? a.look : LOOKS[0];
+  const skin = escHtml(a.skin || '#f1c27d');
+  const hair = escHtml(a.hair || '#3b2a1f');
+  const color = escHtml(a.color || '#8b5cf6');
+  const isSdr = a.role !== 'Chercheur IA';
+  return `
+  <svg class="bu-figure" viewBox="0 0 60 80" aria-hidden="true" focusable="false">
+    <ellipse cx="30" cy="78.5" rx="17" ry="2.4" fill="rgba(0,0,0,.28)"/>
+    <path d="M13 80 L13 63 Q13 45 30 44.5 Q47 45 47 63 L47 80 Z" fill="${color}"/>
+    <path d="M24.5 45 L30 55 L35.5 45 Z" fill="#f8f5ff"/>
+    <path d="M24.5 45 L30 55 L26.6 66 L18.5 53 Z" fill="rgba(0,0,0,.16)"/>
+    <path d="M35.5 45 L30 55 L33.4 66 L41.5 53 Z" fill="rgba(0,0,0,.16)"/>
+    <rect x="36" y="59" width="6" height="4" rx="1" fill="#fff" opacity=".92"/>
+    <rect x="26" y="35.5" width="8" height="10" rx="2" fill="${skin}"/>
+    <ellipse cx="17.6" cy="27" rx="2.4" ry="3.1" fill="${skin}"/>
+    <ellipse cx="42.4" cy="27" rx="2.4" ry="3.1" fill="${skin}"/>
+    <ellipse cx="30" cy="26" rx="12.5" ry="13" fill="${skin}"/>
+    ${hairSvg(look, hair)}
+    <path d="M22.5 22.6 Q25 21.2 27.6 22.4 M32.4 22.4 Q35 21.2 37.5 22.6" fill="none" stroke="${hair}" stroke-width="1.1" stroke-linecap="round"/>
+    <circle cx="25" cy="27" r="1.7" fill="#1b1440"/>
+    <circle cx="35" cy="27" r="1.7" fill="#1b1440"/>
+    <path d="M26 33 Q30 36 34 33" fill="none" stroke="#7a3b2e" stroke-width="1.4" stroke-linecap="round"/>
+    ${isSdr
+      ? `<path d="M17.2 27 Q17.2 11.5 30 11.5 Q42.8 11.5 42.8 27" fill="none" stroke="#1b1440" stroke-width="1.7"/>
+         <rect x="15" y="24" width="4.4" height="7" rx="2" fill="#1b1440"/>
+         <rect x="40.6" y="24" width="4.4" height="7" rx="2" fill="#1b1440"/>
+         <path d="M41.2 31 Q41.2 37.5 35 37.5" fill="none" stroke="#1b1440" stroke-width="1.2" stroke-linecap="round"/>
+         <rect x="32.8" y="36.4" width="3.6" height="2.6" rx="1.2" fill="#1b1440"/>`
+      : `<circle cx="25" cy="27" r="3.7" fill="rgba(255,255,255,.08)" stroke="#1b1440" stroke-width="1"/>
+         <circle cx="35" cy="27" r="3.7" fill="rgba(255,255,255,.08)" stroke="#1b1440" stroke-width="1"/>
+         <path d="M28.7 27 H31.3" stroke="#1b1440" stroke-width="1"/>`}
+    <rect class="bu-arm bu-arm-l" x="10" y="52" width="9" height="20" rx="4.5" fill="${color}"/>
+    <rect class="bu-arm bu-arm-r" x="41" y="52" width="9" height="20" rx="4.5" fill="${color}"/>
+    <circle cx="14.5" cy="73.5" r="3.2" fill="${skin}"/>
+    <circle cx="45.5" cy="73.5" r="3.2" fill="${skin}"/>
     <g class="bu-cup">
-      <rect x="46" y="60" width="9" height="10" rx="2" fill="#fff" stroke="#c9bfe8"/>
-      <path d="M55 63 q3 2 0 5" fill="none" stroke="#c9bfe8" stroke-width="1.4"/>
+      <rect x="49" y="66" width="8" height="9" rx="2" fill="#fff" stroke="#c9bfe8"/>
+      <path d="M57 68 q2.5 2 0 4.5" fill="none" stroke="#c9bfe8" stroke-width="1.4"/>
     </g>
   </svg>`;
+}
 
 const sceneKey = agents => agents.map(a => a.id).join(',');
 
@@ -87,8 +109,7 @@ export function updateScene(room, store, clients, sel) {
     pin.setAttribute('aria-pressed', String(sel === a.id));
     pin.setAttribute('aria-label', `${a.name}, ${BU_STATUS_LABEL[a.status]}, ${pr.done} sur ${pr.total} prospects traités`);
     pin.querySelector('[data-bu-amt]').textContent = `${pr.done}/${pr.total}`;
-    const st = pin.querySelector('[data-bu-st]');
-    st.className = 'bu-st ' + a.status;
+    pin.querySelector('[data-bu-st]').className = 'bu-st ' + a.status;
     const bar = room.querySelector(`[data-bu-bar="${CSS.escape(a.id)}"]`);
     if (bar) { bar.style.setProperty('--h', Math.max(6, pr.pct) + '%'); bar.title = `${a.name} : ${pr.pct} %`; }
   });
@@ -156,6 +177,19 @@ export function shellHtml(store) {
     </div>`;
 }
 
+// Bulle d'accès au bureau, affichée sur les autres pages
+export function bureauFabHtml() {
+  return `<button type="button" class="bu-fab" data-nav="bureau" aria-label="Ouvrir le bureau des agents" title="Bureau des agents">
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <circle cx="8" cy="7" r="2.6"/>
+      <path d="M3.5 15.5v-1.2a3.2 3.2 0 0 1 3.2-3.2h.6a3.2 3.2 0 0 1 3.2 3.2v1.2"/>
+      <path d="M2.5 15.5h19M5 15.5V21M19 15.5V21"/>
+      <rect x="14" y="5" width="7" height="6" rx="1"/>
+      <path d="M17.5 11v4.5"/>
+    </svg>
+  </button>`;
+}
+
 export function chipsHtml(store, clients) {
   const c = counts(store, clients);
   return [
@@ -167,7 +201,11 @@ export function chipsHtml(store, clients) {
 }
 
 function taskBadge(t) {
-  if (t.status === 'done') return `<span class="ds-badge ds-badge--good">Terminée${t.result ? ' · ' + t.result + ' importés' : ''}</span>`;
+  if (t.status === 'done') {
+    if (t.type === 'message') return `<span class="ds-badge ds-badge--good">Terminée · ${t.processed || 0} message(s) préparé(s)</span>`;
+    return `<span class="ds-badge ds-badge--good">Terminée${t.result ? ' · ' + t.result + ' importés' : ''}</span>`;
+  }
+  if (t.type === 'message' && t.processed) return `<span class="ds-badge">En cours · ${t.processed} préparé(s)</span>`;
   return t.type === 'recherche'
     ? '<span class="ds-badge ds-badge--warn">À faire dans Prospects</span>'
     : '<span class="ds-badge">À faire</span>';
@@ -207,7 +245,8 @@ export function cardHtml(store, clients, sel) {
       <div class="bu-card__id"><strong>${escHtml(a.name)}</strong><span class="bu-why">${escHtml(a.role)} · ${escHtml(a.cat)}</span></div>
       <span class="bu-status ${a.status}">${escHtml(BU_STATUS_LABEL[a.status])}</span>
     </div>
-    <p class="bu-why">${pr.done} sur ${pr.total} prospects traités (${pr.pct} %)</p>
+    <p class="bu-line" data-state="${escHtml(a.status)}">${escHtml(statusLine(store, a))}</p>
+    <p class="bu-why">${pr.done} sur ${pr.total} prospects de son métier traités (${pr.pct} %)</p>
     <div class="bu-progress" role="img" aria-label="${pr.pct} % traités"><i style="width:${pr.pct}%"></i></div>
     <div class="bu-card__actions">${controlsHtml(a)}</div>
     <div class="bu-tasks">
@@ -218,7 +257,7 @@ export function cardHtml(store, clients, sel) {
 }
 
 export function agentsHtml(store, clients) {
-  if (!store.agents.length) return '<p class="bu-why">Aucun agent. Créez-en un à droite.</p>';
+  if (!store.agents.length) return '<p class="bu-why">Aucun agent. Créez-en un dans le formulaire ci-dessous.</p>';
   return store.agents.map(a => {
     const pr = progress(store, a, clients);
     return `<article class="bu-row">
@@ -226,6 +265,7 @@ export function agentsHtml(store, clients) {
       <div class="bu-row__info">
         <strong>${escHtml(a.name)}</strong>
         <span class="bu-why">${escHtml(a.role)} · ${escHtml(a.cat)} · ${escHtml(BU_STATUS_LABEL[a.status])} · ${pr.done} sur ${pr.total} traités</span>
+        <p class="bu-line" data-state="${escHtml(a.status)}">${escHtml(statusLine(store, a))}</p>
         <div class="bu-progress" role="img" aria-label="${pr.pct} % traités"><i style="width:${pr.pct}%"></i></div>
         ${a.tasks.map(t => taskRowHtml(a, t)).join('') || '<p class="bu-why">Aucune tâche.</p>'}
         <div class="bu-card__actions">${controlsHtml(a)}</div>
