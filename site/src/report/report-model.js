@@ -90,7 +90,7 @@ function buildCriteria(diag) {
   const mk = x => ({
     label: clean(x.label), source: clean(x.source),
     status: !x.measured ? 'unmeasured' : x.ok ? 'ok' : 'fix',
-    text: clean(!x.measured ? 'Donnée non disponible : exclu du score.' : x.ok ? x.advice : (x.gap || x.advice)),
+    text: clean(!x.measured ? (x.unmeasuredReason || 'Donnée non disponible : exclu du score.') : x.ok ? x.advice : (x.gap || x.advice)),
   });
   const categories = (diag.categories || []).filter(x => x.scored).map(cat => ({
     id: clean(cat.id), label: clean(cat.label), description: clean(cat.description),

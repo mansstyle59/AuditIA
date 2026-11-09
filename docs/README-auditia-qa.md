@@ -14,6 +14,13 @@ Cette liste doit être suivie après toute modification significative de `site/i
 - [ ] Aucune clé secrète intégrée dans le code client ou affichée dans l’interface.
 - [ ] Vérifier que les règles Supabase RLS limitent les données au compte autorisé.
 
+## Preuves Google Business Profile et téléphone
+- [ ] Un numéro explicitement retourné par Google Places est identifié comme donnée Places, avec sa provenance.
+- [ ] Si Places Details ne retourne aucun numéro, le critère reste « non mesuré » : ne pas conclure que le téléphone est absent de Google Maps/GBP et ne pas pénaliser le score.
+- [ ] Un numéro saisi/importé dans la fiche client ne devient pas automatiquement une preuve Google.
+- [ ] Le rapport PDF distingue le numéro Google Places, le numéro client non vérifié et l’absence de donnée ; recommander une vérification manuelle si nécessaire.
+- [ ] Date de création SIRENE présentée comme date légale d’enregistrement, jamais comme date d’ouverture du commerce.
+
 ## Mobile — iPhone Safari
 - [ ] En-tête visible, sans trou ni recouvrement avec le contenu.
 - [ ] Zone sûre iOS respectée en haut et en bas.
