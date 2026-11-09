@@ -8,7 +8,6 @@ export const NAV = [
   { id: 'clients', label: 'Clients', icon: 'users' },
   { id: 'audits', label: 'Audits', icon: 'file' },
   { id: 'prospects', label: 'Prospects', icon: 'target' },
-  { id: 'bureau', label: 'Bureau', icon: 'agents' },
   { id: 'settings', label: 'Réglages', icon: 'settings' },
 ];
 

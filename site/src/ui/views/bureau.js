@@ -12,6 +12,19 @@ export const SEATS = [
 ];
 export const COFFEE = { x: 90, y: 34 };
 
+// Bulle flottante : accès au bureau depuis toutes les pages (icône bureau avec un bonhomme)
+export function bureauFabHtml() {
+  return `<button type="button" class="bu-fab" data-nav="bureau" aria-label="Ouvrir le bureau des agents" title="Bureau des agents">
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <circle cx="8" cy="7" r="2.6"/>
+      <path d="M3.5 15.5v-1.2a3.2 3.2 0 0 1 3.2-3.2h.6a3.2 3.2 0 0 1 3.2 3.2v1.2"/>
+      <path d="M2.5 15.5h19M5 15.5V21M19 15.5V21"/>
+      <rect x="14" y="5" width="7" height="6" rx="1"/>
+      <path d="M17.5 11v4.5"/>
+    </svg>
+  </button>`;
+}
+
 const figure = a => `
   <svg class="bu-figure" viewBox="0 0 60 80" aria-hidden="true">
     <rect x="14" y="44" width="32" height="36" rx="12" fill="${escHtml(a.color)}"/>

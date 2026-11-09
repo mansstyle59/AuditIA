@@ -111,6 +111,21 @@
 .bu-col h3 span { color: var(--ds-lavender); font-variant-numeric: tabular-nums; }
 .bu-names { margin: 0; padding-left: 16px; font-size: var(--ds-fs-xs); overflow-wrap: anywhere; }
 
+/* Bulle d'accès au bureau (flottante, toutes les pages connectées) */
+.bu-fab {
+  position: fixed; right: 24px; bottom: calc(24px + env(safe-area-inset-bottom)); z-index: 40;
+  width: 60px; height: 60px; padding: 0; border: 1px solid var(--ds-line); border-radius: 50%;
+  display: grid; place-items: center; cursor: pointer; color: #fff;
+  background: var(--ds-grad-cta); box-shadow: 0 12px 28px rgba(0, 0, 0, .45);
+  transition: transform 120ms ease, border-color var(--ease), box-shadow var(--ease);
+}
+.bu-fab svg { width: 30px; height: 30px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.bu-fab:hover { border-color: var(--ds-lavender); box-shadow: 0 14px 32px rgba(0, 0, 0, .5), 0 0 0 4px rgba(196, 181, 253, .18); }
+.bu-fab:active { transform: scale(.95); }
+.bu-fab:focus-visible { outline: 2px solid var(--ds-lavender-2); outline-offset: 3px; }
+html[data-layout="mobile"] .bu-fab { right: 16px; bottom: calc(96px + env(safe-area-inset-bottom)); width: 56px; height: 56px; }
+html[data-layout="mobile"] .bu-fab svg { width: 28px; height: 28px; }
+
 /* Ordinateur : pièce à gauche, carte à droite, panneaux côte à côte */
 html[data-layout="desktop"] .bu-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(300px, 360px); gap: var(--ds-s-5); align-items: start; }
 html[data-layout="desktop"] .bu-cardwrap { position: sticky; top: var(--ds-s-6); }
