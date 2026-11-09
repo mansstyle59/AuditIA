@@ -32,7 +32,7 @@
 .ds-input {
   width: 100%; min-height: var(--ds-touch); padding: var(--ds-s-3) var(--ds-s-4);
   font: inherit; font-size: 1rem; color: var(--ds-text);
-  background: var(--ds-bg-1); border: 1px solid var(--ds-line); border-radius: var(--ds-r-sm);
+  background: var(--ds-bg-1); border: 1px solid var(--ds-input-border); border-radius: var(--ds-r-sm);
 }
 .ds-input::placeholder { color: var(--ds-muted); opacity: .8; }
 .ds-input:focus-visible { outline: 3px solid var(--ds-lavender); outline-offset: 2px; border-color: var(--ds-lavender); }

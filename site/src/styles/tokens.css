@@ -12,6 +12,8 @@
   --ds-surface-hi: #3F2280;
   --ds-line: #5B35A8;
   --ds-line-soft: #432487;
+  /* Bordure des champs : contraste WCAG 1.4.11 ≥ 3:1 sur le fond du champ et la carte. */
+  --ds-input-border: #8B5CF6;
   /* Accents violets/lavande */
   --ds-primary: #8B5CF6;
   --ds-primary-2: #A78BFA;
