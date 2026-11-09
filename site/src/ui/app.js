@@ -26,6 +26,33 @@ import { getAuthClient } from '../auth/client.js';
 import { NOT_ALLOWED, createAuthService, parseAuthLink } from '../auth/service.js';
 
 const root = document.getElementById('app');
+
+// Thème persistant : sombre par défaut pour ne pas modifier l'apparence historique.
+const THEME_KEY = 'auditia-theme';
+function readThemePreference() {
+  try {
+    const saved = localStorage.getItem(THEME_KEY);
+    return saved === 'light' || saved === 'dark' ? saved : 'dark';
+  } catch {
+    return 'dark';
+  }
+}
+function applyTheme(theme, persist = true) {
+  const selected = theme === 'light' ? 'light' : 'dark';
+  document.documentElement.dataset.theme = selected;
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute('content', selected === 'light' ? '#F7F5FC' : '#12052B');
+  if (persist) {
+    try { localStorage.setItem(THEME_KEY, selected); } catch { /* stockage indisponible : thème conservé pour la session */ }
+  }
+  root.querySelectorAll('[data-theme-toggle]').forEach(button => {
+    const next = selected === 'light' ? 'dark' : 'light';
+    button.textContent = next === 'light' ? '☀️ Thème clair' : '🌙 Thème sombre';
+    button.setAttribute('aria-label', next === 'light' ? 'Passer au thème clair' : 'Passer au thème sombre');
+    button.setAttribute('aria-pressed', String(selected === 'light'));
+  });
+}
+applyTheme(readThemePreference(), false);
 const wide = window.matchMedia('(min-width: 900px)');
 const TITLES = Object.fromEntries(NAV.map(n => [n.id, n.label]));
 const state = {
@@ -255,6 +282,11 @@ async function onReset(e) {
 /* ---------- Événements (délégation sur la racine) ---------- */
 root.addEventListener('click', event => {
   const t = event.target;
+  const themeButton = t.closest('[data-theme-toggle]');
+  if (themeButton) {
+    applyTheme(document.documentElement.dataset.theme === 'light' ? 'dark' : 'light');
+    return;
+  }
   if (landingClick(t, root)) return; // page d'accueil publique : défilement et menu
   const go = t.closest('[data-go]');
   if (go) { showAuth(go.dataset.go); return; }
