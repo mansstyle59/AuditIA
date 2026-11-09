@@ -72,6 +72,27 @@ test("un identifiant Google Places permet d’utiliser les données Google réel
   assert.ok(titles.includes("Publier des “posts” Google si vous gérez la fiche"));
 });
 
+test("le numéro Google et le lien téléphonique du site sont deux mesures distinctes", () => {
+  const client = { name: "Commerce test", details: { place_id: "ChIJfixture", googlePhone: "+33400000000", googlePhoneCheckedAt: "2026-11-09T09:00:00Z" } };
+  const audit = { site: { pageRead: true, tel: [] } };
+  const diagnostic = visibilityAudit(audit, client);
+  const googlePhone = item(diagnostic, "Téléphone présent sur la fiche Google");
+  const siteTel = item(diagnostic, "Lien téléphone cliquable sur le site (tel:)");
+
+  assert.equal(googlePhone?.measured, true);
+  assert.equal(googlePhone?.ok, true);
+  assert.equal(googlePhone?.source, "Google Places");
+  assert.equal(siteTel?.measured, true);
+  assert.equal(siteTel?.ok, false);
+  assert.match(siteTel?.advice || "", /Aucun lien tel:/);
+});
+
+test("un échec de lecture Google Places ne devient pas une preuve d’absence de téléphone", () => {
+  const diagnostic = visibilityAudit({}, { details: { place_id: "ChIJfixture" } });
+  const phone = item(diagnostic, "Téléphone présent sur la fiche Google");
+  assert.equal(phone?.measured, false);
+});
+
 test("le contrôle HTTPS décrit uniquement le protocole de l’URL, pas la validité TLS", () => {
   const httpsDiagnostic = visibilityAudit({}, { website: "https://example.test" });
   const httpsItem = item(httpsDiagnostic, "Adresse du site en HTTPS");
