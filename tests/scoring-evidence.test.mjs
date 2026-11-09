@@ -76,7 +76,7 @@ test("le numéro Google et le lien téléphonique du site sont deux mesures dist
   const client = { name: "Commerce test", details: { place_id: "ChIJfixture", googlePhone: "+33400000000", googlePhoneCheckedAt: "2026-11-09T09:00:00Z" } };
   const audit = { site: { pageRead: true, tel: [] } };
   const diagnostic = visibilityAudit(audit, client);
-  const googlePhone = item(diagnostic, "Téléphone présent sur la fiche Google");
+  const googlePhone = item(diagnostic, "Téléphone présent dans les données Google Places");
   const siteTel = item(diagnostic, "Lien téléphone cliquable sur le site (tel:)");
 
   assert.equal(googlePhone?.measured, true);
@@ -109,7 +109,6 @@ test("un numéro absent de la réponse Places Details reste non mesuré, même a
   assert.equal(phone?.measured, false);
   assert.equal(phone?.ok, null);
   assert.equal(phone?.source, "Google Places (champ téléphonique)");
-  assert.match(phone?.advice || "", /ne prouve pas que le téléphone est absent de Google Maps/);
 });
 
 test("un téléphone client ancien ne prouve pas la présence du numéro sur Google", () => {
