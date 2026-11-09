@@ -127,6 +127,8 @@ jobs:
         run: node --test tests/business-profile.test.mjs
       - name: Test Bureau agents and tasks
         run: node --test tests/bureau-store.test.mjs tests/registry-prospects.test.mjs
+      - name: Test Bureau home metrics
+        run: node --test tests/home-metrics.test.mjs
       - name: Validate CSS syntax
         shell: bash
         run: |

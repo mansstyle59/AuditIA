@@ -90,6 +90,7 @@ export function createAgent(store, { name, cat, role }) {
     status: 'idle',
     current: null,
     tasks: [],
+    created: Date.now(),
   };
   store.agents.push(agent);
   return { ok: true, agent };

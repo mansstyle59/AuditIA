@@ -1,6 +1,6 @@
 // AuditIA — Bureau : état de l'écran, actions et tâche de fond des agents.
 // Les règles sont dans bureau-store.js ; l'affichage dans views/bureau.js.
-import { emptyStore, loadStore, saveStore, createAgent, addTask, findTask, removeTask, removeAgent, setAgentStatus, tick, messageFor, finishSearch, failSearch, setFoundStatus } from './bureau-store.js';
+import { emptyStore, loadStore, saveStore, counts, createAgent, addTask, findTask, removeTask, removeAgent, setAgentStatus, tick, messageFor, finishSearch, failSearch, setFoundStatus } from './bureau-store.js';
 import { shellHtml, chipsHtml, cardHtml, agentsHtml, readyHtml, pipeHtml, foundHtml, updateScene } from './views/bureau.js';
 import { findCandidates, isKnownClient } from '../data/registry-prospects.js';
 import { insertClient } from '../data/queries.js';
@@ -65,7 +65,7 @@ export function createBureauController({ getUser, getData, getView, rerender, ge
       } finally {
         running.delete(t.id);
       }
-      if (owner === o) { save(); if (getView() === 'bureau') refresh(); }
+      if (owner === o) { save(); const v = getView(); if (v === 'bureau' || v === 'messages') refresh(); else if (v === 'home') rerender(); }
     }
   }
 
@@ -101,7 +101,9 @@ export function createBureauController({ getUser, getData, getView, rerender, ge
     if (!owner) return;
     if (tick(store, clients())) {
       save();
-      if (getView() === 'bureau') refresh();
+      const v = getView();
+      if (v === 'bureau' || v === 'messages') refresh();
+      else if (v === 'home') rerender(); // le bureau de l'accueil suit les agents au poste
     }
     runSearches();
   }, 5000);
@@ -115,9 +117,32 @@ export function createBureauController({ getUser, getData, getView, rerender, ge
       if (!ensure()) return;
       refresh();
     },
+    // Accueil : agents, sélection et clients (lecture seule)
+    homeContext() {
+      if (!ensure()) return null;
+      return { store, sel };
+    },
+    // Page « Messages » : seulement la liste des messages prêts à relire
+    messagesHtml() {
+      if (!ensure()) return '';
+      return `<div class="bu">
+        <section class="ds-card bu-panel" aria-labelledby="bu-h-ready">
+          <h2 class="ds-card__title" id="bu-h-ready">Messages prêts à relire</h2>
+          <p class="bu-why">Messages d’accroche préparés par vos agents. Relisez-les avant tout envoi : rien n’est envoyé automatiquement.</p>
+          <div class="bu-list" id="bu-ready"></div>
+        </section>
+        <p class="bu-msg" id="bu-msg" role="status" aria-live="polite"></p>
+      </div>`;
+    },
+    readyCount() {
+      if (!ensure()) return 0;
+      return counts(store, clients()).ready;
+    },
     reset() { owner = null; store = emptyStore(); sel = null; pendingDel = null; },
     onClick(t) {
       if (!getUser()) return false;
+      const home = t.closest('[data-home-agent]');
+      if (home) { if (ensure()) { sel = home.dataset.homeAgent; rerender(); } return true; }
       const pin = t.closest('[data-bu-agent]');
       if (pin) { if (ensure()) { sel = pin.dataset.buAgent; refresh(); } return true; }
       const btn = t.closest('[data-bu-act]');

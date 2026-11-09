@@ -4,10 +4,11 @@
 // Lot 3 : section Prospects (recherche de commerces, commerces proches, ajout manuel avec contrôle des doublons).
 // Lot 4 : audits complets (lancement, progression réelle, dossier d'audit avec score, plan d'action et recommandations).
 // Lot 5 : rapports PDF et graphiques. Lot 6 : réglages (profil, marque, état des services).
-import { NAV, emptyState, spinnerCard, errorCard } from './components/ui.js';
+import { NAV, emptyState, spinnerCard, errorCard, btn } from './components/ui.js';
 import { mobileShell } from './layout-mobile.js';
 import { desktopShell } from './layout-desktop.js';
-import { homeMobile, homeDesktop } from './views/home.js';
+import { bureauHomeMobile, bureauHomeDesktop, homeHeaderExtra, HOME_SUBTITLE } from './views/bureau-home.js';
+import { DEFAULT_PERIOD, PERIODS } from '../data/home-metrics.js';
 import { clientsView, clientsResultsHtml } from './views/clients.js';
 import { clientDetailView } from './views/client-detail.js';
 import { createSearchController } from './search-controller.js';
@@ -42,7 +43,7 @@ function applyTheme(theme, persist = true) {
   const selected = theme === 'light' ? 'light' : 'dark';
   document.documentElement.dataset.theme = selected;
   const meta = document.querySelector('meta[name="theme-color"]');
-  if (meta) meta.setAttribute('content', selected === 'light' ? '#F7F5FC' : '#12052B');
+  if (meta) meta.setAttribute('content', selected === 'light' ? '#F7F5FC' : '#0A0326');
   if (persist) {
     try { localStorage.setItem(THEME_KEY, selected); } catch { /* stockage indisponible : thème conservé pour la session */ }
   }
@@ -60,11 +61,11 @@ const state = {
   user: null, view: 'home', clientId: null, recoveryShown: false,
   auditId: null,
   data: { status: 'idle', clients: [], audits: [], error: '' },
-  ui: { q: '', tier: '', sort: 'urgence' }, // filtres de la liste des clients
+  ui: { q: '', tier: '', sort: 'urgence', period: DEFAULT_PERIOD }, // filtres de la liste des clients et période du bureau
   brand: defaultBrand(), // marque enregistrée (réglages) ; marque par défaut si absente
   gen: 0, // numéro de chargement : un résultat périmé (déconnexion, nouveau chargement) est ignoré
 };
-const LIVE_VIEWS = ['home', 'clients', 'client', 'prospects', 'bureau', 'audits', 'audit'];
+const LIVE_VIEWS = ['home', 'clients', 'client', 'prospects', 'bureau', 'messages', 'audits', 'audit'];
 
 // Les e-mails de réinitialisation renvoient vers la racine du site (ancienne interface incluse).
 // Pour qu'ils reviennent sur cette page, l'URL devrait être autorisée dans Supabase (réglage distant, non modifié ici).
@@ -115,7 +116,7 @@ const bureau = createBureauController({
   getUser: () => state.user,
   getData: () => state.data,
   getView: () => state.view,
-  rerender: () => { if (state.user && state.view === 'bureau') renderWorkspace(); },
+  rerender: () => { if (state.user && ['bureau', 'home', 'messages'].includes(state.view)) renderWorkspace(); },
   getSupabase: () => getAuthClient(),
   reload: silentReload,
 });
@@ -154,11 +155,25 @@ function busy(btn, on, label) {
 const val = id => (document.getElementById(id)?.value || '').trim();
 
 /* ---------- Espace protégé ---------- */
+const COMING = {
+  rapports: {
+    title: 'Rapports',
+    text: 'Les rapports PDF se préparent depuis le dossier de chaque audit : aperçu, téléchargement et partage. Une page de synthèse de tous vos rapports arrive bientôt.',
+    action: { label: 'Voir les audits', nav: 'audits' },
+  },
+  devis: { title: 'Devis & Offres', text: 'La création de devis et d’offres n’est pas encore disponible dans AuditIA. Elle sera ajoutée prochainement.' },
+  formations: { title: 'Formations', text: 'Les formations ne sont pas encore disponibles dans AuditIA. Elles seront ajoutées prochainement.' },
+};
 function placeholder() {
-  return emptyState({
-    title: 'Section non branchée',
-    text: "Cette section sera branchée aux prochains lots. Pour l'instant, utilisez l'interface actuelle.",
-  });
+  const c = COMING[state.view];
+  if (!c) {
+    return emptyState({
+      title: 'Section non branchée',
+      text: "Cette section sera branchée aux prochains lots. Pour l'instant, utilisez l'interface actuelle.",
+    });
+  }
+  return emptyState({ title: c.title + ' — bientôt disponible', text: c.text })
+    + (c.action ? `<div class="ds-d-actions">${btn({ label: c.action.label, variant: 'primary', attrs: `data-nav="${c.action.nav}"` })}</div>` : '');
 }
 
 function bodyFor(isWide) {
@@ -175,6 +190,7 @@ function bodyFor(isWide) {
   if (state.view === 'clients') return clientsView(d, state.ui);
   if (state.view === 'prospects') return search.html();
   if (state.view === 'bureau') return bureau.html();
+  if (state.view === 'messages') return bureau.messagesHtml();
   if (state.view === 'audits') return auditsView(d, audits.filter(), audits.notice(), audits.snapshot());
   if (state.view === 'audit') {
     const a = d.audits.find(x => String(x.id) === String(state.auditId));
@@ -182,7 +198,10 @@ function bodyFor(isWide) {
     state.view = 'audits'; // dossier introuvable (supprimé ?) : retour à la liste
     return auditsView(d, audits.filter(), audits.notice(), audits.snapshot());
   }
-  return isWide ? homeDesktop(d) : homeMobile(d);
+  const hc = bureau.homeContext();
+  if (!hc) return '';
+  const ctx = { data: d, store: hc.store, sel: hc.sel, period: state.ui.period };
+  return isWide ? bureauHomeDesktop(ctx) : bureauHomeMobile(ctx);
 }
 
 function renderWorkspace() {
@@ -191,14 +210,22 @@ function renderWorkspace() {
   const body = bodyFor(isWide);
   const active = state.view === 'client' ? 'clients' : state.view === 'audit' ? 'audits' : state.view;
   const title = state.view === 'client' ? 'Fiche client' : state.view === 'audit' ? 'Dossier d’audit' : TITLES[state.view];
+  const isHome = state.view === 'home';
   const params = { title, active, body, brand: state.brand };
   root.innerHTML = isWide
-    ? desktopShell({ ...params, account: { email: state.user.email || '' } })
-    : mobileShell(params);
+    ? desktopShell({
+      ...params,
+      subtitle: isHome ? HOME_SUBTITLE.desktop : '',
+      headerExtra: isHome && state.data.status === 'ready' ? homeHeaderExtra(state.ui.period) : '',
+      account: { email: state.user.email || '' },
+      badges: { messages: state.data.status === 'ready' ? bureau.readyCount() : 0 },
+      search: state.view === 'clients' ? state.ui.q : '',
+    })
+    : mobileShell({ ...params, subtitle: isHome ? HOME_SUBTITLE.mobile : '' });
   document.documentElement.dataset.layout = isWide ? 'desktop' : 'mobile';
   paintBrand(state.brand, root);
   if (state.view === 'prospects' && state.data.status === 'ready') search.mounted();
-  if (state.view === 'bureau' && state.data.status === 'ready') bureau.mounted();
+  if ((state.view === 'bureau' || state.view === 'messages') && state.data.status === 'ready') bureau.mounted();
 }
 
 // Chargement des clients et des audits (lecture seule). Un résultat arrivé après une déconnexion est ignoré.
@@ -231,7 +258,7 @@ function enter(user) {
   state.user = user;
   state.view = 'home';
   state.clientId = null;
-  state.ui = { q: '', tier: '', sort: 'urgence' };
+  state.ui = { q: '', tier: '', sort: 'urgence', period: DEFAULT_PERIOD };
   search.reset();
   report.close(); audits.reset(); settings.reset(); bing.reset(); bureau.reset();
   window.scrollTo(0, 0);
@@ -331,7 +358,13 @@ root.addEventListener('click', event => {
   const chip = t.closest('[data-client-chip]');
   if (chip) { state.ui.q = chip.dataset.clientChip; refreshClientResults(); return; }
   const nav = t.closest('[data-nav]');
-  if (nav) { state.view = nav.dataset.nav; if (state.view === 'settings') settings.open(); renderWorkspace(); window.scrollTo(0, 0); }
+  if (nav) {
+    state.view = nav.dataset.nav;
+    if (state.view === 'settings') settings.open();
+    renderWorkspace();
+    const anchor = nav.dataset.navAnchor && document.getElementById(nav.dataset.navAnchor);
+    if (anchor) anchor.scrollIntoView({ block: 'start' }); else window.scrollTo(0, 0);
+  }
 });
 
 // Recherche et tri des clients : seuls les résultats sont recomposés, le champ garde le focus
@@ -343,11 +376,23 @@ root.addEventListener('input', event => {
   search.onInput(event.target);
 });
 root.addEventListener('change', event => {
-  if (state.user && event.target.matches('[data-client-sort]')) { state.ui.sort = event.target.value; refreshClientResults(); }
+  if (state.user && event.target.matches('[data-client-sort]')) { state.ui.sort = event.target.value; refreshClientResults(); return; }
+  if (state.user && event.target.matches('[data-home-period]')) {
+    if (PERIODS.some(p => p.id === event.target.value)) { state.ui.period = event.target.value; renderWorkspace(); }
+  }
 });
 
 root.addEventListener('submit', event => {
   const id = event.target.id;
+  if (state.user && event.target.matches('[data-global-search]')) {
+    // Recherche de la barre du haut : ouvre la liste des clients déjà filtrée
+    event.preventDefault();
+    state.ui.q = String(new FormData(event.target).get('q') || '').trim();
+    state.view = 'clients';
+    renderWorkspace();
+    window.scrollTo(0, 0);
+    return;
+  }
   if (state.user && search.onSubmit(event.target)) { event.preventDefault(); return; }
   if (state.user && settings.onSubmit(event.target)) { event.preventDefault(); return; }
   if (id === 'fSignin') onSignin(event);

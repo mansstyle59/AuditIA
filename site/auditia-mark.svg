@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="AuditIA">
+  <defs>
+    <linearGradient id="g" x1="0.2" y1="0" x2="0.55" y2="1">
+      <stop offset="0" stop-color="#8FA2FF"/>
+      <stop offset="0.45" stop-color="#9A6BFF"/>
+      <stop offset="1" stop-color="#D23CF2"/>
+    </linearGradient>
+    <linearGradient id="t" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#C25BFF"/>
+      <stop offset="1" stop-color="#9B35E8"/>
+    </linearGradient>
+  </defs>
+  <path d="M50 17 L22.5 80" fill="none" stroke="url(#g)" stroke-width="19" stroke-linecap="round"/>
+  <path d="M50 17 L77.5 80" fill="none" stroke="url(#g)" stroke-width="19" stroke-linecap="round"/>
+  <path d="M36.5 63 L63.5 63 L61.5 72 Q61 74 59 74 L34 74 Q32 74 32.6 72 Z" fill="url(#t)" opacity=".95"/>
+</svg>

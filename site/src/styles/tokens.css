@@ -2,10 +2,10 @@
    Le thème sombre reste le défaut afin de préserver l'expérience actuelle. */
 :root {
   /* Fonds : violet nuit */
-  --ds-bg-0: #12052B;
-  --ds-bg-1: #1A0838;
-  --ds-bg-2: #241048;
-  --ds-bg-3: #2F1760;
+  --ds-bg-0: #0A0326;
+  --ds-bg-1: #12063A;
+  --ds-bg-2: #1A0B4E;
+  --ds-bg-3: #261266;
   /* Surfaces : cartes sombres opaques */
   --ds-surface: #2A1458;
   --ds-surface-2: #341A6B;
@@ -37,7 +37,7 @@
   --ds-err-bg: #4A1230;  --ds-err-fg: #FFE1E6;  --ds-err-fg-2: #FFC2CB;
   --ds-on-good: #04210F; --ds-on-warn: #2B1C00;  --ds-on-danger: #3A0712;
   /* Dégradés */
-  --ds-grad-bg: linear-gradient(180deg, #1A0838 0%, #12052B 100%);
+  --ds-grad-bg: radial-gradient(120% 55% at 78% 0%, #3B1A98 0%, rgba(59, 26, 152, 0) 62%), linear-gradient(180deg, #12063A 0%, #0A0326 100%);
   --ds-grad-hero: linear-gradient(135deg, #3A1B7E 0%, #2A1260 45%, #1A0838 100%);
   --ds-grad-cta: linear-gradient(135deg, #7B3FE4 0%, #6D28D9 55%, #5B21B6 100%);
   --ds-grad-text: linear-gradient(90deg, #C9A8FF 0%, #E0B8FF 100%);

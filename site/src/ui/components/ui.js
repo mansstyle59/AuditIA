@@ -2,15 +2,28 @@
 // Aucun appel réseau, aucune logique métier : uniquement de l'affichage.
 import { escHtml } from '../../core/utils.js';
 
-// Entrées de navigation partagées par les deux coquilles (mobile et ordinateur)
-export const NAV = [
+// Navigation mobile (barre du bas) et ordinateur (barre latérale) : deux listes distinctes, comme les deux maquettes.
+export const NAV_MOBILE = [
   { id: 'home', label: 'Accueil', icon: 'home' },
   { id: 'clients', label: 'Clients', icon: 'users' },
   { id: 'audits', label: 'Audits', icon: 'file' },
   { id: 'prospects', label: 'Prospects', icon: 'target' },
-  { id: 'bureau', label: 'Bureau', icon: 'agents' },
   { id: 'settings', label: 'Réglages', icon: 'settings' },
 ];
+export const NAV_DESKTOP = [
+  { id: 'home', label: 'Bureau', icon: 'home' },
+  { id: 'audits', label: 'Audits', icon: 'file' },
+  { id: 'clients', label: 'Clients', icon: 'users' },
+  { id: 'prospects', label: 'Prospects', icon: 'target' },
+  { id: 'bureau', label: 'Agents IA', icon: 'bot' },
+  { id: 'messages', label: 'Messages', icon: 'chat' },
+  { id: 'rapports', label: 'Rapports', icon: 'chart' },
+  { id: 'devis', label: 'Devis & Offres', icon: 'quote' },
+  { id: 'formations', label: 'Formations', icon: 'cap' },
+  { id: 'settings', label: 'Réglages', icon: 'settings' },
+];
+// Titres de page (toutes les sections)
+export const NAV = [...NAV_DESKTOP];
 
 const ICONS = {
   home: '<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
@@ -19,6 +32,23 @@ const ICONS = {
   target: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>',
   agents: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M19.5 20a6.5 6.5 0 0 0-2.5-5.1"/>',
   settings: '<path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/>',
+  bot: '<rect x="4" y="8" width="16" height="12" rx="3"/><path d="M12 8V4M9 3.5h6"/><circle cx="9" cy="14" r="1.2"/><circle cx="15" cy="14" r="1.2"/><path d="M2 13v3M22 13v3"/>',
+  chat: '<path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H10l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/><path d="M8 10h.01M12 10h.01M16 10h.01"/>',
+  chart: '<path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/>',
+  quote: '<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/><path d="M8 17l2-3 2 2 3-4"/>',
+  cap: '<path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11.5V16c0 1.5 3 3 6 3s6-1.5 6-3v-4.5"/><path d="M22 9v6"/>',
+  search: '<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>',
+  bell: '<path d="M6 17V11a6 6 0 0 1 12 0v6l2 2H4z"/><path d="M10 21h4"/>',
+  calendar: '<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  arrow: '<path d="M5 12h14M13 6l6 6-6 6"/>',
+  check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+  chevron: '<path d="M6 9l6 6 6-6"/>',
+  up: '<path d="M12 19V5M6 11l6-6 6 6"/>',
+  mail: '<rect x="3" y="5" width="18" height="14" rx="3"/><path d="M3 8l9 6 9-6"/>',
+  userplus: '<circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 13-3.5"/><path d="M19 8v6M16 11h6"/>',
+  crown: '<path d="M3 8l4.5 4L12 5l4.5 7L21 8l-2 11H5z"/>',
+  bars: '<path d="M6 20V13M12 20V6M18 20v-9"/>',
 };
 
 export function icon(name) {
