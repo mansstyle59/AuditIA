@@ -17,6 +17,7 @@ import { auditsView, auditDossierView } from './views/audits.js';
 import { createSettingsController } from './settings-controller.js';
 import { createBingController } from './bing-controller.js';
 import { createBureauController } from './bureau-controller.js';
+import { bureauFabHtml } from './views/bureau.js';
 import { authScreen, authLoading, authError } from './screens/auth.js';
 import { landingClick } from './screens/landing.js';
 import { loadWorkspaceData, dataErrorMessage } from '../data/queries.js';
@@ -29,6 +30,7 @@ import { NOT_ALLOWED, createAuthService, parseAuthLink } from '../auth/service.j
 const root = document.getElementById('app');
 const wide = window.matchMedia('(min-width: 900px)');
 const TITLES = Object.fromEntries(NAV.map(n => [n.id, n.label]));
+TITLES.bureau = 'Bureau'; // hors du menu : accessible par la bulle
 const state = {
   user: null, view: 'home', clientId: null, recoveryShown: false,
   auditId: null,
@@ -166,6 +168,7 @@ function renderWorkspace() {
   root.innerHTML = isWide
     ? desktopShell({ ...params, account: { email: state.user.email || '' } })
     : mobileShell(params);
+  if (state.view !== 'bureau') root.insertAdjacentHTML('beforeend', bureauFabHtml());
   document.documentElement.dataset.layout = isWide ? 'desktop' : 'mobile';
   paintBrand(state.brand, root);
   if (state.view === 'prospects' && state.data.status === 'ready') search.mounted();
