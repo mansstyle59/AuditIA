@@ -115,6 +115,7 @@ const CATEGORY_BY_CRITERION = {
   'Fiche Google/Maps associée': 'google',
   'Établissement identifié dans Google Places': 'google',
   'Horaires renseignés': 'google',
+  'Téléphone présent dans les données Google Places': 'google',
   'Téléphone visible': 'google',
   'Photos sur la fiche Google': 'google',
   'Note Google': 'reputation',
