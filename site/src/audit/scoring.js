@@ -222,7 +222,7 @@ export function visibilityAudit(a,c){
        if(googlePlaceId&&d.hours!=null) add('seo','Horaires renseignés',hours,5,'Aucun horaire n’est présent dans les données récupérées. Vérifier la fiche publique avant de conclure.','Horaires présents dans les données récupérées.',null,'Google Places');
       else add('seo','Horaires renseignés',null,5,'Les horaires n’ont pas été récupérés.','Horaires disponibles.',null,'Fiche commerce');
       const googlePhone = googlePlaceId ? String(d.googlePhone !== undefined ? d.googlePhone || '' : d.phone || phone || '').trim() : '';
-      const phoneMeasured = googlePlaceId ? (googlePhone ? true : false) : (phone ? true : null);
+      const phoneMeasured = googlePhone ? true : d.googlePhoneCheckedAt ? false : (googlePlaceId && phone ? true : null);
       add('seo','Téléphone présent sur la fiche Google',phoneMeasured,5,
         googlePlaceId ? 'Google Places n’a pas fourni de numéro pour la fiche associée. Vérifier le numéro dans Google Maps avant de conclure.' : 'Aucun numéro n’est enregistré dans AuditIA. La fiche Google n’a pas été vérifiée pendant cette analyse.',
         googlePhone ? 'Numéro reçu depuis Google Places.' : phone ? 'Numéro enregistré dans la fiche client, source Google non confirmée.' : 'Numéro disponible.',null,
