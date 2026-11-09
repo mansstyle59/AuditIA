@@ -221,12 +221,14 @@ export function visibilityAudit(a,c){
       else add('seo','Volume d’avis',null,10,'Le nombre d’avis n’est pas disponible.','Nombre d’avis disponible.',null,'Google Places');
        if(googlePlaceId&&d.hours!=null) add('seo','Horaires renseignés',hours,5,'Aucun horaire n’est présent dans les données récupérées. Vérifier la fiche publique avant de conclure.','Horaires présents dans les données récupérées.',null,'Google Places');
       else add('seo','Horaires renseignés',null,5,'Les horaires n’ont pas été récupérés.','Horaires disponibles.',null,'Fiche commerce');
-      const googlePhone = googlePlaceId ? String(d.googlePhone !== undefined ? d.googlePhone || '' : d.phone || phone || '').trim() : '';
-      const phoneMeasured = googlePhone ? true : d.googlePhoneCheckedAt ? false : (googlePlaceId && phone ? true : null);
-      add('seo','Téléphone présent sur la fiche Google',phoneMeasured,5,
-        googlePlaceId ? 'Google Places n’a pas fourni de numéro pour la fiche associée. Vérifier le numéro dans Google Maps avant de conclure.' : 'Aucun numéro n’est enregistré dans AuditIA. La fiche Google n’a pas été vérifiée pendant cette analyse.',
-        googlePhone ? 'Numéro reçu depuis Google Places.' : phone ? 'Numéro enregistré dans la fiche client, source Google non confirmée.' : 'Numéro disponible.',null,
-        googlePlaceId ? 'Google Places' : 'Fiche client (non vérifiée)');
+      // Seul le champ explicitement reçu de Google Places confirme la présence du téléphone.
+      // L’absence du champ dans Places Details ne prouve PAS que le numéro est absent de Google Maps/GBP.
+      const googlePhone = googlePlaceId && d.googlePhone != null ? String(d.googlePhone).trim() : '';
+      const phoneMeasured = googlePhone ? true : null;
+      add('seo','Téléphone présent dans les données Google Places',phoneMeasured,5,
+        'Google Places n’a pas retourné de numéro pour cette fiche. Cela ne prouve pas que le téléphone est absent de Google Maps : contrôle manuel nécessaire.',
+        'Numéro reçu dans la réponse Google Places.',null,
+        googlePlaceId ? 'Google Places (champ téléphonique)' : 'Google Places non associé');
       if(page) add('seo','Lien téléphone cliquable sur le site (tel:)',Array.isArray(si.tel)?si.tel.length>0:null,4,
         'Aucun lien tel: n’a été détecté dans la page analysée. Le numéro peut toutefois être affiché en texte simple ou sur une autre page.',
         'Lien tel: détecté sur la page analysée.',null,'Lecture du site');
