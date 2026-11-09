@@ -152,3 +152,11 @@
     );
   }
 }
+
+/* Contrôle du thème : accessible, compact et compatible avec l'en-tête iOS opaque. */
+.ds-m-header__top { display:flex; align-items:center; justify-content:space-between; gap:var(--ds-s-3); min-width:0; }
+.ds-m-header__top .ds-m-brand { min-width:0; overflow-wrap:anywhere; }
+.ds-theme-toggle { flex:0 0 auto; min-height:40px; padding:var(--ds-s-2) var(--ds-s-3); font-size:var(--ds-fs-xs); white-space:nowrap; }
+@media (max-width:380px) {
+  .ds-theme-toggle { padding:var(--ds-s-2); font-size:0.75rem; }
+}
