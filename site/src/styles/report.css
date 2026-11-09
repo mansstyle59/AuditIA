@@ -35,7 +35,7 @@ html.rp-lock, html.rp-lock body { overflow: hidden; }
 .rp-tile { display: grid; gap: 2px; padding: var(--ds-s-3) var(--ds-s-3); border-radius: var(--ds-r-sm); background: #F4F0FE; border: 1px solid #D9D2EE; border-left: 5px solid #6B6386; }
 .rp-tile--good { border-left-color: #15803D; } .rp-tile--warn { border-left-color: #B45309; } .rp-tile--bad { border-left-color: #B91C1C; }
 .rp-tile__l { font-size: .8125rem; font-weight: 700; color: #5B5173; text-transform: uppercase; letter-spacing: .03em; }
-.rp-tile b { font-size: 1.5rem; line-height: 1.2; } .rp-tile--good b { color: #15803D; } .rp-tile--warn b { color: #B45309; } .rp-tile--bad b { color: #B91C1C; }
+.rp-tile b { font-size: 1.5rem; line-height: 1.2; } .rp-tile--good b { color: #166534; } .rp-tile--warn b { color: #92400E; } .rp-tile--bad b { color: #B91C1C; }
 .rp-tile__s { font-size: .875rem; color: #5B5173; }
 .rp-pill { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: .8125rem; font-weight: 700; line-height: 1.5; background: #E6DEFB; color: #1E1536; border: 1px solid #D9D2EE; white-space: nowrap; }
 .rp-pill--good { background: #15803D; color: #FFFFFF; border-color: #15803D; } .rp-pill--warn { background: #B45309; color: #FFFFFF; border-color: #B45309; } .rp-pill--bad { background: #B91C1C; color: #FFFFFF; border-color: #B91C1C; }
