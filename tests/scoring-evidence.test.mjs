@@ -81,7 +81,7 @@ test("le numéro Google et le lien téléphonique du site sont deux mesures dist
 
   assert.equal(googlePhone?.measured, true);
   assert.equal(googlePhone?.ok, true);
-  assert.equal(googlePhone?.source, "Google Places");
+  assert.equal(googlePhone?.source, "Google Places (champ téléphonique)");
   assert.equal(siteTel?.measured, true);
   assert.equal(siteTel?.ok, false);
   assert.match(siteTel?.advice || "", /Aucun lien tel:/);
@@ -89,7 +89,7 @@ test("le numéro Google et le lien téléphonique du site sont deux mesures dist
 
 test("un échec de lecture Google Places ne devient pas une preuve d’absence de téléphone", () => {
   const diagnostic = visibilityAudit({}, { details: { place_id: "ChIJfixture" } });
-  const phone = item(diagnostic, "Téléphone présent sur la fiche Google");
+  const phone = item(diagnostic, "Téléphone présent dans les données Google Places");
   assert.equal(phone?.measured, false);
 });
 
