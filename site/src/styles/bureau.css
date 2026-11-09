@@ -94,6 +94,10 @@
 .bu-progress i { display: block; height: 100%; border-radius: inherit; background: var(--ds-grad-cta); transition: width 300ms ease; }
 .bu-card__actions { display: flex; flex-wrap: wrap; gap: var(--ds-s-2); }
 .bu-tasks { display: grid; gap: var(--ds-s-2); }
+.bu-confirm { display: grid; gap: var(--ds-s-2); padding: var(--ds-s-3); border: 1px solid var(--ds-danger); border-radius: var(--ds-r-sm); background: var(--ds-err-bg); }
+.bu-danger { color: var(--ds-danger); }
+.bu-danger:hover, .bu-danger:focus-visible { outline: 2px solid var(--ds-danger); outline-offset: 2px; }
+.bu-danger:active { opacity: .85; }
 
 /* Tâches et listes */
 .bu-cols { display: grid; gap: var(--ds-s-4); align-items: start; }
