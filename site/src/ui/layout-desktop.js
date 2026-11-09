@@ -19,7 +19,7 @@ export function desktopShell({ title, active, body, account = null, brand = null
     </aside>
     <main class="ds-d-main" id="contenu">
       <div class="ds-d-inner">
-        <header class="ds-d-header"><h1 class="ds-d-title">${escHtml(title)}</h1></header>
+        <header class="ds-d-header"><h1 class="ds-d-title">${escHtml(title)}</h1><button type="button" class="ds-btn ds-theme-toggle" data-theme-toggle aria-label="Passer au thème clair">☀️ Thème clair</button></header>
         ${body}
       </div>
     </main>

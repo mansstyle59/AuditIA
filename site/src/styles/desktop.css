@@ -131,3 +131,7 @@
   .ds-d-split > .ds-d-stack + .ds-d-stack .ds-row--btn { flex-wrap: wrap; row-gap: var(--ds-s-1); }
   .ds-d-split > .ds-d-stack + .ds-d-stack .ds-row__main { flex: 1 1 9rem; min-width: 0; }
 }
+
+/* Contrôle du thème dans l'en-tête desktop. */
+.ds-d-header .ds-theme-toggle { flex:0 0 auto; }
+.ds-d-header { flex-wrap:wrap; }

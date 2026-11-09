@@ -1,5 +1,5 @@
 /* AuditIA — design system v3 : palette AuditIA d'origine, affinée avec les accents FormIA.
-   Contraste sombre conservé : les composants existants sont conçus pour ce thème. */
+   Le thème sombre reste le défaut afin de préserver l'expérience actuelle. */
 :root {
   /* Fonds : violet nuit */
   --ds-bg-0: #12052B;
@@ -12,6 +12,8 @@
   --ds-surface-hi: #3F2280;
   --ds-line: #5B35A8;
   --ds-line-soft: #432487;
+  /* Bordure des champs : contraste WCAG 1.4.11 ≥ 3:1 sur le fond du champ et la carte. */
+  --ds-input-border: #8B5CF6;
   /* Accents violets/lavande */
   --ds-primary: #8B5CF6;
   --ds-primary-2: #A78BFA;
@@ -34,10 +36,9 @@
   --ds-warn-bg: #3A2A0B; --ds-warn-fg: #FFE9B8; --ds-warn-fg-2: #FFD7A0;
   --ds-err-bg: #4A1230;  --ds-err-fg: #FFE1E6;  --ds-err-fg-2: #FFC2CB;
   --ds-on-good: #04210F; --ds-on-warn: #2B1C00;  --ds-on-danger: #3A0712;
-  /* Dégradés : thème sombre d'origine, accents violets maîtrisés */
+  /* Dégradés */
   --ds-grad-bg: linear-gradient(180deg, #1A0838 0%, #12052B 100%);
   --ds-grad-hero: linear-gradient(135deg, #3A1B7E 0%, #2A1260 45%, #1A0838 100%);
-  /* CTA : stops suffisamment sombres pour conserver un texte blanc lisible (contraste WCAG AA). */
   --ds-grad-cta: linear-gradient(135deg, #7B3FE4 0%, #6D28D9 55%, #5B21B6 100%);
   --ds-grad-text: linear-gradient(90deg, #C9A8FF 0%, #E0B8FF 100%);
   --ds-grad-banner: linear-gradient(120deg, #4B2399 0%, #6B35C8 55%, #5A2DB3 100%);
@@ -45,7 +46,7 @@
   --ds-s-1: 4px;  --ds-s-2: 8px;  --ds-s-3: 12px; --ds-s-4: 16px;
   --ds-s-5: 20px; --ds-s-6: 24px; --ds-s-8: 32px; --ds-s-10: 40px;
   --ds-s-12: 48px; --ds-s-16: 64px;
-  /* Rayons d'origine */
+  /* Rayons */
   --ds-r-sm: 12px; --ds-r-md: 18px; --ds-r-lg: 24px; --ds-r-xl: 32px; --ds-r-pill: 999px;
   /* Typographie */
   --ds-font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Inter, "Helvetica Neue", Arial, sans-serif;
@@ -56,7 +57,7 @@
   --ds-fs-h3: 1.25rem;
   --ds-fs-h2: clamp(1.5rem, 1.1rem + 1.8vw, 2.125rem);
   --ds-fs-h1: clamp(2rem, 1.4rem + 3vw, 3.75rem);
-  /* Ombres thème sombre */
+  /* Ombres */
   --ds-shadow-card: 0 10px 28px rgba(8, 2, 24, 0.45);
   --ds-shadow-glow: 0 10px 30px rgba(139, 92, 246, 0.32);
   --ds-shadow-nav: 0 12px 32px rgba(8, 2, 24, 0.6);
@@ -65,10 +66,48 @@
   --ds-header-h: 64px;
   --ds-tabbar-h: 68px;
   --ds-container: 1240px;
-  /* Zones de sécurité iOS : marge visuelle supplémentaire du header mobile */
+  /* Zones de sécurité iOS */
   --ds-safe-top: env(safe-area-inset-top, 0px);
   --ds-safe-top-extra: 28px;
   --ds-safe-right: env(safe-area-inset-right, 0px);
   --ds-safe-bottom: env(safe-area-inset-bottom, 0px);
   --ds-safe-left: env(safe-area-inset-left, 0px);
+}
+
+/* Thème clair : surcharge uniquement des tokens, pour garder un rendu cohérent
+   sur toutes les vues qui utilisent le design system. */
+:root[data-theme="light"] {
+  color-scheme: light;
+  --ds-bg-0: #F7F5FC;
+  --ds-bg-1: #FFFFFF;
+  --ds-bg-2: #F1ECFA;
+  --ds-bg-3: #E8DFF8;
+  --ds-surface: #FFFFFF;
+  --ds-surface-2: #F5F1FC;
+  --ds-surface-hi: #EDE5FA;
+  --ds-line: #CFC1E9;
+  --ds-line-soft: #E4DCF2;
+  --ds-primary: #6D28D9;
+  --ds-primary-2: #6D28D9;
+  --ds-primary-deep: #5B21B6;
+  --ds-lavender: #5B21B6;
+  --ds-lavender-2: #4C1D95;
+  --ds-glow: #6D28D9;
+  --ds-text: #241638;
+  --ds-text-2: #3D3155;
+  --ds-muted: #5B5270;
+  --ds-on-light: #24104D;
+  --ds-on-light-2: #4B3A7A;
+  --ds-ok-bg: #DCFCE7; --ds-ok-fg: #166534; --ds-ok-fg-2: #14532D;
+  --ds-warn-bg: #FEF3C7; --ds-warn-fg: #92400E; --ds-warn-fg-2: #78350F;
+  --ds-err-bg: #FCE7F3; --ds-err-fg: #9D174D; --ds-err-fg-2: #831843;
+  --ds-on-good: #052E16; --ds-on-warn: #451A03; --ds-on-danger: #500724;
+  --ds-grad-bg: linear-gradient(180deg, #FFFFFF 0%, #F7F5FC 100%);
+  --ds-grad-hero: linear-gradient(135deg, #F1EAFE 0%, #E9E0FB 55%, #F7F5FC 100%);
+  --ds-grad-cta: linear-gradient(135deg, #7C3AED 0%, #6D28D9 55%, #5B21B6 100%);
+  --ds-grad-text: linear-gradient(90deg, #6D28D9 0%, #5B21B6 100%);
+  --ds-grad-banner: linear-gradient(120deg, #EDE5FA 0%, #E4D8F8 55%, #F1ECFA 100%);
+  --ds-shadow-card: 0 8px 24px rgba(44, 24, 84, 0.08);
+  --ds-shadow-glow: 0 8px 22px rgba(109, 40, 217, 0.18);
+  --ds-shadow-nav: 0 -8px 24px rgba(44, 24, 84, 0.12);
 }

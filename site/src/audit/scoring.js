@@ -115,6 +115,7 @@ const CATEGORY_BY_CRITERION = {
   'Fiche Google/Maps associée': 'google',
   'Établissement identifié dans Google Places': 'google',
   'Horaires renseignés': 'google',
+  'Téléphone présent dans les données Google Places': 'google',
   'Téléphone visible': 'google',
   'Photos sur la fiche Google': 'google',
   'Note Google': 'reputation',
@@ -205,11 +206,11 @@ export function visibilityAudit(a,c){
       const tier=(v,stops)=>{for(const st of stops){if(v>=st[0])return st[1];}return 0;};
       const items=[];
       // Un critère n'entre dans le calcul que si une source a fourni assez de données pour le mesurer.
-      const add=(pillar,label,observed,weight,bad,good,val,source)=>{
+      const add=(pillar,label,observed,weight,bad,good,val,source,unmeasuredReason)=>{
         const measured=observed!==null&&observed!==undefined;
         const ok=measured?!!observed:null;
         const v=measured?(val==null?(ok?1:0):Math.max(0,Math.min(1,Number(val)))):null;
-        items.push({pillar,label,category:CATEGORY_BY_CRITERION[label] || (pillar === 'geo' ? 'geo' : 'local_seo'),ok,measured,weight,source:source||'Données du dossier',advice:!measured?'À vérifier : donnée non disponible.':ok?good:bad,gap:measured&&!ok?bad:'',val:v});
+        items.push({pillar,label,category:CATEGORY_BY_CRITERION[label] || (pillar === 'geo' ? 'geo' : 'local_seo'),ok,measured,weight,source:source||'Données du dossier',advice:!measured?'À vérifier : donnée non disponible.':ok?good:bad,gap:measured&&!ok?bad:'',unmeasuredReason:unmeasuredReason||'',val:v});
       };
       // SEO : présence locale, réputation, site et mesures techniques réellement disponibles.
       add('seo','Fiche Google/Maps associée',hasGoogle,18,'Aucun identifiant Google Places n’est associé à ce dossier. Cela ne prouve pas que la fiche est absente : vérifiez-la avant de conclure.','Identifiant Google Places associé au dossier.',null,'Google Places');
@@ -221,7 +222,19 @@ export function visibilityAudit(a,c){
       else add('seo','Volume d’avis',null,10,'Le nombre d’avis n’est pas disponible.','Nombre d’avis disponible.',null,'Google Places');
        if(googlePlaceId&&d.hours!=null) add('seo','Horaires renseignés',hours,5,'Aucun horaire n’est présent dans les données récupérées. Vérifier la fiche publique avant de conclure.','Horaires présents dans les données récupérées.',null,'Google Places');
       else add('seo','Horaires renseignés',null,5,'Les horaires n’ont pas été récupérés.','Horaires disponibles.',null,'Fiche commerce');
-      add('seo','Téléphone visible',phone?true:(d.phone===null||d.phone===undefined?null:false),5,'Aucun numéro n’est renseigné sur la fiche client. Vérifier la fiche publique.','Numéro renseigné.',null,'Fiche client');
+      // Seul le champ explicitement reçu de Google Places confirme la présence du téléphone.
+      // L’absence du champ dans Places Details ne prouve PAS que le numéro est absent de Google Maps/GBP.
+      const googlePhone = googlePlaceId && d.googlePhone != null ? String(d.googlePhone).trim() : '';
+      const phoneMeasured = googlePhone ? true : null;
+      add('seo','Téléphone présent dans les données Google Places',phoneMeasured,5,
+        'Google Places n’a pas retourné de numéro pour cette fiche. Cela ne prouve pas que le téléphone est absent de Google Maps : contrôle manuel nécessaire.',
+        'Numéro reçu dans la réponse Google Places.',null,
+        googlePlaceId ? 'Google Places (champ téléphonique)' : 'Google Places non associé',
+        'Google Places n’a pas retourné de numéro. Cela ne prouve pas que le téléphone est absent de Google Maps/GBP : vérification manuelle nécessaire.');
+      if(page) add('seo','Lien téléphone cliquable sur le site (tel:)',Array.isArray(si.tel)?si.tel.length>0:null,4,
+        'Aucun lien tel: n’a été détecté dans la page analysée. Le numéro peut toutefois être affiché en texte simple ou sur une autre page.',
+        'Lien tel: détecté sur la page analysée.',null,'Lecture du site');
+      else add('seo','Lien téléphone cliquable sur le site (tel:)',null,4,'La page du site n’a pas été lue.','Lien tel: détecté.',null,'Lecture du site');
       if(perf!=null){const pv=tier(perf,[[90,1],[70,0.8],[50,0.6],[30,0.35],[0,0.15]]);add('seo','Performance mobile',perf>=50,8,'Performance mobile mesurée à '+perf+'/100. Examiner les opportunités Lighthouse avant de choisir les optimisations.','Performance mobile mesurée à '+perf+'/100.',pv,'Google Lighthouse');}
       else add('seo','Performance mobile',null,8,'La performance mobile n’a pas été mesurée.','Performance mobile mesurée.',null,'Google Lighthouse');
       if(seoLh!=null){const lv=tier(seoLh,[[90,1],[70,0.75],[50,0.5],[0,0.25]]);add('seo','Référencement technique (Lighthouse)',seoLh>=80,6,'Score SEO technique Lighthouse : '+seoLh+'/100. Consulter les audits détaillés pour identifier les corrections pertinentes.','Score SEO technique : '+seoLh+'/100.',lv,'Google Lighthouse');}

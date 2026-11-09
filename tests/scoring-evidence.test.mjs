@@ -72,6 +72,57 @@ test("un identifiant Google Places permet d’utiliser les données Google réel
   assert.ok(titles.includes("Publier des “posts” Google si vous gérez la fiche"));
 });
 
+test("le numéro Google et le lien téléphonique du site sont deux mesures distinctes", () => {
+  const client = { name: "Commerce test", details: { place_id: "ChIJfixture", googlePhone: "+33400000000", googlePhoneCheckedAt: "2026-11-09T09:00:00Z" } };
+  const audit = { site: { pageRead: true, tel: [] } };
+  const diagnostic = visibilityAudit(audit, client);
+  const googlePhone = item(diagnostic, "Téléphone présent dans les données Google Places");
+  const siteTel = item(diagnostic, "Lien téléphone cliquable sur le site (tel:)");
+
+  assert.equal(googlePhone?.measured, true);
+  assert.equal(googlePhone?.ok, true);
+  assert.equal(googlePhone?.source, "Google Places (champ téléphonique)");
+  assert.equal(siteTel?.measured, true);
+  assert.equal(siteTel?.ok, false);
+  assert.match(siteTel?.advice || "", /Aucun lien tel:/);
+});
+
+test("un échec de lecture Google Places ne devient pas une preuve d’absence de téléphone", () => {
+  const diagnostic = visibilityAudit({}, { details: { place_id: "ChIJfixture" } });
+  const phone = item(diagnostic, "Téléphone présent dans les données Google Places");
+  assert.equal(phone?.measured, false);
+});
+
+test("un numéro absent de la réponse Places Details reste non mesuré, même après vérification", () => {
+  const client = {
+    phone: "04 11 22 33 44",
+    details: {
+      place_id: "ChIJfixture",
+      phone: "04 11 22 33 44",
+      googlePhone: null,
+      googlePhoneCheckedAt: "2026-11-09T09:00:00Z",
+    },
+  };
+  const diagnostic = visibilityAudit({}, client);
+  const phone = item(diagnostic, "Téléphone présent dans les données Google Places");
+
+  assert.equal(phone?.measured, false);
+  assert.equal(phone?.ok, null);
+  assert.equal(phone?.source, "Google Places (champ téléphonique)");
+  assert.match(phone?.unmeasuredReason || "", /ne prouve pas que le téléphone est absent de Google Maps/);
+});
+
+test("un téléphone client ancien ne prouve pas la présence du numéro sur Google", () => {
+  const diagnostic = visibilityAudit({}, {
+    phone: "04 11 22 33 44",
+    details: { place_id: "ChIJfixture", phone: "04 11 22 33 44" },
+  });
+  const phone = item(diagnostic, "Téléphone présent dans les données Google Places");
+
+  assert.equal(phone?.measured, false);
+  assert.equal(phone?.ok, null);
+});
+
 test("le contrôle HTTPS décrit uniquement le protocole de l’URL, pas la validité TLS", () => {
   const httpsDiagnostic = visibilityAudit({}, { website: "https://example.test" });
   const httpsItem = item(httpsDiagnostic, "Adresse du site en HTTPS");

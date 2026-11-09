@@ -13,7 +13,10 @@ export function mobileShell({ title, active, body, brand = null }) {
 
   return `<div class="ds-mobile">
     <header class="ds-m-header">
-      <span class="ds-m-brand" data-brand-name>${brandNameHtml(brand)}</span>
+      <div class="ds-m-header__top">
+        <span class="ds-m-brand" data-brand-name>${brandNameHtml(brand)}</span>
+        <button type="button" class="ds-btn ds-theme-toggle" data-theme-toggle aria-label="Passer au thème clair">☀️ Thème clair</button>
+      </div>
       <h1 class="ds-m-title">${escHtml(title)}</h1>
     </header>
     <main class="ds-m-main" id="contenu">${body}</main>

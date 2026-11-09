@@ -16,6 +16,8 @@ import { createReportController } from './report-controller.js';
 import { auditsView, auditDossierView } from './views/audits.js';
 import { createSettingsController } from './settings-controller.js';
 import { createBingController } from './bing-controller.js';
+import { createBureauController } from './bureau-controller.js';
+import { bureauFabHtml } from './views/bureau.js';
 import { authScreen, authLoading, authError } from './screens/auth.js';
 import { landingClick } from './screens/landing.js';
 import { loadWorkspaceData, dataErrorMessage } from '../data/queries.js';
@@ -26,8 +28,36 @@ import { getAuthClient } from '../auth/client.js';
 import { NOT_ALLOWED, createAuthService, parseAuthLink } from '../auth/service.js';
 
 const root = document.getElementById('app');
+
+// Thème persistant : sombre par défaut pour ne pas modifier l'apparence historique.
+const THEME_KEY = 'auditia-theme';
+function readThemePreference() {
+  try {
+    const saved = localStorage.getItem(THEME_KEY);
+    return saved === 'light' || saved === 'dark' ? saved : 'dark';
+  } catch {
+    return 'dark';
+  }
+}
+function applyTheme(theme, persist = true) {
+  const selected = theme === 'light' ? 'light' : 'dark';
+  document.documentElement.dataset.theme = selected;
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute('content', selected === 'light' ? '#F7F5FC' : '#12052B');
+  if (persist) {
+    try { localStorage.setItem(THEME_KEY, selected); } catch { /* stockage indisponible : thème conservé pour la session */ }
+  }
+  root.querySelectorAll('[data-theme-toggle]').forEach(button => {
+    const next = selected === 'light' ? 'dark' : 'light';
+    button.textContent = next === 'light' ? '☀️ Thème clair' : '🌙 Thème sombre';
+    button.setAttribute('aria-label', next === 'light' ? 'Passer au thème clair' : 'Passer au thème sombre');
+    button.setAttribute('aria-pressed', String(selected === 'light'));
+  });
+}
+applyTheme(readThemePreference(), false);
 const wide = window.matchMedia('(min-width: 900px)');
 const TITLES = Object.fromEntries(NAV.map(n => [n.id, n.label]));
+TITLES.bureau = 'Bureau'; // hors du menu : accessible par la bulle
 const state = {
   user: null, view: 'home', clientId: null, recoveryShown: false,
   auditId: null,
@@ -36,7 +66,7 @@ const state = {
   brand: defaultBrand(), // marque enregistrée (réglages) ; marque par défaut si absente
   gen: 0, // numéro de chargement : un résultat périmé (déconnexion, nouveau chargement) est ignoré
 };
-const LIVE_VIEWS = ['home', 'clients', 'client', 'prospects', 'audits', 'audit'];
+const LIVE_VIEWS = ['home', 'clients', 'client', 'prospects', 'bureau', 'audits', 'audit'];
 
 // Les e-mails de réinitialisation renvoient vers la racine du site (ancienne interface incluse).
 // Pour qu'ils reviennent sur cette page, l'URL devrait être autorisée dans Supabase (réglage distant, non modifié ici).
@@ -81,6 +111,15 @@ const bing = createBingController({
   getSupabase: () => getAuthClient(),
   getClient: id => state.data.clients.find(c => String(c.id) === String(id)) || null,
   rerender: () => { if (state.user && state.view === 'client') renderWorkspace(); },
+});
+// Bureau : agents et tâches (données du compte dans le navigateur) ; prospects = clients enregistrés, lus seulement
+const bureau = createBureauController({
+  getUser: () => state.user,
+  getData: () => state.data,
+  getView: () => state.view,
+  rerender: () => { if (state.user && state.view === 'bureau') renderWorkspace(); },
+  getSupabase: () => getAuthClient(),
+  reload: silentReload,
 });
 const auth = createAuthService({ getClient: getAuthClient, redirectUrl: REDIRECT_URL });
 
@@ -137,6 +176,7 @@ function bodyFor(isWide) {
   }
   if (state.view === 'clients') return clientsView(d, state.ui);
   if (state.view === 'prospects') return search.html();
+  if (state.view === 'bureau') return bureau.html();
   if (state.view === 'audits') return auditsView(d, audits.filter(), audits.notice(), audits.snapshot());
   if (state.view === 'audit') {
     const a = d.audits.find(x => String(x.id) === String(state.auditId));
@@ -157,9 +197,11 @@ function renderWorkspace() {
   root.innerHTML = isWide
     ? desktopShell({ ...params, account: { email: state.user.email || '' } })
     : mobileShell(params);
+  if (state.view !== 'bureau') root.insertAdjacentHTML('beforeend', bureauFabHtml());
   document.documentElement.dataset.layout = isWide ? 'desktop' : 'mobile';
   paintBrand(state.brand, root);
   if (state.view === 'prospects' && state.data.status === 'ready') search.mounted();
+  if (state.view === 'bureau' && state.data.status === 'ready') bureau.mounted();
 }
 
 // Chargement des clients et des audits (lecture seule). Un résultat arrivé après une déconnexion est ignoré.
@@ -194,7 +236,7 @@ function enter(user) {
   state.clientId = null;
   state.ui = { q: '', tier: '', sort: 'urgence' };
   search.reset();
-  report.close(); audits.reset(); settings.reset(); bing.reset();
+  report.close(); audits.reset(); settings.reset(); bing.reset(); bureau.reset();
   window.scrollTo(0, 0);
   loadData();
   loadBrandNow(user);
@@ -211,7 +253,7 @@ async function logout() {
   state.user = null;
   state.gen++; // annule un chargement en cours
   search.reset(); // vide les résultats, la clé et les recherches en cours
-  report.close(); audits.reset(); settings.reset();
+  report.close(); audits.reset(); settings.reset(); bureau.reset();
   state.data = { status: 'idle', clients: [], audits: [], error: '' };
   state.brand = defaultBrand(); paintBrand(state.brand, root); // la marque d'un compte ne reste pas affichée après déconnexion
   await auth.signOut();
@@ -255,6 +297,11 @@ async function onReset(e) {
 /* ---------- Événements (délégation sur la racine) ---------- */
 root.addEventListener('click', event => {
   const t = event.target;
+  const themeButton = t.closest('[data-theme-toggle]');
+  if (themeButton) {
+    applyTheme(document.documentElement.dataset.theme === 'light' ? 'dark' : 'light');
+    return;
+  }
   if (landingClick(t, root)) return; // page d'accueil publique : défilement et menu
   const go = t.closest('[data-go]');
   if (go) { showAuth(go.dataset.go); return; }
@@ -275,6 +322,7 @@ root.addEventListener('click', event => {
   if (bing.onClick(t)) return;
   if (audits.onClick(t)) return;
   if (search.onClick(t)) return;
+  if (bureau.onClick(t)) return;
   if (settings.onClick(t)) return;
   const oa = t.closest('[data-open-audit]');
   if (oa) { state.view = 'audit'; state.auditId = oa.dataset.openAudit; renderWorkspace(); window.scrollTo(0, 0); return; }
