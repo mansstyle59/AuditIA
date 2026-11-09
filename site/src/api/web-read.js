@@ -4,6 +4,8 @@
    Déplacées telles quelles depuis site/index.html (étape 2) : mêmes adresses, mêmes délais maximum, mêmes secours. */
 import { safeHttpUrl, withTimeout } from '../core/utils.js';
 import { AI_BOTS, parseRobotsForAI } from '../audit/site-analysis.js';
+import { parseRobotsPolicy, isRobotsResponseUnverifiable } from '../audit/robots.js';
+import { readTextLimited, readBytesLimited } from './bounded-fetch.mjs';
 
 export async function fetchDomainDate(website){
       try{
@@ -22,7 +24,7 @@ export async function fetchSirene(c){
   const city=String((c&&c.city)||'').trim();
   const details=(c&&c.details)||{};
   const address=String(details.address||(c&&c.address)||'').trim();
-  const postal=(address.match(/\\b\\d{5}\\b/)||[])[0]||'';
+  const postal=(address.match(/\b\d{5}\b/)||[])[0]||'';
   const queries=[...new Set([
     [name,postal,city].filter(Boolean).join(' '),
     [name,city].filter(Boolean).join(' '),
@@ -37,7 +39,7 @@ export async function fetchSirene(c){
     (data&&Array.isArray(data.results)?data.results:[]).forEach(x=>{if(x&&x.siren&&!all.some(y=>String(y.siren)===String(x.siren)))all.push(x);});
     if(all.length>=20) break;
   }
-  const norm=s=>String(s||'').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+  const norm=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
   const target=norm(name), targetCity=norm(city), targetPostal=postal;
   const scored=all.map(res=>{
     const siege=res.siege||{};
@@ -59,7 +61,7 @@ export async function fetchSirene(c){
   if(!best||best.score<55) return {matched:false,reason:all.length?'Correspondances insuffisamment fiables':'Aucun résultat dans le registre',candidates:all.length,fetchedAt:new Date().toISOString()};
   const {res,siege,score}=best;
   const dir=(res.dirigeants&&res.dirigeants[0])||null;
-  const dirName=dir?((dir.nom||dir.nom_patronymique)?((dir.prenoms||dir.prenom||'')+' '+(dir.nom||dir.nom_patronymique)).replace(/\\s+/g,' ').trim():(dir.denomination||'')):'';
+  const dirName=dir?((dir.nom||dir.nom_patronymique)?((dir.prenoms||dir.prenom||'')+' '+(dir.nom||dir.nom_patronymique)).replace(/\s+/g,' ').trim():(dir.denomination||'')):'';
   return {matched:true,matchScore:score,matchConfidence:score>=85?'élevée':score>=65?'moyenne':'à vérifier',
     siren:res.siren||'',siret:siege.siret||'',denomination:res.nom_complet||res.nom_raison_sociale||'',
     dateCreation:siege.date_creation||res.date_creation||'',naf:res.activite_principale||siege.activite_principale||'',
@@ -69,34 +71,96 @@ export async function fetchSirene(c){
     fetchedAt:new Date().toISOString()};
 }
 
-export async function readSiteText(url,opts,timeout){const ctl=new AbortController();const t=setTimeout(()=>ctl.abort(),timeout||40000);try{const r=await fetch(url,{...(opts||{}),signal:ctl.signal});if(!r.ok){const e=new Error('HTTP '+r.status);e.status=r.status;throw e;}return await r.text();}finally{clearTimeout(t);}}
+export async function readSiteText(url,opts,timeout,maxBytes=5*1024*1024){return readTextLimited(url,opts,timeout||40000,maxBytes);}
 
-export async function fetchGeoFiles(site){
-      let origin;try{origin=new URL(site).origin;}catch(e){return null;}
-      const get=async path=>{try{const t=await readSiteText('https://api.allorigins.win/raw?url='+encodeURIComponent(origin+path),{},12000);return typeof t==='string'?t:null;}catch(e){return null;}};
-      const [rb,ll]=await Promise.all([get('/robots.txt'),get('/llms.txt')]);
-      const looksHtml=t=>/^\s*</.test(t||'')||/<html|<body/i.test(t||'');
-      const robots=rb==null?null:(looksHtml(rb)||!/user-agent/i.test(rb)?{read:true,blocked:[],total:AI_BOTS.length,missing:true}:parseRobotsForAI(rb));
-      const llms=ll==null?null:(!looksHtml(ll)&&ll.trim().length>40);
-      return {robots,llms};
-    }
+function looksHtmlText(text){
+  return /^\s*</.test(text||'') || /<html|<body/i.test(text||'');
+}
+
+function robotsInfoUnavailable(status='unavailable'){
+  return {
+    robots:{read:false,blocked:[],total:AI_BOTS.length,unavailable:true},
+    policy:{status,allowed:null,llmsAllowed:null,matchedRule:null,userAgent:'AuditIA'}
+  };
+}
+
+/* Lecture préalable de robots.txt : le moteur doit décider du crawl avant d'appeler
+   les proxys de lecture, PageSpeed ou le service de capture. */
+export async function fetchRobotsPolicy(site){
+  site=safeHttpUrl(site); if(!site) return {robots:null,policy:{status:'invalid-url',allowed:null,llmsAllowed:null,userAgent:'AuditIA'}};
+  let parsed;
+  try{ parsed=new URL(site); }catch(e){ return {robots:null,policy:{status:'invalid-url',allowed:null,llmsAllowed:null,userAgent:'AuditIA'}}; }
+  const origin=parsed.origin;
+  const targetPath=(parsed.pathname||'/')+parsed.search;
+  const robotsUrl='https://api.allorigins.win/raw?url='+encodeURIComponent(origin+'/robots.txt');
+  let rb=null;
+  try{ rb=await readSiteText(robotsUrl,{},8000,512*1024); }
+  catch(e){
+    return robotsInfoUnavailable(e&&e.code==='response_too_large'?'too-large':'unavailable');
+  }
+  if(isRobotsResponseUnverifiable(rb)){
+    return {...robotsInfoUnavailable('unverifiable-response'),policy:{...robotsInfoUnavailable('unverifiable-response').policy,path:targetPath}};
+  }
+  const policy=parseRobotsPolicy(rb,'AuditIA',targetPath);
+  const llmsPolicy=parseRobotsPolicy(rb,'AuditIA','/llms.txt');
+  const robots=policy.status==='invalid'
+    ? {read:false,blocked:[],total:AI_BOTS.length,invalid:true}
+    : parseRobotsForAI(rb);
+  return {robots,policy:{...policy,llmsAllowed:llmsPolicy.allowed}};
+}
+
+export async function fetchGeoFiles(site, robotsInfo=null){
+  let info=robotsInfo;
+  if(!info) info=await fetchRobotsPolicy(site);
+  const policy=info&&info.policy;
+  let origin;
+  try{origin=new URL(site).origin;}catch(e){return {robots:info&&info.robots||null,policy:policy||null,llms:null};}
+  let llms=null;
+  // llms.txt est lui aussi une ressource crawlée : ne le lire que si robots l'autorise.
+  if(policy&&policy.llmsAllowed===true){
+    try{
+      const text=await readSiteText('https://api.allorigins.win/raw?url='+encodeURIComponent(origin+'/llms.txt'),{},8000);
+      llms=!looksHtmlText(text)&&text.trim().length>40;
+    }catch(e){llms=null;}
+  }
+  return {robots:info&&info.robots||null,policy:policy||null,llms};
+}
 
 export async function readSiteHtml(url){
-      url=safeHttpUrl(url); if(!url) throw new Error('adresse non autorisée');
-      const tries=[()=>readSiteText('https://r.jina.ai/'+url,{headers:{'X-Return-Format':'html','X-Timeout':'25'}},45000),()=>readSiteText('https://api.allorigins.win/raw?url='+encodeURIComponent(url),{},30000)];
-      let last;for(const f of tries){try{const t=await f();if(t&&t.length>200&&/<(html|head|body)[\s>]/i.test(t))return t;last=new Error('page vide ou illisible');}catch(e){last=e;}}
-      throw last||new Error('page illisible');
-    }
+  url=safeHttpUrl(url); if(!url) throw new Error('adresse non autorisée');
+  // Le moteur limite cette source à 20 s : le fetch doit aussi s'annuler à cette échéance.
+  // Le fallback AllOrigins est retiré, car son User-Agent et son respect robots ne sont pas vérifiables.
+  const text=await readSiteText(
+    'https://r.jina.ai/'+url,
+    {headers:{
+      'X-Return-Format':'html',
+      'X-Timeout':'20',
+      'X-Robots-Txt':'AuditIA'
+    }},
+    20000
+  );
+  if(text&&text.length>200&&/<(html|head|body)[\s>]/i.test(text)) return text;
+  throw new Error('page vide, illisible ou refusée par robots.txt via Jina Reader');
+}
 
 export async function fetchScreenshot(site){
-      site=safeHttpUrl(site); if(!site) return null;
-      const svc='https://s.wordpress.com/mshots/v1/'+encodeURIComponent(site)+'?w=1000&h=750';
-      for(let i=0;i<3;i++){
-        try{
-          const r=await withTimeout(fetch('https://api.allorigins.win/raw?url='+encodeURIComponent(svc)),22000);
-          if(r.ok){ const blob=await r.blob(); if(blob && blob.size>9000 && /image\//.test(blob.type||'image/jpeg')){ const d=await new Promise(res=>{const fr=new FileReader();fr.onload=()=>res(fr.result);fr.onerror=()=>res(null);fr.readAsDataURL(blob);}); if(d) return d; } }
-        }catch(e){}
-        await new Promise(r=>setTimeout(r,4000));
-      }
-      return null;
-    }
+  site=safeHttpUrl(site); if(!site) return null;
+  const svc='https://s.wordpress.com/mshots/v1/'+encodeURIComponent(site)+'?w=1000&h=750';
+  const url='https://api.allorigins.win/raw?url='+encodeURIComponent(svc);
+  const maxBytes=8*1024*1024;
+  try{
+    // Lecture progressive : ne pas charger un Blob arbitrairement volumineux avant
+    // de vérifier sa taille. Le proxy peut omettre Content-Length.
+    const {bytes,contentType}=await readBytesLimited(url,{},18000,maxBytes);
+    if(bytes.byteLength<=9000) return null;
+    const imageType=contentType||'image/jpeg';
+    if(!/^image\//i.test(imageType)) return null;
+    const blob=new Blob([bytes],{type:imageType});
+    return await new Promise(resolve=>{
+      const reader=new FileReader();
+      reader.onload=()=>resolve(reader.result);
+      reader.onerror=()=>resolve(null);
+      reader.readAsDataURL(blob);
+    });
+  }catch(e){return null;}
+}
