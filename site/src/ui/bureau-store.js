@@ -15,6 +15,8 @@ const KEY = 'auditia-bureau-v1:';
 const COLORS = ['#60a5fa', '#f472b6', '#a78bfa', '#fbbf24', '#34d399', '#f87171', '#22d3ee', '#fb923c', '#c084fc'];
 const SKINS = ['#f1c27d', '#e0ac69', '#c68642', '#8d5524', '#ffdbac'];
 const HAIRS = ['#3b2a1f', '#1b1b1b', '#111111', '#7a4b2a', '#2b1d14', '#d4a017'];
+// Coiffures et accessoires des personnages (un agent SDR porte un casque, les chercheurs des lunettes)
+export const LOOKS = ['short', 'bun', 'side', 'long'];
 
 export function emptyStore() { return { agents: [], statuses: {} }; }
 
@@ -74,16 +76,18 @@ export function createAgent(store, { name, cat, role }) {
   if (!clean) return { ok: false, error: 'Donnez un prénom à l’agent.' };
   if (store.agents.length >= BU_MAX_AGENTS) return { ok: false, error: `Le bureau accueille ${BU_MAX_AGENTS} agents au maximum.` };
   const i = store.agents.length;
+  const chosenRole = role === 'Chercheur IA' ? 'Chercheur IA' : 'SDR IA';
   const agent = {
     id: 'a' + Date.now().toString(36) + i,
     name: clean,
-    role: role === 'Chercheur IA' ? 'Chercheur IA' : 'SDR IA',
+    role: chosenRole,
     cat: String(cat || '').trim() || BU_ALL,
-    glasses: i % 2 === 1,
+    look: LOOKS[i % LOOKS.length],
     color: COLORS[i % COLORS.length],
     skin: SKINS[i % SKINS.length],
     hair: HAIRS[i % HAIRS.length],
     status: 'idle',
+    current: null,
     tasks: [],
   };
   store.agents.push(agent);
@@ -134,11 +138,32 @@ export function tick(store, clients) {
   store.agents.forEach(a => {
     if (a.status !== 'working') return;
     const t = a.tasks.find(x => x.type === 'message' && x.status === 'todo');
-    if (!t) { a.status = 'idle'; changed = true; return; }
+    if (!t) { a.status = 'idle'; a.current = null; changed = true; return; }
     const next = clients.find(c => sameCat(t.cat, c) && statusOf(store, c) === 'À contacter');
-    if (next) store.statuses[String(next.id)] = { status: 'Message prêt', by: a.name };
-    else t.status = 'done';
+    if (next) {
+      store.statuses[String(next.id)] = { status: 'Message prêt', by: a.name };
+      t.processed = (t.processed || 0) + 1;
+      a.current = next.name;
+    } else {
+      t.status = 'done';
+      a.current = null;
+    }
     changed = true;
   });
   return changed;
+}
+
+// Phrase d'état affichée sur la carte de l'agent : dit ce qu'il fait, ou pourquoi il ne fait rien
+export function statusLine(store, a) {
+  if (a.status === 'break') return 'En pause café. Aucun prospect traité pendant la pause.';
+  const todo = a.tasks.filter(t => t.status === 'todo');
+  if (a.status === 'working') {
+    if (a.current) return `En cours : message préparé pour ${a.current}.`;
+    if (!todo.some(t => t.type === 'message')) return 'Aucune tâche « Messages » à traiter. Ajoutez-en une ci-dessous.';
+    return 'En cours : recherche du prochain prospect à traiter.';
+  }
+  if (!a.tasks.length) return 'Sans tâche. Ajoutez-en une dans le formulaire ci-dessous.';
+  if (todo.some(t => t.type === 'message')) return 'Prêt. Faites-le travailler pour préparer les messages.';
+  if (todo.some(t => t.type === 'recherche')) return 'Tâche de recherche à faire depuis Prospects.';
+  return 'Toutes ses tâches sont terminées.';
 }

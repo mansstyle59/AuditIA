@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  emptyStore, createAgent, addTask, setAgentStatus, tick, statusOf, progress, counts, messageFor, removeTask,
+  emptyStore, createAgent, addTask, setAgentStatus, tick, statusOf, progress, counts, messageFor, removeTask, statusLine, LOOKS,
 } from '../site/src/ui/bureau-store.js';
 
 const clients = [
@@ -69,4 +69,33 @@ test('suppression de tâche et message d’accroche', () => {
   const msg = messageFor(clients[0]);
   assert.ok(msg.includes('Façades Test à Carcassonne'));
   assert.ok(msg.endsWith('Souhaitez-vous recevoir le rapport ?'));
+});
+
+test('phrase d’état : dit ce que fait l’agent, ou pourquoi il ne fait rien', () => {
+  const s = emptyStore();
+  const a = createAgent(s, { name: 'Sophie', cat: 'Peintre façadier', role: 'SDR IA' }).agent;
+  assert.match(statusLine(s, a), /Sans tâche/);
+  addTask(s, a.id, { type: 'recherche', cat: 'Peintre façadier', zone: 'Carcassonne' });
+  assert.match(statusLine(s, a), /Tâche de recherche/);
+  addTask(s, a.id, { type: 'message', cat: 'Peintre façadier' });
+  assert.match(statusLine(s, a), /Faites-le travailler/);
+  setAgentStatus(s, a.id, 'working');
+  tick(s, clients);
+  assert.equal(a.current, 'Façades Test');
+  assert.match(statusLine(s, a), /message préparé pour Façades Test/);
+  assert.equal(a.tasks.find(t => t.type === 'message').processed, 1);
+  setAgentStatus(s, a.id, 'break');
+  assert.match(statusLine(s, a), /pause café/);
+});
+
+test('création d’agent : apparence cohérente et tâche terminée sans prospect', () => {
+  const s = emptyStore();
+  const a = createAgent(s, { name: 'Ryan', cat: 'Serrurier', role: 'SDR IA' }).agent;
+  assert.ok(LOOKS.includes(a.look));
+  addTask(s, a.id, { type: 'message', cat: 'Serrurier' });
+  setAgentStatus(s, a.id, 'working');
+  tick(s, clients);
+  assert.equal(a.tasks[0].status, 'done');
+  assert.equal(a.current, null);
+  assert.equal(a.tasks[0].processed, undefined);
 });

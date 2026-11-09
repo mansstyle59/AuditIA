@@ -57,8 +57,11 @@
 .bu-pin.break .bu-cup { display: inline; }
 .bu-pin[aria-pressed="true"] .bu-figure { filter: drop-shadow(0 0 4px rgba(196, 181, 253, .95)) drop-shadow(0 0 10px rgba(139, 92, 246, .7)); }
 .bu-pin.working .bu-figure { animation: bu-nod 1.6s ease-in-out infinite; }
-.bu-pin.working .bu-arm-l { transform-origin: 17px 54px; animation: bu-type-l .28s ease-in-out infinite alternate; }
-.bu-pin.working .bu-arm-r { transform-origin: 43px 54px; animation: bu-type-r .28s ease-in-out infinite alternate; }
+.bu-pin.working .bu-arm-l { transform-origin: 14px 52px; animation: bu-type-l .28s ease-in-out infinite alternate; }
+.bu-pin.working .bu-arm-r { transform-origin: 46px 52px; animation: bu-type-r .28s ease-in-out infinite alternate; }
+.bu-line { margin: 0; padding: var(--ds-s-2) var(--ds-s-3); border-radius: var(--ds-r-sm); background: var(--ds-bg-1); border-left: 3px solid var(--ds-primary); font-size: var(--ds-fs-sm); overflow-wrap: anywhere; }
+.bu-line[data-state="working"] { border-left-color: var(--ds-good); }
+.bu-line[data-state="break"] { border-left-color: var(--ds-warn); }
 .bu-pin.idle .bu-figure { animation: bu-breathe 3s ease-in-out infinite; }
 .bu-pin.break .bu-figure { transform: rotate(-4deg); transform-origin: 30px 80px; transition: transform 600ms ease; }
 @keyframes bu-nod { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
