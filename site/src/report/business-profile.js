@@ -1,5 +1,5 @@
 // AuditIA — profil commerce pour les rapports. Fonctions pures : aucune recherche réseau ni donnée inventée.
-const clean = value => String(value == null ? '' : value).replace(/\\s+/g, ' ').trim();
+const clean = value => String(value == null ? '' : value).replace(/\s+/g, ' ').trim();
 const has = (obj, key) => Object.prototype.hasOwnProperty.call(obj || {}, key);
 
 function parseDate(value) {
