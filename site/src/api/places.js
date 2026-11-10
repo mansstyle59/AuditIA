@@ -31,13 +31,7 @@ export async function searchNearby(getClient, pos) {
     includedTypes: NEARBY_TYPES, maxResultCount: MAX_RESULTS, radius: NEARBY_RADIUS_M,
   }, 15000, MSG_NEARBY_403);
   const rows = (data.places || []).map(normalizePlace).filter(p => p.placeId && p.name);
-  rows.sort((a, b) => {
-    const opportunity = nearbyOpportunity(b).score - nearbyOpportunity(a).score;
-    if (opportunity) return opportunity;
-    if (a.reviews == null && b.reviews != null) return 1;
-    if (a.reviews != null && b.reviews == null) return -1;
-    return (a.reviews ?? 0) - (b.reviews ?? 0);
-  });
+  rows.sort((a, b) => nearbyOpportunity(b).score - nearbyOpportunity(a).score || ((a.reviews || 0) - (b.reviews || 0)));
   return rows;
 }
 

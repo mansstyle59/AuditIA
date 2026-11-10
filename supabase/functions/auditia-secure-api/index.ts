@@ -1,5 +1,4 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-import { isPublicHttpUrl } from "./url-validation.mjs";
 
 // AuditIA — auditia-secure-api, VERSION 2.
 // Seul point d'accès serveur aux API Google (Places API New, PageSpeed Insights).
@@ -47,7 +46,6 @@ const LIMITS: Record<string, { perMinute: number; perDay: number }> = {
   places_autocomplete: { perMinute: 30, perDay: 1500 },
   places_details: { perMinute: 30, perDay: 400 },
   pagespeed: { perMinute: 4, perDay: 40 },
-  bing_site_stats: { perMinute: 5, perDay: 60 },
 };
 
 // Messages d'erreur stables, sans détail interne. Le client les affiche tels quels.
@@ -70,9 +68,6 @@ const ERRORS: Record<string, [number, string]> = {
   invalid_target_url: [400, "Adresse de site non analysable."],
   google_places_key_not_configured: [424, "La clé Google Places n’est pas configurée côté serveur."],
   pagespeed_key_not_configured: [424, "La clé PageSpeed n’est pas configurée côté serveur."],
-  bing_webmaster_key_not_configured: [424, "La clé Bing Webmaster n’est pas configurée côté serveur."],
-  bing_site_not_verified: [403, "Ce site n’est pas vérifié dans le compte Bing Webmaster connecté."],
-  bing_webmaster_unavailable: [502, "Bing Webmaster Tools est temporairement indisponible."],
   rate_limit_exceeded: [429, "Trop de requêtes. Patientez une minute."],
   daily_quota_exceeded: [429, "Quota journalier atteint. Réessayez demain."],
   secure_api_unavailable: [503, "Service temporairement indisponible. Réessayez."],
@@ -102,7 +97,12 @@ function clampInt(value: unknown, min: number, max: number, fallback: number): n
   return Number.isFinite(n) ? Math.min(max, Math.max(min, Math.trunc(n))) : fallback;
 }
 function validPublicUrl(value: string): boolean {
-  return isPublicHttpUrl(value);
+  try {
+    const u = new URL(value);
+    return (u.protocol === "https:" || u.protocol === "http:") &&
+      !["localhost", "127.0.0.1", "0.0.0.0", "::1"].includes(u.hostname) &&
+      !u.hostname.endsWith(".local") && !u.hostname.endsWith(".internal");
+  } catch { return false; }
 }
 async function serviceFetch(path: string, init: RequestInit = {}) {
   return fetch(`${PROJECT_URL}/rest/v1/${path}`, {
@@ -212,37 +212,6 @@ async function handleSettings(action: string, body: Record<string, unknown>, use
   });
 }
 
-// Bing Webmaster : lecture seule. La propriété est validée côté serveur avant toute statistique.
-async function bingSiteStats(siteUrl: string, key: string): Promise<Record<string, unknown>> {
-  const base = "https://ssl.bing.com/webmaster/api.svc/json/";
-  const get = async (method: string, params: Record<string, string> = {}) => {
-    const u = new URL(base + method);
-    u.searchParams.set("apikey", key);
-    for (const [k, v] of Object.entries(params)) u.searchParams.set(k, v);
-    const res = await fetch(u.toString(), { signal: AbortSignal.timeout(15_000), headers: { Accept: "application/json" } });
-    if (!res.ok) throw new Error("bing_upstream");
-    const raw = await res.text();
-    if (raw.length > 1_000_000) throw new Error("bing_response_too_large");
-    return JSON.parse(raw);
-  };
-  const sitesResponse = await get("GetUserSites");
-  const sites = Array.isArray(sitesResponse?.d) ? sitesResponse.d : [];
-  let requestedHost = "";
-  try { requestedHost = new URL(siteUrl).hostname.toLowerCase().replace(/^www\\./, ""); } catch { throw new Error("bing_invalid_site"); }
-  const matching = sites.filter((site: Record<string, unknown>) => {
-    if (site.IsVerified !== true || typeof site.Url !== "string") return false;
-    const value = String(site.Url);
-    if (value.startsWith("sc-domain:")) return value.slice(10).toLowerCase().replace(/^www\\./, "") === requestedHost;
-    try { return new URL(value).hostname.toLowerCase().replace(/^www\\./, "") === requestedHost; } catch { return false; }
-  });
-  if (matching.length !== 1) throw new Error("bing_site_not_verified");
-  const verifiedSite = String(matching[0].Url);
-  const stats = await get("GetRankAndTrafficStats", { siteUrl: verifiedSite });
-  const rows = Array.isArray(stats?.d) ? stats.d : [];
-  // Ne renvoie que les statistiques de trafic, jamais les codes de vérification ou autres propriétés.
-  return { ok: true, provider: "Bing Webmaster Tools", siteUrl: verifiedSite, traffic: rows.slice(-180).map((x: Record<string, unknown>) => ({ Date: x.Date, Clicks: x.Clicks, Impressions: x.Impressions })) };
-}
-
 // Compteur atomique (RPC existante, réservée au service_role). Échec = refus (fermé).
 async function consume(bucket: string, limit: number, windowSeconds: number) {
   const response = await serviceFetch("rpc/auditia_consume_rate_limit", {
@@ -256,12 +225,7 @@ async function consume(bucket: string, limit: number, windowSeconds: number) {
 }
 
 // Valide la requête AVANT toute consommation de quota. Retourne les champs normalisés pour l'appel amont.
-function validate(action: string, body: Record<string, unknown>, origin: string | null, apiKeys: { places: string; pagespeed: string; bing: string }): { ok: true; key: string; fields: Record<string, unknown> } | { ok: false; res: Response } {
-  if (action === "bing_site_stats") {
-    const siteUrl = safeText(body.siteUrl, 2048);
-    if (!validPublicUrl(siteUrl)) return { ok: false, res: reply(origin, "invalid_target_url") };
-    return { ok: true, key: apiKeys.bing, fields: { siteUrl } };
-  }
+function validate(action: string, body: Record<string, unknown>, origin: string | null, apiKeys: { places: string; pagespeed: string }): { ok: true; key: string; fields: Record<string, unknown> } | { ok: false; res: Response } {
   if (action === "places_searchText") {
     const textQuery = safeText(body.textQuery, 250);
     if (!textQuery) return { ok: false, res: reply(origin, "invalid_query") };
@@ -379,11 +343,10 @@ Deno.serve(async (req: Request) => {
     const apiKeys = {
       places: safeText(settingsRow.google_places_api_key, 500) || GOOGLE_PLACES_KEY,
       pagespeed: safeText(settingsRow.pagespeed_api_key, 500) || PAGESPEED_KEY,
-      bing: safeText(settingsRow.bing_webmaster_api_key, 500),
     };
     const v = validate(action, body, origin, apiKeys);
     if (!v.ok) return v.res;
-    if (!v.key) return reply(origin, action.startsWith("places_") ? "google_places_key_not_configured" : action === "bing_site_stats" ? "bing_webmaster_key_not_configured" : "pagespeed_key_not_configured");
+    if (!v.key) return reply(origin, action.startsWith("places_") ? "google_places_key_not_configured" : "pagespeed_key_not_configured");
 
     const minute = await consume(`${user.id}:${action}:min`, limits.perMinute, 60);
     if (!minute.allowed) {
@@ -394,16 +357,6 @@ Deno.serve(async (req: Request) => {
       return reply(origin, "daily_quota_exceeded", { "Retry-After": String(day.retry_after_seconds) }, { retry_after_seconds: day.retry_after_seconds });
     }
 
-    if (action === "bing_site_stats") {
-      try {
-        const result = await bingSiteStats(String(v.fields.siteUrl || ""), v.key);
-        return new Response(JSON.stringify(result), { status: 200, headers: { ...corsHeaders(origin), "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" } });
-      } catch (error) {
-        const code = error instanceof Error ? error.message : "";
-        if (code === "bing_site_not_verified") return reply(origin, "bing_site_not_verified");
-        return reply(origin, "bing_webmaster_unavailable");
-      }
-    }
     const upstream = await callUpstream(action, v.fields, v.key);
     // Filet de sécurité : si Google renvoyait la clé dans sa réponse, elle serait masquée avant envoi.
     const text = (await upstream.text()).split(v.key).join("[masqué]");

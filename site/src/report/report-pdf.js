@@ -228,19 +228,18 @@ export function buildReportPdf(JsPDF, m) {
   section('Fiche détaillée du commerce', 62);
   const bp = m.businessProfile || {};
   const profileRows = [
-    ['Nom commercial', m.meta.business], ['Raison sociale', bp.legalName], ['Dirigeant déclaré (SIRENE)', bp.dirigeant],
-    ['Adresse du commerce', bp.address || m.meta.address], ['Téléphone', bp.phone || m.meta.phone], ['Source du téléphone', bp.phoneSource],
+    ['Nom commercial', m.meta.business], ['Raison sociale', bp.legalName],
+    ['Adresse du commerce', bp.address || m.meta.address], ['Téléphone', bp.phone || m.meta.phone],
     ['E-mail public', bp.email], ['Site internet', bp.website || m.meta.website],
     ['SIREN', bp.siren], ['SIRET du siège', bp.siret], ['Forme juridique', bp.legalForm],
-    ['Activité principale / APE', bp.naf], ['Date de création légale (SIRENE)', bp.creationDate],
+    ['Activité principale / APE', bp.naf], ['Date de création légale', bp.creationDate],
     ['Ancienneté à la date du rapport', bp.ageLabel], ['Nombre d’établissements', bp.establishments],
     ['Code postal / commune', [bp.postalCode,bp.legalCity].filter(Boolean).join(' ')],
     ['Statut de l’établissement', bp.googleStatus],
-    ['Note Google / avis', bp.rating == null && bp.reviews == null ? '' : [bp.rating != null ? frNum(bp.rating) + '/5' : 'Note non disponible', bp.reviews != null ? bp.reviews + ' avis' : 'Avis non disponibles'].join(' · ')]
+    ['Note Google / avis', bp.rating != null ? frNum(bp.rating) + '/5 · ' + (bp.reviews || 0) + ' avis' : '']
   ].filter(x => x[1] !== null && x[1] !== undefined && String(x[1]).trim() !== '');
   if (profileRows.length) {
     table([{w:57},{w:117}], ['Information','Donnée vérifiée / enregistrée'], profileRows);
-    if (bp.creationDate) para('La date de création issue de SIRENE est une date légale d’enregistrement ; elle ne confirme pas à elle seule la date d’ouverture au public du magasin.', {size:8.2,color:C.muted});
   } else {
     para('Informations détaillées indisponibles dans le dossier. Relancez une analyse avec une fiche Google correctement associée.', {color:C.muted});
   }

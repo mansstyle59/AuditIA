@@ -6,16 +6,13 @@ Application web d'audit de visibilité numérique des commerces locaux.
 
 ## Structure du dépôt
 
-Le site est publié directement depuis `site/` par GitHub Pages, sans bundler ni étape de compilation.
+Un seul site, publié tel quel — pas d'étape de compilation.
 
-- `site/index.html` — point d’entrée GitHub Pages ; redirige vers l’interface officielle.
-- `site/nouvelle-interface.html` — page active de l’application (coquille HTML et feuilles CSS).
-- `site/src/ui/app.js` — véritable point d’entrée JavaScript de l’application : authentification Supabase, navigation et espace de travail.
-- `site/src/` — modules JavaScript, vues, styles, moteur d’audit et intégrations.
-- `site/manifest.webmanifest` et les icônes — manifeste PWA et ressources d’installation.
-- `.github/workflows/pages.yml` — valide les ressources et tests, puis publie le dossier `site/` sur GitHub Pages à chaque push sur `main`.
-
-L’ancienne interface autonome reste dans le dépôt pour compatibilité ; elle n’est pas le point d’entrée actif de la nouvelle application.
+- `site/` — l'application complète (une page `index.html` autonome : HTML, CSS et JavaScript).
+  - `site/index.html` — connexion + espace de travail (clients, audits, réglages).
+  - `site/manifest.webmanifest` — manifeste PWA (ajout à l'écran d'accueil).
+  - `site/apple-touch-icon.png`, `icon-192.png`, `icon-512.png`, `favicon-32.png`, `auditia-icon.svg` — icônes.
+- `.github/workflows/pages.yml` — publie automatiquement le dossier `site/` sur GitHub Pages à chaque push sur `main`.
 
 ## Connexion
 

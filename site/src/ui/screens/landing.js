@@ -45,7 +45,7 @@ const scrollBtn = (id, label, cls) => `<button type="button" class="${cls}" data
 function header() {
   return `<header class="ds-l-head" id="top">
     <div class="ds-l-wrap ds-l-head__in">
-      <a class="ds-l-logo" href="./" aria-label="AuditIA by AffiAds — accueil"><span class="ds-lockup"><img class="ds-lockup__mark" src="./auditia-mark.svg" alt="" width="56" height="56"><span class="ds-lockup__text"><b>AUDITIA</b><small>by AffiAds</small></span></span></a>
+      <a class="ds-l-logo" href="./" aria-label="AuditIA by AffiAds — accueil"><img src="./auditia-logo-dark.svg?v=2" alt="AuditIA by AffiAds" width="250" height="72"></a>
       <nav class="ds-l-nav" aria-label="Navigation du site">${NAV.map((n, i) => scrollBtn(n.id, n.label, 'ds-l-nav__item' + (i === 0 ? ' is-active' : ''))).join('')}</nav>
       <div class="ds-l-cta">${scrollBtn('connexion', 'Connexion', 'ds-btn ds-l-btn')}${scrollBtn('connexion', 'Lancer un audit', 'ds-btn ds-btn--primary ds-l-btn')}</div>
       <button type="button" class="ds-l-burger" data-menu-toggle aria-expanded="false" aria-controls="lMenu" aria-label="Ouvrir le menu">${svgIcon('<path d="M4 7h16M4 12h16M4 17h16"/>')}</button>

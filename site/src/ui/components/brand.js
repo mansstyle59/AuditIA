@@ -4,9 +4,7 @@ import { brandInitials } from '../../settings/brand.js';
 
 export const brandMarkHtml = b => (b && b.logo
   ? `<img class="ds-brand-logo" src="${escHtml(b.logo)}" alt="">`
-  : b && b.custom
-    ? escHtml(brandInitials(b))
-    : '<img class="ds-brand-logo ds-brand-logo--mark" src="./auditia-mark.svg" alt="" width="40" height="40">');
+  : escHtml(brandInitials(b)));
 export const brandNameHtml = b => escHtml((b && b.appName) || 'AuditIA');
 
 // Applique la marque aux éléments déjà affichés (sans recomposer l'écran : pas de perte de saisie) et aux variables CSS.

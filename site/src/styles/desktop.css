@@ -53,20 +53,6 @@
   .ds-detail { grid-template-columns: minmax(0, 1.5fr) minmax(300px, 1fr); gap: var(--ds-s-6); align-items: start; }
 }
 
-/* Tablette paysage / petit ordinateur : éviter les KPI trop étroits et les cartes en colonnes serrées. */
-@media (min-width: 900px) and (max-width: 1099.98px) {
-  .ds-d-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .ds-d-split { grid-template-columns: minmax(0, 1fr); }
-
-  /* Liste clients : garder les filtres de niveau confortables sur tablette paysage. */
-  .ds-tiers { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .ds-tier--avg { grid-column: 1 / -1; }
-
-  /* Liste Audits : éviter une première colonne trop étroite avec la sidebar sur petit desktop.
-     La composition en deux lignes reprend le rythme mobile sans réduire les actions. */
-  .ds-audit-head { display: none; }
-}
-
 @media (min-width: 900px) {
   /* Lot 3 : fiches en deux colonnes ; formulaire à gauche et résultats à droite sur grand écran */
   .ds-places { grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr)); }
@@ -82,38 +68,15 @@
 
 /* Lot 4 : audits — ordinateur (tableau professionnel et colonnes) */
 @media (min-width: 900px) {
-  .ds-dossier-head { grid-template-columns: minmax(0, 1fr) minmax(0, 470px); align-items: center; }
-  .ds-dossier-head .ds-d-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .ds-dossier-head .ds-d-actions .ds-btn { width: 100%; padding-inline: var(--ds-s-3); }
+  .ds-audit-head, .ds-audit-row { display: grid; grid-template-columns: minmax(0, 2.2fr) minmax(150px, 1fr) 110px 200px; grid-template-areas: none; gap: var(--ds-s-4); align-items: center; }
+  .ds-audit-head { padding: 0 var(--ds-s-4); margin-bottom: var(--ds-s-2); font-size: var(--ds-fs-xs); font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: var(--ds-lavender); }
+  .ds-audit-row > * { grid-area: auto; } .ds-audit-row__score, .ds-audit-row__act { justify-self: start; }
+  .ds-audit-rows { gap: var(--ds-s-2); } .ds-audit-row:hover { border-color: var(--ds-line); background: var(--ds-surface-2); }
+  .ds-dossier-head { grid-template-columns: minmax(260px, 1fr) minmax(0, auto); align-items: center; }
+  .ds-dossier-head .ds-d-actions { justify-content: flex-end; max-width: 560px; }
   .ds-live { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; }
   .ds-live > .ds-live__top, .ds-live > .ds-prog, .ds-live > .ds-prog__row, .ds-live > .ds-live__counts, .ds-live > .ds-msg, .ds-live > p, .ds-live > .ds-facts { grid-column: 1 / -1; }
   .ds-live > .ds-srcs { grid-column: 1 / -1; grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
-
-/* Audits : tableau à quatre colonnes uniquement quand la largeur permet
-   réellement d'afficher la sidebar et les colonnes. Entre 900 et 1099 px,
-   la composition tablette définie plus haut (2 lignes) reste prioritaire. */
-@media (min-width: 1100px) {
-  .ds-audit-head, .ds-audit-row {
-    display: grid;
-    grid-template-columns: minmax(0, 2.2fr) minmax(150px, 1fr) 110px 200px;
-    grid-template-areas: none;
-    gap: var(--ds-s-4);
-    align-items: center;
-  }
-  .ds-audit-head {
-    padding: 0 var(--ds-s-4);
-    margin-bottom: var(--ds-s-2);
-    font-size: var(--ds-fs-xs);
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: .06em;
-    color: var(--ds-lavender);
-  }
-  .ds-audit-row > * { grid-area: auto; }
-  .ds-audit-row__score, .ds-audit-row__act { justify-self: start; }
-  .ds-audit-rows { gap: var(--ds-s-2); }
-  .ds-audit-row:hover { border-color: var(--ds-line); background: var(--ds-surface-2); }
 }
 
 /* Lot 7 : ordinateur — bouton retour à sa taille (pas étiré), carte latérale lisible */
@@ -123,7 +86,3 @@
   .ds-d-split > .ds-d-stack + .ds-d-stack .ds-row--btn { flex-wrap: wrap; row-gap: var(--ds-s-1); }
   .ds-d-split > .ds-d-stack + .ds-d-stack .ds-row__main { flex: 1 1 9rem; min-width: 0; }
 }
-
-/* Contrôle du thème dans l'en-tête desktop. */
-.ds-d-header .ds-theme-toggle { flex:0 0 auto; }
-.ds-d-header { flex-wrap:wrap; }

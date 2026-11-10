@@ -3,7 +3,7 @@
 // Un critère non mesuré est affiché « non mesuré », jamais comme un défaut.
 import { btn, card, badge, scoreBadge, scoreTone, bar, emptyState, avatar, searchField } from '../components/ui.js';
 import { auditList, auditAnalysis, auditDate, clientAuditHistory } from '../../data/audits.js';
-import { escHtml, safeHttpUrl, fmtRating } from '../../core/utils.js';
+import { escHtml, safeHttpUrl } from '../../core/utils.js';
 import { liveHtml, bannerSlot } from './audit-live.js';
 
 const fmtDate = d => d ? d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' }) : '';
@@ -228,7 +228,7 @@ function clientCard(c) {
     ['Activité / code APE', [s.naf, s.nafSection].filter(Boolean).join(' · ')],
     ['Établissements déclarés', s.etablissements],
     ['État administratif', s.etatAdministratif === 'A' ? 'Actif' : s.etatAdministratif === 'F' ? 'Fermé' : s.etatAdministratif],
-    ['Note Google', d.rating != null ? '★ ' + fmtRating(d.rating) + ' (' + (d.reviews || 0) + ' avis)' : ''],
+    ['Note Google', d.rating != null ? '★ ' + d.rating + ' (' + (d.reviews || 0) + ' avis)' : ''],
     ['Horaires Google', Array.isArray(d.hours) ? d.hours.join(' · ') : '']
   ].filter(r => r[1] != null && String(r[1]).trim() !== '');
   const legal = s.siren ? '<p class="ds-row__meta">Source : <a href="https://annuaire-entreprises.data.gouv.fr/entreprise/' + encodeURIComponent(s.siren) + '" target="_blank" rel="noopener noreferrer">Annuaire des Entreprises ↗</a> · Correspondance ' + escHtml(s.matchConfidence || 'à vérifier') + '</p>' : '<p class="ds-row__meta">Informations légales non confirmées : lancez une analyse complète pour interroger le registre public. Aucune donnée n’est déduite.</p>';

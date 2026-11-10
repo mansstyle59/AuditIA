@@ -38,7 +38,7 @@ function apiField(svc, s) {
     ? `<button type="button" class="ds-api-clear" data-api-clear="${svc.column}" ${disabled}>Supprimer la clé enregistrée</button>`
     : '';
   const usage = svc.used
-    ? '<span class="ds-api-use ds-api-use--active">Utilisée dans AuditIA</span>'
+    ? '<span class="ds-api-use ds-api-use--active">Utilisée par les audits</span>'
     : '<span class="ds-api-use">Enregistrée pour intégration ultérieure</span>';
   const hint = status.hint ? `<small class="ds-api-hint">${escHtml(status.source || 'Clé disponible')} · ${escHtml(status.hint)}</small>` : `<small class="ds-api-hint">${escHtml(status.source || 'Aucune clé enregistrée')}</small>`;
   return `<article class="ds-api-service">
@@ -70,7 +70,7 @@ function servicesCard(s) {
   return card({
     title: 'API et intégrations',
     body: `<form data-api-settings-form novalidate>
-      <p class="ds-api-intro">Gérez les connexions utilisées par AuditIA. Les clés Google Places, PageSpeed et Bing Webmaster sont transmises à la fonction serveur sécurisée ; elles ne sont jamais affichées après enregistrement.</p>
+      <p class="ds-api-intro">Gérez les connexions utilisées par AuditIA. Les clés Google Places et PageSpeed peuvent être remplacées ici sans les exposer dans le navigateur.</p>
       <fieldset class="ds-api-group"><legend>Services utilisés par les audits</legend><div class="ds-api-grid">${primary}</div></fieldset>
       <fieldset class="ds-api-group"><legend>Autres intégrations</legend><p class="ds-hint">Ces connecteurs sont conservés dans vos réglages. Une clé enregistrée ne signifie pas que l’intégration est déjà activée dans le moteur d’audit.</p><div class="ds-api-grid">${other}</div></fieldset>
       <fieldset class="ds-api-group"><legend>Propriétés et informations complémentaires</legend><div class="ds-fgrid">${fields}</div></fieldset>

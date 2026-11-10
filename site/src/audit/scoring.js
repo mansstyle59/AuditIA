@@ -62,28 +62,24 @@ export function rankBadge(r){ if(r.error) return {t:'indisponible',c:'no'}; if(r
 export function improvementPlan(a,c){
       const d=(c&&c.details)||{}; const si=(a&&a.site)||{}; const s=a&&a.scan;
       const kw=targetKeywords(c); const city=String((c&&c.city)||'').trim(); const base=kw.base||'votre activité';
-      const hasGoogle=!!String(d.place_id||'').trim();
-      const rating=(hasGoogle&&d.rating!=null&&Number.isFinite(Number(d.rating)))?Number(d.rating):null;
-      const reviews=(hasGoogle&&d.reviews!=null&&Number.isFinite(Number(d.reviews)))?Number(d.reviews):null;
-      const photos=(hasGoogle&&d.photoCount!=null&&Number.isFinite(Number(d.photoCount)))?Number(d.photoCount):null;
-      const hours=hasGoogle&&Array.isArray(d.hours)&&d.hours.length>0;
-       const hasWeb=!!String((c&&c.website)||d.website||'').trim();
+      const hasGoogle=!!(d.place_id||d.address||d.rating!=null);
+      const rating=(d.rating!=null)?Number(d.rating):null; const reviews=Number(d.reviews||0);
+      const photos=(d.photoCount!=null)?Number(d.photoCount):null;
+      const hours=!!(Array.isArray(d.hours)&&d.hours.length);
+      const hasWeb=!!String((c&&c.website)||'').trim();
       const perf=(s&&s.scores)?s.scores.performance:null;
       const socials=(si.socials)||[]; const haveNet=new Set(socials.map(x=>x.net));
       const missingNet=['Instagram','Facebook','TikTok'].filter(m=>!haveNet.has(m));
-      const dirs=(si.directories)||[]; const comp=si.competitors; const topComp=comp&&comp.list&&comp.list.find(x=>!x.isSelf&&x.reviews!=null);
+      const dirs=(si.directories)||[]; const comp=si.competitors; const topComp=comp&&comp.list&&comp.list.find(x=>!x.isSelf);
       const items=[]; const push=(axis,title,why,how,priority,impact)=>items.push({axis,title,why,how,priority,impact});
-      if(!hasGoogle) push('Fiche Google','Vérifier et associer la fiche Google Business Profile','Aucun identifiant Google Places n’est associé à ce dossier. Cela ne prouve pas que la fiche n’existe pas : vérifiez le commerce dans Google Maps/Places avant de conclure.',['Rechercher le nom exact et la ville dans Google Maps ou Places','Comparer l’adresse et le téléphone avec les informations du commerçant','Associer la fiche confirmée au dossier AuditIA via Google Places'],'Haute','Fort');
-       else push('Fiche Google','Vérifier et compléter la fiche Google Business Profile si vous en êtes gestionnaire','Une fiche Google Places est associée au dossier, mais cela ne confirme pas les droits de gestion ni la complétude du profil.',['Confirmer que vous êtes propriétaire ou gestionnaire de la fiche','Vérifier catégories, description, adresse, téléphone et horaires','Compléter les informations manquantes si vous disposez des accès'],'Haute','Fort');
-      if(hasGoogle&&reviews!=null&&reviews<10){
-        const competitorNote=topComp?' Votre concurrent '+topComp.name+' en a déjà '+topComp.reviews+' — l’écart se rattrape avec une collecte régulière.':'';
-        const reviewNote='Les avis contribuent à la confiance des clients et constituent un signal parmi d’autres pour la visibilité locale. Volume observé : '+reviews+' avis'+(rating!=null?' ('+rating+'/5)':'')+'.'+competitorNote;
-        push('Avis & réputation','Lancer une collecte d’avis Google',reviewNote,['QR code vers l’avis Google en caisse / à l’accueil','SMS ou e-mail après l’achat avec le lien court d’avis','Former l’équipe à demander un avis à l’oral aux clients contents','Objectif : 5 à 10 nouveaux avis par mois','Répondre à 100 % des avis (merci + réponse pro aux négatifs)'],'Haute','Fort');
-      } else if(hasGoogle&&rating!=null&&rating<4.3) push('Avis & réputation','Faire remonter la note Google','Note actuelle '+rating+'/5 : une note plus basse peut réduire la confiance des clients et rendre la comparaison moins favorable'+(topComp&&topComp.rating?' (ex. '+topComp.name+' : ★ '+topComp.rating+')':'')+'.',['Répondre posément à chaque avis négatif et corriger les points récurrents','Solliciter activement les clients satisfaits (ils notent rarement d’eux-mêmes)','Viser une majorité d’avis récents (Google valorise la fraîcheur)'],'Haute','Fort');
-       if(hasGoogle&&photos!=null&&photos<10) push('Fiche Google','Ajouter des photos récentes (et régulièrement)','Le nombre de photos récupéré est de '+photos+'. Vérifier la qualité et la récence, pas seulement le volume.',['Devanture, intérieur, produits phares, équipe','Photo de couverture et logo soignés','Ajouter 2 à 3 nouvelles photos par mois pour montrer l’activité'],'Moyenne','Moyen');
-      if(hasGoogle&&!hours) push('Fiche Google','Vérifier les horaires sur la fiche Google','Les horaires n’ont pas été récupérés dans les données disponibles. Vérifiez la fiche publique avant de conclure qu’ils sont absents.',['Confirmer les horaires habituels avec le commerçant','Mettre à jour les horaires et les exceptions sur la fiche Google'],'Moyenne','Moyen');
-       if(hasGoogle) push('Fiche Google','Publier des “posts” Google si vous gérez la fiche','Les posts peuvent présenter les offres et événements aux personnes qui consultent la fiche. Leur effet sur le classement n’est pas garanti et leur publication nécessite un accès de gestion.',['Si vous êtes propriétaire ou gestionnaire, publier 1 à 2 posts par mois','Ajouter une photo et un bouton d’action à chaque post'],'À planifier','Moyen');
-       if(!hasWeb) push('Site web','Vérifier si le commerce dispose d’un site web','Aucune URL n’est renseignée dans AuditIA. Cela ne prouve pas que le commerce n’a pas de site : confirmer auprès du commerçant avant de recommander une création.',['Demander l’adresse officielle au commerçant','Vérifier que le site correspond bien à l’établissement','Ajouter l’URL validée au dossier AuditIA'],'Haute','Fort');
+      if(!hasGoogle) push('Fiche Google','Créer et faire valider la fiche Google Business Profile','La recherche locale (« '+base+(city?' '+city:'')+' ») passe d’abord par Google et Maps. Sans fiche validée, le commerce est absent des résultats et de la carte : c’est la première cause d’invisibilité.',['Créer la fiche sur google.com/business (nom exact, adresse, téléphone)','Choisir la bonne catégorie principale + 2 à 3 catégories secondaires','Faire valider la fiche (courrier, téléphone ou vidéo)','Remplir 100 % des champs dès la validation'],'Haute','Fort');
+      else push('Fiche Google','Compléter la fiche Google à 100 %','Une fiche complète aide les clients à vérifier rapidement les informations essentielles. Son effet sur la position dépend aussi de la pertinence, de la distance et de la notoriété.',['Rédiger une description avec vos services + la ville','Ajouter catégories secondaires, zone desservie et attributs (accès, paiements, Wi-Fi, terrasse…)','Renseigner les produits/services avec photos et prix','Ajouter un lien d’action (réserver / commander / prendre RDV)'],'Haute','Fort');
+      if(rating==null||reviews<10) push('Avis & réputation','Lancer une collecte d’avis Google','Les avis contribuent à la confiance des clients et constituent un signal parmi d’autres pour la visibilité locale. Aujourd’hui : '+(reviews||0)+' avis'+(rating!=null?' ('+rating+'/5)':'')+'.'+(topComp?' Votre concurrent '+topComp.name+' en a déjà '+topComp.reviews+' — l’écart se rattrape avec une collecte régulière.':''),['QR code vers l’avis Google en caisse / à l’accueil','SMS ou e-mail après l’achat avec le lien court d’avis','Former l’équipe à demander un avis à l’oral aux clients contents','Objectif : 5 à 10 nouveaux avis par mois','Répondre à 100 % des avis (merci + réponse pro aux négatifs)'],'Haute','Fort');
+      else if(rating<4.3) push('Avis & réputation','Faire remonter la note Google','Note actuelle '+rating+'/5 : une note plus basse peut réduire la confiance des clients et rendre la comparaison moins favorable'+(topComp&&topComp.rating?' (ex. '+topComp.name+' : ★ '+topComp.rating+')':'')+'.',['Répondre posément à chaque avis négatif et corriger les points récurrents','Solliciter activement les clients satisfaits (ils notent rarement d’eux-mêmes)','Viser une majorité d’avis récents (Google valorise la fraîcheur)'],'Haute','Fort');
+      if(photos!=null&&photos<10) push('Fiche Google','Ajouter des photos récentes (et régulièrement)','Les fiches avec beaucoup de photos récentes génèrent plus d’appels et d’itinéraires. Aujourd’hui : '+photos+' photo'+(photos>1?'s':'')+'.',['Devanture, intérieur, produits phares, équipe','Photo de couverture et logo soignés','Ajouter 2 à 3 nouvelles photos par mois pour montrer l’activité'],'Moyenne','Moyen');
+      if(!hours) push('Fiche Google','Renseigner les horaires (et exceptionnels)','Google affiche les horaires dans les résultats. Absents, ils font perdre des clients et des clics, surtout en soirée et les jours fériés.',['Saisir les horaires d’ouverture habituels','Renseigner les horaires exceptionnels (fêtes, congés)'],'Moyenne','Moyen');
+      push('Fiche Google','Publier des “posts” Google régulièrement','Les posts permettent de présenter les offres, nouveautés et événements aux personnes qui consultent la fiche ; leur effet sur le classement n’est pas garanti.',['Publier 1 à 2 posts par mois (promo, nouveauté, événement)','Ajouter une photo + un bouton d’action à chaque post'],'À planifier','Moyen');
+      if(!hasWeb) push('Site web','Créer un site vitrine','Sans site web, les clients disposent de moins d’informations pour vérifier les services, les horaires et les coordonnées. Un site clair peut aussi fournir des informations structurées aux moteurs de recherche et aux assistants IA.',['Page d’accueil claire : qui, quoi, où, horaires, contact','Page services / menu avec photos (et prix si pertinent)','Page contact : carte, téléphone cliquable, itinéraire','Boutons « Appeler » / « Itinéraire » / « Réserver » visibles sur mobile','Site rapide, en HTTPS, pensé mobile d’abord'],'Haute','Fort');
       else { if(perf!=null&&perf<50) push('Site web','Accélérer le site sur mobile','Performance mobile '+perf+'/100. Plus d’un visiteur sur deux quitte un site qui met plus de 3 s à charger, et Google pénalise les sites lents.',['Compresser et servir les images en WebP','Limiter les scripts et plugins tiers','Activer le cache + bon hébergement','Charger les images en différé (lazy-load)'],'Haute','Fort');
         if(si.pageRead&&!(si.title&&si.metaDesc)) push('Site web','Optimiser les balises SEO','Sans titre ni description clairs, Google n’a pas de résumé à afficher et vous perdez des clics dans les résultats.',['Titre < 60 caractères avec activité + ville','Meta-description accrocheuse (140-160 car.) avec appel à l’action','Un seul H1 par page, structuré avec des sous-titres'],'Moyenne','Moyen'); }
       if(hasWeb&&si.pageRead&&!si.localSchema) push('Visibilité IA (GEO)','Ajouter les données structurées (schema.org LocalBusiness)','LE levier pour être compris par Google ET par les IA. Les données structurées disent « qui, quoi, où, quand » ; sans elles, ChatGPT ou Gemini ont du mal à vous citer quand un client demande « meilleur '+base+(city?' à '+city:'')+' ».',['Ajouter un bloc JSON-LD « LocalBusiness » (nom, adresse, téléphone, horaires, position)','Reprendre exactement les coordonnées de Google (cohérence NAP)','Ajouter FAQ et avis structurés si possible'],'Haute','Fort');
@@ -94,7 +90,7 @@ export function improvementPlan(a,c){
       const usableRk=(si.rankings||[]).filter(r=>!r.error);
       const notRanked=usableRk.length>0&&!usableRk.some(r=>r.pos!=null&&r.pos<=10);
       const behind=comp&&comp.selfRank&&comp.selfRank>3;
-       if(notRanked||behind){ const arg=(comp&&comp.selfRank)?('Par nombre d’avis, ce commerce est n°'+comp.selfRank+' sur '+comp.total+' commerces comparés'+(topComp?', derrière '+topComp.name+' ('+topComp.reviews+' avis)':'')+'. Ce n’est pas le rang Google Maps.'):(notRanked?'Le nom ou le site n’apparaît pas dans les adresses des 10 premiers résultats web.':'La comparaison de concurrents doit être vérifiée à partir des données disponibles.');
+      if(notRanked||behind||!hasGoogle){ const arg=(comp&&comp.selfRank)?('Par nombre d’avis, ce commerce est n°'+comp.selfRank+' sur '+comp.total+' commerces comparés'+(topComp?', derrière '+topComp.name+' ('+topComp.reviews+' avis)':'')+'. Ce n’est pas le rang Google Maps.'):(notRanked?'Le nom ou le site n’apparaît pas dans les adresses des 10 premiers résultats web.':'Sans fiche Google, le commerce n’est pas identifiable dans la recherche locale.');
         push('SEO local','Remonter sur « '+mainKw+' » (référencement local)',arg,['Optimiser la fiche Google (catégories, description, photos, posts) — 1er levier local','Accélérer la collecte d’avis récents','Mêmes nom / adresse / téléphone partout (site, annuaires, Google)','Publier du contenu local sur le site (ville, quartiers, services)','Obtenir quelques liens locaux (presse, partenaires, associations)'],'Haute','Fort'); }
       if(dirs.length<2) push('Annuaires & citations','S’inscrire sur les annuaires clés','Être référencé sur les grands annuaires renforce la cohérence des informations et la confiance (pour Google comme pour les IA).',['Pages Jaunes, Google Maps et annuaires de la ville','TripAdvisor / TheFork (resto), Planity (beauté), Doctolib (santé)…','Mettre partout EXACTEMENT les mêmes coordonnées (cohérence NAP)'],'Moyenne','Moyen');
       const rank={'Haute':0,'Moyenne':1,'À planifier':2};
@@ -104,7 +100,7 @@ export function improvementPlan(a,c){
 export const AUDIT_CATEGORY_META = [
   { id: 'google', label: 'Fiche Google & informations pratiques', description: 'Identification de l’établissement, coordonnées, horaires et photos.', scored: true },
   { id: 'reputation', label: 'Avis & e-réputation', description: 'Note publique et volume d’avis observés.', scored: true },
-  { id: 'website', label: 'Site web & expérience mobile', description: 'Protocole HTTPS, lisibilité mobile, contact et qualité technique.', scored: true },
+  { id: 'website', label: 'Site web & expérience mobile', description: 'Sécurité, lisibilité mobile, contact et qualité technique.', scored: true },
   { id: 'local_seo', label: 'SEO local & mots-clés', description: 'Référencement technique et présence dans les recherches explorées.', scored: true },
   { id: 'social', label: 'Réseaux sociaux & annuaires', description: 'Profils sociaux et présence dans les annuaires détectés.', scored: true },
   { id: 'geo', label: 'Visibilité IA & GEO', description: 'Données structurées, lisibilité et accès des assistants IA.', scored: true },
@@ -112,17 +108,16 @@ export const AUDIT_CATEGORY_META = [
 ];
 
 const CATEGORY_BY_CRITERION = {
-  'Fiche Google/Maps associée': 'google',
-  'Établissement identifié dans Google Places': 'google',
+  'Fiche Google Business': 'google',
+  'Présence reconnue (Google/Maps)': 'google',
   'Horaires renseignés': 'google',
-  'Téléphone présent dans les données Google Places': 'google',
   'Téléphone visible': 'google',
   'Photos sur la fiche Google': 'google',
   'Note Google': 'reputation',
   'Volume d’avis': 'reputation',
   'Avis publics': 'reputation',
   'Site web': 'website',
-  'Adresse du site en HTTPS': 'website',
+  'Site sécurisé (HTTPS)': 'website',
   'Performance mobile': 'website',
   'Balises SEO (titre + description)': 'website',
   'Compatible mobile': 'website',
@@ -192,12 +187,11 @@ export function visibilityAudit(a,c){
       const d=(c&&c.details)||{}, scan=a&&a.scan, si=a&&a.site;
       const site=String((c&&c.website)||d.website||'').trim();
       const secure=/^https:\/\//i.test(site);
-      const googlePlaceId=String(d.place_id||'').trim();
-      const hasGoogle=googlePlaceId?true:null;
-      const rating=(googlePlaceId&&d.rating!=null&&Number.isFinite(Number(d.rating)))?Number(d.rating):null;
-      const reviews=(googlePlaceId&&d.reviews!=null&&Number.isFinite(Number(d.reviews)))?Number(d.reviews):null;
+      const rating=(d.rating!=null&&Number.isFinite(Number(d.rating)))?Number(d.rating):null;
+      const reviews=(d.reviews!=null&&Number.isFinite(Number(d.reviews)))?Number(d.reviews):null;
       const phone=String((c&&c.phone)||d.phone||'').trim();
-      const hours=googlePlaceId&&Array.isArray(d.hours)&&d.hours.length>0;
+      const hasGoogle=!!(d.place_id||d.address||rating!=null||reviews!=null);
+      const hours=Array.isArray(d.hours)&&d.hours.length>0;
       const perf=scan&&scan.scores&&Number.isFinite(Number(scan.scores.performance))?Number(scan.scores.performance):null;
       const seoLh=scan&&scan.scores&&Number.isFinite(Number(scan.scores.seo))?Number(scan.scores.seo):null;
       const page=!!(si&&si.pageRead);
@@ -206,35 +200,23 @@ export function visibilityAudit(a,c){
       const tier=(v,stops)=>{for(const st of stops){if(v>=st[0])return st[1];}return 0;};
       const items=[];
       // Un critère n'entre dans le calcul que si une source a fourni assez de données pour le mesurer.
-      const add=(pillar,label,observed,weight,bad,good,val,source,unmeasuredReason)=>{
+      const add=(pillar,label,observed,weight,bad,good,val,source)=>{
         const measured=observed!==null&&observed!==undefined;
         const ok=measured?!!observed:null;
         const v=measured?(val==null?(ok?1:0):Math.max(0,Math.min(1,Number(val)))):null;
-        items.push({pillar,label,category:CATEGORY_BY_CRITERION[label] || (pillar === 'geo' ? 'geo' : 'local_seo'),ok,measured,weight,source:source||'Données du dossier',advice:!measured?'À vérifier : donnée non disponible.':ok?good:bad,gap:measured&&!ok?bad:'',unmeasuredReason:unmeasuredReason||'',val:v});
+        items.push({pillar,label,category:CATEGORY_BY_CRITERION[label] || (pillar === 'geo' ? 'geo' : 'local_seo'),ok,measured,weight,source:source||'Données du dossier',advice:!measured?'À vérifier : donnée non disponible.':ok?good:bad,gap:measured&&!ok?bad:'',val:v});
       };
       // SEO : présence locale, réputation, site et mesures techniques réellement disponibles.
-      add('seo','Fiche Google/Maps associée',hasGoogle,18,'Aucun identifiant Google Places n’est associé à ce dossier. Cela ne prouve pas que la fiche est absente : vérifiez-la avant de conclure.','Identifiant Google Places associé au dossier.',null,'Google Places');
-       add('seo','Site web',site?true:null,16,'Aucune URL de site web n’est renseignée dans ce dossier. Cela ne prouve pas que le commerce n’a pas de site : confirmer auprès du commerçant.','Adresse de site web renseignée.',null,'Fiche client');
-      if(site) add('seo','Adresse du site en HTTPS',secure,4,'L’adresse enregistrée utilise HTTP. Vérifier la redirection HTTPS et le certificat TLS séparément.','Adresse enregistrée en HTTPS. Le certificat TLS n’a pas été vérifié par ce contrôle.',null,'Adresse enregistrée');
+      add('seo','Fiche Google Business',hasGoogle,18,'La fiche Google n’est pas confirmée dans les données du dossier. Vérifier la fiche publique avant de conclure.','Fiche Google identifiée.',null,'Fiche commerce');
+      add('seo','Site web',site?true:false,16,'Aucune adresse de site web n’est renseignée sur la fiche client. Confirmer avec le commerçant avant de recommander la création d’un site.','Adresse de site web renseignée.',null,'Fiche client');
+      if(site) add('seo','Site sécurisé (HTTPS)',secure,4,'L’adresse enregistrée n’utilise pas HTTPS. Vérifier la redirection et le certificat depuis le navigateur.','Adresse HTTPS.',null,'Adresse enregistrée');
       if(rating!=null){const rv=tier(rating,[[4.6,1],[4.2,0.9],[4.0,0.8],[3.5,0.55],[3.0,0.3],[0,0.15]]);add('seo','Note Google',rating>=4,10,'La note publique est inférieure à 4/5. Examiner les avis et les motifs avant de définir une réponse.','Note publique : '+rating+'/5.',rv,'Google Places');}
       else add('seo','Note Google',null,10,'La note Google n’est pas disponible. Ne pas conclure que le commerce n’a pas d’avis.','Note Google disponible.',null,'Google Places');
       if(reviews!=null){const rv=tier(reviews,[[50,1],[20,0.85],[10,0.6],[3,0.35],[1,0.15],[0,0]]);add('seo','Volume d’avis',reviews>=20,10,'Le volume observé est de '+reviews+' avis. Comparer aux commerces similaires avant de fixer un objectif.','Volume observé : '+reviews+' avis.',rv,'Google Places');}
       else add('seo','Volume d’avis',null,10,'Le nombre d’avis n’est pas disponible.','Nombre d’avis disponible.',null,'Google Places');
-       if(googlePlaceId&&d.hours!=null) add('seo','Horaires renseignés',hours,5,'Aucun horaire n’est présent dans les données récupérées. Vérifier la fiche publique avant de conclure.','Horaires présents dans les données récupérées.',null,'Google Places');
+      if(d.hours!=null) add('seo','Horaires renseignés',hours,5,'Aucun horaire n’est présent dans les données récupérées. Vérifier la fiche publique avant de conclure.','Horaires présents dans les données récupérées.',null,'Fiche commerce');
       else add('seo','Horaires renseignés',null,5,'Les horaires n’ont pas été récupérés.','Horaires disponibles.',null,'Fiche commerce');
-      // Seul le champ explicitement reçu de Google Places confirme la présence du téléphone.
-      // L’absence du champ dans Places Details ne prouve PAS que le numéro est absent de Google Maps/GBP.
-      const googlePhone = googlePlaceId && d.googlePhone != null ? String(d.googlePhone).trim() : '';
-      const phoneMeasured = googlePhone ? true : null;
-      add('seo','Téléphone présent dans les données Google Places',phoneMeasured,5,
-        'Google Places n’a pas retourné de numéro pour cette fiche. Cela ne prouve pas que le téléphone est absent de Google Maps : contrôle manuel nécessaire.',
-        'Numéro reçu dans la réponse Google Places.',null,
-        googlePlaceId ? 'Google Places (champ téléphonique)' : 'Google Places non associé',
-        'Google Places n’a pas retourné de numéro. Cela ne prouve pas que le téléphone est absent de Google Maps/GBP : vérification manuelle nécessaire.');
-      if(page) add('seo','Lien téléphone cliquable sur le site (tel:)',Array.isArray(si.tel)?si.tel.length>0:null,4,
-        'Aucun lien tel: n’a été détecté dans la page analysée. Le numéro peut toutefois être affiché en texte simple ou sur une autre page.',
-        'Lien tel: détecté sur la page analysée.',null,'Lecture du site');
-      else add('seo','Lien téléphone cliquable sur le site (tel:)',null,4,'La page du site n’a pas été lue.','Lien tel: détecté.',null,'Lecture du site');
+      add('seo','Téléphone visible',phone?true:(d.phone===null||d.phone===undefined?null:false),5,'Aucun numéro n’est renseigné sur la fiche client. Vérifier la fiche publique.','Numéro renseigné.',null,'Fiche client');
       if(perf!=null){const pv=tier(perf,[[90,1],[70,0.8],[50,0.6],[30,0.35],[0,0.15]]);add('seo','Performance mobile',perf>=50,8,'Performance mobile mesurée à '+perf+'/100. Examiner les opportunités Lighthouse avant de choisir les optimisations.','Performance mobile mesurée à '+perf+'/100.',pv,'Google Lighthouse');}
       else add('seo','Performance mobile',null,8,'La performance mobile n’a pas été mesurée.','Performance mobile mesurée.',null,'Google Lighthouse');
       if(seoLh!=null){const lv=tier(seoLh,[[90,1],[70,0.75],[50,0.5],[0,0.25]]);add('seo','Référencement technique (Lighthouse)',seoLh>=80,6,'Score SEO technique Lighthouse : '+seoLh+'/100. Consulter les audits détaillés pour identifier les corrections pertinentes.','Score SEO technique : '+seoLh+'/100.',lv,'Google Lighthouse');}
@@ -246,7 +228,7 @@ export function visibilityAudit(a,c){
         const socials=(si.socials||[]).filter(x=>x&&x.url);
         add('seo','Réseaux sociaux reliés',socials.length>0,6,'Aucun lien de réseau social n’a été détecté dans les pages analysées. Vérifier les liens du pied de page et les profils officiels.','Au moins un lien social détecté.',Math.min(1,socials.length/2),'Lecture du site');
       }
-       if(googlePlaceId&&d.photoCount!=null&&Number.isFinite(Number(d.photoCount))){const n=Number(d.photoCount),pv=tier(n,[[10,1],[5,0.8],[1,0.4],[0,0]]);add('seo','Photos sur la fiche Google',n>=5,6,'Nombre de photos récupéré : '+n+'. Vérifier la qualité et la récence, pas seulement le volume.','Nombre de photos récupéré : '+n+'.',pv,'Google Places');}
+      if(d.photoCount!=null&&Number.isFinite(Number(d.photoCount))){const n=Number(d.photoCount),pv=tier(n,[[10,1],[5,0.8],[1,0.4],[0,0]]);add('seo','Photos sur la fiche Google',n>=5,6,'Nombre de photos récupéré : '+n+'. Vérifier la qualité et la récence, pas seulement le volume.','Nombre de photos récupéré : '+n+'.',pv,'Google Places');}
       if(si&&si.booking!=null) add('seo','Prise de contact en ligne',!!((si.booking&&si.booking.length)||si.whatsapp),4,'Aucun parcours de réservation ou contact direct n’a été détecté sur la page analysée.','Un moyen de prise de contact directe a été détecté.',null,'Lecture du site');
       if(si&&si.rankings&&si.rankings.some(r=>!r.error)){
         const usable=si.rankings.filter(r=>!r.error),n=usable.length,topN=usable.filter(r=>r.pos!=null&&r.pos<=10).length,top3=usable.filter(r=>r.pos!=null&&r.pos<=3).length,foundN=usable.filter(r=>r.found).length;
@@ -254,7 +236,7 @@ export function visibilityAudit(a,c){
         add('seo','Présence sur les mots-clés explorés',n?topN>=1:null,10,n?'Le site ou le nom n’a pas été retrouvé dans les dix premiers résultats de l’échantillon exploré. Ce n’est pas une mesure du classement Google Maps.':'Aucun mot-clé mesurable.','Présence retrouvée dans '+foundN+'/'+n+' recherches explorées.',rv,'Recherche web indicative');
       }
       // GEO : critères sur le contenu uniquement lorsque la page a été lue, autres données selon leur source.
-      add('geo','Établissement identifié dans Google Places',hasGoogle,16,'Aucun identifiant Google Places n’est associé à ce dossier. Cela ne prouve pas que l’établissement est absent de Google.','Établissement associé dans Google Places.',null,'Google Places');
+      add('geo','Présence reconnue (Google/Maps)',hasGoogle,16,'La fiche Google n’est pas confirmée dans les données disponibles.','Fiche Google identifiée.',null,'Fiche commerce');
       if(page){
         const schema=!!si.localSchema, sv=schema?1:((si.ldTypes||[]).length?0.4:0);
         add('geo','Données structurées LocalBusiness',schema,20,'Aucun schéma LocalBusiness n’a été détecté sur la page lue. Vérifier aussi les données structurées sur les autres pages pertinentes.','Données structurées LocalBusiness détectées.',sv,'Lecture du site');
@@ -354,7 +336,7 @@ export function auditActions(a,c,diag){
         [/performance|largest contentful paint|first contentful paint|cumulative layout shift|speed index|blocking time/i,'Performance mobile'],
         [/meta description|title element|document has a title|seo/i,'Référencement technique (Lighthouse)'],
         [/viewport|tap targets|font sizes/i,'Compatible mobile'],
-        [/https|http requests/i,'Adresse du site en HTTPS'],
+        [/https|http requests/i,'Site sécurisé (HTTPS)'],
         [/accessibility|contrast|aria|label/i,'Accessibilité']
       ];
       const already=new Set(fromDiagnostic.map(x=>x.label.toLowerCase()));
