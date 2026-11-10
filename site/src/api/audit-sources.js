@@ -67,6 +67,24 @@ export function createAuditSources(deps0){
         });
         return {socials,directories:dirs.slice(0,8)};
       }
+      /* Recherche ciblée par réseau : chaque plateforme possède sa propre ligne de progression dans l'audit. */
+      async function findSocialProfile(c, network){
+        const hosts={Instagram:'instagram.com',Facebook:'facebook.com',YouTube:'youtube.com',TikTok:'tiktok.com',LinkedIn:'linkedin.com'};
+        const host=hosts[network]; const name=String((c&&c.name)||'').trim();
+        if(!host||!name) return null;
+        const city=String((c&&c.city)||'').trim();
+        const query=('site:'+host+' "'+name+'" '+city).trim();
+        const results=await fetchSerp(query).catch(()=>[]);
+        for(const r of results){
+          let u; try{u=new URL(r.url);}catch(e){continue;}
+          if(!(u.hostname===host||u.hostname.endsWith('.'+host))) continue;
+          if(/\/login|\/share|\/sharer|\/policies|\/privacy/i.test(u.pathname)) continue;
+          if(businessInUrl(u.href,name)||businessInUrl(r.title,name)){
+            return {net:network,url:u.href,source:'recherche web ciblée'};
+          }
+        }
+        return null;
+      }
       async function fetchPlacePhotos(placeId){
         if(!placeId) return null;
         try{ return await placePhotoCount(deps.getClient, placeId); }catch(e){ return null; }
