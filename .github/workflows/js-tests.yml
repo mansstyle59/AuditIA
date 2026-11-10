@@ -1,0 +1,31 @@
+name: AuditIA moteur de score (tests JS)
+
+on:
+  push:
+    branches: [main, "feature/**", "audit/**"]
+    paths:
+      - "site/src/audit/**"
+      - "site/src/data/audits.js"
+      - "site/tests/**"
+      - ".github/workflows/js-tests.yml"
+  pull_request:
+    paths:
+      - "site/src/audit/**"
+      - "site/src/data/audits.js"
+      - "site/tests/**"
+      - ".github/workflows/js-tests.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Tests unitaires du score
+        run: node --test site/tests/*.test.mjs

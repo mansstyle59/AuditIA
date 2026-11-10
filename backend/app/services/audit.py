@@ -3,14 +3,14 @@ from collections.abc import AsyncIterator
 from urllib.parse import urlparse
 
 from app.models import AuditRequest
-from app.providers.search import DuckDuckGoSearch
+from app.providers.search import build_default_provider
 
 
 class AuditService:
     """Orchestrates independent public-source searches and streams real progress."""
 
     def __init__(self, provider=None, *, concurrency: int = 3, source_timeout: float = 18):
-        self.provider = provider or DuckDuckGoSearch()
+        self.provider = provider or build_default_provider()
         self.semaphore = asyncio.Semaphore(max(1, concurrency))
         self.source_timeout = source_timeout
 
@@ -108,9 +108,13 @@ class AuditService:
                     key: ("done" if results.get(key) else "empty_or_limited")
                     for key, _, _ in jobs
                 },
+                "search_provider": getattr(self.provider, "name", "inconnu"),
+                "search_reliability": getattr(self.provider, "reliability", "indicatif"),
                 "notice": (
                     "Découverte web indicative : chaque résultat doit être vérifié. "
                     "Les profils sociaux ne sont pas confirmés par la plateforme elle-même."
+                    + (" Recherche par relais public sans API officielle : fiabilité moindre."
+                       if getattr(self.provider, "reliability", "") == "indicatif" else "")
                 ),
             },
         }

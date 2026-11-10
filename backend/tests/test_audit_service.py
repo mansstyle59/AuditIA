@@ -50,3 +50,56 @@ def test_search_parser_decodes_duckduckgo_redirect_and_deduplicates():
     assert len(results) == 1
     assert results[0]["url"] == "https://example.com/page"
     assert results[0]["source"] == "web"
+
+
+def test_build_default_provider_prefers_official_api_when_key_is_set():
+    from app.providers.search import BraveSearch, build_default_provider
+
+    assert isinstance(build_default_provider({}), DuckDuckGoSearch)
+    provider = build_default_provider({"BRAVE_SEARCH_API_KEY": "test-key"})
+    assert isinstance(provider, BraveSearch)
+    assert provider.reliability == "api-officielle"
+
+
+@pytest.mark.asyncio
+async def test_brave_provider_parses_official_api_response_and_sends_key():
+    import httpx
+    from app.providers.search import BraveSearch
+
+    seen = {}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen["token"] = request.headers.get("X-Subscription-Token")
+        seen["q"] = request.url.params.get("q")
+        return httpx.Response(200, json={"web": {"results": [
+            {"title": "Boulangerie Martin", "url": "https://example.com/martin", "description": "Pain"},
+            {"title": "Doublon", "url": "https://example.com/martin"},
+            {"title": "Sans lien", "url": "ftp://nope"},
+        ]}})
+
+    provider = BraveSearch("secret-key", transport=httpx.MockTransport(handler))
+    results = await provider.search('"Martin" "Narbonne"', "web")
+    assert seen == {"token": "secret-key", "q": '"Martin" "Narbonne"'}
+    assert [r["url"] for r in results] == ["https://example.com/martin"]
+    assert results[0]["provider"] == "brave"
+
+
+@pytest.mark.asyncio
+async def test_duckduckgo_retries_once_on_rate_limit_then_succeeds():
+    import httpx
+    from app.providers.search import DuckDuckGoSearch
+
+    calls = {"n": 0}
+    html = '<div class="result"><a class="result__a" href="https://example.com/ok">OK</a></div>'
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        calls["n"] += 1
+        if calls["n"] == 1:
+            return httpx.Response(429)
+        return httpx.Response(200, text=html)
+
+    provider = DuckDuckGoSearch(transport=httpx.MockTransport(handler), retry_delay=0)
+    results = await provider.search("boulangerie", "web")
+    assert calls["n"] == 2
+    assert results[0]["url"] == "https://example.com/ok"
+    assert results[0]["provider"] == "duckduckgo"

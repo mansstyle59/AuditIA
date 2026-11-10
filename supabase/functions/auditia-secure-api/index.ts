@@ -25,6 +25,11 @@ const ALLOWED_ORIGINS = new Set<string>([
 
 const PLACES_BASE = "https://places.googleapis.com/v1/";
 const PAGESPEED_URL = "https://www.googleapis.com/pagespeedonline/v5/runPagespeed";
+const BRAVE_SEARCH_URL = "https://api.search.brave.com/res/v1/web/search";
+const BRAVE_KEY = Deno.env.get("BRAVE_SEARCH_API_KEY") || "";
+const SITE_TIMEOUT_MS = 12_000;
+const SITE_MAX_BYTES = 1_500_000;
+const SITE_MAX_REDIRECTS = 3;
 const UPSTREAM_TIMEOUT_MS = 20_000;
 const PAGESPEED_TIMEOUT_MS = 55_000;
 const MAX_BODY_CHARS = 24_000;
@@ -46,6 +51,8 @@ const LIMITS: Record<string, { perMinute: number; perDay: number }> = {
   places_autocomplete: { perMinute: 30, perDay: 1500 },
   places_details: { perMinute: 30, perDay: 400 },
   pagespeed: { perMinute: 4, perDay: 40 },
+  site_read: { perMinute: 60, perDay: 1500 },
+  web_search: { perMinute: 20, perDay: 400 },
 };
 
 // Messages d'erreur stables, sans détail interne. Le client les affiche tels quels.
@@ -68,6 +75,9 @@ const ERRORS: Record<string, [number, string]> = {
   invalid_target_url: [400, "Adresse de site non analysable."],
   google_places_key_not_configured: [424, "La clé Google Places n’est pas configurée côté serveur."],
   pagespeed_key_not_configured: [424, "La clé PageSpeed n’est pas configurée côté serveur."],
+  search_key_not_configured: [424, "La clé de recherche web n’est pas configurée côté serveur."],
+  site_unreadable: [502, "Site inaccessible ou illisible."],
+  search_unavailable: [502, "Recherche web indisponible."],
   rate_limit_exceeded: [429, "Trop de requêtes. Patientez une minute."],
   daily_quota_exceeded: [429, "Quota journalier atteint. Réessayez demain."],
   secure_api_unavailable: [503, "Service temporairement indisponible. Réessayez."],
@@ -225,6 +235,119 @@ async function consume(bucket: string, limit: number, windowSeconds: number) {
 }
 
 // Valide la requête AVANT toute consommation de quota. Retourne les champs normalisés pour l'appel amont.
+// Lecture d'un site côté serveur (remplace les relais tiers). Refus des adresses internes, redirections contrôlées.
+function isPublicHost(hostname: string): boolean {
+  const h = hostname.toLowerCase();
+  if (!h.includes(".") || h.includes(":")) return false; // pas de nom court, pas d'IPv6 littérale
+  if (h === "localhost" || h.endsWith(".localhost") || h.endsWith(".local") || h.endsWith(".internal")) return false;
+  const m = h.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
+  if (m) {
+    const a = Number(m[1]), b = Number(m[2]);
+    if (a === 0 || a === 10 || a === 127 || a >= 224 || (a === 169 && b === 254) || (a === 172 && b >= 16 && b <= 31) || (a === 192 && b === 168)) return false;
+  }
+  return true;
+}
+
+async function readLimited(res: Response, max: number): Promise<string> {
+  if (!res.body) return "";
+  const reader = res.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  while (total < max) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    chunks.push(value);
+    total += value.byteLength;
+  }
+  await reader.cancel().catch(() => {});
+  const merged = new Uint8Array(Math.min(total, max));
+  let offset = 0;
+  for (const c of chunks) {
+    const room = merged.byteLength - offset;
+    if (room <= 0) break;
+    const part = c.subarray(0, Math.min(c.byteLength, room));
+    merged.set(part, offset);
+    offset += part.byteLength;
+  }
+  return new TextDecoder("utf-8").decode(merged.subarray(0, offset));
+}
+
+async function readSitePage(start: URL): Promise<{ status: number; finalUrl: string; contentType: string; body: string } | null> {
+  let current = start;
+  for (let hop = 0; hop <= SITE_MAX_REDIRECTS; hop++) {
+    if (!isPublicHost(current.hostname)) return null;
+    const res = await fetch(current.toString(), {
+      redirect: "manual",
+      headers: { "User-Agent": "AuditIA-Reader/1.0", Accept: "text/html,text/plain,application/xml;q=0.9,*/*;q=0.5" },
+      signal: AbortSignal.timeout(SITE_TIMEOUT_MS),
+    });
+    if (res.status >= 300 && res.status < 400) {
+      const location = res.headers.get("location");
+      await res.body?.cancel().catch(() => {});
+      if (!location) return null;
+      current = new URL(location, current);
+      if (!/^https?:$/.test(current.protocol)) return null;
+      continue;
+    }
+    const contentType = (res.headers.get("content-type") || "").toLowerCase();
+    if (contentType && !/text\/|xml|json/.test(contentType)) {
+      await res.body?.cancel().catch(() => {});
+      return null;
+    }
+    const body = await readLimited(res, SITE_MAX_BYTES);
+    return { status: res.status, finalUrl: current.toString(), contentType, body };
+  }
+  return null;
+}
+
+function validateSiteRead(body: Record<string, unknown>, origin: string | null): { ok: true; key: string; fields: Record<string, unknown> } | { ok: false; res: Response } {
+  let site: URL;
+  try { site = new URL(safeText(body.url, 2000)); } catch { return { ok: false, res: reply(origin, "invalid_target_url") }; }
+  if (!/^https?:$/.test(site.protocol) || !isPublicHost(site.hostname)) return { ok: false, res: reply(origin, "invalid_target_url") };
+  const path = safeText(body.path, 200) || "/";
+  if (!path.startsWith("/") || path.startsWith("//") || path.includes("\\")) return { ok: false, res: reply(origin, "invalid_target_url") };
+  return { ok: true, key: "site", fields: { origin: site.origin, path } };
+}
+
+function validateWebSearch(body: Record<string, unknown>, origin: string | null): { ok: true; key: string; fields: Record<string, unknown> } | { ok: false; res: Response } {
+  const query = safeText(body.query, 200);
+  if (!query) return { ok: false, res: reply(origin, "invalid_query") };
+  return { ok: true, key: "brave", fields: { query } };
+}
+
+async function handleSiteRead(f: Record<string, unknown>, origin: string | null): Promise<Response> {
+  const target = new URL(f.path as string, f.origin as string);
+  const page = await readSitePage(target);
+  if (!page) return reply(origin, "site_unreadable");
+  return new Response(JSON.stringify(page), {
+    status: 200,
+    headers: { ...corsHeaders(origin), "Content-Type": "application/json; charset=utf-8" },
+  });
+}
+
+async function handleWebSearch(f: Record<string, unknown>, origin: string | null): Promise<Response> {
+  if (!BRAVE_KEY) return reply(origin, "search_key_not_configured");
+  const u = new URL(BRAVE_SEARCH_URL);
+  u.searchParams.set("q", f.query as string);
+  u.searchParams.set("count", "10");
+  u.searchParams.set("country", "fr");
+  u.searchParams.set("search_lang", "fr");
+  const r = await fetch(u.toString(), {
+    headers: { Accept: "application/json", "X-Subscription-Token": BRAVE_KEY },
+    signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
+  });
+  if (!r.ok) return reply(origin, "search_unavailable");
+  const j = await r.json().catch(() => null);
+  const raw = Array.isArray(j?.web?.results) ? j.web.results : [];
+  const results = raw
+    .map((x: Record<string, unknown>) => ({ title: safeText(x.title, 240), url: safeText(x.url, 500), snippet: safeText(x.description, 500) }))
+    .filter((x: { url: string }) => /^https?:\/\//.test(x.url));
+  return new Response(JSON.stringify({ results }), {
+    status: 200,
+    headers: { ...corsHeaders(origin), "Content-Type": "application/json; charset=utf-8" },
+  });
+}
+
 function validate(action: string, body: Record<string, unknown>, origin: string | null, apiKeys: { places: string; pagespeed: string }): { ok: true; key: string; fields: Record<string, unknown> } | { ok: false; res: Response } {
   if (action === "places_searchText") {
     const textQuery = safeText(body.textQuery, 250);
@@ -337,6 +460,20 @@ Deno.serve(async (req: Request) => {
     }
     const limits = LIMITS[action];
     if (!limits) return reply(origin, "unsupported_action");
+
+    if (action === "site_read" || action === "web_search") {
+      const v2 = action === "site_read" ? validateSiteRead(body, origin) : validateWebSearch(body, origin);
+      if (!v2.ok) return v2.res;
+      const minute = await consume(`${user.id}:${action}:min`, limits.perMinute, 60);
+      if (!minute.allowed) {
+        return reply(origin, "rate_limit_exceeded", { "Retry-After": String(minute.retry_after_seconds) }, { retry_after_seconds: minute.retry_after_seconds });
+      }
+      const day = await consume(`${user.id}:${action}:day`, limits.perDay, 86400);
+      if (!day.allowed) {
+        return reply(origin, "daily_quota_exceeded", { "Retry-After": String(day.retry_after_seconds) }, { retry_after_seconds: day.retry_after_seconds });
+      }
+      return action === "site_read" ? await handleSiteRead(v2.fields, origin) : await handleWebSearch(v2.fields, origin);
+    }
 
     // Validation complète AVANT consommation de quota : une requête invalide ne consomme rien.
     const settingsRow = await getAdminSettingsRow(user.id);

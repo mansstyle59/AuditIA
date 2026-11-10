@@ -1,6 +1,6 @@
 // AuditIA — données d'audit pour la nouvelle interface (logique pure, sans affichage ni réseau).
 // Réutilise le moteur de score existant : visibilityAudit, actionPlan, improvementPlan, auditUnmeasured…
-import { auditHasAnalysis, visibilityAudit, visibilityVerdict, visibilityLabel, actionPlan, auditActions, improvementPlan, auditUnmeasured } from '../audit/scoring.js';
+import { auditHasAnalysis, visibilityAudit, visibilityVerdict, visibilityLabel, actionPlan, auditActions, improvementPlan, unifiedRecommendations, auditUnmeasured } from '../audit/scoring.js';
 import { checklistTemplate } from '../core/config.js';
 
 export const AUDIT_TITLE = 'Audit de visibilité numérique';
@@ -59,7 +59,7 @@ export function auditAnalysis(a, c) {
     label: diag.hasScore ? visibilityLabel(diag.index) : null,
     plan: actionPlan(a, c, diag),
     actions: auditActions(a, c, diag),
-    recommendations: improvementPlan(a, c),
+    recommendations: unifiedRecommendations(improvementPlan(a, c), actionPlan(a, c, diag)),
     unmeasured: auditUnmeasured(a, c),
     lighthouse,
     scan: a.scan || null,

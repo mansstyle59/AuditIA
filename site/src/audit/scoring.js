@@ -236,7 +236,7 @@ export function visibilityAudit(a,c){
         add('seo','Présence sur les mots-clés explorés',n?topN>=1:null,10,n?'Le site ou le nom n’a pas été retrouvé dans les dix premiers résultats de l’échantillon exploré. Ce n’est pas une mesure du classement Google Maps.':'Aucun mot-clé mesurable.','Présence retrouvée dans '+foundN+'/'+n+' recherches explorées.',rv,'Recherche web indicative');
       }
       // GEO : critères sur le contenu uniquement lorsque la page a été lue, autres données selon leur source.
-      add('geo','Présence reconnue (Google/Maps)',hasGoogle,16,'La fiche Google n’est pas confirmée dans les données disponibles.','Fiche Google identifiée.',null,'Fiche commerce');
+      add('seo','Présence reconnue (Google/Maps)',hasGoogle,16,'La fiche Google n’est pas confirmée dans les données disponibles.','Fiche Google identifiée.',null,'Fiche commerce');
       if(page){
         const schema=!!si.localSchema, sv=schema?1:((si.ldTypes||[]).length?0.4:0);
         add('geo','Données structurées LocalBusiness',schema,20,'Aucun schéma LocalBusiness n’a été détecté sur la page lue. Vérifier aussi les données structurées sur les autres pages pertinentes.','Données structurées LocalBusiness détectées.',sv,'Lecture du site');
@@ -255,15 +255,15 @@ export function visibilityAudit(a,c){
         }
         add('geo','Description claire',!!si.metaDesc,8,'Aucune meta-description n’a été détectée sur la page lue.','Meta-description détectée.',null,'Lecture du site');
       }
-      if(reviews!=null){const rv=tier(reviews,[[50,1],[20,0.85],[10,0.6],[3,0.3],[0,0.1]]);add('geo','Avis publics',reviews>=20,12,'Le volume public observé est de '+reviews+' avis. Le volume seul ne mesure ni la satisfaction ni la qualité des réponses.','Volume public observé : '+reviews+' avis.',rv,'Google Places');}
-      else add('geo','Avis publics',null,12,'Le nombre d’avis n’est pas disponible.','Nombre d’avis disponible.',null,'Google Places');
+      if(reviews!=null){const rv=tier(reviews,[[50,1],[20,0.85],[10,0.6],[3,0.3],[0,0.1]]);add('seo','Avis publics',reviews>=20,12,'Le volume public observé est de '+reviews+' avis. Le volume seul ne mesure ni la satisfaction ni la qualité des réponses.','Volume public observé : '+reviews+' avis.',rv,'Google Places');}
+      else add('seo','Avis publics',null,12,'Le nombre d’avis n’est pas disponible.','Nombre d’avis disponible.',null,'Google Places');
       if(si){
         const dirs=Array.isArray(si.directories)?si.directories:[];
         const dv=tier(dirs.length,[[3,1],[2,0.7],[1,0.4],[0,0]]);
-        add('geo','Présence dans les annuaires détectés',dirs.length>=2,10,'Moins de deux annuaires ont été détectés dans les sources consultées. Il s’agit d’un échantillon et non d’un recensement complet.','Annuaire(s) détecté(s) : '+dirs.length+'.',dv,'Recherche web');
-        add('geo','Présence sur plusieurs réseaux',major>=2,6,'Moins de deux profils parmi Instagram, Facebook, TikTok et YouTube ont été détectés. Vérifier les profils officiels avant de conclure.','Profils de réseaux principaux détectés : '+major+'.',Math.min(1,major/2),'Site + recherche web');
+        add('seo','Présence dans les annuaires détectés',dirs.length>=2,10,'Moins de deux annuaires ont été détectés dans les sources consultées. Il s’agit d’un échantillon et non d’un recensement complet.','Annuaire(s) détecté(s) : '+dirs.length+'.',dv,'Recherche web');
+        add('seo','Présence sur plusieurs réseaux',major>=2,6,'Moins de deux profils parmi Instagram, Facebook, TikTok et YouTube ont été détectés. Vérifier les profils officiels avant de conclure.','Profils de réseaux principaux détectés : '+major+'.',Math.min(1,major/2),'Site + recherche web');
       }
-      if(d.sirene&&d.sirene.matched) add('geo','Entreprise présente dans SIRENE',true,6,'','Identité trouvée dans le registre SIRENE.',1,'Registre officiel');
+      if(d.sirene&&d.sirene.matched) add('seo','Entreprise présente dans SIRENE',true,6,'','Identité trouvée dans le registre SIRENE.',1,'Registre officiel');
       const gx=page&&si.geo;
       if(gx&&gx.robots&&Array.isArray(gx.robots.blocked)){
         const blocked=gx.robots.blocked.length,total=Math.max(1,Number(gx.robots.total)||1),v=1-blocked/total;
@@ -359,4 +359,29 @@ export function auditActions(a,c,diag){
 export function auditHasAnalysis(a){
       // A checklist completed by hand is not the same thing as an evidence-backed analysis.
       return !!(a&&(a.scan||a.site||a.status==='Analysé'));
+    }
+
+// Point 4 : une seule source de vérité pour les actions. Le « Plan d'action » (contrôles mesurés non conformes)
+// est prioritaire. Une recommandation de conseil n'est gardée que si son sujet n'est pas déjà couvert par le plan.
+const RECO_TO_CRITERION = [
+  [/données structurées|schema\.org/i, 'Données structurées LocalBusiness'],
+  [/accélérer le site|performance/i, 'Performance mobile'],
+  [/balises SEO/i, 'Balises SEO (titre + description)'],
+  [/note Google/i, 'Note Google'],
+  [/collecte d’avis/i, 'Volume d’avis'],
+  [/fiche Google Business|créer et faire valider la fiche/i, 'Fiche Google Business'],
+  [/site vitrine/i, 'Site web'],
+  [/photos/i, 'Photos sur la fiche Google'],
+  [/horaires/i, 'Horaires renseignés'],
+  [/référencement local|remonter sur/i, 'Présence sur les mots-clés explorés'],
+  [/instagram|facebook|réseaux manquants/i, 'Présence sur plusieurs réseaux'],
+  [/annuaires/i, 'Présence dans les annuaires détectés'],
+];
+
+export function unifiedRecommendations(recos, plan){
+      const covered=new Set((plan||[]).map(p=>p.t));
+      return (recos||[]).filter(r=>{
+        const hit=RECO_TO_CRITERION.find(([rx])=>rx.test(String(r.title||'')));
+        return !(hit&&covered.has(hit[1]));
+      });
     }

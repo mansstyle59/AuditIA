@@ -1,7 +1,8 @@
-/* AuditIA — lecture de sources web publiques : page d'un site (via r.jina.ai / allorigins), robots.txt et llms.txt,
+/* AuditIA — lecture de sources web publiques : pages d'un site (lues par le serveur, sans relais tiers), robots.txt et llms.txt,
    ancienneté du domaine (RDAP), informations légales (SIRENE), capture d'écran (mShots).
    Fonctions asynchrones qui ne dépendent d'aucun état de l'interface (entrées en paramètres, résultat renvoyé).
    Déplacées telles quelles depuis site/index.html (étape 2) : mêmes adresses, mêmes délais maximum, mêmes secours. */
+import { secureApi } from './secure-api.js';
 import { safeHttpUrl, withTimeout } from '../core/utils.js';
 import { AI_BOTS, parseRobotsForAI } from '../audit/site-analysis.js';
 
@@ -33,7 +34,6 @@ export async function fetchSirene(c){
     const url='https://recherche-entreprises.api.gouv.fr/search?q='+encodeURIComponent(q)+'&page=1&per_page=10';
     let data=null;
     try{const r=await withTimeout(fetch(url),10000);if(r.ok)data=await r.json();}catch(e){}
-    if(!data){try{const r=await withTimeout(fetch('https://api.allorigins.win/raw?url='+encodeURIComponent(url)),12000);if(r.ok)data=await r.json();}catch(e){}}
     (data&&Array.isArray(data.results)?data.results:[]).forEach(x=>{if(x&&x.siren&&!all.some(y=>String(y.siren)===String(x.siren)))all.push(x);});
     if(all.length>=20) break;
   }
@@ -71,9 +71,44 @@ export async function fetchSirene(c){
 
 export async function readSiteText(url,opts,timeout){const ctl=new AbortController();const t=setTimeout(()=>ctl.abort(),timeout||40000);try{const r=await fetch(url,{...(opts||{}),signal:ctl.signal});if(!r.ok){const e=new Error('HTTP '+r.status);e.status=r.status;throw e;}return await r.text();}finally{clearTimeout(t);}}
 
-export async function fetchGeoFiles(site){
+// Lecture d'une page du site par le serveur (action site_read) : aucune adresse n'est confiée à un relais tiers.
+export async function siteRead(getClient, site, path, ms){
+      const data=await secureApi(getClient,{action:'site_read',url:site,path:path||'/'},ms||15000);
+      if(!data||typeof data.body!=='string') throw new Error('page illisible');
+      return data;
+    }
+
+// Liens internes utiles (services, tarifs, contact, à propos, FAQ, horaires), même domaine, 3 au plus.
+export function internalPaths(html, base){
+      let doc; try{ doc=new DOMParser().parseFromString(html,'text/html'); }catch(e){ return []; }
+      const origin=new URL(base).origin; const seen=new Set(); const out=[];
+      const rx=/service|prestation|tarif|carte|menu|contact|propos|about|faq|horaire|nos-|produit/i;
+      doc.querySelectorAll('a[href]').forEach(a=>{
+        let u; try{ u=new URL(a.getAttribute('href'),base); }catch(e){ return; }
+        if(u.origin!==origin) return;
+        if(u.pathname==='/'||seen.has(u.pathname)) return;
+        if(/\.(pdf|jpe?g|png|webp|gif|zip)$/i.test(u.pathname)) return;
+        if(!rx.test(u.pathname)&&!rx.test(a.textContent||'')) return;
+        seen.add(u.pathname); out.push(u.pathname);
+      });
+      return out.slice(0,3);
+    }
+
+export async function readSiteHtml(url, getClient){
+      url=safeHttpUrl(url); if(!url) throw new Error('adresse non autorisée');
+      const home=await siteRead(getClient,url,'/');
+      if(home.body.length<200||!/<(html|head|body)[\s>]/i.test(home.body)) throw new Error('page vide ou illisible');
+      const paths=internalPaths(home.body, home.finalUrl||url);
+      const extra=await Promise.allSettled(paths.map(p=>siteRead(getClient,url,p,15000)));
+      // Les pages internes sont ajoutées à la suite de l'accueil : l'analyse lit ainsi tout le contenu lu.
+      const parts=[home.body];
+      extra.forEach((r,i)=>{ if(r.status==='fulfilled'&&/<(html|head|body)[\s>]/i.test(r.value.body)) parts.push('<!-- page : '+paths[i]+' -->\n'+r.value.body); });
+      return parts.join('\n');
+    }
+
+export async function fetchGeoFiles(site, getClient){
       let origin;try{origin=new URL(site).origin;}catch(e){return null;}
-      const get=async path=>{try{const t=await readSiteText('https://api.allorigins.win/raw?url='+encodeURIComponent(origin+path),{},12000);return typeof t==='string'?t:null;}catch(e){return null;}};
+      const get=async path=>{try{const d=await siteRead(getClient,origin,path,12000);return d.body;}catch(e){return null;}};
       const [rb,ll]=await Promise.all([get('/robots.txt'),get('/llms.txt')]);
       const looksHtml=t=>/^\s*</.test(t||'')||/<html|<body/i.test(t||'');
       const robots=rb==null?null:(looksHtml(rb)||!/user-agent/i.test(rb)?{read:true,blocked:[],total:AI_BOTS.length,missing:true}:parseRobotsForAI(rb));
@@ -81,19 +116,12 @@ export async function fetchGeoFiles(site){
       return {robots,llms};
     }
 
-export async function readSiteHtml(url){
-      url=safeHttpUrl(url); if(!url) throw new Error('adresse non autorisée');
-      const tries=[()=>readSiteText('https://r.jina.ai/'+url,{headers:{'X-Return-Format':'html','X-Timeout':'25'}},45000),()=>readSiteText('https://api.allorigins.win/raw?url='+encodeURIComponent(url),{},30000)];
-      let last;for(const f of tries){try{const t=await f();if(t&&t.length>200&&/<(html|head|body)[\s>]/i.test(t))return t;last=new Error('page vide ou illisible');}catch(e){last=e;}}
-      throw last||new Error('page illisible');
-    }
-
 export async function fetchScreenshot(site){
       site=safeHttpUrl(site); if(!site) return null;
       const svc='https://s.wordpress.com/mshots/v1/'+encodeURIComponent(site)+'?w=1000&h=750';
       for(let i=0;i<3;i++){
         try{
-          const r=await withTimeout(fetch('https://api.allorigins.win/raw?url='+encodeURIComponent(svc)),22000);
+          const r=await withTimeout(fetch(svc),22000);
           if(r.ok){ const blob=await r.blob(); if(blob && blob.size>9000 && /image\//.test(blob.type||'image/jpeg')){ const d=await new Promise(res=>{const fr=new FileReader();fr.onload=()=>res(fr.result);fr.onerror=()=>res(null);fr.readAsDataURL(blob);}); if(d) return d; } }
         }catch(e){}
         await new Promise(r=>setTimeout(r,4000));

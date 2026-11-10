@@ -11,7 +11,6 @@ import { secureApi } from './secure-api.js';
 import { placePhotoCount } from './places.js';
 import { SOCIAL_RX, businessInUrl } from '../audit/site-analysis.js';
 import { targetKeywords } from '../audit/scoring.js';
-import { readSiteText } from './web-read.js';
 
 export function createAuditSources(deps0){
   const deps=Object.assign({
@@ -27,34 +26,16 @@ export function createAuditSources(deps0){
         if(cacheKey) serpMemo.set(cacheKey, job);
         return job;
       }
+      // Recherche web via le serveur (action web_search). Renvoie [] si le service n'est pas configuré ou indisponible.
       async function fetchSerpUncached(query){
-        const target='https://html.duckduckgo.com/html/?q='+encodeURIComponent(query);
-        const tries=[
-          'https://api.allorigins.win/raw?url='+encodeURIComponent(target),
-          'https://corsproxy.io/?url='+encodeURIComponent(target),
-          'https://r.jina.ai/'+target,
-          'https://r.jina.ai/https://lite.duckduckgo.com/lite/?q='+encodeURIComponent(query)
-        ];
-        const dec=h=>{ const m=String(h||'').match(/[?&]uddg=([^&]+)/); if(m){ try{return decodeURIComponent(m[1]);}catch(e){} } return h; };
-        const parse=html=>{
-          if(!html||html.length<200) return [];
-          let results=[];
-          try{ const doc=new DOMParser().parseFromString(html,'text/html'); results=[...doc.querySelectorAll('a.result__a')].map(a=>({title:(a.textContent||'').trim(),url:dec(a.getAttribute('href')||'')})).filter(r=>/^https?:/i.test(r.url)); }catch(e){}
-          if(!results.length){ const re=/uddg=([^&"' )]+)/g; let m; const seen=new Set(); while((m=re.exec(html))){ let v; try{v=decodeURIComponent(m[1]);}catch(e){continue;} if(/^https?:/i.test(v)&&!seen.has(v)){seen.add(v);results.push({title:'',url:v});} } }
-          if(results.length<8){ const md=/\[([^\]]{2,140})\]\((https?:\/\/[^)\s]+)\)/g; let mm; const seen=new Set(results.map(r=>r.url)); while((mm=md.exec(html))){ let v=mm[2]; if(/duckduckgo\.com|allorigins|corsproxy|jina\.ai/i.test(v)) continue; if(!seen.has(v)){ seen.add(v); results.push({title:(mm[1]||'').trim(),url:v}); } } }
-          return results.slice(0,25);
-        };
-        // Try providers concurrently so one slow proxy cannot multiply the wait
-        // for every keyword. Return the first usable result set, with a hard timeout.
-        let timer;
         try{
-          const attempts=tries.map(u=>readSiteText(u,{},7000).then(html=>{const results=parse(html); if(!results.length) throw new Error('Aucun résultat exploitable'); return results;}));
-          const timeout=new Promise((_,reject)=>{timer=setTimeout(()=>reject(new Error('Délai de recherche dépassé')),12000);});
-          const found = await Promise.race([Promise.any(attempts),timeout]);
+          const data=await secureApi(deps.getClient,{action:'web_search',query:String(query||'').slice(0,200)},12000);
           deps.onSearch();
-          return found;
+          return (data&&Array.isArray(data.results)?data.results:[])
+            .map(r=>({title:String(r.title||'').trim(),url:String(r.url||'')}))
+            .filter(r=>/^https?:/i.test(r.url))
+            .slice(0,25);
         }catch(e){ deps.onSearch(); return []; }
-        finally{ if(timer) clearTimeout(timer); }
       }
       async function findWebPresence(c){
         const name=String((c&&c.name)||'').trim(); if(!name) return {socials:[],directories:[]};

@@ -126,7 +126,7 @@ export function createAuditEngine(deps0) {
       };
       const skip = Promise.resolve(null);
       const [html, web, instagram, facebook, youtube, tiktok, linkedin, sir, photos, domain, shot, cp, speed, rk, gf] = await Promise.all([
-        hasWeb ? track('site', readSiteHtml(site)) : skip,
+        hasWeb ? track('site', readSiteHtml(site, () => deps.getClient())) : skip,
         track('presence', src.findWebPresence(c)),
         track('instagram', src.findSocialProfile(c, 'Instagram')),
         track('facebook', src.findSocialProfile(c, 'Facebook')),
@@ -140,7 +140,7 @@ export function createAuditEngine(deps0) {
         track('rivals', src.fetchCompetitors(c), value => setFact('Concurrents locaux', value.total != null ? value.total + ' commerces' : 'Résultats reçus', value.selfRank ? 'N°' + value.selfRank + ' par nombre d’avis, pas le rang Google' : 'Comparaison du volume d’avis')),
         hasWeb ? track('perf', src.fetchPagespeed(site), value => { scan = value; setFact('Performance mobile', value.scores && value.scores.performance != null ? value.scores.performance + '/100' : 'Mesurée', 'Google PageSpeed Insights · Lighthouse'); }) : skip,
         track('keywords', src.checkRankings(c)),
-        hasWeb ? track('geo', fetchGeoFiles(site)) : skip
+        hasWeb ? track('geo', fetchGeoFiles(site, () => deps.getClient())) : skip
       ]);
 
       if (html) { siteRes = analyzeSite(html, site); siteRes.hasWebsite = true; siteRes.pageRead = true; siteRes.geo = Object.assign({}, geoFromHtml(html), gf || {}); setFact('Site web', 'Page lue', (siteRes.finalUrl || site) + ' · ' + ((siteRes.socials || []).length) + ' réseaux sur la page'); }

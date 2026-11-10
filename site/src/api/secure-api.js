@@ -20,6 +20,9 @@ const PROXY_MESSAGES = {
   rate_limit_exceeded: 'Trop de requêtes. Patientez une minute puis réessayez.',
   daily_quota_exceeded: 'Quota journalier atteint. Réessayez demain.',
   secure_api_unavailable: 'Service temporairement indisponible. Réessayez.',
+  search_key_not_configured: 'La recherche web n’est pas configurée côté serveur.',
+  site_unreadable: 'Site inaccessible ou illisible.',
+  search_unavailable: 'Recherche web indisponible. Réessayez plus tard.',
 };
 
 // Appelle le proxy avec le jeton de session. Retourne le JSON renvoyé par Google (forme inchangée).
