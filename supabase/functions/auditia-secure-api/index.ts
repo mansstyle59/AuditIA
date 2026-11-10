@@ -1,8 +1,9 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import { isPublicHttpUrl } from "./url-validation.mjs";
 
-// AuditIA — auditia-secure-api, VERSION 2.
-// Seul point d'accès serveur aux API Google (Places API New, PageSpeed Insights).
-// - Clés : uniquement dans les secrets de la fonction (GOOGLE_PLACES_API_KEY, PAGESPEED_API_KEY).
+// AuditIA — auditia-secure-api, VERSION 3 (base : production v7 + lecture de site et recherche web).
+// Seul point d'accès serveur aux API Google (Places API New, PageSpeed Insights) et à la recherche web.
+// - Clés : uniquement dans les secrets de la fonction (GOOGLE_PLACES_API_KEY, PAGESPEED_API_KEY, BRAVE_SEARCH_API_KEY).
 //   Aucune lecture de app_settings, aucun repli. Une clé n'est jamais renvoyée ni journalisée.
 // - Accès : jeton utilisateur vérifié auprès d'Auth, e-mail confirmé, administrateur uniquement.
 // - Entrées : action en liste blanche, champs bornés, Content-Type JSON obligatoire.
@@ -14,6 +15,11 @@ const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const ADMIN_EMAIL = "dewulf.denis@gmail.com";
 const GOOGLE_PLACES_KEY = Deno.env.get("GOOGLE_PLACES_API_KEY") || "";
 const PAGESPEED_KEY = Deno.env.get("PAGESPEED_API_KEY") || "";
+const BRAVE_KEY = Deno.env.get("BRAVE_SEARCH_API_KEY") || "";
+const BRAVE_SEARCH_URL = "https://api.search.brave.com/res/v1/web/search";
+const SITE_TIMEOUT_MS = 12_000;
+const SITE_MAX_BYTES = 1_500_000;
+const SITE_MAX_REDIRECTS = 3;
 
 // Origines autorisées : production GitHub Pages, aperçu Vercel stable. Les origines de développement
 // ne sont acceptées que si elles sont listées dans la variable ALLOWED_ORIGINS_DEV (absente en production).
@@ -25,11 +31,6 @@ const ALLOWED_ORIGINS = new Set<string>([
 
 const PLACES_BASE = "https://places.googleapis.com/v1/";
 const PAGESPEED_URL = "https://www.googleapis.com/pagespeedonline/v5/runPagespeed";
-const BRAVE_SEARCH_URL = "https://api.search.brave.com/res/v1/web/search";
-const BRAVE_KEY = Deno.env.get("BRAVE_SEARCH_API_KEY") || "";
-const SITE_TIMEOUT_MS = 12_000;
-const SITE_MAX_BYTES = 1_500_000;
-const SITE_MAX_REDIRECTS = 3;
 const UPSTREAM_TIMEOUT_MS = 20_000;
 const PAGESPEED_TIMEOUT_MS = 55_000;
 const MAX_BODY_CHARS = 24_000;
@@ -51,6 +52,7 @@ const LIMITS: Record<string, { perMinute: number; perDay: number }> = {
   places_autocomplete: { perMinute: 30, perDay: 1500 },
   places_details: { perMinute: 30, perDay: 400 },
   pagespeed: { perMinute: 4, perDay: 40 },
+  bing_site_stats: { perMinute: 5, perDay: 60 },
   site_read: { perMinute: 60, perDay: 1500 },
   web_search: { perMinute: 20, perDay: 400 },
 };
@@ -75,6 +77,9 @@ const ERRORS: Record<string, [number, string]> = {
   invalid_target_url: [400, "Adresse de site non analysable."],
   google_places_key_not_configured: [424, "La clé Google Places n’est pas configurée côté serveur."],
   pagespeed_key_not_configured: [424, "La clé PageSpeed n’est pas configurée côté serveur."],
+  bing_webmaster_key_not_configured: [424, "La clé Bing Webmaster n’est pas configurée côté serveur."],
+  bing_site_not_verified: [403, "Ce site n’est pas vérifié dans le compte Bing Webmaster connecté."],
+  bing_webmaster_unavailable: [502, "Bing Webmaster Tools est temporairement indisponible."],
   search_key_not_configured: [424, "La clé de recherche web n’est pas configurée côté serveur."],
   site_unreadable: [502, "Site inaccessible ou illisible."],
   search_unavailable: [502, "Recherche web indisponible."],
@@ -107,12 +112,7 @@ function clampInt(value: unknown, min: number, max: number, fallback: number): n
   return Number.isFinite(n) ? Math.min(max, Math.max(min, Math.trunc(n))) : fallback;
 }
 function validPublicUrl(value: string): boolean {
-  try {
-    const u = new URL(value);
-    return (u.protocol === "https:" || u.protocol === "http:") &&
-      !["localhost", "127.0.0.1", "0.0.0.0", "::1"].includes(u.hostname) &&
-      !u.hostname.endsWith(".local") && !u.hostname.endsWith(".internal");
-  } catch { return false; }
+  return isPublicHttpUrl(value);
 }
 async function serviceFetch(path: string, init: RequestInit = {}) {
   return fetch(`${PROJECT_URL}/rest/v1/${path}`, {
@@ -222,6 +222,37 @@ async function handleSettings(action: string, body: Record<string, unknown>, use
   });
 }
 
+// Bing Webmaster : lecture seule. La propriété est validée côté serveur avant toute statistique.
+async function bingSiteStats(siteUrl: string, key: string): Promise<Record<string, unknown>> {
+  const base = "https://ssl.bing.com/webmaster/api.svc/json/";
+  const get = async (method: string, params: Record<string, string> = {}) => {
+    const u = new URL(base + method);
+    u.searchParams.set("apikey", key);
+    for (const [k, v] of Object.entries(params)) u.searchParams.set(k, v);
+    const res = await fetch(u.toString(), { signal: AbortSignal.timeout(15_000), headers: { Accept: "application/json" } });
+    if (!res.ok) throw new Error("bing_upstream");
+    const raw = await res.text();
+    if (raw.length > 1_000_000) throw new Error("bing_response_too_large");
+    return JSON.parse(raw);
+  };
+  const sitesResponse = await get("GetUserSites");
+  const sites = Array.isArray(sitesResponse?.d) ? sitesResponse.d : [];
+  let requestedHost = "";
+  try { requestedHost = new URL(siteUrl).hostname.toLowerCase().replace(/^www\./, ""); } catch { throw new Error("bing_invalid_site"); }
+  const matching = sites.filter((site: Record<string, unknown>) => {
+    if (site.IsVerified !== true || typeof site.Url !== "string") return false;
+    const value = String(site.Url);
+    if (value.startsWith("sc-domain:")) return value.slice(10).toLowerCase().replace(/^www\./, "") === requestedHost;
+    try { return new URL(value).hostname.toLowerCase().replace(/^www\./, "") === requestedHost; } catch { return false; }
+  });
+  if (matching.length !== 1) throw new Error("bing_site_not_verified");
+  const verifiedSite = String(matching[0].Url);
+  const stats = await get("GetRankAndTrafficStats", { siteUrl: verifiedSite });
+  const rows = Array.isArray(stats?.d) ? stats.d : [];
+  // Ne renvoie que les statistiques de trafic, jamais les codes de vérification ou autres propriétés.
+  return { ok: true, provider: "Bing Webmaster Tools", siteUrl: verifiedSite, traffic: rows.slice(-180).map((x: Record<string, unknown>) => ({ Date: x.Date, Clicks: x.Clicks, Impressions: x.Impressions })) };
+}
+
 // Compteur atomique (RPC existante, réservée au service_role). Échec = refus (fermé).
 async function consume(bucket: string, limit: number, windowSeconds: number) {
   const response = await serviceFetch("rpc/auditia_consume_rate_limit", {
@@ -234,20 +265,7 @@ async function consume(bucket: string, limit: number, windowSeconds: number) {
   return row as { allowed: boolean; current_count: number; retry_after_seconds: number };
 }
 
-// Valide la requête AVANT toute consommation de quota. Retourne les champs normalisés pour l'appel amont.
-// Lecture d'un site côté serveur (remplace les relais tiers). Refus des adresses internes, redirections contrôlées.
-function isPublicHost(hostname: string): boolean {
-  const h = hostname.toLowerCase();
-  if (!h.includes(".") || h.includes(":")) return false; // pas de nom court, pas d'IPv6 littérale
-  if (h === "localhost" || h.endsWith(".localhost") || h.endsWith(".local") || h.endsWith(".internal")) return false;
-  const m = h.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
-  if (m) {
-    const a = Number(m[1]), b = Number(m[2]);
-    if (a === 0 || a === 10 || a === 127 || a >= 224 || (a === 169 && b === 254) || (a === 172 && b >= 16 && b <= 31) || (a === 192 && b === 168)) return false;
-  }
-  return true;
-}
-
+// Lecture d'un site côté serveur (remplace les relais tiers). Refus des adresses internes à chaque saut.
 async function readLimited(res: Response, max: number): Promise<string> {
   if (!res.body) return "";
   const reader = res.body.getReader();
@@ -275,7 +293,7 @@ async function readLimited(res: Response, max: number): Promise<string> {
 async function readSitePage(start: URL): Promise<{ status: number; finalUrl: string; contentType: string; body: string } | null> {
   let current = start;
   for (let hop = 0; hop <= SITE_MAX_REDIRECTS; hop++) {
-    if (!isPublicHost(current.hostname)) return null;
+    if (!isPublicHttpUrl(current.toString())) return null;
     const res = await fetch(current.toString(), {
       redirect: "manual",
       headers: { "User-Agent": "AuditIA-Reader/1.0", Accept: "text/html,text/plain,application/xml;q=0.9,*/*;q=0.5" },
@@ -300,10 +318,47 @@ async function readSitePage(start: URL): Promise<{ status: number; finalUrl: str
   return null;
 }
 
+// Valide la requête AVANT toute consommation de quota. Retourne les champs normalisés pour l'appel amont.
+function validate(action: string, body: Record<string, unknown>, origin: string | null, apiKeys: { places: string; pagespeed: string; bing: string }): { ok: true; key: string; fields: Record<string, unknown> } | { ok: false; res: Response } {
+  if (action === "bing_site_stats") {
+    const siteUrl = safeText(body.siteUrl, 2048);
+    if (!validPublicUrl(siteUrl)) return { ok: false, res: reply(origin, "invalid_target_url") };
+    return { ok: true, key: apiKeys.bing, fields: { siteUrl } };
+  }
+  if (action === "places_searchText") {
+    const textQuery = safeText(body.textQuery, 250);
+    if (!textQuery) return { ok: false, res: reply(origin, "invalid_query") };
+    const maskName = safeText(body.mask, 20) || "list";
+    if (!MASKS[maskName]) return { ok: false, res: reply(origin, "invalid_mask") };
+    const includedType = safeText(body.includedType, 60);
+    return { ok: true, key: apiKeys.places, fields: { textQuery, mask: MASKS[maskName], includedType, maxResultCount: clampInt(body.maxResultCount, 1, 20, 20) } };
+  }
+  if (action === "places_searchNearby") {
+    const lat = Number(body.latitude), lng = Number(body.longitude);
+    if (!Number.isFinite(lat) || !Number.isFinite(lng) || Math.abs(lat) > 90 || Math.abs(lng) > 180) return { ok: false, res: reply(origin, "invalid_coordinates") };
+    const types = Array.isArray(body.includedTypes) ? body.includedTypes.filter((x): x is string => typeof x === "string" && x.length <= 60).slice(0, 20) : [];
+    return { ok: true, key: apiKeys.places, fields: { lat, lng, types, radius: clampInt(body.radius, 100, 50000, 5000), maxResultCount: clampInt(body.maxResultCount, 1, 20, 20) } };
+  }
+  if (action === "places_autocomplete") {
+    const input = safeText(body.input, 180);
+    if (!input) return { ok: false, res: reply(origin, "invalid_input") };
+    return { ok: true, key: apiKeys.places, fields: { input } };
+  }
+  if (action === "places_details") {
+    const placeId = safeText(body.placeId, 300);
+    if (!/^[A-Za-z0-9_-]+$/.test(placeId)) return { ok: false, res: reply(origin, "invalid_place_id") };
+    return { ok: true, key: apiKeys.places, fields: { placeId, mask: body.mask === "photos" ? "photos" : DETAIL_MASK } };
+  }
+  // pagespeed
+  const target = safeText(body.url, 2048);
+  if (!validPublicUrl(target)) return { ok: false, res: reply(origin, "invalid_target_url") };
+  return { ok: true, key: apiKeys.pagespeed, fields: { target, strategy: body.strategy === "desktop" ? "desktop" : "mobile" } };
+}
+
 function validateSiteRead(body: Record<string, unknown>, origin: string | null): { ok: true; key: string; fields: Record<string, unknown> } | { ok: false; res: Response } {
-  let site: URL;
-  try { site = new URL(safeText(body.url, 2000)); } catch { return { ok: false, res: reply(origin, "invalid_target_url") }; }
-  if (!/^https?:$/.test(site.protocol) || !isPublicHost(site.hostname)) return { ok: false, res: reply(origin, "invalid_target_url") };
+  const raw = safeText(body.url, 2000);
+  if (!isPublicHttpUrl(raw)) return { ok: false, res: reply(origin, "invalid_target_url") };
+  const site = new URL(raw);
   const path = safeText(body.path, 200) || "/";
   if (!path.startsWith("/") || path.startsWith("//") || path.includes("\\")) return { ok: false, res: reply(origin, "invalid_target_url") };
   return { ok: true, key: "site", fields: { origin: site.origin, path } };
@@ -346,37 +401,6 @@ async function handleWebSearch(f: Record<string, unknown>, origin: string | null
     status: 200,
     headers: { ...corsHeaders(origin), "Content-Type": "application/json; charset=utf-8" },
   });
-}
-
-function validate(action: string, body: Record<string, unknown>, origin: string | null, apiKeys: { places: string; pagespeed: string }): { ok: true; key: string; fields: Record<string, unknown> } | { ok: false; res: Response } {
-  if (action === "places_searchText") {
-    const textQuery = safeText(body.textQuery, 250);
-    if (!textQuery) return { ok: false, res: reply(origin, "invalid_query") };
-    const maskName = safeText(body.mask, 20) || "list";
-    if (!MASKS[maskName]) return { ok: false, res: reply(origin, "invalid_mask") };
-    const includedType = safeText(body.includedType, 60);
-    return { ok: true, key: apiKeys.places, fields: { textQuery, mask: MASKS[maskName], includedType, maxResultCount: clampInt(body.maxResultCount, 1, 20, 20) } };
-  }
-  if (action === "places_searchNearby") {
-    const lat = Number(body.latitude), lng = Number(body.longitude);
-    if (!Number.isFinite(lat) || !Number.isFinite(lng) || Math.abs(lat) > 90 || Math.abs(lng) > 180) return { ok: false, res: reply(origin, "invalid_coordinates") };
-    const types = Array.isArray(body.includedTypes) ? body.includedTypes.filter((x): x is string => typeof x === "string" && x.length <= 60).slice(0, 20) : [];
-    return { ok: true, key: apiKeys.places, fields: { lat, lng, types, radius: clampInt(body.radius, 100, 50000, 5000), maxResultCount: clampInt(body.maxResultCount, 1, 20, 20) } };
-  }
-  if (action === "places_autocomplete") {
-    const input = safeText(body.input, 180);
-    if (!input) return { ok: false, res: reply(origin, "invalid_input") };
-    return { ok: true, key: apiKeys.places, fields: { input } };
-  }
-  if (action === "places_details") {
-    const placeId = safeText(body.placeId, 300);
-    if (!/^[A-Za-z0-9_-]+$/.test(placeId)) return { ok: false, res: reply(origin, "invalid_place_id") };
-    return { ok: true, key: apiKeys.places, fields: { placeId, mask: body.mask === "photos" ? "photos" : DETAIL_MASK } };
-  }
-  // pagespeed
-  const target = safeText(body.url, 2048);
-  if (!validPublicUrl(target)) return { ok: false, res: reply(origin, "invalid_target_url") };
-  return { ok: true, key: apiKeys.pagespeed, fields: { target, strategy: body.strategy === "desktop" ? "desktop" : "mobile" } };
 }
 
 // Appel amont. La clé n'apparaît que dans l'en-tête ou l'URL de cet appel, jamais dans une réponse ou un journal.
@@ -480,10 +504,11 @@ Deno.serve(async (req: Request) => {
     const apiKeys = {
       places: safeText(settingsRow.google_places_api_key, 500) || GOOGLE_PLACES_KEY,
       pagespeed: safeText(settingsRow.pagespeed_api_key, 500) || PAGESPEED_KEY,
+      bing: safeText(settingsRow.bing_webmaster_api_key, 500),
     };
     const v = validate(action, body, origin, apiKeys);
     if (!v.ok) return v.res;
-    if (!v.key) return reply(origin, action.startsWith("places_") ? "google_places_key_not_configured" : "pagespeed_key_not_configured");
+    if (!v.key) return reply(origin, action.startsWith("places_") ? "google_places_key_not_configured" : action === "bing_site_stats" ? "bing_webmaster_key_not_configured" : "pagespeed_key_not_configured");
 
     const minute = await consume(`${user.id}:${action}:min`, limits.perMinute, 60);
     if (!minute.allowed) {
@@ -494,6 +519,16 @@ Deno.serve(async (req: Request) => {
       return reply(origin, "daily_quota_exceeded", { "Retry-After": String(day.retry_after_seconds) }, { retry_after_seconds: day.retry_after_seconds });
     }
 
+    if (action === "bing_site_stats") {
+      try {
+        const result = await bingSiteStats(String(v.fields.siteUrl || ""), v.key);
+        return new Response(JSON.stringify(result), { status: 200, headers: { ...corsHeaders(origin), "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" } });
+      } catch (error) {
+        const code = error instanceof Error ? error.message : "";
+        if (code === "bing_site_not_verified") return reply(origin, "bing_site_not_verified");
+        return reply(origin, "bing_webmaster_unavailable");
+      }
+    }
     const upstream = await callUpstream(action, v.fields, v.key);
     // Filet de sécurité : si Google renvoyait la clé dans sa réponse, elle serait masquée avant envoi.
     const text = (await upstream.text()).split(v.key).join("[masqué]");
