@@ -77,6 +77,7 @@ class AuditService:
                 event = await queue.get()
                 if event["type"] == "source_completed":
                     finished += 1
+                    pending -= 1
                     event["progress"] = round(finished / len(jobs) * 100)
                     event["completed_sources"] = finished
                     event["total_sources"] = len(jobs)
