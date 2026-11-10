@@ -199,7 +199,9 @@ function presenceCard(an) {
     ...socials.map(x => [x.net, x.url]), ...dirs.map(x => [x.name, x.url]),
   ].map(([n, u]) => `<li><a class="ds-linkbtn" href="${escHtml(safeHttpUrl(u))}" target="_blank" rel="noopener noreferrer">${escHtml(n)} ↗</a></li>`).join('');
   const pageLine = si.hasWebsite ? (si.pageRead ? 'Page du site lue' + (typeof si.title === 'string' && si.title ? ' : « ' + si.title + ' »' : '.') : 'La page du site n’a pas pu être lue : les critères de contenu ne sont pas notés.') : 'Pas de site web renseigné.';
-  return card({ title: 'Présence en ligne', body: `<p class="ds-row__meta">${escHtml(pageLine)}</p>${rows ? `<ul class="ds-linklist">${rows}</ul>` : '<p class="ds-row__meta">Aucun réseau ni annuaire détecté.</p>'}` });
+  const logoUrl = si.logo && safeHttpUrl(si.logo.url);
+  const logo = logoUrl ? `<div class="ds-d-actions" style="align-items:center;margin-bottom:12px"><img src="${escHtml(logoUrl)}" alt="Logo ou icône du site" loading="lazy" referrerpolicy="no-referrer" style="width:64px;height:64px;object-fit:contain;border:1px solid var(--ds-line);border-radius:12px;background:#fff;padding:6px"><span class="ds-row__meta">${escHtml(si.logo.source || 'Image de marque détectée')} · source : site officiel</span></div>` : '';
+  return card({ title: 'Présence en ligne', body: `${logo}<p class="ds-row__meta">${escHtml(pageLine)}</p>${rows ? `<ul class="ds-linklist">${rows}</ul>` : '<p class="ds-row__meta">Aucun réseau ni annuaire détecté.</p>'}` });
 }
 
 function historyCard(history, currentId) {
