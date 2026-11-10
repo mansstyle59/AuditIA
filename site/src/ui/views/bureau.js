@@ -404,6 +404,7 @@ export function cardHtml(store, clients, sel, pendingDel = null) {
     <div class="bu-progress" role="img" aria-label="${pr.pct} % traités"><i style="width:${pr.pct}%"></i></div>
     ${statsHtml(a)}
     <div class="bu-card__actions">${controlsHtml(a)}</div>
+    <div class="bu-lv" role="group" aria-label="Niveau de ${escHtml(a.name)}"><span class="bu-label">Niveau</span>${Object.entries(LEVELS).map(([k, v]) => `<button type="button" class="bu-lv__btn${levelOf(a) === v ? ' is-on' : ''}" aria-pressed="${levelOf(a) === v}" title="${escHtml(v.hint)}" data-bu-act="level" data-bu-id="${escHtml(a.id)}" data-bu-to="${k}">${v.label}</button>`).join('')}</div>
     ${deleteHtml(a, pendingDel)}
     <div class="bu-tasks">
       <p class="bu-label">Tâches</p>

@@ -33,3 +33,11 @@ test('classement des agents', () => {
   const rows = agentBoard(ag, a => (a.id === 2 ? { done: 3, total: 4, pct: 75 } : { done: 1, total: 4, pct: 25 }), () => ({ messages: 0, found: 0 }));
   assert.equal(rows[0].name, 'B');
 });
+
+import { prospectsCsv } from '../site/src/data/dashboard-metrics.js';
+test('export CSV : guillemets doublés et formules neutralisées', () => {
+  const csv = prospectsCsv([{ name: '=CMD()', city: 'Aude "11"', category: 'Plombier', status: 'Client', score: 62 }]);
+  assert.ok(csv.includes('"\'=CMD()"'));
+  assert.ok(csv.includes('"Aude ""11"""'));
+  assert.ok(csv.startsWith('﻿"Nom"'));
+});

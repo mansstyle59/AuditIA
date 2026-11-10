@@ -33,11 +33,12 @@ function funnelCard(f) {
 function barsCard(weeks) {
   const max = Math.max(1, ...weeks);
   const total = weeks.reduce((a, b) => a + b, 0);
-  const bars = weeks.map((v, i) => `<div class="db-bar" title="${v} nouveau(x) commerce(s)"><i style="height:${Math.max(v ? 8 : 3, Math.round(v / max * 100))}%"></i><span>${i === weeks.length - 1 ? 'Cette sem.' : 'S-' + (weeks.length - 1 - i)}</span></div>`).join('');
+  const bars = weeks.map((v, i) => `<div class="db-bar" title="${v} nouveau(x) commerce(s)"><span class="db-bar__v">${v || ''}</span><i style="height:${Math.max(v ? 8 : 3, Math.round(v / max * 100))}%"></i><span>${i === weeks.length - 1 ? 'Cette sem.' : 'S-' + (weeks.length - 1 - i)}</span></div>`).join('');
+  const seg = [4, 8, 12].map(n => `<button type="button" class="db-seg__btn${n === weeks.length ? ' is-on' : ''}" aria-pressed="${n === weeks.length}" data-db-weeks="${n}">${n} sem.</button>`).join('');
   return `<section class="hm-card hm-panel" aria-labelledby="db-h-add">
-    <h2 class="hm-panel__title" id="db-h-add">Nouveaux commerces par semaine</h2>
+    <div class="hm-panel__head"><h2 class="hm-panel__title" id="db-h-add">Nouveaux commerces</h2><div class="db-seg" role="group" aria-label="Période">${seg}</div></div>
     ${total ? `<div class="db-bars" role="img" aria-label="${total} nouveaux commerces sur ${weeks.length} semaines">${bars}</div>`
-      : '<p class="hm-empty">Aucun commerce ajouté sur les dernières semaines.</p>'}
+      : `<p class="hm-empty">Aucun commerce ajouté sur ${weeks.length} semaines.</p>`}
   </section>`;
 }
 
@@ -101,6 +102,7 @@ export function dashboardView(ctx) {
   const board = agentBoard(store.agents, a => progress(store, a, data.clients), agentStats);
   const clientsWon = f.counts['Client'];
   return `<div class="hm db">
+    <div class="db-tools"><button type="button" class="ds-btn ds-btn--sm" data-db-export>${icon('arrow')} Exporter les prospects (CSV)</button></div>
     <div class="db-kpis">
       ${kpi('Commerces suivis', hs.clientCount, hs.clientCount ? `${c.todo} à contacter` : 'Aucun pour le moment', 'users')}
       ${kpi('Contactés', f.total ? rate(f.contactRate) : '—', `${f.counts['Contacté'] + f.counts['Intéressé'] + f.counts['Client'] + f.counts['Refusé']} sur ${f.total}`, 'mail')}
@@ -112,7 +114,7 @@ export function dashboardView(ctx) {
       ${todoCard({ ready: c.ready, due })}
       ${lineCard(monthlyScores(data.audits))}
       ${scoreCard(scoreBuckets(data.audits))}
-      ${barsCard(weeklyAdds(data.clients))}
+      ${barsCard(weeklyAdds(data.clients, ctx.weeks || 8))}
       ${agentsCard(board)}
     </div>
   </div>`;

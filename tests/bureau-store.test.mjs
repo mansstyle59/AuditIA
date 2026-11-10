@@ -225,3 +225,16 @@ test('un agent avec seulement une recherche en attente reste au poste', () => {
   assert.equal(tick(s, []), true);
   assert.equal(s.agents[0].status, 'idle');
 });
+
+import { setAgentLevel } from '../site/src/ui/bureau-store.js';
+test('niveau modifiable ; les messages citent le score réel seulement s’il existe', () => {
+  const s = emptyStore();
+  const a = createAgent(s, { name: 'N', cat: 'Plombier', role: 'SDR IA' }).agent;
+  assert.equal(setAgentLevel(s, a.id, 'expert').level, 'expert');
+  assert.equal(setAgentLevel(s, a.id, 'bidon'), null);
+  assert.equal(s.agents[0].level, 'expert');
+  const c = { id: 9, name: 'Chez Paul', city: 'Aude' };
+  assert.ok(!messageFor(c, 'chaleureux').includes('/100'));
+  assert.ok(messageFor({ ...c, _score: 42 }, 'chaleureux').includes('42/100'));
+  assert.ok(messageFor({ ...c, _score: 42 }, 'direct', 'relance').includes('42/100'));
+});

@@ -78,3 +78,15 @@ export function agentBoard(agents, progressOf, statsOf) {
     return { id: a.id, name: a.name, role: a.role, done: p.done, total: p.total, pct: p.pct, messages: st.messages, found: st.found, status: a.status };
   }).sort((x, y) => y.done - x.done || y.messages - x.messages);
 }
+
+
+// Export CSV des prospects (nom, ville, métier, statut) ; les valeurs commençant par = + - @ sont neutralisées
+export function prospectsCsv(rows) {
+  const cell = v => {
+    let t = String(v ?? '').replace(/\s+/g, ' ').trim();
+    if (/^[=+\-@]/.test(t)) t = "'" + t;
+    return '"' + t.replace(/"/g, '""') + '"';
+  };
+  const head = ['Nom', 'Ville', 'Métier', 'Statut', 'Score audit'];
+  return '\uFEFF' + [head, ...rows.map(r => [r.name, r.city, r.category, r.status, r.score ?? ''])].map(r => r.map(cell).join(';')).join('\r\n');
+}

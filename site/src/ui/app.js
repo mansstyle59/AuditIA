@@ -10,6 +10,9 @@ import { desktopShell } from './layout-desktop.js';
 import { bureauHomeMobile, bureauHomeDesktop, homeLiveInner, homeHeaderExtra, HOME_SUBTITLE } from './views/bureau-home.js';
 import { DEFAULT_PERIOD, PERIODS } from '../data/home-metrics.js';
 import { dashboardView } from './views/dashboard.js';
+import { prospectsCsv } from '../data/dashboard-metrics.js';
+import { statusOf } from './bureau-store.js';
+import { auditHasAnalysis } from '../audit/scoring.js';
 import { clientsView, clientsResultsHtml } from './views/clients.js';
 import { clientDetailView } from './views/client-detail.js';
 import { createSearchController } from './search-controller.js';
@@ -62,7 +65,7 @@ const state = {
   user: null, view: 'home', clientId: null, recoveryShown: false,
   auditId: null,
   data: { status: 'idle', clients: [], audits: [], error: '' },
-  ui: { q: '', tier: '', sort: 'urgence', period: DEFAULT_PERIOD }, // filtres de la liste des clients et période du bureau
+  ui: { q: '', tier: '', sort: 'urgence', period: DEFAULT_PERIOD, dbWeeks: 8 }, // filtres de la liste des clients et période du bureau
   brand: defaultBrand(), // marque enregistrée (réglages) ; marque par défaut si absente
   gen: 0, // numéro de chargement : un résultat périmé (déconnexion, nouveau chargement) est ignoré
 };
@@ -201,9 +204,25 @@ function bodyFor(isWide) {
   }
   const hc = bureau.homeContext();
   if (!hc) return '';
-  if (state.view === 'dashboard') return dashboardView({ data: d, store: hc.store });
+  if (state.view === 'dashboard') return dashboardView({ data: d, store: hc.store, weeks: state.ui.dbWeeks });
   const ctx = { data: d, store: hc.store, sel: hc.sel, period: state.ui.period, snap: audits.snapshot() };
   return isWide ? bureauHomeDesktop(ctx) : bureauHomeMobile(ctx);
+}
+
+function exportProspects() {
+  const hc = bureau.homeContext();
+  if (!hc || state.data.status !== 'ready') return;
+  const { clients, audits: list } = state.data;
+  const rows = clients.map(c => {
+    const a = list.filter(x => String(x.client_id) === String(c.id) && auditHasAnalysis(x))
+      .sort((x, y) => String(y.updated_at || y.created_at || '').localeCompare(String(x.updated_at || x.created_at || '')))[0];
+    return { name: c.name, city: c.city, category: c.category, status: statusOf(hc.store, c), score: a ? Number(a.score) || '' : '' };
+  });
+  const url = URL.createObjectURL(new Blob([prospectsCsv(rows)], { type: 'text/csv;charset=utf-8' }));
+  const a = document.createElement('a');
+  a.href = url; a.download = 'auditia-prospects.csv';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
 }
 
 function renderWorkspace() {
@@ -260,7 +279,7 @@ function enter(user) {
   state.user = user;
   state.view = 'home';
   state.clientId = null;
-  state.ui = { q: '', tier: '', sort: 'urgence', period: DEFAULT_PERIOD };
+  state.ui = { q: '', tier: '', sort: 'urgence', period: DEFAULT_PERIOD, dbWeeks: 8 };
   search.reset();
   report.close(); audits.reset(); settings.reset(); bing.reset(); bureau.reset();
   window.scrollTo(0, 0);
@@ -368,6 +387,9 @@ boot(); return; }
   if (search.onClick(t)) return;
   if (bureau.onClick(t)) return;
   if (settings.onClick(t)) return;
+  const wk = t.closest('[data-db-weeks]');
+  if (wk) { state.ui.dbWeeks = Number(wk.dataset.dbWeeks) || 8; renderWorkspace(); return; }
+  if (t.closest('[data-db-export]')) { exportProspects(); return; }
   const oa = t.closest('[data-open-audit]');
   if (oa) { state.view = 'audit'; state.auditId = oa.dataset.openAudit; renderWorkspace(); window.scrollTo(0, 0); return; }
   const open = t.closest('[data-open-client]');

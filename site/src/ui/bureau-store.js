@@ -71,18 +71,28 @@ export const TONES = { chaleureux: 'Chaleureux', direct: 'Direct', formel: 'Form
 export const DEFAULT_TONE = 'chaleureux';
 export const FOLLOWUP_DAYS = 3;
 
+// Phrase d'accroche fondée sur le score réel de l'audit déjà réalisé (client._score) ; vide s'il n'y en a pas
+function scoreLine(client, tone) {
+  const sc = Number(client._score);
+  if (!Number.isFinite(sc) || sc <= 0) return '';
+  if (sc >= 75) return tone === 'direct' ? ` Votre score est de ${sc}/100 : bon, avec encore des gains possibles.` : ` Votre visibilité ressort plutôt bien (${sc}/100), avec encore quelques pistes pour aller plus loin.`;
+  if (sc >= 50) return tone === 'direct' ? ` Votre score est de ${sc}/100 : il y a de la marge.` : ` Votre visibilité ressort à ${sc}/100 : correcte, avec plusieurs points faciles à améliorer.`;
+  return tone === 'direct' ? ` Votre score est de ${sc}/100 : c’est faible et corrigeable.` : ` Votre visibilité ressort à ${sc}/100 : il y a de belles marges de progression.`;
+}
+
 export function messageFor(client, tone = DEFAULT_TONE, kind = 'accroche') {
   const city = String(client.city || '').trim();
   const where = city ? ' à ' + city : '';
   const n = client.name;
+  const sc = scoreLine(client, tone);
   if (kind === 'relance') {
-    if (tone === 'direct') return `Bonjour, je reviens vers vous au sujet de ${n}. Avez-vous eu le temps de voir mon message sur l’audit gratuit de votre visibilité ? Je peux vous l’envoyer en 2 minutes.`;
-    if (tone === 'formel') return `Bonjour, je me permets de revenir vers vous concernant ${n}${where}. Je vous avais proposé un audit gratuit de votre visibilité en ligne ; êtes-vous disponible pour que je vous en transmette le rapport ?`;
-    return `Bonjour, je reviens vers vous pour ${n}${where}. J’espère que tout va bien ! Je vous avais proposé un audit gratuit de votre visibilité sur Google et les assistants IA : souhaitez-vous que je vous envoie le rapport ?`;
+    if (tone === 'direct') return `Bonjour, je reviens vers vous au sujet de ${n}.${sc} Avez-vous eu le temps de voir mon message sur l’audit gratuit de votre visibilité ? Je peux vous l’envoyer en 2 minutes.`;
+    if (tone === 'formel') return `Bonjour, je me permets de revenir vers vous concernant ${n}${where}. Je vous avais proposé un audit gratuit de votre visibilité en ligne.${sc} Êtes-vous disponible pour que je vous en transmette le rapport ?`;
+    return `Bonjour, je reviens vers vous pour ${n}${where}. J’espère que tout va bien ! Je vous avais proposé un audit gratuit de votre visibilité sur Google et les assistants IA.${sc} Souhaitez-vous que je vous envoie le rapport ?`;
   }
-  if (tone === 'direct') return `Bonjour, j’ai regardé la visibilité de ${n}${where} sur Google et dans les réponses des assistants IA : il y a des points à corriger. Je vous envoie l’audit gratuit ?`;
-  if (tone === 'formel') return `Bonjour, je me suis intéressé à ${n}${where}. Je vous propose un audit gratuit de votre visibilité sur Google et dans les réponses des assistants IA (ChatGPT, Gemini…), indiquant ce qui fonctionne et ce qui manque. Souhaitez-vous recevoir le rapport ?`;
-  return `Bonjour, je me suis intéressé à ${n}${where}. Je propose un audit gratuit de votre visibilité sur Google et dans les réponses des assistants IA (ChatGPT, Gemini…) : ce qui fonctionne déjà et ce qui manque. Souhaitez-vous recevoir le rapport ?`;
+  if (tone === 'direct') return `Bonjour, j’ai regardé la visibilité de ${n}${where} sur Google et dans les réponses des assistants IA.${sc || ' Il y a des points à corriger.'} Je vous envoie l’audit gratuit ?`;
+  if (tone === 'formel') return `Bonjour, je me suis intéressé à ${n}${where}. Je vous propose un audit gratuit de votre visibilité sur Google et dans les réponses des assistants IA (ChatGPT, Gemini…), indiquant ce qui fonctionne et ce qui manque.${sc} Souhaitez-vous recevoir le rapport ?`;
+  return `Bonjour, je me suis intéressé à ${n}${where}. Je propose un audit gratuit de votre visibilité sur Google et dans les réponses des assistants IA (ChatGPT, Gemini…) : ce qui fonctionne déjà et ce qui manque.${sc} Souhaitez-vous recevoir le rapport ?`;
 }
 
 // Fait avancer un prospect dans le pipeline (action de l'utilisateur)
@@ -152,6 +162,14 @@ export function createAgent(store, { name, cat, role, level }) {
   };
   store.agents.push(agent);
   return { ok: true, agent };
+}
+
+export function setAgentLevel(store, agentId, level) {
+  const a = store.agents.find(x => x.id === agentId);
+  if (!a || !LEVELS[level]) return null;
+  a.level = level;
+  a.beat = 0;
+  return a;
 }
 
 export function addTask(store, agentId, { type, cat, zone }) {

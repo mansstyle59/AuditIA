@@ -1,8 +1,9 @@
 // AuditIA — Bureau : état de l'écran, actions et tâche de fond des agents.
 // Les règles sont dans bureau-store.js ; l'affichage dans views/bureau.js.
-import { emptyStore, loadStore, saveStore, counts, createAgent, addTask, findTask, removeTask, removeAgent, setAgentStatus, tick, messageFor, finishSearch, failSearch, setFoundStatus, setProspectStatus, setAllAgents, TONES, DEFAULT_TONE } from './bureau-store.js';
+import { emptyStore, loadStore, saveStore, counts, createAgent, addTask, findTask, removeTask, removeAgent, setAgentStatus, setAgentLevel, LEVELS, tick, messageFor, finishSearch, failSearch, setFoundStatus, setProspectStatus, setAllAgents, TONES, DEFAULT_TONE } from './bureau-store.js';
 import { shellHtml, chipsHtml, cardHtml, agentsHtml, readyHtml, followHtml, pipeHtml, foundHtml, updateScene } from './views/bureau.js';
 import { findCandidates, isKnownClient } from '../data/registry-prospects.js';
+import { auditHasAnalysis } from '../audit/scoring.js';
 import { insertClient } from '../data/queries.js';
 // (chipsHtml, cardHtml, agentsHtml, readyHtml, pipeHtml : fragments rafraîchis en place)
 
@@ -15,7 +16,14 @@ export function createBureauController({ getUser, getData, getView, rerender, ge
 
   const clients = () => {
     const d = getData();
-    return d && d.status === 'ready' ? d.clients : [];
+    if (!d || d.status !== 'ready') return [];
+    // Score réel du dernier audit analysé, pour personnaliser les messages (jamais inventé)
+    const last = new Map();
+    (d.audits || []).filter(auditHasAnalysis).forEach(a => {
+      const k = String(a.client_id), st = String(a.updated_at || a.created_at || '');
+      if (!last.has(k) || st > last.get(k).st) last.set(k, { st, score: Number(a.score) });
+    });
+    return d.clients.map(c => (last.has(String(c.id)) ? { ...c, _score: last.get(String(c.id)).score } : c));
   };
   const val = id => (document.getElementById(id)?.value || '').trim();
 
@@ -178,6 +186,11 @@ export function createBureauController({ getUser, getData, getView, rerender, ge
         save();
         note(started ? `Tâche ajoutée : ${r.agent.name} se met au travail.` : `Tâche ajoutée à ${r.agent.name}.`, 'ok');
         refresh();
+        return true;
+      }
+      if (act === 'level') {
+        const a = setAgentLevel(store, id, btn.dataset.buTo);
+        if (a) { save(); note(`${a.name} passe au niveau ${LEVELS[a.level].label}.`, 'ok'); refresh(); }
         return true;
       }
       if (act === 'work' || act === 'stop' || act === 'cafe' || act === 'back') {
