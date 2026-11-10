@@ -37,8 +37,14 @@ jobs:
           for _, body in ld:
               json.loads(body)
           inline = [(attrs, body) for attrs, body in scripts if not re.search(r"\bsrc\s*=", attrs, re.I) and not re.search(r"application/ld\+json", attrs, re.I)]
-          if not inline:
-              raise SystemExit("No inline JavaScript found in site/index.html")
+          external = re.findall(r"""<script\b[^>]*\bsrc\s*=\s*["']([^"']+)["']""", html, re.I)
+          if not inline and not external:
+              raise SystemExit("No inline or external JavaScript found in site/index.html")
+          for src in external:
+              if not src.startswith(("https://", "http://", "//")):
+                  target = (html_path.parent / src.split("?", 1)[0].split("#", 1)[0]).resolve()
+                  if not target.is_file():
+                      raise SystemExit(f"External script not found: {src}")
           with tempfile.TemporaryDirectory() as tmp:
               for i, (attrs, body) in enumerate(inline, 1):
                   # Un <script type="module"> (avec import) se vérifie en .mjs ; les scripts classiques en .js.
@@ -70,7 +76,7 @@ jobs:
           missing = [asset for asset in assets if asset not in ("./",) and not (root / asset.removeprefix("./")).is_file()]
           if missing:
               raise SystemExit("Missing service-worker assets: " + ", ".join(missing))
-          print(f"Validation OK: {len(inline)} inline scripts, {len(src_files)} src modules, manifest JSON and {len(assets)} service-worker assets.")
+          print(f"Validation OK: {len(inline)} inline scripts, {len(external)} external scripts, {len(src_files)} src modules, manifest JSON and {len(assets)} service-worker assets.")
           PY
       - name: Upload site artifact
         uses: actions/upload-pages-artifact@v3
