@@ -17,7 +17,12 @@ import { createAuditSources } from '../api/audit-sources.js';
 /* Les 10 sources, dans l'ordre de l'ancien moteur. `needsWeb` : source possible seulement si le commerce a un site. */
 export const AUDIT_SOURCES = [
   { id: 'site',     label: 'Analyse du site',                     group: 'site',     needsWeb: true,  ms: 20000, issue: 'lecture du site impossible' },
-  { id: 'presence', label: 'Réseaux sociaux et annuaires',        group: 'presence', needsWeb: false, ms: 35000, issue: 'présence web indisponible' },
+  { id: 'presence', label: 'Recherche web et annuaires',          group: 'presence', needsWeb: false, ms: 35000, issue: 'présence web indisponible' },
+  { id: 'instagram',label: 'Recherche Instagram',                    group: 'social',   needsWeb: false, ms: 18000, issue: 'recherche Instagram indisponible' },
+  { id: 'facebook', label: 'Recherche Facebook',                     group: 'social',   needsWeb: false, ms: 18000, issue: 'recherche Facebook indisponible' },
+  { id: 'youtube',  label: 'Recherche YouTube',                      group: 'social',   needsWeb: false, ms: 18000, issue: 'recherche YouTube indisponible' },
+  { id: 'tiktok',   label: 'Recherche TikTok',                        group: 'social',   needsWeb: false, ms: 18000, issue: 'recherche TikTok indisponible' },
+  { id: 'linkedin', label: 'Recherche LinkedIn',                     group: 'social',   needsWeb: false, ms: 18000, issue: 'recherche LinkedIn indisponible' },
   { id: 'sirene',   label: 'SIRENE (informations légales)',       group: 'fiche',    needsWeb: false, ms: 15000, issue: 'données légales indisponibles' },
   { id: 'photos',   label: 'Photos de la fiche Google',           group: 'fiche',    needsWeb: false, ms: 15000, issue: 'photos Google indisponibles' },
   { id: 'domain',   label: 'Âge du domaine',                      group: 'fiche',    needsWeb: true,  ms: 12000, issue: 'date de création du domaine indisponible' },
@@ -120,9 +125,14 @@ export function createAuditEngine(deps0) {
         })();
       };
       const skip = Promise.resolve(null);
-      const [html, web, sir, photos, domain, shot, cp, speed, rk, gf] = await Promise.all([
+      const [html, web, instagram, facebook, youtube, tiktok, linkedin, sir, photos, domain, shot, cp, speed, rk, gf] = await Promise.all([
         hasWeb ? track('site', readSiteHtml(site)) : skip,
         track('presence', src.findWebPresence(c)),
+        track('instagram', src.findSocialProfile(c, 'Instagram')),
+        track('facebook', src.findSocialProfile(c, 'Facebook')),
+        track('youtube', src.findSocialProfile(c, 'YouTube')),
+        track('tiktok', src.findSocialProfile(c, 'TikTok')),
+        track('linkedin', src.findSocialProfile(c, 'LinkedIn')),
         track('sirene', fetchSirene(c)),
         track('photos', src.fetchPlacePhotos((c && c.details && c.details.place_id) || '')),
         hasWeb ? track('domain', fetchDomainDate(site)) : skip,
@@ -136,7 +146,12 @@ export function createAuditEngine(deps0) {
       if (html) { siteRes = analyzeSite(html, site); siteRes.hasWebsite = true; siteRes.pageRead = true; siteRes.geo = Object.assign({}, geoFromHtml(html), gf || {}); setFact('Site web', 'Page lue', (siteRes.finalUrl || site) + ' · ' + ((siteRes.socials || []).length) + ' réseaux sur la page'); }
       else if (hasWeb) { siteRes = { socials: [], directories: [], hasWebsite: true, pageRead: false, analyzedAt: new Date().toISOString(), finalUrl: site }; setFact('Site web', 'Page non lue', 'Les critères de la page ne sont pas notés'); }
       else siteRes = { hasWebsite: false, pageRead: false, socials: [], directories: [], analyzedAt: new Date().toISOString(), finalUrl: null };
-      if (web) { siteRes.socials = siteRes.socials || []; const have = new Set(siteRes.socials.map(s => s.net)); (web.socials || []).forEach(w => { if (!have.has(w.net)) { have.add(w.net); siteRes.socials.push(w); } }); siteRes.directories = web.directories || []; setFact('Présence web', (web.socials || []).length + ' réseaux · ' + (web.directories || []).length + ' annuaires', 'Uniquement si le nom est dans l’adresse'); }
+      siteRes.socials = siteRes.socials || [];
+      const socialFound = [instagram, facebook, youtube, tiktok, linkedin].filter(Boolean);
+      const have = new Set(siteRes.socials.map(s => s.net));
+      [...(web && web.socials || []), ...socialFound].forEach(w => { if (!have.has(w.net)) { have.add(w.net); siteRes.socials.push(w); } });
+      siteRes.directories = web && web.directories || [];
+      setFact('Présence en ligne', siteRes.socials.length + ' réseaux · ' + siteRes.directories.length + ' annuaires', 'Profils trouvés par recherche web ou liens du site ; absence de résultat ≠ absence de compte.');
       if (shot) siteRes.screenshot = shot;
       if (cp) siteRes.competitors = cp;
       if (Array.isArray(rk)) { siteRes.rankings = rk; const usable = rk.filter(r => !r.error); const found = usable.filter(r => r.found).length; setFact('Mots-clés', usable.length ? found + ' / ' + usable.length : 'Indisponible', usable.length ? 'Nom ou site trouvé dans l’adresse de la page' : 'La recherche web n’a pas répondu'); }
