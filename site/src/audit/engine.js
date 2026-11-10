@@ -147,7 +147,7 @@ export function createAuditEngine(deps0) {
       else if (hasWeb) { siteRes = { socials: [], directories: [], hasWebsite: true, pageRead: false, analyzedAt: new Date().toISOString(), finalUrl: site }; setFact('Site web', 'Page non lue', 'Les critères de la page ne sont pas notés'); }
       else siteRes = { hasWebsite: false, pageRead: false, socials: [], directories: [], analyzedAt: new Date().toISOString(), finalUrl: null };
       siteRes.socials = siteRes.socials || [];
-      const socialFound = [instagram, facebook, youtube, tiktok, linkedin].filter(Boolean);
+      const socialFound = [instagram, facebook, youtube, tiktok, linkedin].filter(x => x && x.found);
       const have = new Set(siteRes.socials.map(s => s.net));
       [...(web && web.socials || []), ...socialFound].forEach(w => { if (!have.has(w.net)) { have.add(w.net); siteRes.socials.push(w); } });
       siteRes.directories = web && web.directories || [];
