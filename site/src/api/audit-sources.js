@@ -138,5 +138,5 @@ export function createAuditSources(deps0){
         const recommendations=Object.values(au).filter(x=>x&&typeof x.score==='number'&&x.score<0.9&&x.title&&(x.scoreDisplayMode==='metricSavings'||(x.details&&x.details.type==='opportunity')||x.scoreDisplayMode==='binary'||x.scoreDisplayMode==='numeric')).sort((x,y)=>x.score-y.score).slice(0,8).map(x=>({title:cleanTxt(x.title),detail:cleanTxt(x.description),gain:x.displayValue||null,severity:x.score<0.5?'haute':'moyenne'}));
         return { provider:'Google PageSpeed Insights · Lighthouse (mobile)', analyzedAt:new Date().toISOString(), url:site, finalUrl:lh.finalDisplayedUrl||site, scores:{performance:sc('performance'),accessibility:sc('accessibility'),bestPractices:sc('best-practices'),seo:sc('seo')}, metrics:{ 'Contenu affiché (FCP)':dv('first-contentful-paint'), 'Plus grand contenu (LCP)':dv('largest-contentful-paint'), 'Interactivité (TBT)':dv('total-blocking-time'), 'Stabilité visuelle (CLS)':dv('cumulative-layout-shift'), 'Vitesse (Speed Index)':dv('speed-index') }, recommendations };
       }
-  return { fetchSerp, findWebPresence, fetchPlacePhotos, fetchCompetitors, checkRankings, fetchPagespeed };
+  return { fetchSerp, findWebPresence, findSocialProfile, fetchPlacePhotos, fetchCompetitors, checkRankings, fetchPagespeed };
 }
