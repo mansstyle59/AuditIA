@@ -128,7 +128,7 @@ const CATEGORY_BY_CRITERION = {
   'Réseaux sociaux reliés': 'social',
   'Présence dans les annuaires détectés': 'social',
   'Présence sur plusieurs réseaux': 'social',
-  'Entreprise présente dans SIRENE': 'geo',
+  'Entreprise présente dans SIRENE': 'google',
   'Données structurées LocalBusiness': 'geo',
   'Contenu lisible sur la page': 'geo',
   'Adresse et horaires en clair': 'geo',

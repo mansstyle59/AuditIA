@@ -45,7 +45,7 @@ function buildSources(a, c) {
   } else add('Fiche Google (Google Places)', 'unmeasured', 'Note et avis non fournis pour ce commerce.');
 
   const photos = num(d.photoCount);
-  if (photos != null) add('Photos de la fiche Google', 'measured', photos + (photos >= 10 ? '+' : '') + ' ' + plural(photos, 'photo', 'photos'));
+  if (photos != null) add('Photos de la fiche Google', 'measured', photos + ' ' + plural(photos, 'photo', 'photos'));
   else add('Photos de la fiche Google', 'unmeasured', 'Nombre non fourni par Google.');
 
   if (!hasSite) add('Lecture du site web', 'na', 'Aucun site web renseigné.');
@@ -170,6 +170,44 @@ function summaryText(m) {
 }
 
 /* Construit le rapport. Renvoie { ok:false, reason } si le dossier n'a pas été analysé. Ne modifie JAMAIS ses arguments. */
+const GOOGLE_STATUS = { OPERATIONAL: 'En activité', CLOSED_TEMPORARILY: 'Fermeture temporaire', CLOSED_PERMANENTLY: 'Fermé définitivement' };
+
+/* Fiche légale et pratique du commerce : uniquement les données enregistrées (fiche Google, registre SIRENE).
+   Même règle que le score : un rapprochement SIRENE existant est « matched », même si sa confiance est à vérifier. */
+export function buildBusinessProfile(c, now = new Date()) {
+  const d = (c && c.details) || {};
+  const s = d.sirene || null;
+  const matched = !!(s && s.matched);
+  const created = s && s.dateCreation ? new Date(s.dateCreation) : null;
+  const validCreated = created && !Number.isNaN(created.getTime()) ? created : null;
+  let ageLabel = '';
+  if (validCreated) {
+    const years = Math.floor((now - validCreated) / (365.25 * 86400000));
+    ageLabel = years >= 1 ? years + ' ' + plural(years, 'an', 'ans') : 'moins d’un an';
+  }
+  const siren = matched ? clean(s.siren) : '';
+  return {
+    legalStatus: matched ? 'matched' : 'unmatched',
+    confidence: matched ? clean(s.matchConfidence) : '',
+    officialUrl: siren ? 'https://annuaire-entreprises.data.gouv.fr/entreprise/' + encodeURIComponent(siren) : '',
+    legalName: matched ? clean(s.denomination) : '',
+    siren, siret: matched ? clean(s.siret) : '',
+    legalForm: matched ? clean(s.formeJuridique) : '',
+    naf: matched ? clean(s.naf) : '',
+    creationDate: validCreated ? fmtLong(validCreated) : '',
+    ageLabel,
+    establishments: matched && s.etablissements != null ? String(s.etablissements) : '',
+    postalCode: matched ? clean(s.codePostal) : '',
+    legalCity: matched ? clean(s.ville) : '',
+    address: clean(d.address),
+    phone: clean(d.phone || c.phone),
+    website: clean(c.website || d.website),
+    googleStatus: GOOGLE_STATUS[clean(d.status)] || '',
+    rating: num(d.rating), reviews: num(d.reviews),
+    hours: Array.isArray(d.hours) ? d.hours.map(clean).filter(Boolean) : [],
+  };
+}
+
 export function buildReport(audit, client, allAudits = [], now = new Date()) {
   if (!audit) return { ok: false, reason: 'Dossier d’audit introuvable.' };
   const an = auditAnalysis(audit, client);
@@ -241,5 +279,6 @@ export function buildReport(audit, client, allAudits = [], now = new Date()) {
   if (m.pillars.geo.value != null) ind.push({ id: 'geo', label: 'GEO · assistants IA', value: m.pillars.geo.value, group: 'Visibilité' });
   if (m.lighthouse) m.lighthouse.scores.filter(x => x.value != null).forEach(x => ind.push({ id: 'lh-' + slugify(x.label), label: x.label, value: Math.max(0, Math.min(100, Math.round(x.value))), group: 'Performance du site' }));
   m.indicators = ind;
+  m.businessProfile = buildBusinessProfile(client, now);
   return m;
 }

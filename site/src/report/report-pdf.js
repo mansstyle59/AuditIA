@@ -255,7 +255,6 @@ export function buildReportPdf(JsPDF, m) {
   }
 
   /* =============== SYNTHÈSE =============== */
-  newPage();
   section('Synthèse de l’audit', 60);
   m.summary.forEach((s, i) => para(s, { size: i === 0 ? 10.5 : 9.8, style: i === 0 ? 'bold' : 'normal', gap: 2 }));
   y += 2;
