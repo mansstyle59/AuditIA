@@ -49,6 +49,28 @@ export function analyzeSite(html,pageUrl){
       const viewport=!!doc.querySelector('meta[name="viewport" i]');
       const ldTypes=new Set();
       doc.querySelectorAll('script[type="application/ld+json"]').forEach(s=>{try{const walk=o=>{if(!o||typeof o!=='object')return;if(Array.isArray(o))return o.forEach(walk);const t=o['@type'];(Array.isArray(t)?t:[t]).filter(Boolean).forEach(x=>ldTypes.add(String(x)));if(o['@graph'])walk(o['@graph']);};walk(JSON.parse(s.textContent));}catch(e){}});
+      // Logo de l'entreprise : priorité aux données structurées et aux images explicitement nommées « logo ».
+      let logo=null;
+      const setLogo=(raw,source)=>{
+        if(logo||!raw)return;
+        const value=typeof raw==='string'?raw:(raw.url||raw.contentUrl||'');
+        try{const u=new URL(value,base||undefined);if(/^https?:$/.test(u.protocol))logo={url:u.href,source};}catch(e){}
+      };
+      const walkLogo=o=>{
+        if(!o||typeof o!=='object')return;
+        if(Array.isArray(o)){o.forEach(walkLogo);return;}
+        if(o.logo)setLogo(o.logo,'Données structurées du site');
+        if(o['@graph'])walkLogo(o['@graph']);
+      };
+      doc.querySelectorAll('script[type="application/ld+json"]').forEach(s=>{try{walkLogo(JSON.parse(s.textContent));}catch(e){}});
+      if(!logo){
+        const img=doc.querySelector('img[class*="logo" i], img[id*="logo" i], header img[alt*="logo" i]');
+        if(img)setLogo(img.getAttribute('src')||img.getAttribute('data-src'),'Image identifiée comme logo sur le site');
+      }
+      if(!logo){
+        const icon=doc.querySelector('link[rel~="icon"][href], link[rel="apple-touch-icon"][href]');
+        if(icon)setLogo(icon.getAttribute('href'),'Icône du site (logo non détecté)');
+      }
       const LOCAL_TYPES=/LocalBusiness|Restaurant|FoodEstablishment|Bakery|CafeOrCoffeeShop|BarOrPub|Store|HairSalon|BeautySalon|DaySpa|HealthAndBeautyBusiness|Hotel|LodgingBusiness|AutoRepair|AutomotiveBusiness|HomeAndConstructionBusiness|Plumber|Electrician|HousePainter|ProfessionalService|MedicalBusiness|Dentist|Physician|Organization/;
       const localSchema=[...ldTypes].some(t=>LOCAL_TYPES.test(t));
       const text=(doc.body&&doc.body.textContent||'').replace(/\s+/g,' ');
@@ -57,7 +79,7 @@ export function analyzeSite(html,pageUrl){
       const addressOnSite=/\b\d{5}\b/.test(text)&&/rue|avenue|boulevard|place|chemin|route|impasse|quai/i.test(text);
       const years=[...text.matchAll(/(?:©|copyright|depuis)\s*(?:\d{4}\s*[-–]\s*)?(\d{4})/gi)].map(m=>+m[1]).filter(y=>y>1990&&y<=new Date().getFullYear());
       const copyrightYear=years.length?Math.min(...years):null;
-      return {socials,tel,whatsapp,booking,tracking,cms,title,metaDesc,viewport,ldTypes:[...ldTypes],localSchema,words,hoursOnSite,addressOnSite,copyrightYear,pageRead:true,analyzedAt:new Date().toISOString(),finalUrl:pageUrl};
+      return {socials,logo,tel,whatsapp,booking,tracking,cms,title,metaDesc,viewport,ldTypes:[...ldTypes],localSchema,words,hoursOnSite,addressOnSite,copyrightYear,pageRead:true,analyzedAt:new Date().toISOString(),finalUrl:pageUrl};
     }
 
 export const GENERIC_NAME=new Set(['boulangerie','restaurant','cafe','coiffure','garage','hotel','pizzeria','boucherie','pharmacie','centre','salon','auto','pizza','bar','maison','atelier','studio','institut','commerce','shop','store','food','snack','kebab','sushi','traiteur','fleuriste','opticien','tabac','presse']);
