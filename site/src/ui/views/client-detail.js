@@ -3,7 +3,7 @@
 import { btn, card, stat, badge, scoreBadge, sparkline, emptyState, linkBtn, avatar } from '../components/ui.js';
 import { clientDetail, clientInfoRows, clientCategory } from '../../data/portfolio.js';
 import { auditHasAnalysis } from '../../audit/scoring.js';
-import { escHtml, safeHttpUrl, fmtRating } from '../../core/utils.js';
+import { escHtml, safeHttpUrl } from '../../core/utils.js';
 import { bannerSlot } from './audit-live.js';
 import { noticeBlock } from './audits.js';
 
@@ -32,7 +32,7 @@ function auditsCard(audits, c, ctl) {
   return card({ title: 'Audits de ce client', body: `<ul class="ds-list">${rows}</ul><div class="ds-d-actions">${launch}</div>` });
 }
 
-export function clientDetailView(c, audits, ctl, bingCtl = null) {
+export function clientDetailView(c, audits, ctl) {
   const d = c.details || {};
   const info = clientDetail(c, audits);
   const tel = String(c.phone || d.phone || '').replace(/[^\d+]/g, '');
@@ -40,7 +40,7 @@ export function clientDetailView(c, audits, ctl, bingCtl = null) {
   const mapsQ = encodeURIComponent([c.name, d.address || c.city].filter(Boolean).join(' '));
   const sub = [c.city, clientCategory(c)].filter(Boolean).join(' · ');
   const header = `<section class="ds-card ds-client-head">
-    <div class="ds-client-id">${avatar(c.name)}<div class="ds-client-id__txt"><h2>${escHtml(c.name || 'Commerce')}</h2>${sub ? `<p class="ds-row__meta">${escHtml(sub)}</p>` : ''}${d.rating != null || d.reviews != null || d.place_id ? `<p class="ds-row__meta">${d.rating != null ? `★ ${escHtml(fmtRating(d.rating))}/5` : 'Note non disponible'} · ${d.reviews != null ? `${escHtml(d.reviews)} avis Google` : 'Avis non disponibles'}</p>` : ''}</div></div>
+    <div class="ds-client-id">${avatar(c.name)}<div class="ds-client-id__txt"><h2>${escHtml(c.name || 'Commerce')}</h2>${sub ? `<p class="ds-row__meta">${escHtml(sub)}</p>` : ''}${d.rating != null ? `<p class="ds-row__meta">★ ${escHtml(d.rating)} · ${escHtml(d.reviews || 0)} avis Google</p>` : ''}</div></div>
     <div class="ds-d-actions">
       ${tel ? linkBtn({ label: 'Appeler', href: 'tel:' + tel }) : ''}
       ${site ? linkBtn({ label: 'Site web', href: site, external: true }) : ''}
@@ -56,7 +56,7 @@ export function clientDetailView(c, audits, ctl, bingCtl = null) {
   return `${btn({ label: '← Clients', attrs: 'data-nav="clients"' })}
     ${bannerSlot(ctl ? ctl.snapshot() : null)}${noticeBlock(ctl ? ctl.notice() : null)}
     <div class="ds-detail">
-      <div class="ds-d-stack ds-detail__main">${header}${stats}${auditsCard(info.audits, c, ctl)}${bingCtl ? bingCtl.html(c) : ''}</div>
+      <div class="ds-d-stack ds-detail__main">${header}${stats}${auditsCard(info.audits, c, ctl)}</div>
       <div class="ds-d-stack ds-detail__side">${evo}${infoCard(c)}</div>
     </div>`;
 }

@@ -11,7 +11,7 @@
 import { safeHttpUrl, siteHost } from '../core/utils.js';
 import { analyzeSite, geoFromHtml } from './site-analysis.js';
 import { visibilityAudit } from './scoring.js';
-import { readSiteHtml, fetchSirene, fetchDomainDate, fetchScreenshot, fetchGeoFiles, fetchRobotsPolicy } from '../api/web-read.js';
+import { readSiteHtml, fetchSirene, fetchDomainDate, fetchScreenshot, fetchGeoFiles } from '../api/web-read.js';
 import { createAuditSources } from '../api/audit-sources.js';
 
 /* Les 10 sources, dans l'ordre de l'ancien moteur. `needsWeb` : source possible seulement si le commerce a un site. */
@@ -19,7 +19,7 @@ export const AUDIT_SOURCES = [
   { id: 'site',     label: 'Analyse du site',                     group: 'site',     needsWeb: true,  ms: 20000, issue: 'lecture du site impossible' },
   { id: 'presence', label: 'Réseaux sociaux et annuaires',        group: 'presence', needsWeb: false, ms: 35000, issue: 'présence web indisponible' },
   { id: 'sirene',   label: 'SIRENE (informations légales)',       group: 'fiche',    needsWeb: false, ms: 15000, issue: 'données légales indisponibles' },
-  { id: 'photos',   label: 'Fiche Google (coordonnées, horaires et photos)', group: 'fiche', needsWeb: false, ms: 15000, issue: 'fiche Google indisponible' },
+  { id: 'photos',   label: 'Photos de la fiche Google',           group: 'fiche',    needsWeb: false, ms: 15000, issue: 'photos Google indisponibles' },
   { id: 'domain',   label: 'Âge du domaine',                      group: 'fiche',    needsWeb: true,  ms: 12000, issue: 'date de création du domaine indisponible' },
   { id: 'shot',     label: 'Capture d’écran du site',             group: 'site',     needsWeb: true,  ms: 20000, issue: 'capture du site indisponible' },
   { id: 'rivals',   label: 'Concurrents proches',                 group: 'rivals',   needsWeb: false, ms: 25000, issue: 'comparaison des concurrents indisponible' },
@@ -120,93 +120,21 @@ export function createAuditEngine(deps0) {
         })();
       };
       const skip = Promise.resolve(null);
-      const skipSource = (id, note) => {
-        const st = row(id);
-        if (!st) return;
-        st.status = 'skipped';
-        st.note = note;
-        st.endedAt = deps.now();
-        emit();
-      };
-
-      // robots.txt est consulté avant toute lecture de page, capture ou PageSpeed.
-      let robotsInfo = null;
-      let canCrawl = false;
-      if (hasWeb) {
-        const geoMeta = AUDIT_SOURCES.find(s => s.id === 'geo');
-        const geoState = row('geo');
-        geoState.status = 'active';
-        geoState.startedAt = deps.now();
-        emit();
-        try {
-          robotsInfo = await withTimeout(fetchRobotsPolicy(site), Math.min(geoMeta.ms, 10000));
-          const policy = robotsInfo && robotsInfo.policy;
-          if (!policy || policy.allowed == null) {
-            canCrawl = false;
-            geoState.status = 'limited';
-            geoState.note = 'robots.txt inaccessible ou illisible ; crawl suspendu par prudence.';
-            issues.push(geoMeta.issue);
-          } else {
-            canCrawl = policy.allowed === true;
-            geoState.status = 'done';
-            geoState.note = canCrawl
-              ? 'robots.txt autorise AuditIA pour le chemin demandé.'
-              : 'robots.txt interdit AuditIA : ' + (policy.matchedRule || 'règle Disallow') + '.';
-          }
-        } catch (e) {
-          canCrawl = false;
-          geoState.status = 'limited';
-          geoState.note = 'robots.txt inaccessible ; crawl suspendu par prudence.';
-          issues.push(geoMeta.issue);
-        }
-        geoState.endedAt = deps.now();
-        current.pct = progressPct();
-        emit();
-        if (!canCrawl) {
-          const policy = robotsInfo && robotsInfo.policy;
-          const reason = policy && policy.allowed === false
-            ? 'robots.txt interdit le chemin ' + (policy.path || site) + ' (' + (policy.matchedRule || 'Disallow') + ').'
-            : 'robots.txt inaccessible ou illisible ; crawl suspendu par prudence.';
-          ['site', 'shot', 'perf'].forEach(id => skipSource(id, reason));
-        }
-      }
-
       const [html, web, sir, photos, domain, shot, cp, speed, rk, gf] = await Promise.all([
-        canCrawl ? track('site', readSiteHtml(site)) : skip,
+        hasWeb ? track('site', readSiteHtml(site)) : skip,
         track('presence', src.findWebPresence(c)),
         track('sirene', fetchSirene(c)),
         track('photos', src.fetchPlacePhotos((c && c.details && c.details.place_id) || '')),
         hasWeb ? track('domain', fetchDomainDate(site)) : skip,
-        canCrawl ? track('shot', fetchScreenshot(site)) : skip,
+        hasWeb ? track('shot', fetchScreenshot(site)) : skip,
         track('rivals', src.fetchCompetitors(c), value => setFact('Concurrents locaux', value.total != null ? value.total + ' commerces' : 'Résultats reçus', value.selfRank ? 'N°' + value.selfRank + ' par nombre d’avis, pas le rang Google' : 'Comparaison du volume d’avis')),
-        canCrawl ? track('perf', src.fetchPagespeed(site), value => { scan = value; setFact('Performance mobile', value.scores && value.scores.performance != null ? value.scores.performance + '/100' : 'Mesurée', 'Google PageSpeed Insights · Lighthouse'); }) : skip,
+        hasWeb ? track('perf', src.fetchPagespeed(site), value => { scan = value; setFact('Performance mobile', value.scores && value.scores.performance != null ? value.scores.performance + '/100' : 'Mesurée', 'Google PageSpeed Insights · Lighthouse'); }) : skip,
         track('keywords', src.checkRankings(c)),
-        hasWeb ? fetchGeoFiles(site, robotsInfo) : skip
+        hasWeb ? track('geo', fetchGeoFiles(site)) : skip
       ]);
 
-      if (hasWeb && gf && row('geo')) {
-        const geoState = row('geo');
-        if (gf.policy && gf.policy.llmsAllowed === false) {
-          geoState.note += ' llms.txt interdit par robots.txt.';
-        } else if (gf.policy && gf.policy.llmsAllowed === true) {
-          geoState.note += gf.llms === true
-            ? ' llms.txt lu.'
-            : gf.llms === false
-              ? ' llms.txt absent ou non exploitable.'
-              : ' llms.txt inaccessible.';
-        }
-        emit();
-      }
-
       if (html) { siteRes = analyzeSite(html, site); siteRes.hasWebsite = true; siteRes.pageRead = true; siteRes.geo = Object.assign({}, geoFromHtml(html), gf || {}); setFact('Site web', 'Page lue', (siteRes.finalUrl || site) + ' · ' + ((siteRes.socials || []).length) + ' réseaux sur la page'); }
-      else if (hasWeb) {
-        siteRes = { socials: [], directories: [], hasWebsite: true, pageRead: false, analyzedAt: new Date().toISOString(), finalUrl: site, geo: Object.assign({}, gf || {}) };
-        const policy = robotsInfo && robotsInfo.policy;
-        const note = !canCrawl
-          ? (policy && policy.allowed === false ? 'Lecture suspendue par robots.txt ; les critères de page ne sont pas notés.' : 'robots.txt indisponible ; lecture suspendue par prudence.')
-          : 'Les critères de la page ne sont pas notés car la lecture a échoué.';
-        setFact('Site web', 'Page non lue', note);
-      }
+      else if (hasWeb) { siteRes = { socials: [], directories: [], hasWebsite: true, pageRead: false, analyzedAt: new Date().toISOString(), finalUrl: site }; setFact('Site web', 'Page non lue', 'Les critères de la page ne sont pas notés'); }
       else siteRes = { hasWebsite: false, pageRead: false, socials: [], directories: [], analyzedAt: new Date().toISOString(), finalUrl: null };
       if (web) { siteRes.socials = siteRes.socials || []; const have = new Set(siteRes.socials.map(s => s.net)); (web.socials || []).forEach(w => { if (!have.has(w.net)) { have.add(w.net); siteRes.socials.push(w); } }); siteRes.directories = web.directories || []; setFact('Présence web', (web.socials || []).length + ' réseaux · ' + (web.directories || []).length + ' annuaires', 'Uniquement si le nom est dans l’adresse'); }
       if (shot) siteRes.screenshot = shot;
@@ -215,26 +143,8 @@ export function createAuditEngine(deps0) {
       if (speed) scan = speed;
       if (domain) newDetails = { ...(newDetails || (c && c.details) || {}), domainCreated: domain };
       if (sir && sir.matched) newDetails = { ...(newDetails || (c && c.details) || {}), sirene: sir };
-      if (photos != null) {
-        const baseDetails = newDetails || (c && c.details) || {};
-        newDetails = { ...baseDetails, place_id: baseDetails.place_id || photos.placeId || null,
-          googlePhone: photos.phone || null, googlePhoneCheckedAt: new Date().toISOString(),
-          googlePhoneSource: 'Google Places',
-          ...(photos.phone ? { phone: photos.phone } : {}),
-          ...(photos.rating != null ? { rating: photos.rating } : {}),
-          ...(photos.reviews != null ? { reviews: photos.reviews } : {}),
-          ...(photos.hours != null ? { hours: photos.hours } : {}),
-          ...(photos.status ? { status: photos.status } : {}),
-          ...(photos.address ? { googleAddress: photos.address } : {}),
-          ...(photos.website ? { googleWebsite: photos.website } : {}),
-          ...(photos.photoCount != null ? { photoCount: photos.photoCount } : {})
-        };
-      }
-      if (newDetails && c) { try {
-        const clientUpdate = { details: newDetails };
-        if (newDetails.googlePhone) clientUpdate.phone = newDetails.googlePhone;
-        await supabase.from('clients').update(clientUpdate).eq('id', c.id);
-      } catch (e) { /* même comportement que l'ancienne interface : non bloquant */ } }
+      if (photos != null) newDetails = { ...(newDetails || (c && c.details) || {}), photoCount: photos };
+      if (newDetails && c) { try { await supabase.from('clients').update({ details: newDetails }).eq('id', c.id); } catch (e) { /* même comportement que l'ancienne interface : non bloquant */ } }
 
       setPhase('Génération du rapport…', 96);
       await deps.wait(280);

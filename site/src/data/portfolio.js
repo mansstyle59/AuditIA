@@ -2,7 +2,7 @@
 // Règles reprises de l'ancienne interface : accueil (dkHomeHtml, mqStatsHtml, mqLatestHtml),
 // liste des clients (cStat, niveaux, filtre, tri) et fiche client (clientDetailHtml).
 import { auditHasAnalysis } from '../audit/scoring.js';
-import { norm, fmtRating } from '../core/utils.js';
+import { norm } from '../core/utils.js';
 
 const stamp = a => String(a.updated_at || a.created_at || '');
 
@@ -89,7 +89,7 @@ export function clientInfoRows(c) {
   if (d.address) rows.push(['Adresse', d.address]);
   if (c.phone || d.phone) rows.push(['Téléphone', c.phone || d.phone]);
   if (c.website) rows.push(['Site web', c.website]);
-  if (d.rating != null) rows.push(['Note Google', '★ ' + fmtRating(d.rating) + ' (' + (d.reviews || 0) + ' avis)']);
+  if (d.rating != null) rows.push(['Note Google', '★ ' + d.rating + ' (' + (d.reviews || 0) + ' avis)']);
   if (d.photoCount != null) rows.push(['Photos Google', d.photoCount + (d.photoCount >= 10 ? '+' : '') + ' photo' + (d.photoCount > 1 ? 's' : '')]);
   if (d.status) rows.push(['Statut', STATUS[d.status] || d.status]);
   if (d.domainCreated) {

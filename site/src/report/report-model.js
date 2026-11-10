@@ -4,7 +4,6 @@
 // inexistant est « sans objet », et l'historique n'existe qu'avec au moins deux audits réellement analysés.
 import { auditAnalysis, auditDate } from '../data/audits.js';
 import { auditHasAnalysis } from '../audit/scoring.js';
-import { buildBusinessProfile } from './business-profile.js';
 
 export const REPORT_TITLE = 'Rapport de visibilité numérique';
 const MAX_COMPETITORS = 10;   // lignes affichées (le commerce audité est toujours conservé)
@@ -90,7 +89,7 @@ function buildCriteria(diag) {
   const mk = x => ({
     label: clean(x.label), source: clean(x.source),
     status: !x.measured ? 'unmeasured' : x.ok ? 'ok' : 'fix',
-    text: clean(!x.measured ? (x.unmeasuredReason || 'Donnée non disponible : exclu du score.') : x.ok ? x.advice : (x.gap || x.advice)),
+    text: clean(!x.measured ? 'Donnée non disponible : exclu du score.' : x.ok ? x.advice : (x.gap || x.advice)),
   });
   const categories = (diag.categories || []).filter(x => x.scored).map(cat => ({
     id: clean(cat.id), label: clean(cat.label), description: clean(cat.description),
@@ -122,7 +121,7 @@ function buildCompetitors(si) {
   let shown = all.slice(0, MAX_COMPETITORS);
   const self = all.find(x => x.isSelf);
   if (self && !shown.includes(self)) shown = shown.slice(0, MAX_COMPETITORS - 1).concat(self);   // le commerce audité reste toujours visible
-  return { list: shown, total: all.length, hidden: all.length - shown.length, selfRank: num(cp.selfRank), count: num(cp.rankedTotal) ?? num(cp.total) ?? all.length };
+  return { list: shown, total: all.length, hidden: all.length - shown.length, selfRank: num(cp.selfRank), count: num(cp.total) || all.length };
 }
 
 function buildRankings(si) {
@@ -220,7 +219,6 @@ export function buildReport(audit, client, allAudits = [], now = new Date()) {
     },
     pillars: { seo: { ...pillar(diag.seo), total: countOf('seo') }, geo: { ...pillar(diag.geo), total: countOf('geo') } },
 
-    businessProfile: buildBusinessProfile(client, now),
     sources: buildSources(audit, client),
     unmeasuredNotes: (an.unmeasured || []).filter(x => x.n > 0).map(x => ({ label: clean(x.label), why: clean(x.why), n: x.n })),
     infoNotes: (an.unmeasured || []).filter(x => x.n === 0).map(x => ({ label: clean(x.label), why: clean(x.why) })),

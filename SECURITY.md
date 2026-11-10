@@ -1,33 +1,30 @@
 # Sécurité — AuditIA
 
-## Mesures observées
-- Les tables `clients`, `audits` et `app_settings` ont RLS activé. Les politiques SQL observées limitent les lignes à l'utilisateur authentifié dont l'e-mail correspond au compte administrateur configuré.
-- La clé Supabase publishable présente dans le navigateur est publique par conception ; elle ne remplace jamais RLS.
-- `auditia-secure-api` et `claude-assist` sont des Edge Functions actives. La première vérifie le JWT, l'e-mail confirmé, l'autorisation administrateur, les actions autorisées et les quotas. Les appels Google Places, PageSpeed et Bing passent par cette fonction.
-- Les clés Google Places, PageSpeed, Bing et autres réglages sont lues par la fonction avec `service_role` et ne sont pas renvoyées en clair par l'action `settings_read`. Les clés Anthropic sont conservées dans les secrets de `claude-assist`.
-- Le limiteur utilise la RPC `auditia_consume_rate_limit` ; si le limiteur est indisponible, l'appel est refusé.
-- Le service worker met en cache les ressources statiques de l'application, pas les réponses API contenant des paramètres.
+## Mesures en place
+- Les tables publiques `clients`, `audits` et `app_settings` ont RLS activé.
+- Les politiques SQL limitent l'accès aux données au compte administrateur autorisé et à ses propres lignes.
+- La clé Supabase publiée dans le navigateur est une clé publique ; elle ne remplace jamais RLS.
+- L'index `audits_client_id_idx` accélère la relation entre audits et commerces.
+- Les liens affichés et les adresses envoyées aux services d’analyse doivent être `http` ou `https`. Les adresses locales, privées et les schémas `javascript:` sont refusés.
+- Le service worker ne met en cache que les fichiers de l’application, jamais une requête avec paramètres.
+- Les couleurs de marque injectées dans le style doivent être un code hexadécimal. Le logo enregistré est converti en PNG.
 
-## Limite importante concernant les clés API
-Les clés Google Places/PageSpeed/Bing sont actuellement stockées dans la ligne `app_settings` du compte administrateur et lues côté serveur par `service_role`. La politique RLS observée autorise également l'administrateur authentifié à lire sa propre ligne `app_settings` via l'API Supabase. Elles ne sont donc pas accessibles aux utilisateurs non autorisés, mais elles ne sont pas isolées de manière stricte du compte administrateur authentifié.
+## À ne pas mettre dans le dépôt ni dans le navigateur
+Ne jamais versionner les clés privées/service-role, mots de passe, tokens de webhook ou secrets API. Les clés de navigateur (Google Places, PageSpeed, OpenAI, Bing) ne doivent pas être considérées comme secrètes si le code client les lit : elles peuvent être extraites depuis le navigateur. Les déplacer derrière une fonction serveur/Edge Function, puis les stocker dans les secrets Supabase, avec restrictions de clés côté fournisseur.
 
-Pour un cloisonnement serveur-only plus fort, migrer les clés vers Supabase Vault ou une table dédiée sans politique SELECT pour `authenticated`, puis adapter l'Edge Function et les réglages. **Ne pas supprimer ni migrer les clés sans migration testée et sauvegarde**, afin de préserver les intégrations existantes.
+## Webhooks et limitation de débit
+Le projet actuel est un site statique GitHub Pages et ne déclare actuellement aucune Edge Function Supabase. Il n'y a donc pas de point d'entrée serveur AuditIA où placer un secret de webhook et un limiteur fiable. Un compteur côté navigateur ne protège pas contre les abus. Avant d'exposer des webhooks ou des appels API coûteux, créer une Edge Function qui :
+1. vérifie l'identité Supabase de l'utilisateur et autorise seulement les opérations nécessaires ;
+2. valide les paramètres et limite taille/fréquence des requêtes côté serveur ;
+3. lit les clés depuis les secrets de fonction, jamais depuis `app_settings` ou le JavaScript client ;
+4. applique un rate limit côté serveur (par utilisateur et/ou IP) et renvoie `429` en cas de dépassement ;
+5. journalise les refus sans enregistrer les clés ni les données sensibles.
 
-## URL, SSRF et services tiers
-- Les URL d'audit sont limitées à HTTP(S) et validées côté client et Edge Function contre les destinations locales/privées connues.
-- Une validation d'URL ne suffit pas à garantir la sécurité des redirections ou du DNS rebinding. Les proxys externes qui récupèrent eux-mêmes une URL peuvent appliquer leurs propres règles réseau : ne pas considérer ce contrôle comme une garantie complète contre ces scénarios.
-- Ne jamais enregistrer dans les journaux une clé API, un jeton, une URL contenant des identifiants ou des données client sensibles.
-
-## Politique robots.txt
-- L'analyse du site consulte `robots.txt` avant la lecture HTML, la capture ou PageSpeed. Un chemin interdit est ignoré sans pénalité de score ; un fichier inaccessible, illisible ou une réponse de proxy ambiguë entraîne une suspension prudente du crawl.
-- Le lecteur HTML utilise Jina Reader avec l'option de respect de robots et n'utilise plus le fallback AllOrigins pour le HTML.
-- La vérification robots est faite avant de transmettre l'URL aux services tiers. AuditIA ne contrôle toutefois pas le User-Agent ni le comportement interne de WordPress mShots ou PageSpeed ; leur conformité robots exacte n'est pas garantie. Cette limite doit rester visible dans la documentation et les rapports.
-- `llms.txt` n'est lu que si son chemin est autorisé par la politique robots.
-- Le parser borne la taille du fichier et combine les groupes User-agent correspondants. Les règles `Allow` et `Disallow` sont évaluées par spécificité ; les égalités favorisent `Allow`.
-
-## Conformité et publication
-Aucun fichier dédié aux mentions légales, à la politique de confidentialité/RGPD ou aux cookies n'a été trouvé dans le dépôt au moment de ce contrôle. Ne pas présenter AuditIA comme prêt à être commercialisé tant que les coordonnées réelles de l'éditeur, les traitements, les services tiers, les cookies/traceurs et les obligations légales applicables n'ont pas été vérifiés et documentés. Ne pas inventer ces informations.
+## État de déploiement
+- Edge Function : `auditia-secure-api` (active, JWT vérifié dans le code de la fonction).
+- Limiteur : `public.auditia_consume_rate_limit`, exécutable uniquement par `service_role`.
+- Table `public.auditia_api_rate_limits` : RLS activé, aucun accès direct accordé aux rôles `anon` et `authenticated`.
+- Index ajouté sur `public.audits(client_id)`.
 
 ## Vérifications recommandées
-- Dans Supabase Auth, vérifier l'activation de la protection contre les mots de passe compromis (« Leaked password protection »).
-- Avant toute migration de secrets ou évolution du crawl, tester sur fixtures locales, préserver les données existantes et vérifier les quotas des services tiers.
+Dans Supabase Auth, activer la protection contre les mots de passe compromis (« Leaked password protection »). Le contrôle de sécurité Supabase a signalé cette option comme désactivée lors du dernier audit.

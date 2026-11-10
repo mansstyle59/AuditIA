@@ -1,55 +1,61 @@
-/* AuditIA — design system v3 : palette AuditIA d'origine, affinée avec les accents FormIA.
-   Le thème sombre reste le défaut afin de préserver l'expérience actuelle. */
+/* AuditIA — design system v3 : tokens.
+   Palette harmonisée avec FormIA (maitriser-claude). */
 :root {
-  /* Fonds : violet nuit */
-  --ds-bg-0: #0A0326;
-  --ds-bg-1: #12063A;
-  --ds-bg-2: #1A0B4E;
-  --ds-bg-3: #261266;
-  /* Surfaces : cartes sombres opaques */
-  --ds-surface: #2A1458;
-  --ds-surface-2: #341A6B;
-  --ds-surface-hi: #3F2280;
-  --ds-line: #5B35A8;
-  --ds-line-soft: #432487;
-  /* Bordure des champs : contraste WCAG 1.4.11 ≥ 3:1 sur le fond du champ et la carte. */
-  --ds-input-border: #8B5CF6;
-  /* Accents violets/lavande */
-  --ds-primary: #8B5CF6;
-  --ds-primary-2: #A78BFA;
-  --ds-primary-deep: #6D3FE0;
-  --ds-lavender: #C4B5FD;
-  --ds-lavender-2: #DDD3FF;
-  --ds-glow: #A78BFA;
-  /* Texte clair sur fonds sombres */
-  --ds-text: #FFFFFF;
-  --ds-text-2: #E6DEFF;
-  --ds-muted: #CFC3F2;
-  --ds-on-light: #24104D;
-  --ds-on-light-2: #4B3A7A;
-  /* États */
-  --ds-good: #34D399;
-  --ds-good-2: #22C55E;
+  /* Fonds lavande et surfaces */
+  --ds-bg-0: #F3F0FF;
+  --ds-bg-1: #F3F0FF;
+  --ds-bg-2: #EAE6FC;
+  --ds-bg-3: #DDD8F2;
+
+  /* Cartes et contours */
+  --ds-surface: #FFFFFF;
+  --ds-surface-2: #EAE6FC;
+  --ds-surface-hi: #ECE8FF;
+  --ds-line: #DDD8F2;
+  --ds-line-soft: #E5E0F4;
+
+  /* Identité violette FormIA */
+  --ds-primary: #7158EA;
+  --ds-primary-2: #8B7DFF;
+  --ds-primary-deep: #5A3FD0;
+  --ds-lavender: #ECE8FF;
+  --ds-lavender-2: #DDD8F2;
+  --ds-glow: #7158EA;
+
+  /* Texte */
+  --ds-text: #1A1530;
+  --ds-text-2: #3D3766;
+  --ds-muted: #58527A;
+  --ds-on-light: #1A1530;
+  --ds-on-light-2: #58527A;
+
+  /* Accent ambre FormIA et états */
+  --ds-good: #16A36B;
+  --ds-good-2: #DDF6EA;
   --ds-warn: #FF9F3F;
-  --ds-danger: #FB7185;
-  /* États utilisés comme couleur de TEXTE : assez contrastés sur le fond du thème */
-  --ds-good-text: #34D399; --ds-warn-text: #FF9F3F; --ds-danger-text: #FB7185;
-  --ds-ok-bg: #0F3B2E;   --ds-ok-fg: #D7FBEA;   --ds-ok-fg-2: #BFF5DD;
-  --ds-warn-bg: #3A2A0B; --ds-warn-fg: #FFE9B8; --ds-warn-fg-2: #FFD7A0;
-  --ds-err-bg: #4A1230;  --ds-err-fg: #FFE1E6;  --ds-err-fg-2: #FFC2CB;
-  --ds-on-good: #04210F; --ds-on-warn: #2B1C00;  --ds-on-danger: #3A0712;
-  /* Dégradés */
-  --ds-grad-bg: radial-gradient(120% 55% at 78% 0%, #3B1A98 0%, rgba(59, 26, 152, 0) 62%), linear-gradient(180deg, #12063A 0%, #0A0326 100%);
-  --ds-grad-hero: linear-gradient(135deg, #3A1B7E 0%, #2A1260 45%, #1A0838 100%);
-  --ds-grad-cta: linear-gradient(135deg, #7B3FE4 0%, #6D28D9 55%, #5B21B6 100%);
-  --ds-grad-text: linear-gradient(90deg, #C9A8FF 0%, #E0B8FF 100%);
-  --ds-grad-banner: linear-gradient(120deg, #4B2399 0%, #6B35C8 55%, #5A2DB3 100%);
-  /* Espacements */
+  --ds-danger: #E5484D;
+
+  /* Messages d'état accessibles */
+  --ds-ok-bg: #DDF6EA;   --ds-ok-fg: #0B7A4E;   --ds-ok-fg-2: #0B7A4E;
+  --ds-warn-bg: #FFF0DE; --ds-warn-fg: #9B4D0B; --ds-warn-fg-2: #9B4D0B;
+  --ds-err-bg: #FDE6E7;  --ds-err-fg: #B72A33;  --ds-err-fg-2: #B72A33;
+  --ds-on-good: #0B7A4E; --ds-on-warn: #3B2600; --ds-on-danger: #FFFFFF;
+
+  /* Dégradés FormIA */
+  --ds-grad-bg: linear-gradient(180deg, #F3F0FF 0%, #F3F0FF 100%);
+  --ds-grad-hero: linear-gradient(150deg, #5A43D6 0%, #2B1F7A 100%);
+  --ds-grad-cta: linear-gradient(135deg, #8B7DFF 0%, #7158EA 55%, #5A3FD0 100%);
+  --ds-grad-text: linear-gradient(90deg, #7158EA 0%, #5A3FD0 100%);
+  --ds-grad-banner: linear-gradient(135deg, #5A43D6 0%, #2B1F7A 100%);
+
+  /* Espacements (échelle 4 px) */
   --ds-s-1: 4px;  --ds-s-2: 8px;  --ds-s-3: 12px; --ds-s-4: 16px;
   --ds-s-5: 20px; --ds-s-6: 24px; --ds-s-8: 32px; --ds-s-10: 40px;
   --ds-s-12: 48px; --ds-s-16: 64px;
+
   /* Rayons */
-  --ds-r-sm: 12px; --ds-r-md: 18px; --ds-r-lg: 24px; --ds-r-xl: 32px; --ds-r-pill: 999px;
+  --ds-r-sm: 12px; --ds-r-md: 16px; --ds-r-lg: 22px; --ds-r-xl: 28px; --ds-r-pill: 999px;
+
   /* Typographie */
   --ds-font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Inter, "Helvetica Neue", Arial, sans-serif;
   --ds-fs-xs: 0.8125rem;
@@ -59,58 +65,21 @@
   --ds-fs-h3: 1.25rem;
   --ds-fs-h2: clamp(1.5rem, 1.1rem + 1.8vw, 2.125rem);
   --ds-fs-h1: clamp(2rem, 1.4rem + 3vw, 3.75rem);
-  /* Ombres */
-  --ds-shadow-card: 0 10px 28px rgba(8, 2, 24, 0.45);
-  --ds-shadow-glow: 0 10px 30px rgba(139, 92, 246, 0.32);
-  --ds-shadow-nav: 0 12px 32px rgba(8, 2, 24, 0.6);
+
+  /* Ombres douces, adaptées aux surfaces claires */
+  --ds-shadow-card: 0 8px 22px rgba(92, 74, 180, 0.07);
+  --ds-shadow-glow: 0 10px 22px rgba(113, 88, 234, 0.22);
+  --ds-shadow-nav: 0 -8px 24px rgba(60, 45, 120, 0.10);
+
   /* Tailles d'interface */
   --ds-touch: 48px;
   --ds-header-h: 64px;
   --ds-tabbar-h: 68px;
   --ds-container: 1240px;
+
   /* Zones de sécurité iOS */
   --ds-safe-top: env(safe-area-inset-top, 0px);
-  --ds-safe-top-extra: 28px;
   --ds-safe-right: env(safe-area-inset-right, 0px);
   --ds-safe-bottom: env(safe-area-inset-bottom, 0px);
   --ds-safe-left: env(safe-area-inset-left, 0px);
-}
-
-/* Thème clair : surcharge uniquement des tokens, pour garder un rendu cohérent
-   sur toutes les vues qui utilisent le design system. */
-:root[data-theme="light"] {
-  color-scheme: light;
-  --ds-bg-0: #F7F5FC;
-  --ds-bg-1: #FFFFFF;
-  --ds-bg-2: #F1ECFA;
-  --ds-bg-3: #E8DFF8;
-  --ds-surface: #FFFFFF;
-  --ds-surface-2: #F5F1FC;
-  --ds-surface-hi: #EDE5FA;
-  --ds-line: #CFC1E9;
-  --ds-line-soft: #E4DCF2;
-  --ds-primary: #6D28D9;
-  --ds-primary-2: #6D28D9;
-  --ds-primary-deep: #5B21B6;
-  --ds-lavender: #5B21B6;
-  --ds-lavender-2: #4C1D95;
-  --ds-glow: #6D28D9;
-  --ds-text: #241638;
-  --ds-text-2: #3D3155;
-  --ds-muted: #5B5270;
-  --ds-on-light: #24104D;
-  --ds-on-light-2: #4B3A7A;
-  --ds-good-text: #047857; --ds-warn-text: #B45309; --ds-danger-text: #BE123C;
-  --ds-ok-bg: #DCFCE7; --ds-ok-fg: #166534; --ds-ok-fg-2: #14532D;
-  --ds-warn-bg: #FEF3C7; --ds-warn-fg: #92400E; --ds-warn-fg-2: #78350F;
-  --ds-err-bg: #FCE7F3; --ds-err-fg: #9D174D; --ds-err-fg-2: #831843;
-  --ds-on-good: #052E16; --ds-on-warn: #451A03; --ds-on-danger: #500724;
-  --ds-grad-bg: linear-gradient(180deg, #FFFFFF 0%, #F7F5FC 100%);
-  --ds-grad-hero: linear-gradient(135deg, #F1EAFE 0%, #E9E0FB 55%, #F7F5FC 100%);
-  --ds-grad-cta: linear-gradient(135deg, #7C3AED 0%, #6D28D9 55%, #5B21B6 100%);
-  --ds-grad-text: linear-gradient(90deg, #6D28D9 0%, #5B21B6 100%);
-  --ds-grad-banner: linear-gradient(120deg, #EDE5FA 0%, #E4D8F8 55%, #F1ECFA 100%);
-  --ds-shadow-card: 0 8px 24px rgba(44, 24, 84, 0.08);
-  --ds-shadow-glow: 0 8px 22px rgba(109, 40, 217, 0.18);
-  --ds-shadow-nav: 0 -8px 24px rgba(44, 24, 84, 0.12);
 }

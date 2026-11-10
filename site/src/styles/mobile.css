@@ -11,7 +11,7 @@
   .ds-m-header {
     position: sticky; top: 0; z-index: 40;
     display: flex; flex-direction: column; justify-content: flex-end; gap: 2px;
-    padding: calc(var(--ds-safe-top) + var(--ds-safe-top-extra)) var(--ds-s-4) var(--ds-s-3);
+    padding: calc(var(--ds-safe-top) + var(--ds-s-3)) var(--ds-s-4) var(--ds-s-3);
     min-height: var(--ds-header-h);
     background: var(--ds-bg-1);
     border-bottom: 1px solid var(--ds-line-soft);
@@ -32,7 +32,7 @@
   /* Barre de navigation fixe en bas : opaque, zone de sécurité inférieure incluse */
   .ds-m-tabbar {
     position: fixed; left: 0; right: 0; bottom: 0; z-index: 50;
-    display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr);
+    display: grid; grid-template-columns: repeat(5, minmax(0, 1fr));
     height: calc(var(--ds-tabbar-h) + var(--ds-safe-bottom));
     padding: 0 var(--ds-safe-right) var(--ds-safe-bottom) var(--ds-safe-left);
     background: var(--ds-bg-2);
@@ -45,24 +45,7 @@
     border: 0; background: transparent; color: var(--ds-muted);
     font-size: var(--ds-fs-xs); font-weight: 600; line-height: 1.1;
   }
-  .ds-m-tab.is-active {
-    position: relative;
-    color: var(--ds-text);
-  }
-  /* Repère violet discret : l'onglet actif reste identifiable sans dépendre uniquement de la couleur du texte. */
-  .ds-m-tab.is-active::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 50%;
-    width: 24px;
-    height: 3px;
-    transform: translateX(-50%);
-    border-radius: 0 0 3px 3px;
-    background: var(--ds-primary-2);
-    box-shadow: 0 0 10px rgba(167, 139, 250, 0.24);
-    pointer-events: none;
-  }
+  .ds-m-tab.is-active { color: var(--ds-text); }
   .ds-m-tab.is-active .ds-icon { color: var(--ds-lavender); }
   .ds-m-tab:active { background: var(--ds-surface); }
 
@@ -73,11 +56,7 @@
   /* Lot 2 : listes et fiches en une colonne ; le texte long passe à la ligne */
   .ds-m-main .ds-row--btn { align-items: center; }
   .ds-m-main .ds-row__title { overflow-wrap: anywhere; }
-  .ds-m-main .ds-detail-kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--ds-s-2); }
-  .ds-m-main .ds-detail-kpis .ds-stat { padding: var(--ds-s-3) var(--ds-s-2); }
   .ds-m-main .ds-detail-kpis .ds-stat__value { font-size: 1.25rem; }
-  .ds-client-head .ds-d-actions { flex-wrap: nowrap; gap: var(--ds-s-2); }
-  .ds-client-head .ds-d-actions .ds-btn { flex: 1 1 0; min-width: 0; padding-inline: var(--ds-s-2); }
   .ds-m-main .ds-section-title { flex-wrap: wrap; }
 }
 
@@ -99,23 +78,15 @@
   .ds-audit-row__act .ds-btn { min-height: 44px; }
 }
 
-/* iOS Safari : zone haute opaque, sans flou, et marge visuelle de 28 px sous la safe area. */
+
+/* Correctif iOS : bande supérieure opaque et texte net (nouvelle-interface). */
 @media (max-width: 899.98px) {
-  html,
-  body {
-    background-color: var(--ds-bg-0);
+  html {
+    background: #12052B;
   }
   body {
+    background-color: #12052B;
     background-image: none;
-  }
-  body::before {
-    content: "";
-    position: fixed;
-    inset: 0 0 auto;
-    height: var(--ds-safe-top);
-    z-index: 1000;
-    background: var(--ds-bg-0);
-    pointer-events: none;
   }
   .ds-mobile {
     position: relative;
@@ -124,7 +95,9 @@
   }
   .ds-m-header {
     top: 0;
-    background: var(--ds-bg-0);
+    padding-top: calc(env(safe-area-inset-top, 0px) + 12px);
+    background: #12052B;
+    background-color: #12052B;
     background-image: none;
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
@@ -144,23 +117,7 @@
     -webkit-font-smoothing: antialiased;
   }
   .ds-m-brand {
-    color: var(--ds-lavender);
+    color: #C4B5FD;
     text-rendering: geometricPrecision;
   }
-
-  /* Les ancres de notification doivent tenir compte de la vraie hauteur du header
-     mobile : safe-area iOS + marge visuelle + contenu du header. */
-  #psNotice {
-    scroll-margin-top: calc(
-      var(--ds-safe-top) + var(--ds-safe-top-extra) + var(--ds-header-h) + var(--ds-s-4)
-    );
-  }
-}
-
-/* Contrôle du thème : accessible, compact et compatible avec l'en-tête iOS opaque. */
-.ds-m-header__top { display:flex; align-items:center; justify-content:space-between; gap:var(--ds-s-3); min-width:0; }
-.ds-m-header__top .ds-m-brand { min-width:0; overflow-wrap:anywhere; }
-.ds-theme-toggle { flex:0 0 auto; min-height:40px; padding:var(--ds-s-2) var(--ds-s-3); font-size:var(--ds-fs-xs); white-space:nowrap; }
-@media (max-width:380px) {
-  .ds-theme-toggle { padding:var(--ds-s-2); font-size:0.75rem; }
 }
