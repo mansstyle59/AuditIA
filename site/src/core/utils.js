@@ -8,6 +8,9 @@ export const escHtml = value => String(value ?? '').replace(/[&<>"']/g, c => ({'
 
 export { safePublicHttpUrl as safeHttpUrl } from './public-url.mjs';
 
+// Note Google affichée : une décimale au plus, virgule française (4.5 → « 4,5 », 4 → « 4 »). Valeur illisible : texte d'origine.
+export function fmtRating(v){ const n=Number(v); return v===''||v==null||!Number.isFinite(n) ? String(v ?? '') : String(Math.round(n*10)/10).replace('.',','); }
+
 export function keyHash(v){let h=5381;const s=String(v||'');for(let i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))>>>0;return h.toString(36);}
 
 export const withTimeout = (p,ms) => Promise.race([p, new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),ms))]);

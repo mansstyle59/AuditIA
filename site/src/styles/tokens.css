@@ -32,6 +32,8 @@
   --ds-good-2: #22C55E;
   --ds-warn: #FF9F3F;
   --ds-danger: #FB7185;
+  /* États utilisés comme couleur de TEXTE : assez contrastés sur le fond du thème */
+  --ds-good-text: #34D399; --ds-warn-text: #FF9F3F; --ds-danger-text: #FB7185;
   --ds-ok-bg: #0F3B2E;   --ds-ok-fg: #D7FBEA;   --ds-ok-fg-2: #BFF5DD;
   --ds-warn-bg: #3A2A0B; --ds-warn-fg: #FFE9B8; --ds-warn-fg-2: #FFD7A0;
   --ds-err-bg: #4A1230;  --ds-err-fg: #FFE1E6;  --ds-err-fg-2: #FFC2CB;
@@ -98,6 +100,7 @@
   --ds-muted: #5B5270;
   --ds-on-light: #24104D;
   --ds-on-light-2: #4B3A7A;
+  --ds-good-text: #047857; --ds-warn-text: #B45309; --ds-danger-text: #BE123C;
   --ds-ok-bg: #DCFCE7; --ds-ok-fg: #166534; --ds-ok-fg-2: #14532D;
   --ds-warn-bg: #FEF3C7; --ds-warn-fg: #92400E; --ds-warn-fg-2: #78350F;
   --ds-err-bg: #FCE7F3; --ds-err-fg: #9D174D; --ds-err-fg-2: #831843;

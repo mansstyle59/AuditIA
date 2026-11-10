@@ -73,7 +73,11 @@
   /* Lot 2 : listes et fiches en une colonne ; le texte long passe à la ligne */
   .ds-m-main .ds-row--btn { align-items: center; }
   .ds-m-main .ds-row__title { overflow-wrap: anywhere; }
+  .ds-m-main .ds-detail-kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--ds-s-2); }
+  .ds-m-main .ds-detail-kpis .ds-stat { padding: var(--ds-s-3) var(--ds-s-2); }
   .ds-m-main .ds-detail-kpis .ds-stat__value { font-size: 1.25rem; }
+  .ds-client-head .ds-d-actions { flex-wrap: nowrap; gap: var(--ds-s-2); }
+  .ds-client-head .ds-d-actions .ds-btn { flex: 1 1 0; min-width: 0; padding-inline: var(--ds-s-2); }
   .ds-m-main .ds-section-title { flex-wrap: wrap; }
 }
 
