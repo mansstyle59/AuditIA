@@ -71,7 +71,7 @@ export function createAuditSources(deps0){
       async function findSocialProfile(c, network){
         const hosts={Instagram:'instagram.com',Facebook:'facebook.com',YouTube:'youtube.com',TikTok:'tiktok.com',LinkedIn:'linkedin.com'};
         const host=hosts[network]; const name=String((c&&c.name)||'').trim();
-        if(!host||!name) return null;
+        if(!host||!name) return {net:network,found:false};
         const city=String((c&&c.city)||'').trim();
         const query=('site:'+host+' "'+name+'" '+city).trim();
         const results=await fetchSerp(query).catch(()=>[]);
@@ -80,10 +80,10 @@ export function createAuditSources(deps0){
           if(!(u.hostname===host||u.hostname.endsWith('.'+host))) continue;
           if(/\/login|\/share|\/sharer|\/policies|\/privacy/i.test(u.pathname)) continue;
           if(businessInUrl(u.href,name)||businessInUrl(r.title,name)){
-            return {net:network,url:u.href,source:'recherche web ciblée'};
+            return {net:network,url:u.href,found:true,source:'recherche web ciblée'};
           }
         }
-        return null;
+        return {net:network,found:false};
       }
       async function fetchPlacePhotos(placeId){
         if(!placeId) return null;
