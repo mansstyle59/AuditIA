@@ -1,7 +1,7 @@
 // AuditIA — vue « Prospects » : recherche de commerces, commerces proches, ajout manuel.
 // Affichage seulement : l'état et les appels réseau sont gérés par search-controller.js.
 import { badge, btn, emptyState, errorCard, linkBtn, spinnerCard, avatar } from '../components/ui.js';
-import { escHtml, safeHttpUrl } from '../../core/utils.js';
+import { escHtml, safeHttpUrl, fmtRating } from '../../core/utils.js';
 import { nearbyOpportunity } from '../../api/places-model.js';
 import { CATEGORIES, filterLabels, findDuplicate } from '../../data/places-search.js';
 
@@ -23,7 +23,7 @@ export function placeCard(p, index, src, clients, adding) {
   const dup = findDuplicate(clients, p);
   const tone = opp.closed ? 'danger' : opp.score >= 60 ? 'good' : opp.score >= 30 ? 'warn' : 'neutral';
   const meta = [p.category, p.address].filter(Boolean).join(' · ');
-  const rating = [p.rating != null ? `★ ${p.rating}/5` : '', p.reviews != null ? `${p.reviews} avis` : (p.rating != null || p.placeId ? 'Avis non disponibles' : '')].filter(Boolean).join(' · ') || 'Note et avis non disponibles';
+  const rating = [p.rating != null ? `★ ${fmtRating(p.rating)}/5` : '', p.reviews != null ? `${p.reviews} avis` : (p.rating != null || p.placeId ? 'Avis non disponibles' : '')].filter(Boolean).join(' · ') || 'Note et avis non disponibles';
   const closed = statusLabel(p.status);
   const site = safeHttpUrl(p.website);
   const reasons = opp.reasons.length ? `<ul class="ds-place__why">${opp.reasons.map(r => `<li>${escHtml(r)}</li>`).join('')}</ul>` : '';
@@ -110,7 +110,7 @@ function addForm(s, clients) {
   const d = [];
   if (p.address) d.push(['Adresse', p.address]);
   if (p.phone) d.push(['Téléphone', p.phone]);
-  if (p.rating != null || p.reviews != null) d.push(['Google', [p.rating != null ? `★ ${p.rating}/5` : 'Note non disponible', p.reviews != null ? `${p.reviews} avis` : 'Avis non disponibles'].join(' · ')]);
+  if (p.rating != null || p.reviews != null) d.push(['Google', [p.rating != null ? `★ ${fmtRating(p.rating)}/5` : 'Note non disponible', p.reviews != null ? `${p.reviews} avis` : 'Avis non disponibles'].join(' · ')]);
   if (Array.isArray(p.hours) && p.hours.length) d.push(['Horaires', p.hours.length + ' jours renseignés']);
   if (statusLabel(p.status)) d.push(['Statut', statusLabel(p.status)]);
   const info = d.length ? `<dl class="ds-kv">${d.map(([k, v]) => `<div><dt>${escHtml(k)}</dt><dd>${escHtml(v)}</dd></div>`).join('')}</dl>` : '';

@@ -1,7 +1,7 @@
 // AuditIA — liste des clients : recherche, niveaux, catégories, tri (règles de l'ancienne interface).
 import { badge, btn, card, chips, emptyState, linkRow, avatar, searchField, linkBtn } from '../components/ui.js';
 import { portfolio, ageLabel, clientCategory } from '../../data/portfolio.js';
-import { escHtml } from '../../core/utils.js';
+import { escHtml, fmtRating } from '../../core/utils.js';
 
 const SORTS = [['urgence', 'Plus urgent d’abord'], ['recent', 'Dernier audit'], ['nom', 'Nom A → Z']];
 
@@ -9,10 +9,10 @@ function tone(sc) { return sc >= 75 ? 'good' : sc >= 50 ? 'warn' : 'danger'; }
 
 function clientMeta(c, stat) {
   const d = c.details || {};
-  const rating = d.rating != null ? ' · ★ ' + d.rating : '';
+  const rating = d.rating != null ? ' · ★ ' + fmtRating(d.rating) : '';
   const head = [c.city, clientCategory(c) || 'Commerce'].filter(Boolean).join(' · ') + rating;
   const n = stat.auditCount;
-  const tail = n + ' audit' + (n > 1 ? 's' : '') + (stat.sc == null ? ' · à analyser' : '');
+  const tail = n + ' audit' + (n > 1 ? 's' : ''); // « À analyser » est déjà affiché par le badge de droite
   return head + ' — ' + tail;
 }
 

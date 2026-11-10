@@ -7,7 +7,7 @@
 .bu-label { color: var(--ds-muted); font-size: var(--ds-fs-xs); font-weight: 700; text-transform: uppercase; letter-spacing: .06em; margin: 0 0 var(--ds-s-2); }
 .bu-hr { border: 0; height: 1px; background: var(--ds-line-soft); margin: var(--ds-s-4) 0; }
 .bu-msg { min-height: 20px; margin: 0; font-size: var(--ds-fs-sm); color: var(--ds-muted); }
-.bu-msg--ok { color: var(--ds-good); }
+.bu-msg--ok { color: var(--ds-good-text); }
 .bu-msg--err { color: var(--ds-danger); }
 
 /* Pastilles de synthèse */

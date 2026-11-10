@@ -51,6 +51,11 @@ function applyTheme(theme, persist = true) {
   if (persist) {
     try { localStorage.setItem(THEME_KEY, selected); } catch { /* stockage indisponible : thème conservé pour la session */ }
   }
+  syncThemeButtons();
+}
+// Le bouton annonce le thème vers lequel on bascule ; à rappeler après chaque recomposition de la coquille.
+function syncThemeButtons() {
+  const selected = document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
   root.querySelectorAll('[data-theme-toggle]').forEach(button => {
     const next = selected === 'light' ? 'dark' : 'light';
     button.textContent = next === 'light' ? '☀️ Thème clair' : '🌙 Thème sombre';
@@ -129,6 +134,7 @@ const auth = createAuthService({ getClient: getAuthClient, redirectUrl: REDIRECT
 /* ---------- Écrans de connexion ---------- */
 function showAuth(mode, msg = '', kind = 'error') {
   root.innerHTML = authScreen(mode, msg, kind);
+  syncThemeButtons();
   document.documentElement.dataset.layout = 'auth';
   window.scrollTo(0, 0);
   if (mode === 'signin') {
@@ -245,6 +251,7 @@ function renderWorkspace() {
     : mobileShell({ ...params, subtitle: isHome ? HOME_SUBTITLE.mobile : '' });
   document.documentElement.dataset.layout = isWide ? 'desktop' : 'mobile';
   paintBrand(state.brand, root);
+  syncThemeButtons();
   if (state.view === 'prospects' && state.data.status === 'ready') search.mounted();
   if ((state.view === 'bureau' || state.view === 'messages') && state.data.status === 'ready') bureau.mounted();
 }
@@ -361,25 +368,7 @@ root.addEventListener('click', event => {
     }
     return;
   }
-  if (t.closest('[data-retry]')) { // « En direct » : l'accueil se met à jour chaque seconde (agents, audit en cours) sans recomposer la page
-setInterval(() => {
-  if (!state.user || state.view !== 'home' || state.data.status !== 'ready') return;
-  const box = document.querySelector('[data-home-live]');
-  const hc = bureau.homeContext();
-  if (!box || !hc) return;
-  const html = homeLiveInner({ data: state.data, store: hc.store, sel: hc.sel, period: state.ui.period, snap: audits.snapshot() });
-  if (box.dataset.sig !== html) { box.innerHTML = html; box.dataset.sig = html; }
-}, 1000);
-
-document.addEventListener('keydown', e => {
-  if (e.key !== '/' || e.metaKey || e.ctrlKey || e.altKey) return;
-  const t = e.target;
-  if (t && (/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName) || t.isContentEditable)) return;
-  const si = document.querySelector('[data-search-input]');
-  if (si) { e.preventDefault(); si.focus(); }
-});
-
-boot(); return; }
+  if (t.closest('[data-retry]')) { boot(); return; }
   if (t.closest('[data-logout]')) { logout(); return; }
   if (!state.user) return;
   if (bing.onClick(t)) return;
@@ -444,6 +433,24 @@ root.addEventListener('submit', event => {
 
 // Changement de largeur : on recompose la coquille, sans toucher aux formulaires en cours de saisie
 wide.addEventListener('change', () => { if (state.user) renderWorkspace(); });
+
+// « En direct » : l'accueil se met à jour chaque seconde (agents, audit en cours) sans recomposer la page
+setInterval(() => {
+  if (!state.user || state.view !== 'home' || state.data.status !== 'ready') return;
+  const box = document.querySelector('[data-home-live]');
+  const hc = bureau.homeContext();
+  if (!box || !hc) return;
+  const html = homeLiveInner({ data: state.data, store: hc.store, sel: hc.sel, period: state.ui.period, snap: audits.snapshot() });
+  if (box.dataset.sig !== html) { box.innerHTML = html; box.dataset.sig = html; }
+}, 1000);
+
+document.addEventListener('keydown', e => {
+  if (e.key !== '/' || e.metaKey || e.ctrlKey || e.altKey) return;
+  const t = e.target;
+  if (t && (/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName) || t.isContentEditable)) return;
+  const si = document.querySelector('[data-search-input]');
+  if (si) { e.preventDefault(); si.focus(); }
+});
 
 /* ---------- Démarrage ---------- */
 async function boot() {

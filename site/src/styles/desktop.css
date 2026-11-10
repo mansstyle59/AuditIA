@@ -65,15 +65,6 @@
   /* Liste Audits : éviter une première colonne trop étroite avec la sidebar sur petit desktop.
      La composition en deux lignes reprend le rythme mobile sans réduire les actions. */
   .ds-audit-head { display: none; }
-  .ds-audit-row {
-    grid-template-columns: minmax(0, 1fr) auto;
-    grid-template-areas: "main score" "date act";
-    gap: var(--ds-s-2) var(--ds-s-3);
-  }
-  .ds-audit-row__main { grid-area: main; }
-  .ds-audit-row__date { grid-area: date; }
-  .ds-audit-row__score { grid-area: score; justify-self: end; }
-  .ds-audit-row__act { grid-area: act; justify-self: end; }
 }
 
 @media (min-width: 900px) {
@@ -91,8 +82,9 @@
 
 /* Lot 4 : audits — ordinateur (tableau professionnel et colonnes) */
 @media (min-width: 900px) {
-  .ds-dossier-head { grid-template-columns: minmax(260px, 1fr) minmax(0, auto); align-items: center; }
-  .ds-dossier-head .ds-d-actions { justify-content: flex-end; max-width: 560px; }
+  .ds-dossier-head { grid-template-columns: minmax(0, 1fr) minmax(0, 470px); align-items: center; }
+  .ds-dossier-head .ds-d-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ds-dossier-head .ds-d-actions .ds-btn { width: 100%; padding-inline: var(--ds-s-3); }
   .ds-live { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; }
   .ds-live > .ds-live__top, .ds-live > .ds-prog, .ds-live > .ds-prog__row, .ds-live > .ds-live__counts, .ds-live > .ds-msg, .ds-live > p, .ds-live > .ds-facts { grid-column: 1 / -1; }
   .ds-live > .ds-srcs { grid-column: 1 / -1; grid-template-columns: repeat(2, minmax(0, 1fr)); }

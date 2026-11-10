@@ -171,6 +171,5 @@ button:disabled, input:disabled, select:disabled, textarea:disabled { cursor: no
   .ds-m-main .ds-card { padding: 14px; }
   .ds-m-main .ds-stat { padding: 12px; }
   .ds-d-actions > .ds-btn, .ds-d-actions > a { max-width: 100%; }
-  .ds-audit-row { grid-template-columns: minmax(0,1fr) auto; }
   .ds-audit-row__act { display: flex; flex-wrap: wrap; gap: 6px; }
 }
