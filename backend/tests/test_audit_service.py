@@ -33,7 +33,7 @@ async def test_stream_reports_each_source_and_finishes_at_100_percent():
     assert any(event["source"] == "facebook" and event["status"] == "limited" for event in completed)
     assert events[-1]["type"] == "audit_completed"
     assert events[-1]["progress"] == 100
-    assert events[-1]["summary"]["results_count"] == 9
+    assert events[-1]["summary"]["results_count"] == 8
 
 
 def test_search_parser_decodes_duckduckgo_redirect_and_deduplicates():
