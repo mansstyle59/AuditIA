@@ -70,6 +70,15 @@ export function portfolio(clients, audits, { q = '', tier = '', sort = 'urgence'
   return { rows, avg, tiers, categories, total: clients.length, shown: rows.length };
 }
 
+// ----- Priorités : commerces dont le dernier score est « À améliorer », du plus faible au plus fort -----
+export function priorityClients(clients, audits, n = 3) {
+  return clients
+    .map(c => ({ client: c, stat: clientStat(c, audits) }))
+    .filter(x => x.stat.tier === 'low')
+    .sort((x, y) => x.stat.sc - y.stat.sc)
+    .slice(0, n);
+}
+
 // ----- Fiche client -----
 export function clientDetail(client, audits) {
   const mine = audits.filter(a => a.client_id === client.id);
