@@ -5,6 +5,7 @@
 import { COLORS, hexToRgb, toneColor, chartData } from './report-charts.js';
 import { REPORT_TITLE, toneOf } from './report-model.js';
 import { defaultBrand, logoFormat } from '../settings/brand.js';
+import { OFFER, offerCards } from '../settings/offer.js';
 
 const PW = 210, PH = 297, M = 18, CW = PW - 2 * M, TOP = 24, BOT = PH - 19, PT = 0.3528;
 const BASE_C = Object.fromEntries(Object.entries(COLORS).map(([k, v]) => [k, hexToRgb(v)]));
@@ -418,6 +419,33 @@ export function buildReportPdf(JsPDF, m) {
     section('Évolution du score', 74);
     para(`Score des ${data.history.length} audits analysés de ce commerce. Seuls les audits réellement réalisés sont représentés.`, { size: 9, color: C.muted });
     lineChart(data.history);
+  }
+
+  /* =============== PROPOSITION (offre commerciale, modifiable dans settings/offer.js) =============== */
+  const cards = offerCards(m.plan);
+  if (cards.length) {
+    section(OFFER.title, 90);
+    para(OFFER.intro, { size: 9.2, color: C.muted, gap: 3 });
+    cards.forEach(cd => {
+      const iw = CW - 17, lines = cd.items.map((t, i) => wrap(t, i >= (cd.nested ? 1 : cd.items.length) ? iw - 4 : iw, 9.2, 'normal'));
+      const h = 18 + lines.reduce((a, l) => a + l.length * lh(9.2) + 1.2, 0) + 2;
+      ensure(Math.min(h, BOT - TOP));
+      fill(C.tint); stroke(C.line, 0.25); pdf.roundedRect(M, y, CW, h, 2.4, 2.4, 'FD');
+      fill(C[cd.tone] || C.primary); pdf.roundedRect(M, y, 1.8, h, 0.9, 0.9, 'F');
+      font('bold', 12, C.deep); pdf.text(fit(cd.name, CW - 52, 12, 'bold'), M + 6, y + 8);
+      if (cd.price) { font('bold', 15, C.primary); pdf.text(T(cd.price), M + CW - 5, y + 8.4, { align: 'right' }); }
+      if (cd.sub) { font('normal', 8.6, C.muted); pdf.text(fit(cd.sub, CW - 12, 8.6), M + 6, y + 13.4); }
+      let cy = y + 18;
+      lines.forEach((ls, i) => {
+        const sub2 = cd.nested && i >= 1, bx = M + (sub2 ? 11 : 7.2);
+        fill(sub2 ? C.muted : C.primary); pdf.circle(bx, cy + 2.1, sub2 ? 0.7 : 0.9, 'F');
+        ls.forEach(l => { font('normal', 9.2, C.ink); pdf.text(l, bx + 3.4, cy + 3.1); cy += lh(9.2); });
+        cy += 1.2;
+      });
+      y += h + 4;
+    });
+    const hasContact = !!(B.contact && (B.contact.email || B.contact.phone || B.contact.website || B.contact.address));
+    if (hasContact) para(OFFER.footer, { size: 8.8, color: C.muted });
   }
 
   /* =============== NOTES =============== */
