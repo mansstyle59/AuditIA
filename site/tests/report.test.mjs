@@ -43,3 +43,16 @@ test('la couleur du score suit son étiquette (48 = « moyenne » = ambre, jamai
   const map = { 'Bonne visibilité': 'good', 'Visibilité moyenne': 'warn', 'Mauvaise visibilité': 'bad' };
   assert.equal(model.score.tone, map[model.score.label]);
 });
+
+test('la proposition reprend les actions du plan, sans promesse de résultat', async () => {
+  const { offerCards, OFFER } = await import('../src/settings/offer.js');
+  const cards = offerCards([{ title: 'Action A' }, { title: 'Action B' }, { title: 'C' }, { title: 'D' }, { title: 'E' }]);
+  assert.equal(cards.length, 3);
+  assert.equal(cards[1].price, '90 €');
+  assert.equal(cards[2].price, '20 €/mois');
+  assert.equal(cards[1].items.length, 1 + OFFER.visibility.maxActions);
+  assert.equal(offerCards([])[1].items.length, 1);
+  assert.equal(offerCards([], { enabled: false }).length, 0);
+  const texte = JSON.stringify(cards).toLowerCase();
+  assert.ok(!/garanti(?!e)|assur|à coup sûr|plus de clients|chiffre d’affaires/.test(texte.replace('aucun résultat n’est garanti', '')));
+});
