@@ -230,6 +230,15 @@ export function buildReportPdf(JsPDF, m) {
   if (m.score.value != null) para(`${m.meta.business} obtient ${m.score.value}/100 : ${m.score.label.toLowerCase()}.`, { size: 11.5, style: 'bold', gap: 2.4 });
   else para('Les données mesurées sont insuffisantes pour établir un score.', { size: 11, style: 'bold', gap: 2.4 });
   para('Trouvé sur Google (SEO) : les clients du coin vous voient-ils quand ils cherchent ? Recommandé par les assistants IA (GEO) : ChatGPT et les autres vous citent-ils ?', { size: 9, color: C.muted, gap: 3 });
+  /* Quatre cartes lisibles par un commerçant, tirées des catégories du diagnostic (aucune valeur inventée). */
+  const catScore = id => { const c = (m.criteria.categories || []).find(x => x.id === id); return c && c.score != null ? Math.round(c.score) : null; };
+  const catLab = v => v == null ? 'Non mesuré' : toneOf(v) === 'good' ? 'Solide' : toneOf(v) === 'warn' ? 'À consolider' : 'À renforcer';
+  if ((m.criteria.categories || []).length) {
+    tiles([['google', 'Fiche Google'], ['reputation', 'Avis'], ['website', 'Site mobile'], ['geo', 'Assistants IA']].map(([id, label]) => {
+      const v = catScore(id);
+      return { label, value: v != null ? v + '/100' : '-', sub: catLab(v), tone: toneOf(v) };
+    }));
+  }
   const brief = (title, list, color, empty) => {
     sub(title, 20);
     if (!list.length) { para(empty, { size: 9, color: C.muted }); return; }
