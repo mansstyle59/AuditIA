@@ -224,6 +224,23 @@ export function buildReportPdf(JsPDF, m) {
      que la fiche commerce se superpose au bandeau violet de la page 1. */
   newPage();
 
+  /* =============== EN BREF (page à montrer au commerçant) =============== */
+  section('En bref', 120);
+  if (m.score.value != null) para(`${m.meta.business} obtient ${m.score.value}/100 : ${m.score.label.toLowerCase()}.`, { size: 11.5, style: 'bold', gap: 2.4 });
+  else para('Les données mesurées sont insuffisantes pour établir un score.', { size: 11, style: 'bold', gap: 2.4 });
+  para('Trouvé sur Google (SEO) : les clients du coin vous voient-ils quand ils cherchent ? Recommandé par les assistants IA (GEO) : ChatGPT et les autres vous citent-ils ?', { size: 9, color: C.muted, gap: 3 });
+  const brief = (title, list, color, empty) => {
+    sub(title, 20);
+    if (!list.length) { para(empty, { size: 9, color: C.muted }); return; }
+    list.slice(0, 3).forEach(x => item({ label: x.label, text: x.text, color }));
+  };
+  brief('Ce qui va bien', m.strengths.items, C.good, 'Aucun point fort mesuré pour le moment.');
+  brief('Ce qu’il vous manque', m.weaknesses.items, C.bad, 'Aucun point faible mesuré.');
+  sub('Par où commencer', 20);
+  if (m.plan.length) m.plan.slice(0, 3).forEach(x => item({ label: `${x.n}. ${x.title}`, text: [x.detail, /\d/.test(x.effort || '') ? 'Temps estimé : ' + x.effort + '.' : ''].filter(Boolean).join(' '), color: C.primary }));
+  else para('Aucune action prioritaire à signaler.', { size: 9, color: C.muted });
+  para('Estimation basée sur des données publiques : elle ne garantit aucun résultat.', { size: 8.2, color: C.muted });
+
   /* =============== IDENTITÉ ET INFORMATIONS DU COMMERCE =============== */
   section('Fiche détaillée du commerce', 62);
   const bp = m.businessProfile || {};
