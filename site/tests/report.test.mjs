@@ -36,3 +36,10 @@ test('le modèle complet expose la fiche légale', () => {
   const model = buildReport(audit, client, [audit], now);
   assert.equal(model.businessProfile.legalStatus, 'matched');
 });
+
+test('la couleur du score suit son étiquette (48 = « moyenne » = ambre, jamais rouge)', () => {
+  const audit = { id: 'a2', status: 'Analysé', score: 48, createdAt: now.toISOString(), site: { pageRead: true, socials: [], directories: [] }, scan: null };
+  const model = buildReport(audit, client, [audit], now);
+  const map = { 'Bonne visibilité': 'good', 'Visibilité moyenne': 'warn', 'Mauvaise visibilité': 'bad' };
+  assert.equal(model.score.tone, map[model.score.label]);
+});

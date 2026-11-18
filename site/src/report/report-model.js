@@ -22,6 +22,8 @@ export function toneOf(v) {
   return n >= 75 ? 'good' : n >= 50 ? 'warn' : 'bad';
 }
 
+const SCORE_LABEL_TONE = { ok: 'good', mid: 'warn', bad: 'bad' };
+
 const pad = n => String(n).padStart(2, '0');
 const fmtLong = d => d ? d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
 const fmtShort = d => d ? `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}` : '';
@@ -252,7 +254,8 @@ export function buildReport(audit, client, allAudits = [], now = new Date()) {
       auditTitle: clean(audit.title),
     },
     score: {
-      value: scoreVal, label: an.label ? an.label.t : '', tone: toneOf(scoreVal), verdict: clean(an.verdict), range,
+      /* La couleur du score suit l'étiquette (mêmes seuils : 70 et 45), pour ne jamais afficher « moyenne » en rouge. */
+      value: scoreVal, label: an.label ? an.label.t : '', tone: scoreVal == null ? 'none' : an.label && SCORE_LABEL_TONE[an.label.c] || toneOf(scoreVal), verdict: clean(an.verdict), range,
       coverage: diag.coverage, measured: diag.measuredCount, total: diag.totalCount,
     },
     pillars: { seo: { ...pillar(diag.seo), total: countOf('seo') }, geo: { ...pillar(diag.geo), total: countOf('geo') } },
