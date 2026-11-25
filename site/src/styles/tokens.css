@@ -1,72 +1,110 @@
-/* AuditIA — design system v3 : palette AuditIA d'origine, affinée avec les accents FormIA.
-   Contraste sombre conservé : les composants existants sont conçus pour ce thème. */
+/* AuditIA — design system v4 « pro » (novembre 2026).
+   Espace de travail : thème clair sobre (fonds blancs, encre violet nuit, accent violet), cohérent avec le rapport PDF.
+   Page publique et connexion (html[data-layout="auth"]) : thème sombre d'origine, redéfini plus bas.
+   Tous les composants lisent ces variables : changer une couleur ici la change partout. */
 :root {
-  /* Fonds : violet nuit */
-  --ds-bg-0: #12052B;
-  --ds-bg-1: #1A0838;
-  --ds-bg-2: #241048;
-  --ds-bg-3: #2F1760;
-  /* Surfaces : cartes sombres opaques */
-  --ds-surface: #2A1458;
-  --ds-surface-2: #341A6B;
-  --ds-surface-hi: #3F2280;
-  --ds-line: #5B35A8;
-  --ds-line-soft: #432487;
-  /* Accents violets/lavande */
-  --ds-primary: #8B5CF6;
-  --ds-primary-2: #A78BFA;
-  --ds-primary-deep: #6D3FE0;
-  --ds-lavender: #C4B5FD;
-  --ds-lavender-2: #DDD3FF;
-  --ds-glow: #A78BFA;
-  /* Texte clair sur fonds sombres */
-  --ds-text: #FFFFFF;
-  --ds-text-2: #E6DEFF;
-  --ds-muted: #CFC3F2;
+  /* Fonds */
+  --ds-bg-0: #F5F4FA;          /* fond de l'application */
+  --ds-bg-1: #FFFFFF;          /* en-têtes, barres */
+  --ds-bg-2: #F1EEF9;          /* zones secondaires */
+  --ds-bg-3: #E7E2F4;          /* pistes de barres, fonds neutres */
+  /* Surfaces */
+  --ds-surface: #FFFFFF;
+  --ds-surface-2: #F8F7FC;
+  --ds-surface-hi: #F1EDFC;
+  --ds-line: #DCD6EB;
+  --ds-line-soft: #E9E5F2;
+  /* Accents violets */
+  --ds-primary: #6D3FE0;
+  --ds-primary-2: #8B5CF6;
+  --ds-primary-deep: #5126C4;
+  --ds-lavender: #6D3FE0;      /* accent texte (liens, chevrons, surtitres) */
+  --ds-lavender-2: #5126C4;
+  --ds-glow: #8B5CF6;
+  --ds-accent-soft: #EFE9FE;   /* fond des éléments actifs */
+  /* Texte */
+  --ds-text: #1E1536;
+  --ds-text-2: #3E3557;
+  --ds-muted: #6A6283;
+  --ds-on-primary: #FFFFFF;
   --ds-on-light: #24104D;
   --ds-on-light-2: #4B3A7A;
-  /* États */
-  --ds-good: #34D399;
-  --ds-good-2: #22C55E;
-  --ds-warn: #FF9F3F;
-  --ds-danger: #FB7185;
-  --ds-ok-bg: #0F3B2E;   --ds-ok-fg: #D7FBEA;   --ds-ok-fg-2: #BFF5DD;
-  --ds-warn-bg: #3A2A0B; --ds-warn-fg: #FFE9B8; --ds-warn-fg-2: #FFD7A0;
-  --ds-err-bg: #4A1230;  --ds-err-fg: #FFE1E6;  --ds-err-fg-2: #FFC2CB;
-  --ds-on-good: #04210F; --ds-on-warn: #2B1C00;  --ds-on-danger: #3A0712;
-  /* Dégradés : thème sombre d'origine, accents violets maîtrisés */
-  --ds-grad-bg: linear-gradient(180deg, #1A0838 0%, #12052B 100%);
-  --ds-grad-hero: linear-gradient(135deg, #3A1B7E 0%, #2A1260 45%, #1A0838 100%);
-  --ds-grad-cta: linear-gradient(135deg, #A78BFA 0%, #8B5CF6 55%, #6D3FE0 100%);
+  /* États (texte et traits lisibles sur blanc) */
+  --ds-good: #15803D;
+  --ds-good-2: #16A34A;
+  --ds-warn: #B45309;
+  --ds-danger: #B91C1C;
+  --ds-ok-bg: #E3F5EA;   --ds-ok-fg: #14532D;   --ds-ok-fg-2: #15803D;
+  --ds-warn-bg: #FDF0DF; --ds-warn-fg: #7C2D12; --ds-warn-fg-2: #B45309;
+  --ds-err-bg: #FBE6E6;  --ds-err-fg: #7F1D1D;  --ds-err-fg-2: #B91C1C;
+  --ds-on-good: #14532D; --ds-on-warn: #7C2D12;  --ds-on-danger: #7F1D1D;
+  /* Dégradés : réservés aux bandeaux de marque */
+  --ds-grad-bg: linear-gradient(180deg, #F7F6FB 0%, #F3F1F9 100%);
+  --ds-grad-hero: linear-gradient(135deg, #2A1260 0%, #3A1B86 60%, #4B23A8 100%);
+  --ds-grad-cta: linear-gradient(135deg, #7C4DF0 0%, #6D3FE0 100%);
   --ds-grad-text: linear-gradient(90deg, #C9A8FF 0%, #E0B8FF 100%);
-  --ds-grad-banner: linear-gradient(120deg, #4B2399 0%, #6B35C8 55%, #5A2DB3 100%);
+  --ds-grad-banner: linear-gradient(120deg, #F1EDFC 0%, #EAE3FD 100%);
+  /* Bandeau de marque (barre latérale, bandeau d'accueil) */
+  --ds-brand-bg: #1C0F3F;
+  --ds-brand-bg-2: #2A1660;
+  --ds-brand-line: #3A2577;
+  --ds-brand-text: #FFFFFF;
+  --ds-brand-muted: #B9AEDB;
   /* Espacements */
   --ds-s-1: 4px;  --ds-s-2: 8px;  --ds-s-3: 12px; --ds-s-4: 16px;
   --ds-s-5: 20px; --ds-s-6: 24px; --ds-s-8: 32px; --ds-s-10: 40px;
   --ds-s-12: 48px; --ds-s-16: 64px;
-  /* Rayons d'origine */
-  --ds-r-sm: 12px; --ds-r-md: 18px; --ds-r-lg: 24px; --ds-r-xl: 32px; --ds-r-pill: 999px;
+  /* Rayons : plus sobres */
+  --ds-r-sm: 8px; --ds-r-md: 12px; --ds-r-lg: 16px; --ds-r-xl: 24px; --ds-r-pill: 999px; --ds-r-btn: 10px;
   /* Typographie */
-  --ds-font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Inter, "Helvetica Neue", Arial, sans-serif;
+  --ds-font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Inter, "Helvetica Neue", Arial, sans-serif;
   --ds-fs-xs: 0.8125rem;
   --ds-fs-sm: 0.9375rem;
   --ds-fs-md: 1rem;
   --ds-fs-lg: 1.125rem;
-  --ds-fs-h3: 1.25rem;
-  --ds-fs-h2: clamp(1.5rem, 1.1rem + 1.8vw, 2.125rem);
-  --ds-fs-h1: clamp(2rem, 1.4rem + 3vw, 3.75rem);
-  /* Ombres thème sombre */
-  --ds-shadow-card: 0 10px 28px rgba(8, 2, 24, 0.45);
-  --ds-shadow-glow: 0 10px 30px rgba(139, 92, 246, 0.32);
-  --ds-shadow-nav: 0 12px 32px rgba(8, 2, 24, 0.6);
+  --ds-fs-h3: 1.125rem;
+  --ds-fs-h2: clamp(1.375rem, 1.15rem + 1vw, 1.75rem);
+  --ds-fs-h1: clamp(1.625rem, 1.3rem + 1.2vw, 2.125rem);
+  /* Ombres légères */
+  --ds-shadow-card: 0 1px 2px rgba(30, 21, 54, 0.04), 0 1px 1px rgba(30, 21, 54, 0.03);
+  --ds-shadow-glow: 0 1px 2px rgba(81, 38, 196, 0.25);
+  --ds-shadow-nav: 0 -1px 0 rgba(30, 21, 54, 0.04), 0 -6px 18px rgba(30, 21, 54, 0.06);
+  --ds-shadow-pop: 0 10px 30px rgba(30, 21, 54, 0.12);
   /* Tailles d'interface */
-  --ds-touch: 48px;
-  --ds-header-h: 64px;
-  --ds-tabbar-h: 68px;
-  --ds-container: 1240px;
+  --ds-touch: 44px;
+  --ds-header-h: 56px;
+  --ds-tabbar-h: 64px;
+  --ds-container: 1200px;
   /* Zones de sécurité iOS */
   --ds-safe-top: env(safe-area-inset-top, 0px);
   --ds-safe-right: env(safe-area-inset-right, 0px);
   --ds-safe-bottom: env(safe-area-inset-bottom, 0px);
   --ds-safe-left: env(safe-area-inset-left, 0px);
+}
+
+/* Page publique et connexion : thème sombre d'origine (vitrine marketing). */
+html[data-layout="auth"] {
+  --ds-bg-0: #12052B; --ds-bg-1: #1A0838; --ds-bg-2: #241048; --ds-bg-3: #2F1760;
+  --ds-surface: #2A1458; --ds-surface-2: #341A6B; --ds-surface-hi: #3F2280;
+  --ds-line: #5B35A8; --ds-line-soft: #432487;
+  --ds-primary: #8B5CF6; --ds-primary-2: #A78BFA; --ds-primary-deep: #6D3FE0;
+  --ds-lavender: #C4B5FD; --ds-lavender-2: #DDD3FF; --ds-glow: #A78BFA; --ds-accent-soft: #3F2280;
+  --ds-text: #FFFFFF; --ds-text-2: #E6DEFF; --ds-muted: #CFC3F2;
+  --ds-good: #34D399; --ds-good-2: #22C55E; --ds-warn: #FF9F3F; --ds-danger: #FB7185;
+  --ds-ok-bg: #0F3B2E;   --ds-ok-fg: #D7FBEA;   --ds-ok-fg-2: #BFF5DD;
+  --ds-warn-bg: #3A2A0B; --ds-warn-fg: #FFE9B8; --ds-warn-fg-2: #FFD7A0;
+  --ds-err-bg: #4A1230;  --ds-err-fg: #FFE1E6;  --ds-err-fg-2: #FFC2CB;
+  --ds-on-good: #04210F; --ds-on-warn: #2B1C00;  --ds-on-danger: #3A0712;
+  --ds-grad-bg: linear-gradient(180deg, #1A0838 0%, #12052B 100%);
+  --ds-grad-hero: linear-gradient(135deg, #3A1B7E 0%, #2A1260 45%, #1A0838 100%);
+  --ds-grad-cta: linear-gradient(135deg, #A78BFA 0%, #8B5CF6 55%, #6D3FE0 100%);
+  --ds-grad-banner: linear-gradient(120deg, #4B2399 0%, #6B35C8 55%, #5A2DB3 100%);
+  --ds-r-sm: 12px; --ds-r-md: 18px; --ds-r-lg: 24px; --ds-r-xl: 32px; --ds-r-btn: 999px;
+  --ds-fs-h3: 1.25rem;
+  --ds-fs-h2: clamp(1.5rem, 1.1rem + 1.8vw, 2.125rem);
+  --ds-fs-h1: clamp(2rem, 1.4rem + 3vw, 3.75rem);
+  --ds-shadow-card: 0 10px 28px rgba(8, 2, 24, 0.45);
+  --ds-shadow-glow: 0 10px 30px rgba(139, 92, 246, 0.32);
+  --ds-shadow-nav: 0 12px 32px rgba(8, 2, 24, 0.6);
+  --ds-touch: 48px; --ds-header-h: 64px; --ds-tabbar-h: 68px; --ds-container: 1240px;
 }

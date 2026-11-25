@@ -1,33 +1,42 @@
 /* AuditIA — coquille mobile (iPhone et Android, < 900 px).
-   Navigation fixe en bas, en-tête opaque, zones de sécurité iOS gérées une seule fois. */
+   En-tête blanc opaque (texte de la barre d'état iOS lisible), navigation fixe en bas,
+   zones de sécurité iOS gérées une seule fois ici. Aucun flou, filtre ni transparence. */
 @media (max-width: 899.98px) {
+  html[data-layout="mobile"], html[data-layout="mobile"] body { background: var(--ds-bg-0); }
   .ds-mobile {
     display: flex; flex-direction: column;
     min-height: 100vh; min-height: 100dvh;
     max-width: 100%; overflow-x: clip;
   }
 
-  /* En-tête : opaque, collé en haut, la zone de l'heure est gérée par --ds-safe-top */
+  /* En-tête : opaque, collé en haut ; la zone de l'heure est gérée par --ds-safe-top */
   .ds-m-header {
     position: sticky; top: 0; z-index: 40;
-    display: flex; flex-direction: column; justify-content: flex-end; gap: 2px;
-    padding: calc(var(--ds-safe-top) + var(--ds-s-3)) var(--ds-s-4) var(--ds-s-3);
+    display: flex; flex-direction: column; justify-content: flex-end; gap: 0;
+    padding: calc(var(--ds-safe-top) + var(--ds-s-3)) max(var(--ds-s-4), var(--ds-safe-left)) var(--ds-s-3) max(var(--ds-s-4), var(--ds-safe-right));
     min-height: var(--ds-header-h);
     background: var(--ds-bg-1);
     border-bottom: 1px solid var(--ds-line-soft);
   }
-  .ds-m-brand { font-size: var(--ds-fs-xs); font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--ds-lavender); }
-  .ds-m-title { font-size: var(--ds-fs-h2); font-weight: 800; }
+  .ds-m-brand { display: flex; align-items: center; gap: 6px; font-size: 0.6875rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--ds-primary); }
+  .ds-m-brand::before { content: ""; width: 8px; height: 8px; border-radius: 2px; background: var(--ds-brand, var(--ds-primary)); }
+  .ds-m-title { font-size: 1.375rem; font-weight: 750; letter-spacing: -0.02em; color: var(--ds-text); }
 
   /* Contenu : réserve la place de la barre du bas + zone de sécurité */
   .ds-m-main {
     flex: 1 1 auto; min-width: 0;
-    padding: var(--ds-s-4) var(--ds-s-4) calc(var(--ds-tabbar-h) + var(--ds-safe-bottom) + var(--ds-s-8));
+    padding: var(--ds-s-4) max(var(--ds-s-4), var(--ds-safe-left)) calc(var(--ds-tabbar-h) + var(--ds-safe-bottom) + var(--ds-s-8)) max(var(--ds-s-4), var(--ds-safe-right));
   }
   .ds-m-main > * + * { margin-top: var(--ds-s-4); }
   .ds-m-main .ds-section-title { margin-top: var(--ds-s-6); }
-  .ds-m-main .ds-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ds-m-main .ds-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--ds-s-3); }
   .ds-m-main .ds-stat__value { font-size: 1.5rem; }
+  .ds-m-main .ds-card { padding: var(--ds-s-4); }
+  .ds-m-main .ds-row { min-height: 56px; }
+  .ds-m-main .ds-row--btn { align-items: center; }
+  .ds-m-main .ds-row__title { overflow-wrap: anywhere; }
+  .ds-m-main .ds-detail-kpis .ds-stat__value { font-size: 1.25rem; }
+  .ds-m-main .ds-section-title { flex-wrap: wrap; }
 
   /* Barre de navigation fixe en bas : opaque, zone de sécurité inférieure incluse */
   .ds-m-tabbar {
@@ -35,89 +44,35 @@
     display: grid; grid-template-columns: repeat(5, minmax(0, 1fr));
     height: calc(var(--ds-tabbar-h) + var(--ds-safe-bottom));
     padding: 0 var(--ds-safe-right) var(--ds-safe-bottom) var(--ds-safe-left);
-    background: var(--ds-bg-2);
-    border-top: 1px solid var(--ds-line);
+    background: var(--ds-bg-1);
+    border-top: 1px solid var(--ds-line-soft);
     box-shadow: var(--ds-shadow-nav);
   }
   .ds-m-tab {
-    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+    position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
     min-height: var(--ds-touch); padding: var(--ds-s-2) 2px;
     border: 0; background: transparent; color: var(--ds-muted);
-    font-size: var(--ds-fs-xs); font-weight: 600; line-height: 1.1;
+    font-size: 0.6875rem; font-weight: 600; line-height: 1.1;
   }
-  .ds-m-tab.is-active { color: var(--ds-text); }
-  .ds-m-tab.is-active .ds-icon { color: var(--ds-lavender); }
-  .ds-m-tab:active { background: var(--ds-surface); }
+  .ds-m-tab .ds-icon { width: 22px; height: 22px; }
+  .ds-m-tab.is-active { color: var(--ds-primary); }
+  .ds-m-tab.is-active::before { content: ""; position: absolute; top: 0; left: 30%; right: 30%; height: 2px; border-radius: 0 0 2px 2px; background: var(--ds-primary); }
+  .ds-m-tab:active { background: var(--ds-surface-2); }
 
-  /* Stat-cards compactes sur petit écran */
-  .ds-m-main .ds-card { padding: var(--ds-s-4); }
-  .ds-m-main .ds-row { min-height: 56px; }
-
-  /* Lot 2 : listes et fiches en une colonne ; le texte long passe à la ligne */
-  .ds-m-main .ds-row--btn { align-items: center; }
-  .ds-m-main .ds-row__title { overflow-wrap: anywhere; }
-  .ds-m-main .ds-detail-kpis .ds-stat__value { font-size: 1.25rem; }
-  .ds-m-main .ds-section-title { flex-wrap: wrap; }
-}
-
-@media (max-width: 899.98px) {
-  /* Lot 3 : boutons pleine largeur dans les cartes de résultat, onglets compacts */
+  /* Prospects : boutons pleine largeur dans les cartes de résultat, onglets compacts */
   .ds-place__actions .ds-btn, .ds-psearch .ds-d-actions .ds-btn { flex: 1 1 100%; }
   .ds-seg__btn { font-size: var(--ds-fs-xs); }
-}
 
-/* Lot 4 : audits — iPhone et petits écrans */
-@media (max-width: 899.98px) {
+  /* Audits */
   .ds-live__name { font-size: var(--ds-fs-lg); }
   .ds-src { grid-template-columns: 28px minmax(0, 1fr); }
   .ds-src__state { grid-column: 2; }
-  .ds-ring { width: 112px; height: 112px; }
+  .ds-ring { width: 104px; height: 104px; }
   .ds-gauges { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .ds-banner .ds-btn { min-height: var(--ds-touch); }
-  .ds-dossier-head .ds-d-actions .ds-btn { flex: 1 1 100%; }
-  .ds-audit-row__act .ds-btn { min-height: 44px; }
-}
-
-
-/* Correctif iOS : bande supérieure opaque et texte net (nouvelle-interface). */
-@media (max-width: 899.98px) {
-  html {
-    background: #12052B;
-  }
-  body {
-    background-color: #12052B;
-    background-image: none;
-  }
-  .ds-mobile {
-    position: relative;
-    isolation: isolate;
-    padding-top: 0;
-  }
-  .ds-m-header {
-    top: 0;
-    padding-top: calc(env(safe-area-inset-top, 0px) + 12px);
-    background: #12052B;
-    background-color: #12052B;
-    background-image: none;
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-    filter: none;
-    transform: none;
-    opacity: 1;
-  }
-  .ds-m-brand,
-  .ds-m-title {
-    filter: none;
-    -webkit-filter: none;
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-    opacity: 1;
-    transform: none;
-    text-shadow: none;
-    -webkit-font-smoothing: antialiased;
-  }
-  .ds-m-brand {
-    color: #C4B5FD;
-    text-rendering: geometricPrecision;
-  }
+  .ds-audit-row__act .ds-btn { min-height: 40px; }
+  /* Dossier : action principale pleine largeur, actions secondaires en grille compacte */
+  .ds-dossier-head .ds-d-actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--ds-s-2); }
+  .ds-dossier-head .ds-d-actions .ds-btn { padding-inline: var(--ds-s-2); font-size: var(--ds-fs-xs); white-space: normal; }
+  .ds-dossier-head .ds-d-actions .ds-btn--primary { grid-column: 1 / -1; font-size: var(--ds-fs-sm); }
 }

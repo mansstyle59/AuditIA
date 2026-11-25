@@ -143,21 +143,24 @@
 .ds-l-tab.is-active { color: var(--ds-text); }
 .ds-l-tab.is-active .ds-icon { color: var(--ds-lavender); }
 
-/* ---------- Bandeau illustré de l'espace connecté ---------- */
+/* ---------- Bandeau d'accueil de l'espace connecté (couleurs de marque, opaque) ---------- */
 .ds-hero {
-  display: grid; gap: var(--ds-s-4); padding: var(--ds-s-5); border-radius: var(--ds-r-xl);
-  background:
-    radial-gradient(520px 320px at 90% 0%, rgba(168, 85, 247, .38), transparent 65%),
-    var(--ds-grad-hero);
-  border: 1px solid var(--ds-line); box-shadow: var(--ds-shadow-card); overflow: hidden;
+  display: grid; gap: var(--ds-s-4); padding: var(--ds-s-5); border-radius: var(--ds-r-lg);
+  background: var(--ds-brand-bg); color: var(--ds-brand-text);
+  border: 1px solid var(--ds-brand-line); overflow: hidden; position: relative;
 }
-.ds-hero__text { display: grid; gap: var(--ds-s-3); align-content: center; min-width: 0; }
-.ds-hero__title { font-size: var(--ds-fs-h2); font-weight: 800; line-height: 1.12; }
-.ds-hero__lead { color: var(--ds-text-2); }
-.ds-hero__actions { display: flex; flex-wrap: wrap; gap: var(--ds-s-3); }
+.ds-hero::after { content: ""; position: absolute; right: -70px; top: -90px; width: 260px; height: 260px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, .08); box-shadow: 0 0 0 34px rgba(255, 255, 255, .025); pointer-events: none; }
+.ds-hero__text { display: grid; gap: var(--ds-s-2); align-content: center; min-width: 0; position: relative; z-index: 1; }
+.ds-hero__kicker { font-size: 0.6875rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: #C4B5FD; }
+.ds-hero__title { font-size: var(--ds-fs-h2); font-weight: 750; line-height: 1.15; color: var(--ds-brand-text); }
+.ds-hero__lead { color: var(--ds-brand-muted); font-size: var(--ds-fs-sm); max-width: 52ch; }
+.ds-hero__actions { display: flex; flex-wrap: wrap; gap: var(--ds-s-2); position: relative; z-index: 1; }
 .ds-hero__actions .ds-btn { flex: 1 1 150px; }
-.ds-hero__visual { min-width: 0; }
-.ds-hero .ds-ill--phone { max-width: 200px; }
+.ds-hero__actions .ds-btn:not(.ds-btn--primary) { background: transparent; color: var(--ds-brand-text); border-color: var(--ds-brand-line); box-shadow: none; }
+.ds-hero__actions .ds-btn:not(.ds-btn--primary):hover { background: var(--ds-brand-bg-2); border-color: #6F5AB8; }
+.ds-hero__actions .ds-btn--primary { background: #FFFFFF; color: var(--ds-brand-bg); border-color: #FFFFFF; }
+.ds-hero__actions .ds-btn--primary:hover { background: #EFE9FE; border-color: #EFE9FE; }
+.ds-hero .ds-btn:focus-visible { outline-color: #C4B5FD; }
 
 /* Très petit écran : image de la carte rapport masquée pour éviter tout débordement */
 @media (max-width: 379.98px) {
@@ -191,9 +194,7 @@
   .ds-l-banner .ds-btn { width: auto; }
   .ds-l-login { padding-block: var(--ds-s-12); }
 
-  .ds-hero { grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); align-items: center; gap: var(--ds-s-8); padding: var(--ds-s-8); }
-  .ds-hero .ds-ill--laptop { display: block; }
-  .ds-hero .ds-ill--phone { display: none; }
+  .ds-hero { grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: var(--ds-s-6); padding: var(--ds-s-6) var(--ds-s-8); }
   .ds-hero__actions .ds-btn { flex: 0 0 auto; }
 }
 @media (min-width: 1100px) {

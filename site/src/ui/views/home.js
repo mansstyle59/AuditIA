@@ -80,15 +80,11 @@ export function homeDesktop(data) {
   const s = homeStats(data.clients, data.audits);
   if (!s.clientCount && !s.auditCount) return welcome();
   const prio = priorityRows(data);
-  return `${heroBand()}
-    <div class="ds-d-toolbar">
-      <p class="ds-row__meta">Vue d'ensemble de votre activité</p>
-      <div class="ds-d-actions">${btn({ label: 'Actualiser', attrs: 'data-reload' })}${btn({ label: 'Voir les commerces', variant: 'primary', attrs: 'data-nav="clients"' })}</div>
-    </div>
+  return `${heroBand({ withReload: true })}
     <div class="ds-grid ds-d-kpis">${kpis(s)}</div>
     <div class="ds-d-split">
       <div class="ds-d-stack">
-        ${card({ title: 'Derniers audits', body: auditRows(s.latest, data.clients, 'Aucun audit pour le moment.') })}
+        ${card({ title: 'Derniers audits', actions: btn({ label: 'Voir les commerces', attrs: 'data-nav="clients"' }), body: auditRows(s.latest, data.clients, 'Aucun audit pour le moment.') })}
       </div>
       <div class="ds-d-stack">
         ${prio ? card({ title: 'À améliorer en priorité', body: prio }) : ''}
