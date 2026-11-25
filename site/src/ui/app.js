@@ -81,7 +81,7 @@ const auth = createAuthService({ getClient: getAuthClient, redirectUrl: REDIRECT
 /* ---------- Écrans de connexion ---------- */
 function showAuth(mode, msg = '', kind = 'error') {
   root.innerHTML = authScreen(mode, msg, kind);
-  document.documentElement.dataset.layout = 'auth';
+  setLayout('auth');
   window.scrollTo(0, 0);
   if (mode === 'signin') {
     // Page d'accueil publique : pas de focus automatique (le clavier iPhone masquerait la page) ;
@@ -109,6 +109,14 @@ function busy(btn, on, label) {
 }
 
 const val = id => (document.getElementById(id)?.value || '').trim();
+
+/* Thème de la page : sombre pour l'accueil public et la connexion, clair pour l'espace de travail.
+   La couleur de la barre du navigateur suit l'en-tête affiché (blanc ou violet nuit). */
+function setLayout(name) {
+  document.documentElement.dataset.layout = name;
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute('content', name === 'auth' ? '#1A0838' : '#FFFFFF');
+}
 
 /* ---------- Espace protégé ---------- */
 function placeholder() {
@@ -151,7 +159,7 @@ function renderWorkspace() {
   root.innerHTML = isWide
     ? desktopShell({ ...params, account: { email: state.user.email || '' } })
     : mobileShell(params);
-  document.documentElement.dataset.layout = isWide ? 'desktop' : 'mobile';
+  setLayout(isWide ? 'desktop' : 'mobile');
   paintBrand(state.brand, root);
   if (state.view === 'prospects' && state.data.status === 'ready') search.mounted();
 }
@@ -309,7 +317,7 @@ wide.addEventListener('change', () => { if (state.user) renderWorkspace(); });
 /* ---------- Démarrage ---------- */
 async function boot() {
   root.innerHTML = authLoading();
-  document.documentElement.dataset.layout = 'auth';
+  setLayout('auth');
   try {
     await getAuthClient();
     const link = parseAuthLink(location.hash, location.search);

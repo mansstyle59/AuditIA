@@ -1,16 +1,15 @@
-// AuditIA — bandeau d'accueil illustré de l'espace connecté (laptop sur ordinateur, smartphone sur mobile).
-// Illustrations : exemples fictifs de démonstration ; les chiffres réels sont dans les cartes juste en dessous.
+// AuditIA — bandeau d'accueil de l'espace connecté : sobre, aux couleurs de la marque, sans illustration fictive.
 import { btn } from '../components/ui.js';
-import { laptopSvg, phoneSvg } from '../illustrations.js';
 
-export function heroBand() {
+export function heroBand({ withReload = false } = {}) {
+  const h = new Date().getHours();
+  const hello = h < 5 || h >= 18 ? 'Bonsoir' : 'Bonjour';
   return `<section class="ds-hero" aria-label="Présentation">
     <div class="ds-hero__text">
-      <p class="ds-l-badge"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c.6 5.2 3.2 7.8 8.4 8.4-5.2.6-7.8 3.2-8.4 8.4-.6-5.2-3.2-7.8-8.4-8.4C8.8 10.8 11.4 8.2 12 3z" fill="currentColor"/></svg>Votre espace AuditIA</p>
-      <h2 class="ds-hero__title">Suivez la visibilité de vos <span class="ds-l-grad">commerces</span></h2>
-      <p class="ds-hero__lead">Retrouvez vos clients, lancez un audit complet et remettez un rapport PDF professionnel.</p>
-      <div class="ds-hero__actions">${btn({ label: 'Trouver des commerces', variant: 'primary', attrs: 'data-nav="prospects"' })}${btn({ label: 'Voir les audits', attrs: 'data-nav="audits"' })}</div>
+      <p class="ds-hero__kicker">Espace de travail</p>
+      <h2 class="ds-hero__title">${hello}, prêt à auditer&nbsp;?</h2>
+      <p class="ds-hero__lead">Trouvez un commerce, lancez un audit complet et remettez un rapport PDF professionnel.</p>
     </div>
-    <div class="ds-hero__visual" aria-hidden="false">${laptopSvg()}${phoneSvg()}<p class="ds-l-caption">Illustration de démonstration — exemple fictif</p></div>
+    <div class="ds-hero__actions">${btn({ label: 'Trouver des commerces', variant: 'primary', attrs: 'data-nav="prospects"' })}${btn({ label: 'Voir les audits', attrs: 'data-nav="audits"' })}${withReload ? btn({ label: 'Actualiser', attrs: 'data-reload' }) : ''}</div>
   </section>`;
 }
